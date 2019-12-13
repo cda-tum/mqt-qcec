@@ -1,0 +1,216 @@
+.version 2.0
+.numvars 25
+.variables x0 x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 x11 x12 x13 x14 x15 x16 x17 x18 x19 x20 x21 x22 x23 x24 
+.inputs x0 x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 x11 x12 x13 x14 x15 x16 x17 x18 x19 x20 x21 x22 x23 x24 
+.outputs x0 x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 x11 x12 x13 x14 x15 x16 x17 x18 x19 x20 x21 x22 x23 x24 
+.constants -------------------------
+.garbage -------------------------
+.begin
+t2 x11 x13
+h1 x13
+t2 x12 x13
+q1:-4 x13
+t2 x11 x13
+q1:4 x13
+t2 x12 x13
+q1:-4 x13
+t2 x11 x13
+q1:4 x12
+q1:4 x13
+h1 x13
+t2 x11 x12
+q1:4 x11
+q1:-4 x12
+t2 x11 x12
+t2 x12 x13
+t2 x10 x14
+h1 x14
+t2 x13 x14
+q1:-4 x14
+t2 x10 x14
+q1:4 x14
+t2 x13 x14
+q1:-4 x14
+t2 x10 x14
+q1:4 x13
+q1:4 x14
+h1 x14
+t2 x10 x13
+q1:4 x10
+q1:-4 x13
+t2 x10 x13
+t2 x13 x14
+t2 x9 x15
+h1 x15
+t2 x14 x15
+q1:-4 x15
+t2 x9 x15
+q1:4 x15
+t2 x14 x15
+q1:-4 x15
+t2 x9 x15
+q1:4 x14
+q1:4 x15
+h1 x15
+t2 x9 x14
+q1:4 x9
+q1:-4 x14
+t2 x9 x14
+t2 x14 x15
+t2 x8 x16
+h1 x16
+t2 x15 x16
+q1:-4 x16
+t2 x8 x16
+q1:4 x16
+t2 x15 x16
+q1:-4 x16
+t2 x8 x16
+q1:4 x15
+q1:4 x16
+h1 x16
+t2 x8 x15
+q1:4 x8
+q1:-4 x15
+t2 x8 x15
+t2 x15 x16
+t2 x7 x17
+h1 x17
+t2 x16 x17
+q1:-4 x17
+t2 x7 x17
+q1:4 x17
+t2 x16 x17
+q1:-4 x17
+t2 x7 x17
+q1:4 x16
+q1:4 x17
+h1 x17
+t2 x7 x16
+q1:4 x7
+q1:-4 x16
+t2 x7 x16
+t2 x16 x17
+h1 x18
+t2 x17 x18
+q1:-4 x18
+t2 x6 x18
+q1:4 x18
+t2 x17 x18
+q1:-4 x18
+t2 x6 x18
+q1:4 x17
+q1:4 x18
+h1 x18
+t2 x6 x17
+q1:4 x6
+q1:-4 x17
+t2 x6 x17
+h1 x19
+t2 x18 x19
+q1:-4 x19
+t2 x5 x19
+q1:4 x19
+t2 x18 x19
+q1:-4 x19
+t2 x5 x19
+q1:4 x18
+q1:4 x19
+h1 x19
+t2 x5 x18
+q1:4 x5
+q1:-4 x18
+t2 x5 x18
+h1 x20
+t2 x19 x20
+q1:-4 x20
+t2 x4 x20
+q1:4 x20
+t2 x19 x20
+q1:-4 x20
+t2 x4 x20
+q1:4 x19
+q1:4 x20
+h1 x20
+t2 x4 x19
+q1:4 x4
+q1:-4 x19
+t2 x4 x19
+h1 x21
+t2 x20 x21
+q1:-4 x21
+t2 x3 x21
+q1:4 x21
+t2 x20 x21
+q1:-4 x21
+t2 x3 x21
+q1:4 x20
+q1:4 x21
+h1 x21
+t2 x3 x20
+q1:4 x3
+q1:-4 x20
+t2 x3 x20
+h1 x22
+t2 x21 x22
+q1:-4 x22
+t2 x2 x22
+q1:4 x22
+t2 x21 x22
+q1:-4 x22
+t2 x2 x22
+q1:4 x21
+q1:4 x22
+h1 x22
+t2 x2 x21
+q1:4 x2
+q1:-4 x21
+t2 x2 x21
+h1 x23
+t2 x22 x23
+q1:-4 x23
+t2 x1 x23
+q1:4 x23
+t2 x22 x23
+q1:-4 x23
+t2 x1 x23
+q1:4 x22
+q1:4 x23
+h1 x23
+t2 x1 x22
+q1:4 x1
+q1:-4 x22
+t2 x1 x22
+t2 x0 x23
+t1 x23
+t2 x1 x22
+t1 x22
+t2 x2 x21
+t1 x21
+t2 x3 x20
+t1 x20
+t2 x4 x19
+t1 x19
+t2 x5 x18
+t1 x18
+t2 x6 x17
+t1 x17
+t2 x7 x16
+t1 x16
+t2 x8 x15
+t1 x15
+t2 x9 x14
+t1 x14
+t2 x10 x13
+t1 x13
+t2 x11 x24
+t2 x12 x24
+t1 x23
+t1 x22
+t1 x21
+t1 x20
+t1 x19
+t1 x18
+t1 x17
+t1 x12
+.end

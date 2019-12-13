@@ -1,0 +1,753 @@
+.version 2.0
+.numvars 28
+.variables x0 x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 x11 x12 x13 x14 x15 x16 x17 x18 x19 x20 x21 x22 x23 x24 x25 x26 x27 
+.inputs x0 x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 x11 x12 x13 x14 x15 x16 x17 x18 x19 x20 x21 x22 x23 x24 x25 x26 x27 
+.outputs x0 x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 x11 x12 x13 x14 x15 x16 x17 x18 x19 x20 x21 x22 x23 x24 x25 x26 x27 
+.constants ----------------------------
+.garbage ----------------------------
+.begin
+t2 x4 x5
+h1 x5
+t2 x4 x5
+q1:-4 x5
+t2 x0 x5
+q1:4 x5
+t2 x4 x5
+q1:-4 x5
+t2 x0 x5
+q1:4 x4
+q1:4 x5
+h1 x5
+t2 x0 x4
+q1:4 x0
+q1:-4 x4
+t2 x0 x4
+t2 x0 x5
+t2 x3 x6
+h1 x6
+t2 x5 x6
+q1:-4 x6
+t2 x3 x6
+q1:4 x6
+t2 x5 x6
+q1:-4 x6
+t2 x3 x6
+q1:4 x5
+q1:4 x6
+h1 x6
+t2 x3 x5
+q1:4 x3
+q1:-4 x5
+t2 x3 x5
+t2 x5 x6
+h1 x7
+t2 x4 x7
+q1:-4 x7
+t2 x0 x7
+q1:4 x7
+t2 x4 x7
+q1:-4 x7
+t2 x0 x7
+q1:4 x4
+q1:4 x7
+h1 x7
+t2 x0 x4
+q1:4 x0
+q1:-4 x4
+t2 x0 x4
+t2 x3 x8
+t2 x7 x8
+t1 x8
+h1 x6
+t2 x8 x6
+q1:-4 x6
+t2 x1 x6
+q1:4 x6
+t2 x8 x6
+q1:-4 x6
+t2 x1 x6
+q1:4 x8
+q1:4 x6
+h1 x6
+t2 x1 x8
+q1:4 x1
+q1:-4 x8
+t2 x1 x8
+h1 x8
+t2 x6 x8
+q1:-4 x8
+t2 x1 x8
+q1:4 x8
+t2 x6 x8
+q1:-4 x8
+t2 x1 x8
+q1:4 x6
+q1:4 x8
+h1 x8
+t2 x1 x6
+q1:4 x1
+q1:-4 x6
+t2 x1 x6
+t2 x4 x9
+t2 x0 x9
+h1 x10
+t2 x9 x10
+q1:-4 x10
+t2 x3 x10
+q1:4 x10
+t2 x9 x10
+q1:-4 x10
+t2 x3 x10
+q1:4 x9
+q1:4 x10
+h1 x10
+t2 x3 x9
+q1:4 x3
+q1:-4 x9
+t2 x3 x9
+h1 x11
+t2 x4 x11
+q1:-4 x11
+t2 x0 x11
+q1:4 x11
+t2 x4 x11
+q1:-4 x11
+t2 x0 x11
+q1:4 x4
+q1:4 x11
+h1 x11
+t2 x0 x4
+q1:4 x0
+q1:-4 x4
+t2 x0 x4
+t2 x4 x11
+t2 x11 x12
+h1 x12
+t2 x9 x12
+q1:-4 x12
+t2 x3 x12
+q1:4 x12
+t2 x9 x12
+q1:-4 x12
+t2 x3 x12
+q1:4 x9
+q1:4 x12
+h1 x12
+t2 x3 x9
+q1:4 x3
+q1:-4 x9
+t2 x3 x9
+h1 x12
+t2 x11 x12
+q1:-4 x12
+t2 x3 x12
+q1:4 x12
+t2 x11 x12
+q1:-4 x12
+t2 x3 x12
+q1:4 x11
+q1:4 x12
+h1 x12
+t2 x3 x11
+q1:4 x3
+q1:-4 x11
+t2 x3 x11
+t2 x1 x13
+t2 x12 x13
+h1 x13
+t2 x10 x13
+q1:-4 x13
+t2 x1 x13
+q1:4 x13
+t2 x10 x13
+q1:-4 x13
+t2 x1 x13
+q1:4 x10
+q1:4 x13
+h1 x13
+t2 x1 x10
+q1:4 x1
+q1:-4 x10
+t2 x1 x10
+h1 x13
+t2 x12 x13
+q1:-4 x13
+t2 x1 x13
+q1:4 x13
+t2 x12 x13
+q1:-4 x13
+t2 x1 x13
+q1:4 x12
+q1:4 x13
+h1 x13
+t2 x1 x12
+q1:4 x1
+q1:-4 x12
+t2 x1 x12
+t2 x13 x8
+h1 x13
+t2 x8 x13
+q1:-4 x13
+t2 x2 x13
+q1:4 x13
+t2 x8 x13
+q1:-4 x13
+t2 x2 x13
+q1:4 x8
+q1:4 x13
+h1 x13
+t2 x2 x8
+q1:4 x2
+q1:-4 x8
+t2 x2 x8
+t2 x3 x14
+h1 x14
+t2 x7 x14
+q1:-4 x14
+t2 x3 x14
+q1:4 x14
+t2 x7 x14
+q1:-4 x14
+t2 x3 x14
+q1:4 x7
+q1:4 x14
+h1 x14
+t2 x3 x7
+q1:4 x3
+q1:-4 x7
+t2 x3 x7
+t2 x7 x14
+t2 x3 x15
+t2 x11 x15
+h1 x15
+t2 x5 x15
+q1:-4 x15
+t2 x3 x15
+q1:4 x15
+t2 x5 x15
+q1:-4 x15
+t2 x3 x15
+q1:4 x5
+q1:4 x15
+h1 x15
+t2 x3 x5
+q1:4 x3
+q1:-4 x5
+t2 x3 x5
+h1 x15
+t2 x11 x15
+q1:-4 x15
+t2 x3 x15
+q1:4 x15
+t2 x11 x15
+q1:-4 x15
+t2 x3 x15
+q1:4 x11
+q1:4 x15
+h1 x15
+t2 x3 x11
+q1:4 x3
+q1:-4 x11
+t2 x3 x11
+t2 x15 x16
+h1 x16
+t2 x14 x16
+q1:-4 x16
+t2 x1 x16
+q1:4 x16
+t2 x14 x16
+q1:-4 x16
+t2 x1 x16
+q1:4 x14
+q1:4 x16
+h1 x16
+t2 x1 x14
+q1:4 x1
+q1:-4 x14
+t2 x1 x14
+h1 x16
+t2 x15 x16
+q1:-4 x16
+t2 x1 x16
+q1:4 x16
+t2 x15 x16
+q1:-4 x16
+t2 x1 x16
+q1:4 x15
+q1:4 x16
+h1 x16
+t2 x1 x15
+q1:4 x1
+q1:-4 x15
+t2 x1 x15
+t2 x0 x17
+h1 x17
+t2 x4 x17
+q1:-4 x17
+t2 x3 x17
+q1:4 x17
+t2 x4 x17
+q1:-4 x17
+t2 x3 x17
+q1:4 x4
+q1:4 x17
+h1 x17
+t2 x3 x4
+q1:4 x3
+q1:-4 x4
+t2 x3 x4
+h1 x17
+t2 x3 x17
+q1:-4 x17
+t2 x0 x17
+q1:4 x17
+t2 x3 x17
+q1:-4 x17
+t2 x0 x17
+q1:4 x3
+q1:4 x17
+h1 x17
+t2 x0 x3
+q1:4 x0
+q1:-4 x3
+t2 x0 x3
+t2 x1 x18
+t2 x17 x18
+h1 x18
+t2 x12 x18
+q1:-4 x18
+t2 x1 x18
+q1:4 x18
+t2 x12 x18
+q1:-4 x18
+t2 x1 x18
+q1:4 x12
+q1:4 x18
+h1 x18
+t2 x1 x12
+q1:4 x1
+q1:-4 x12
+t2 x1 x12
+h1 x18
+t2 x17 x18
+q1:-4 x18
+t2 x1 x18
+q1:4 x18
+t2 x17 x18
+q1:-4 x18
+t2 x1 x18
+q1:4 x17
+q1:4 x18
+h1 x18
+t2 x1 x17
+q1:4 x1
+q1:-4 x17
+t2 x1 x17
+t1 x18
+h1 x16
+t2 x18 x16
+q1:-4 x16
+t2 x2 x16
+q1:4 x16
+t2 x18 x16
+q1:-4 x16
+t2 x2 x16
+q1:4 x18
+q1:4 x16
+h1 x16
+t2 x2 x18
+q1:4 x2
+q1:-4 x18
+t2 x2 x18
+h1 x18
+t2 x16 x18
+q1:-4 x18
+t2 x2 x18
+q1:4 x18
+t2 x16 x18
+q1:-4 x18
+t2 x2 x18
+q1:4 x16
+q1:4 x18
+h1 x18
+t2 x2 x16
+q1:4 x2
+q1:-4 x16
+t2 x2 x16
+t2 x17 x15
+h1 x17
+t2 x15 x17
+q1:-4 x17
+t2 x1 x17
+q1:4 x17
+t2 x15 x17
+q1:-4 x17
+t2 x1 x17
+q1:4 x15
+q1:4 x17
+h1 x17
+t2 x1 x15
+q1:4 x1
+q1:-4 x15
+t2 x1 x15
+t2 x11 x19
+h1 x19
+t2 x4 x19
+q1:-4 x19
+t2 x3 x19
+q1:4 x19
+t2 x4 x19
+q1:-4 x19
+t2 x3 x19
+q1:4 x4
+q1:4 x19
+h1 x19
+t2 x3 x4
+q1:4 x3
+q1:-4 x4
+t2 x3 x4
+h1 x19
+t2 x11 x19
+q1:-4 x19
+t2 x3 x19
+q1:4 x19
+t2 x11 x19
+q1:-4 x19
+t2 x3 x19
+q1:4 x11
+q1:4 x19
+h1 x19
+t2 x3 x11
+q1:4 x3
+q1:-4 x11
+t2 x3 x11
+t2 x7 x20
+h1 x20
+t2 x3 x20
+q1:-4 x20
+t2 x0 x20
+q1:4 x20
+t2 x3 x20
+q1:-4 x20
+t2 x0 x20
+q1:4 x3
+q1:4 x20
+h1 x20
+t2 x0 x3
+q1:4 x0
+q1:-4 x3
+t2 x0 x3
+h1 x20
+t2 x7 x20
+q1:-4 x20
+t2 x3 x20
+q1:4 x20
+t2 x7 x20
+q1:-4 x20
+t2 x3 x20
+q1:4 x7
+q1:4 x20
+h1 x20
+q1:4 x3
+q1:-4 x7
+t2 x3 x7
+t2 x20 x21
+h1 x21
+t2 x19 x21
+q1:-4 x21
+t2 x1 x21
+q1:4 x21
+t2 x19 x21
+q1:-4 x21
+t2 x1 x21
+q1:4 x19
+q1:4 x21
+h1 x21
+t2 x1 x19
+q1:4 x1
+q1:-4 x19
+t2 x1 x19
+h1 x21
+t2 x20 x21
+q1:-4 x21
+t2 x1 x21
+q1:4 x21
+t2 x20 x21
+q1:-4 x21
+t2 x1 x21
+q1:4 x20
+q1:4 x21
+h1 x21
+t2 x1 x20
+q1:4 x1
+q1:-4 x20
+t2 x1 x20
+t2 x21 x17
+h1 x21
+t2 x17 x21
+q1:-4 x21
+t2 x2 x21
+q1:4 x21
+t2 x17 x21
+q1:-4 x21
+t2 x2 x21
+q1:4 x17
+q1:4 x21
+h1 x21
+t2 x2 x17
+q1:4 x2
+q1:-4 x17
+t2 x2 x17
+t2 x9 x22
+h1 x22
+t2 x3 x22
+q1:-4 x22
+t2 x0 x22
+q1:4 x22
+t2 x3 x22
+q1:-4 x22
+t2 x0 x22
+q1:4 x3
+q1:4 x22
+h1 x22
+t2 x0 x3
+q1:4 x0
+q1:-4 x3
+t2 x0 x3
+h1 x22
+t2 x9 x22
+q1:-4 x22
+t2 x3 x22
+q1:4 x22
+t2 x9 x22
+q1:-4 x22
+t2 x3 x22
+q1:4 x9
+q1:4 x22
+h1 x22
+t2 x3 x9
+q1:4 x3
+q1:-4 x9
+t2 x3 x9
+t2 x22 x19
+h1 x22
+t2 x19 x22
+q1:-4 x22
+t2 x1 x22
+q1:4 x22
+t2 x19 x22
+q1:-4 x22
+t2 x1 x22
+q1:4 x19
+q1:4 x22
+h1 x22
+t2 x1 x19
+q1:4 x1
+q1:-4 x19
+t2 x1 x19
+t2 x5 x23
+h1 x23
+t2 x11 x23
+q1:-4 x23
+t2 x3 x23
+q1:4 x23
+t2 x11 x23
+q1:-4 x23
+t2 x3 x23
+q1:4 x11
+q1:4 x23
+h1 x23
+t2 x3 x11
+q1:4 x3
+q1:-4 x11
+t2 x3 x11
+h1 x23
+t2 x5 x23
+q1:-4 x23
+t2 x3 x23
+q1:4 x23
+t2 x5 x23
+q1:-4 x23
+t2 x3 x23
+q1:4 x5
+q1:4 x23
+h1 x23
+t2 x3 x5
+q1:4 x3
+q1:-4 x5
+t2 x3 x5
+h1 x24
+t2 x7 x24
+q1:-4 x24
+t2 x3 x24
+q1:4 x24
+t2 x7 x24
+q1:-4 x24
+t2 x3 x24
+q1:4 x7
+q1:4 x24
+h1 x24
+t2 x3 x7
+q1:4 x3
+q1:-4 x7
+t2 x3 x7
+t2 x24 x23
+h1 x24
+t2 x23 x24
+q1:-4 x24
+t2 x1 x24
+q1:4 x24
+t2 x23 x24
+q1:-4 x24
+t2 x1 x24
+q1:4 x23
+q1:4 x24
+h1 x24
+t2 x1 x23
+q1:4 x1
+q1:-4 x23
+t2 x1 x23
+t2 x24 x22
+h1 x24
+t2 x22 x24
+q1:-4 x24
+t2 x2 x24
+q1:4 x24
+t2 x22 x24
+q1:-4 x24
+t2 x2 x24
+q1:4 x22
+q1:4 x24
+h1 x24
+t2 x2 x22
+q1:4 x2
+q1:-4 x22
+t2 x2 x22
+h1 x25
+t2 x11 x25
+q1:-4 x25
+t2 x3 x25
+q1:4 x25
+t2 x11 x25
+q1:-4 x25
+t2 x3 x25
+q1:4 x11
+q1:4 x25
+h1 x25
+t2 x3 x11
+q1:4 x3
+q1:-4 x11
+t2 x3 x11
+t2 x3 x25
+t2 x3 x9
+t1 x9
+t2 x9 x25
+h1 x9
+t2 x25 x9
+q1:-4 x9
+t2 x1 x9
+q1:4 x9
+t2 x25 x9
+q1:-4 x9
+t2 x1 x9
+q1:4 x25
+q1:4 x9
+h1 x9
+t2 x1 x25
+q1:4 x1
+q1:-4 x25
+t2 x1 x25
+t2 x7 x26
+h1 x26
+t2 x5 x26
+t2 x3 x26
+q1:4 x26
+t2 x5 x26
+q1:-4 x26
+t2 x3 x26
+q1:4 x5
+q1:4 x26
+h1 x26
+t2 x3 x5
+q1:4 x3
+q1:-4 x5
+t2 x3 x5
+h1 x26
+t2 x7 x26
+q1:-4 x26
+t2 x3 x26
+q1:4 x26
+t2 x7 x26
+q1:-4 x26
+t2 x3 x26
+q1:4 x7
+q1:4 x26
+h1 x26
+t2 x3 x7
+q1:4 x3
+q1:-4 x7
+t2 x3 x7
+h1 x27
+t2 x5 x27
+q1:-4 x27
+t2 x3 x27
+q1:4 x27
+t2 x5 x27
+q1:-4 x27
+t2 x3 x27
+q1:4 x5
+q1:4 x27
+h1 x27
+t2 x3 x5
+q1:4 x3
+q1:-4 x5
+t2 x3 x5
+t2 x3 x27
+t1 x27
+h1 x26
+t2 x27 x26
+q1:-4 x26
+t2 x1 x26
+q1:4 x26
+t2 x27 x26
+q1:-4 x26
+t2 x1 x26
+q1:4 x27
+q1:4 x26
+h1 x26
+t2 x1 x27
+q1:4 x1
+q1:-4 x27
+t2 x1 x27
+h1 x27
+t2 x26 x27
+q1:-4 x27
+t2 x1 x27
+q1:4 x27
+t2 x26 x27
+q1:-4 x27
+t2 x1 x27
+q1:4 x26
+q1:4 x27
+h1 x27
+t2 x1 x26
+q1:4 x1
+q1:-4 x26
+t2 x1 x26
+t2 x27 x9
+h1 x27
+t2 x9 x27
+q1:-4 x27
+t2 x2 x27
+q1:4 x27
+t2 x9 x27
+q1:-4 x27
+t2 x2 x27
+q1:4 x9
+q1:4 x27
+h1 x27
+t2 x2 x9
+q1:4 x2
+q1:-4 x9
+t2 x2 x9
+.end

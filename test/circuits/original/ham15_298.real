@@ -1,0 +1,166 @@
+# This file has been generated using RevKit 1.1 (www.revkit.org)
+# Command Line:
+# ./tools/bdd_synthesis.py --filename ham15_30.pla --realname ham15_30.real
+# Based on the approach proposed in R. Wille and R. Drechsler. BDD-based synthesis of reversible logic for large functions. In Design Automation Conf., pages 270-275, 2009.
+.version 2.0
+.numvars 45
+.variables x0 x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 x11 x12 x13 x14 x15 x16 x17 x18 x19 x20 x21 x22 x23 x24 x25 x26 x27 x28 x29 x30 x31 x32 x33 x34 x35 x36 x37 x38 x39 x40 x41 x42 x43 x44
+.inputs a b c d e f g h i j k l m n o 1 1 1 1 1 1 0 0 1 1 1 0 0 0 0 0 0 1 1 1 0 0 1 0 0 1 1 0 0 1
+.outputs  g g g g g g g g g g g g g g g g g g a b g c d g g e f g g g g h g g i j g k l g g m n g o
+.constants ---------------111111001110000001110010011001
+.garbage 111111111111111111--1--11--11-1-11--1--11--1-
+.begin
+t2 x13 x15
+t2 x2 x15
+t2 x14 x16
+t2 x2 x16
+t3 x14 x15 x16
+t3 x2 x14 x16
+t2 x12 x17
+t2 x2 x17
+t3 x12 x16 x17
+t3 x2 x12 x17
+t2 x11 x18
+t2 x2 x18
+t3 x11 x17 x18
+t3 x2 x11 x18
+t2 x8 x18
+t1 x18
+t2 x5 x18
+t1 x18
+t2 x0 x18
+t1 x18
+t2 x7 x18
+t1 x18
+t2 x3 x18
+t1 x18
+t2 x1 x18
+t1 x18
+t2 x11 x19
+t2 x17 x19
+t3 x2 x11 x19
+t3 x11 x17 x19
+t2 x9 x19
+t1 x19
+t2 x8 x19
+t1 x19
+t2 x6 x19
+t1 x19
+t2 x4 x19
+t1 x19
+t2 x3 x19
+t1 x19
+t2 x1 x19
+t1 x19
+t2 x12 x20
+t2 x16 x20
+t3 x2 x12 x20
+t3 x12 x16 x20
+t2 x2 x21
+t3 x11 x20 x21
+t3 x2 x11 x21
+t2 x9 x21
+t1 x21
+t2 x5 x21
+t1 x21
+t2 x7 x21
+t1 x21
+t2 x4 x21
+t1 x21
+t2 x3 x21
+t1 x21
+t2 x10 x21
+t1 x21
+t2 x20 x22
+t3 x2 x11 x22
+t3 x11 x20 x22
+t2 x6 x22
+t1 x22
+t2 x0 x22
+t1 x22
+t2 x7 x22
+t1 x22
+t2 x4 x22
+t1 x22
+t2 x1 x22
+t1 x22
+t2 x10 x22
+t1 x22
+t3 x13 x14 x23
+t2 x14 x23
+t3 x12 x23 x24
+t2 x12 x24
+t3 x11 x24 x25
+t2 x11 x25
+t2 x0 x25
+t1 x25
+t2 x11 x26
+t3 x11 x24 x26
+t2 x24 x26
+t2 x1 x26
+t1 x26
+t2 x2 x27
+t3 x14 x15 x27
+t3 x2 x14 x27
+t2 x27 x28
+t3 x2 x12 x28
+t3 x12 x27 x28
+t2 x2 x29
+t3 x11 x28 x29
+t3 x2 x11 x29
+t2 x12 x30
+t3 x12 x23 x30
+t2 x23 x30
+t2 x11 x31
+t3 x11 x30 x31
+t2 x30 x31
+t2 x3 x31
+t1 x31
+t3 x13 x14 x32
+t2 x13 x32
+t3 x12 x32 x33
+t2 x12 x33
+t3 x11 x33 x34
+t2 x11 x34
+t2 x4 x34
+t1 x34
+t2 x11 x35
+t3 x11 x33 x35
+t2 x33 x35
+t2 x5 x35
+t1 x35
+t2 x12 x36
+t3 x12 x32 x36
+t2 x32 x36
+t3 x11 x36 x37
+t2 x11 x37
+t2 x6 x37
+t1 x37
+t2 x11 x38
+t3 x11 x36 x38
+t2 x36 x38
+t2 x7 x38
+t1 x38
+t2 x14 x39
+t3 x13 x14 x39
+t2 x13 x39
+t3 x12 x39 x40
+t2 x12 x40
+t3 x11 x40 x41
+t2 x11 x41
+t2 x8 x41
+t1 x41
+t2 x11 x42
+t3 x11 x40 x42
+t2 x40 x42
+t2 x9 x42
+t1 x42
+t2 x12 x43
+t3 x12 x39 x43
+t2 x39 x43
+t3 x11 x43 x44
+t2 x11 x44
+t2 x10 x44
+t1 x44
+t1 x18
+.end

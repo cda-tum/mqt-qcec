@@ -1,0 +1,51 @@
+add_subdirectory("${PROJECT_SOURCE_DIR}/extern/googletest" "extern/googletest")
+mark_as_advanced(
+		BUILD_GMOCK BUILD_GTEST BUILD_SHARED_LIBS
+		gmock_build_tests gtest_build_samples gtest_build_tests
+		gtest_disable_pthreads gtest_force_shared_crt gtest_hide_internal_symbols
+)
+set_target_properties(gtest PROPERTIES FOLDER extern)
+set_target_properties(gtest_main PROPERTIES FOLDER extern)
+set_target_properties(gmock PROPERTIES FOLDER extern)
+set_target_properties(gmock_main PROPERTIES FOLDER extern)
+
+add_executable(${PROJECT_NAME}_example ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp)
+target_compile_features(${PROJECT_NAME}_example PUBLIC cxx_std_14)
+set_target_properties(${PROJECT_NAME}_example PROPERTIES CXX_EXTENSIONS OFF)
+target_compile_options(${PROJECT_NAME}_example PUBLIC -mtune=native -march=native -pipe)
+target_link_libraries(${PROJECT_NAME}_example PRIVATE ${PROJECT_NAME})
+
+macro(package_add_test TESTNAME)
+	# create an exectuable in which the tests will be stored
+	add_executable(${TESTNAME} ${ARGN})
+	# link the Google test infrastructure, mocking library, and a default main fuction to
+	# the test executable.  Remove g_test_main if writing your own main function.
+	target_link_libraries(${TESTNAME} PRIVATE ${PROJECT_NAME} gtest gmock gtest_main)
+	target_compile_options(${TESTNAME} PUBLIC -mtune=native -march=native -pipe)
+	set_property(TARGET ${TESTNAME} PROPERTY CXX_EXTENSIONS OFF)
+	if (COVERAGE)
+		target_compile_options(${TESTNAME} PRIVATE --coverage)
+		target_link_libraries(${TESTNAME} PRIVATE --coverage)
+	endif()
+
+	# gtest_discover_tests replaces gtest_add_tests,
+	# see https://cmake.org/cmake/help/v3.10/module/GoogleTest.html for more options to pass to it
+	gtest_discover_tests(${TESTNAME}
+	                     # set a working directory so your project root so that you can find test data via paths relative to the project root
+	                     WORKING_DIRECTORY ${PROJECT_DIR}
+	                     PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${PROJECT_DIR}"
+	                     )
+	set_target_properties(${TESTNAME} PROPERTIES FOLDER tests)
+endmacro()
+
+package_add_test(${PROJECT_NAME}_test ${CMAKE_CURRENT_SOURCE_DIR}/test_general.cpp ${CMAKE_CURRENT_SOURCE_DIR}/test_eq_circuits.cpp ${CMAKE_CURRENT_SOURCE_DIR}/test_noneq_circuits.cpp)
+
+file(COPY        ${CMAKE_CURRENT_SOURCE_DIR}/circuits
+     DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+
+# create symlinks
+execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink ${CMAKE_CURRENT_BINARY_DIR}/circuits ${CMAKE_BINARY_DIR}/circuits)
+execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}_example ${CMAKE_BINARY_DIR}/${PROJECT_NAME}_example)
+execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}_test ${CMAKE_BINARY_DIR}/${PROJECT_NAME}_test)
+
+
