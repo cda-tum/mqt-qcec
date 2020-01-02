@@ -1,5 +1,5 @@
-[![Build Status](https://travis-ci.com/burgholzer/QCEC.svg?token=md6M7jxUi7wqb4j9saQb&branch=master)](https://travis-ci.com/burgholzer/QCEC)
-[![codecov](https://codecov.io/gh/burgholzer/QCEC/branch/master/graph/badge.svg?token=Ws9Rob367B)](https://codecov.io/gh/burgholzer/QCEC)
+[![Build Status](https://travis-ci.com/iic-jku/qcec.svg?branch=master)](https://travis-ci.com/iic-jku/qcec)
+[![codecov](https://codecov.io/gh/iic-jku/qcec/branch/master/graph/badge.svg)](https://codecov.io/gh/iic-jku/qcec)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 # QCEC - A tool for **Q**uantum **C**ircuit **E**quivalence **C**hecking
