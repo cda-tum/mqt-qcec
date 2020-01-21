@@ -10,7 +10,7 @@ Developers: Lukas Burgholzer and Robert Wille.
 
 The tool builds upon [our decision diagram (DD) package](https://github.com/iic-jku/dd_package.git) as well as [our quantum functionality representation (QFR)](https://github.com/iic-jku/qfr.git).
 
-For more information, please visit [iic.jku.at/eda/research/quantum](https://iic.jku.at/eda/research/quantum_verification).
+For more information, please visit [iic.jku.at/eda/research/quantum_verification](http://iic.jku.at/eda/research/quantum_verification).
 
 If you have any questions, feel free to contact us via [iic_quantum@jku.at](mailto:iic_quantum@jku.at) or by creating an issue on GitHub.
 
@@ -26,7 +26,7 @@ with the following available methods:
    - Proportional,
    - Lookahead.
 
-For details on the available methods we refer to [iic.jku.at/eda/research/quantum_verification](https://iic.jku.at/eda/research/quantum_verification).
+For details on the available methods we refer to [iic.jku.at/eda/research/quantum_verification](http://iic.jku.at/eda/research/quantum_verification).
 
 It can either be used as a **standalone executable** with command-line interface, or as a **library** for the incorporation in other projects.
 - The standalone executable is launched in the following way:
@@ -97,7 +97,7 @@ cmake --build . --target QCEC_test
 If you use our tool for your research, we will be thankful if you refer to it by citing the following publication:
 
 ```bibtex
-@article{
+@article{burgholzer2020improved,
     title={Improved DD-based Equivalence Checking of Quantum Circuits},
     author={Burgholzer, Lukas and Wille, Robert},
     journal={Asia and South Pacific Design Automation Conference (ASP-DAC)},
