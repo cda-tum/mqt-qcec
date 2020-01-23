@@ -16,13 +16,35 @@ namespace ec {
 		Equivalent, NonEquivalent, NoInformation, ProbablyEquivalent
 	};
 
-	struct BaseResults {
+	enum Method {
+		Reference, Naive, Proportional, Lookahead
+	};
+
+	static std::string methodToString(const Method method) {
+		switch (method) {
+			case Reference:
+				return "Reference";
+			case Naive:
+				return "Naive";
+			case Proportional:
+				return "Proportional";
+			case Lookahead:
+				return "Lookahead";
+		}
+		return "Unknown strategy";
+	}
+
+	struct EquivalenceCheckingResults {
+		std::string name1;
+		std::string name2;
 		std::string name;
 		unsigned long ngates1 = 0;
 		unsigned long ngates2 = 0;
+		unsigned short nqubits1 = 0;
+		unsigned short nqubits2 = 0;
 		unsigned short nqubits = 0;
 
-		std::string method;
+		Method method;
 
 		// error flags
 		bool timeout = false;
@@ -36,7 +58,7 @@ namespace ec {
 		unsigned long maxActive = 0;
 		dd::Edge result = dd::Package::DDzero;
 
-		virtual ~BaseResults() = default;
+		virtual ~EquivalenceCheckingResults() = default;
 
 		bool error() {
 			return tooManyQubits || differentNrQubits;
@@ -72,19 +94,19 @@ namespace ec {
 				else if (equivalence == ProbablyEquivalent)
 					out << "Suggesting " << name << " to be-equivalent";
 			}
-			out << " with " << method << " method (and a maximum of " << maxActive << " active nodes)\n";
+			out << " with " << methodToString(method) << " method (and a maximum of " << maxActive << " active nodes)\n";
 			return out;
 		}
 
 		static std::ostream& printCSVHeader(std::ostream& out = std::cout) {
-			out << "filename;nqubits;ngates1;ngates2;method;expectedEquivalent;equivalent;time;maxActive\n";
+			out << "filename1;nqubits1;ngates1;filename2;nqubits2;ngates2;expectedEquivalent;equivalent;method;time;maxActive" << std::endl;
 			return out;
 		}
 
 		virtual std::ostream& printCSVEntry(std::ostream& out) {
 			if (error())
 				return out;
-			out << name << ";" << nqubits << ";" << ngates1 << ";" << ngates2 << ";" << method << ";" << expected << ";" << (equivalence == ec::Equivalent) << ";" << time << ";" << maxActive << "\n";
+			out << name1 << ";" << nqubits1 << ";" << ngates1 << ";" << name2 << ";" << nqubits2 << ";" << ngates2 << ";" << ((expected == Equivalent || expected == NonEquivalent)? std::to_string(expected): " ") << ";" << (equivalence == ec::Equivalent) << ";" << methodToString(method) << ";" << time << ";" << maxActive << std::endl;
 			return out;
 		}
 	};

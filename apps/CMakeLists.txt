@@ -5,3 +5,7 @@ target_compile_options(${PROJECT_NAME}_app PUBLIC -mtune=native -march=native -p
 target_link_libraries(${PROJECT_NAME}_app PRIVATE ${PROJECT_NAME})
 
 execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}_app ${CMAKE_BINARY_DIR}/${PROJECT_NAME}_app)
+
+file(COPY        ${CMAKE_CURRENT_SOURCE_DIR}/../extern/qfr/test/qelib1.inc
+     DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink ${CMAKE_CURRENT_BINARY_DIR}/qelib1.inc ${CMAKE_BINARY_DIR}/qelib1.inc)

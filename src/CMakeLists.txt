@@ -1,7 +1,7 @@
 add_library(${PROJECT_NAME} STATIC
             ${PROJECT_SOURCE_DIR}/include/EquivalenceChecker.hpp
             ${CMAKE_CURRENT_SOURCE_DIR}/EquivalenceChecker.cpp
-            ${PROJECT_SOURCE_DIR}/include/BaseResults.hpp
+            ${PROJECT_SOURCE_DIR}/include/EquivalenceCheckingResults.hpp
             ${PROJECT_SOURCE_DIR}/include/ImprovedDDEquivalenceChecker.hpp
             ${CMAKE_CURRENT_SOURCE_DIR}/ImprovedDDEquivalenceChecker.cpp
             )

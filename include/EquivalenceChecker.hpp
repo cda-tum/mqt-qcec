@@ -11,7 +11,7 @@
 
 #include "QuantumComputation.hpp"
 #include "DDpackage.h"
-#include "BaseResults.hpp"
+#include "EquivalenceCheckingResults.hpp"
 
 #define DEBUG_OUTPUT 0
 
@@ -28,6 +28,8 @@ namespace ec {
 
 		std::unique_ptr<dd::Package> dd;
 
+		unsigned short nqubits1 = 0;
+		unsigned short nqubits2 = 0;
 		unsigned short nqubits = 0;
 
 		//std::vector<Direction> performedSequence{};
@@ -37,17 +39,25 @@ namespace ec {
 	public:
 		EquivalenceChecker(qc::QuantumComputation& qc1, qc::QuantumComputation& qc2):
 		qc1(&qc1), qc2(&qc2) {
-			filename1 = qc1.getName();
-			filename2 = qc2.getName();
+
 			dd = std::make_unique<dd::Package>();
 			dd->useMatrixNormalization(true);
+
+			filename1 = results.name1 = qc1.getName();
+			filename2 = results.name2 = qc2.getName();
 			results.name = filename1 + " and " + filename2;
-			nqubits = std::max(qc1.getNqubits(), qc2.getNqubits());
+
+			nqubits1 = results.nqubits1 = qc1.getNqubits();
+			nqubits2 = results.nqubits2 = qc2.getNqubits();
+			nqubits = results.nqubits = std::max(nqubits1, nqubits2);
+
+			results.ngates1 = qc1.getNindividualOps();
+			results.ngates2 = qc2.getNindividualOps();
 		}
 
 		virtual ~EquivalenceChecker() = default;
 
-		BaseResults results;
+		EquivalenceCheckingResults results;
 
 		const qc::QuantumComputation* getCircuit1() const {
 			return qc1;
@@ -72,6 +82,14 @@ namespace ec {
 
 		virtual std::ostream& printResult(std::ostream& out) {
 			return results.print(out);
+		}
+
+		virtual std::ostream & printCSVEntry(std::ostream& out) {
+			return results.printCSVEntry(out);
+		}
+
+		virtual std::ostream & printCSVHeader(std::ostream& out) {
+			return ec::EquivalenceCheckingResults::printCSVHeader(out);
 		}
 
 		virtual bool error() {

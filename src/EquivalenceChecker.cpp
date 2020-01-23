@@ -8,7 +8,7 @@
 #include <chrono>
 
 void ec::EquivalenceChecker::check() {
-	results.method = "Reference";
+	results.method = Reference;
 
 	if (!validInstance())
 		return;

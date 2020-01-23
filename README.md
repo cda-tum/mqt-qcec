@@ -31,7 +31,7 @@ For details on the available methods we refer to [iic.jku.at/eda/research/quantu
 It can either be used as a **standalone executable** with command-line interface, or as a **library** for the incorporation in other projects.
 - The standalone executable is launched in the following way:
     ```commandline
-    QCEC_app <PATH_TO_FILE_1> <PATH_TO_FILE_2> (<method>)
+    QCEC_app <PATH_TO_FILE_1> <PATH_TO_FILE_2> (<method>) (--print_csv)
     ```
   where *\<method\>* is one of
    - reference
@@ -39,7 +39,11 @@ It can either be used as a **standalone executable** with command-line interface
    - proportional (**default**)
    - lookahead 
    
-   The executable performs the equivalence check and prints its result to the standard output.
+   The executable performs the equivalence check and prints its result to the standard output. If the `--print_csv` option is present, a CSV entry according to the following header is printed
+   
+    ```csv
+    filename1;nqubits1;ngates1;filename2;nqubits2;ngates2;expectedEquivalent;equivalent;method;time;maxActive
+    ```
    
 - The library can be used by including the ```ImprovedDDEquivalenceChecker.hpp``` header file and
     ```c++
