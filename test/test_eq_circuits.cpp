@@ -37,8 +37,8 @@ INSTANTIATE_TEST_SUITE_P(SomeCircuits, EQCircuitsTest,
 				"3_17_13",
 				"hwb7_59",
 				"hwb8_114",
-				"grover_5",
-				"mod5adder_129"),
+				"mod5adder_129",
+				"grover_5"),
                          [](const testing::TestParamInfo<EQCircuitsTest::ParamType>& info) {
 			                 std::stringstream ss{};
 			                 ss << info.param;

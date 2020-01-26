@@ -42,6 +42,8 @@ package_add_test(${PROJECT_NAME}_test ${CMAKE_CURRENT_SOURCE_DIR}/test_general.c
 
 file(COPY        ${CMAKE_CURRENT_SOURCE_DIR}/circuits
      DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+file(COPY        ${CMAKE_CURRENT_SOURCE_DIR}/../extern/qfr/test/qelib1.inc
+     DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 # create symlinks
 execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink ${CMAKE_CURRENT_BINARY_DIR}/circuits ${CMAKE_BINARY_DIR}/circuits)

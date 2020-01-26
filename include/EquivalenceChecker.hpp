@@ -16,7 +16,7 @@
 #define DEBUG_OUTPUT 0
 
 namespace ec {
-	enum Direction: bool { LEFT = true, RIGHT=false };
+	enum Direction: bool { LEFT = true, RIGHT = false };
 
 	class EquivalenceChecker {
 	protected:
@@ -51,8 +51,8 @@ namespace ec {
 			nqubits2 = results.nqubits2 = qc2.getNqubits();
 			nqubits = results.nqubits = std::max(nqubits1, nqubits2);
 
-			results.ngates1 = qc1.getNindividualOps();
-			results.ngates2 = qc2.getNindividualOps();
+			results.ngates1 = qc1.getNops();
+			results.ngates2 = qc2.getNops();
 		}
 
 		virtual ~EquivalenceChecker() = default;

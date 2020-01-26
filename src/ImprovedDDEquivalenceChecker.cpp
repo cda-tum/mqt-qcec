@@ -120,6 +120,8 @@ namespace ec {
 	void ImprovedDDEquivalenceChecker::checkLookahead() {
 		dd::Edge lookLeft{}, lookRight{}, left{}, right{}, saved{};
 		bool cachedLeft = false, cachedRight = false;
+		std::unordered_set<dd::NodePtr> visited1{};
+		std::unordered_set<dd::NodePtr> visited2{};
 
 		while (it1 != end1 && it2 != end2) {
 			if(!cachedLeft) {
@@ -138,7 +140,9 @@ namespace ec {
 			lookLeft = dd->multiply(left, saved);
 			lookRight = dd->multiply(saved, right);
 
-			if (dd->size(lookLeft) <= dd->size(lookRight)) {
+			visited1.clear();
+			visited2.clear();
+			if (nodecount(lookLeft, visited1) <= nodecount(lookRight, visited2)) {
 				results.result = lookLeft;
 				cachedLeft = false;
 				//performedSequence.push_back(LEFT);

@@ -18,13 +18,48 @@ void ec::EquivalenceChecker::check() {
 	#endif
 
 	auto start = std::chrono::high_resolution_clock::now();
-	dd::Edge e = qc1->buildFunctionality(dd);
+
+	std::array<short, qc::MAX_QUBITS> line{};
+	line.fill(qc::LINE_DEFAULT);
+	dd::Edge e = dd->makeIdent(0, short(nqubits-1));
+	dd->incRef(e);
+
+	for (auto & op : *qc1) {
+		if (!op->isUnitary()) {
+			std::cerr << "Functionality not unitary." << std::endl;
+			exit(1);
+		}
+
+		auto tmp = dd->multiply(op->getDD(dd, line, qc1->outputPermutation, true), e);
+
+		dd->incRef(tmp);
+		dd->decRef(e);
+		e = tmp;
+
+		dd->garbageCollect();
+	}
 
 	#if DEBUG_OUTPUT
 		std::cout << "Built 1st circuit. Starting 2nd circuit.\n" << std::flush;
 	#endif
 
-	dd::Edge f = qc2->buildFunctionality(dd);
+	dd::Edge f = dd->makeIdent(0, short(nqubits-1));
+	dd->incRef(f);
+
+	for (auto & op : *qc2) {
+		if (!op->isUnitary()) {
+			std::cerr << "Functionality not unitary." << std::endl;
+			exit(1);
+		}
+
+		auto tmp = dd->multiply(op->getDD(dd, line, qc2->outputPermutation, true), f);
+
+		dd->incRef(tmp);
+		dd->decRef(f);
+		f = tmp;
+
+		dd->garbageCollect();
+	}
 
 	#if DEBUG_OUTPUT
 		std::cout << "Built 2nd circuit\n" << std::flush;

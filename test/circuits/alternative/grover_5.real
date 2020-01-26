@@ -82,30 +82,12 @@ t2 x8 x7
 h1 x6
 h1 x7
 t1 x8
-t2 x6 x7
 h1 x8
-h1 x6
-h1 x7
 t1 x8
-t2 x6 x7
 h1 x8
-h1 x6
-h1 x7
-t2 x6 x7
-t2 x5 x6
-t2 x7 x8
-h1 x5
-h1 x6
-h1 x7
-h1 x8
-t2 x5 x6
-t2 x7 x8
-h1 x5
-h1 x6
-h1 x7
-h1 x8
-t2 x5 x6
-t2 x7 x8
+f2 x6 x7
+f2 x5 x6
+f2 x7 x8
 t2 x4 x5
 q1:-4 x5
 t2 x6 x5
@@ -124,28 +106,10 @@ t2 x6 x5
 h1 x4
 h1 x5
 h1 x6
-t2 x4 x5
+f2 x4 x5
 t1 x6
-h1 x4
-h1 x5
-t2 x6 x7
-t2 x4 x5
-h1 x6
-h1 x7
-h1 x4
-h1 x5
-t2 x6 x7
-t2 x4 x5
-h1 x6
-h1 x7
-t2 x3 x4
-t2 x6 x7
-h1 x3
-h1 x4
-t2 x3 x4
-h1 x3
-h1 x4
-t2 x3 x4
+f2 x6 x7
+f2 x3 x4
 t2 x2 x3
 q1:-4 x3
 t2 x4 x3
@@ -164,14 +128,8 @@ t2 x4 x3
 h1 x2
 h1 x3
 h1 x4
-t2 x2 x3
+f2 x2 x3
 t1 x4
-h1 x2
-h1 x3
-t2 x2 x3
-h1 x2
-h1 x3
-t2 x2 x3
 f2 x1 x2
 t2 x0 x1
 q1:-4 x1
@@ -225,14 +183,8 @@ t2 x3 x2
 h1 x4
 q1:-4 x3
 q1:-4 x2
-t2 x4 x5
+f2 x4 x5
 t2 x3 x2
-h1 x4
-h1 x5
-t2 x4 x5
-h1 x4
-h1 x5
-t2 x4 x5
 t2 x5 x6
 q1:-4 x6
 t2 x7 x6
@@ -252,44 +204,14 @@ t1 x5
 h1 x6
 t1 x7
 h1 x5
-t2 x5 x6
+f2 x5 x6
 h1 x7
-h1 x5
-h1 x6
-t2 x5 x6
-h1 x5
-h1 x6
-t2 x5 x6
-t2 x4 x5
+f2 x4 x5
 t1 x6
-h1 x4
-h1 x5
-t2 x6 x7
-t2 x4 x5
-h1 x6
-h1 x7
-h1 x4
-h1 x5
-t2 x6 x7
-t2 x4 x5
-h1 x6
-h1 x7
-t2 x3 x4
-t2 x6 x7
-h1 x3
-h1 x4
-t2 x7 x8
-t2 x3 x4
-h1 x7
-h1 x8
-h1 x3
-h1 x4
-t2 x7 x8
-t2 x3 x4
-h1 x7
-h1 x8
+f2 x3 x4
+f2 x6 x7
+f2 x7 x8
 t2 x2 x3
-t2 x7 x8
 q1:-4 x3
 t2 x4 x3
 q1:-4 x3
@@ -307,14 +229,8 @@ t2 x4 x3
 h1 x2
 h1 x3
 t1 x4
-t2 x2 x3
+f2 x2 x3
 h1 x4
-h1 x2
-h1 x3
-t2 x2 x3
-h1 x2
-h1 x3
-t2 x2 x3
 f2 x1 x2
 t2 x0 x1
 q1:-4 x1
@@ -402,30 +318,12 @@ t2 x8 x7
 h1 x6
 h1 x7
 t1 x8
-t2 x6 x7
+f2 x6 x7
 h1 x8
-h1 x6
-h1 x7
 t1 x8
-t2 x6 x7
 h1 x8
-h1 x6
-h1 x7
-t2 x6 x7
-t2 x5 x6
-t2 x7 x8
-h1 x5
-h1 x6
-h1 x7
-h1 x8
-t2 x5 x6
-t2 x7 x8
-h1 x5
-h1 x6
-h1 x7
-h1 x8
-t2 x5 x6
-t2 x7 x8
+f2 x5 x6
+f2 x7 x8
 t2 x4 x5
 q1:-4 x5
 t2 x6 x5
@@ -444,28 +342,10 @@ t2 x6 x5
 h1 x4
 h1 x5
 h1 x6
-t2 x4 x5
+f2 x4 x5
 t1 x6
-h1 x4
-h1 x5
-t2 x6 x7
-t2 x4 x5
-h1 x6
-h1 x7
-h1 x4
-h1 x5
-t2 x6 x7
-t2 x4 x5
-h1 x6
-h1 x7
-t2 x3 x4
-t2 x6 x7
-h1 x3
-h1 x4
-t2 x3 x4
-h1 x3
-h1 x4
-t2 x3 x4
+f2 x6 x7
+f2 x3 x4
 t2 x2 x3
 q1:-4 x3
 t2 x4 x3
@@ -484,14 +364,8 @@ t2 x4 x3
 h1 x2
 h1 x3
 h1 x4
-t2 x2 x3
+f2 x2 x3
 t1 x4
-h1 x2
-h1 x3
-t2 x2 x3
-h1 x2
-h1 x3
-t2 x2 x3
 f2 x1 x2
 t2 x0 x1
 q1:-4 x1
@@ -545,14 +419,8 @@ t2 x3 x2
 h1 x4
 q1:-4 x3
 q1:-4 x2
-t2 x4 x5
+f2 x4 x5
 t2 x3 x2
-h1 x4
-h1 x5
-t2 x4 x5
-h1 x4
-h1 x5
-t2 x4 x5
 t2 x5 x6
 q1:-4 x6
 t2 x7 x6
@@ -572,44 +440,14 @@ t1 x5
 h1 x6
 t1 x7
 h1 x5
-t2 x5 x6
+f2 x5 x6
 h1 x7
-h1 x5
-h1 x6
-t2 x5 x6
-h1 x5
-h1 x6
-t2 x5 x6
-t2 x4 x5
+f2 x4 x5
 t1 x6
-h1 x4
-h1 x5
-t2 x6 x7
-t2 x4 x5
-h1 x6
-h1 x7
-h1 x4
-h1 x5
-t2 x6 x7
-t2 x4 x5
-h1 x6
-h1 x7
-t2 x3 x4
-t2 x6 x7
-h1 x3
-h1 x4
-t2 x7 x8
-t2 x3 x4
-h1 x7
-h1 x8
-h1 x3
-h1 x4
-t2 x7 x8
-t2 x3 x4
-h1 x7
-h1 x8
+f2 x6 x7
+f2 x3 x4
 t2 x2 x3
-t2 x7 x8
+f2 x7 x8
 q1:-4 x3
 t2 x4 x3
 q1:-4 x3
@@ -627,14 +465,8 @@ t2 x4 x3
 h1 x2
 h1 x3
 t1 x4
-t2 x2 x3
+f2 x2 x3
 h1 x4
-h1 x2
-h1 x3
-t2 x2 x3
-h1 x2
-h1 x3
-t2 x2 x3
 f2 x1 x2
 t2 x0 x1
 q1:-4 x1
@@ -722,30 +554,12 @@ t2 x8 x7
 h1 x6
 h1 x7
 t1 x8
-t2 x6 x7
 h1 x8
-h1 x6
-h1 x7
 t1 x8
-t2 x6 x7
 h1 x8
-h1 x6
-h1 x7
-t2 x6 x7
-t2 x5 x6
-t2 x7 x8
-h1 x5
-h1 x6
-h1 x7
-h1 x8
-t2 x5 x6
-t2 x7 x8
-h1 x5
-h1 x6
-h1 x7
-h1 x8
-t2 x5 x6
-t2 x7 x8
+f2 x6 x7
+f2 x5 x6
+f2 x7 x8
 t2 x4 x5
 q1:-4 x5
 t2 x6 x5
@@ -764,28 +578,10 @@ t2 x6 x5
 h1 x4
 h1 x5
 h1 x6
-t2 x4 x5
+f2 x4 x5
 t1 x6
-h1 x4
-h1 x5
-t2 x6 x7
-t2 x4 x5
-h1 x6
-h1 x7
-h1 x4
-h1 x5
-t2 x6 x7
-t2 x4 x5
-h1 x6
-h1 x7
-t2 x3 x4
-t2 x6 x7
-h1 x3
-h1 x4
-t2 x3 x4
-h1 x3
-h1 x4
-t2 x3 x4
+f2 x3 x4
+f2 x6 x7
 t2 x2 x3
 q1:-4 x3
 t2 x4 x3
@@ -804,14 +600,8 @@ t2 x4 x3
 h1 x2
 h1 x3
 h1 x4
-t2 x2 x3
+f2 x2 x3
 t1 x4
-h1 x2
-h1 x3
-t2 x2 x3
-h1 x2
-h1 x3
-t2 x2 x3
 f2 x1 x2
 t2 x0 x1
 q1:-4 x1
@@ -865,14 +655,8 @@ t2 x3 x2
 h1 x4
 q1:-4 x3
 q1:-4 x2
-t2 x4 x5
+f2 x4 x5
 t2 x3 x2
-h1 x4
-h1 x5
-t2 x4 x5
-h1 x4
-h1 x5
-t2 x4 x5
 t2 x5 x6
 q1:-4 x6
 t2 x7 x6
@@ -892,44 +676,14 @@ t1 x5
 h1 x6
 t1 x7
 h1 x5
-t2 x5 x6
+f2 x5 x6
 h1 x7
-h1 x5
-h1 x6
-t2 x5 x6
-h1 x5
-h1 x6
-t2 x5 x6
-t2 x4 x5
+f2 x4 x5
 t1 x6
-h1 x4
-h1 x5
-t2 x6 x7
-t2 x4 x5
-h1 x6
-h1 x7
-h1 x4
-h1 x5
-t2 x6 x7
-t2 x4 x5
-h1 x6
-h1 x7
-t2 x3 x4
-t2 x6 x7
-h1 x3
-h1 x4
-t2 x7 x8
-t2 x3 x4
-h1 x7
-h1 x8
-h1 x3
-h1 x4
-t2 x7 x8
-t2 x3 x4
-h1 x7
-h1 x8
+f2 x3 x4
+f2 x6 x7
 t2 x2 x3
-t2 x7 x8
+f2 x7 x8
 q1:-4 x3
 t2 x4 x3
 q1:-4 x3
@@ -947,14 +701,8 @@ t2 x4 x3
 h1 x2
 h1 x3
 t1 x4
-t2 x2 x3
+f2 x2 x3
 h1 x4
-h1 x2
-h1 x3
-t2 x2 x3
-h1 x2
-h1 x3
-t2 x2 x3
 f2 x1 x2
 t2 x0 x1
 q1:-4 x1
@@ -1041,30 +789,12 @@ q1:-4 x7
 t2 x8 x7
 h1 x7
 t1 x8
-t2 x6 x7
+f2 x6 x7
 h1 x8
-h1 x6
-h1 x7
 t1 x8
-t2 x6 x7
 h1 x8
-h1 x6
-h1 x7
-t2 x6 x7
-t2 x5 x6
-t2 x7 x8
-h1 x5
-h1 x6
-h1 x7
-h1 x8
-t2 x5 x6
-t2 x7 x8
-h1 x5
-h1 x6
-h1 x7
-h1 x8
-t2 x5 x6
-t2 x7 x8
+f2 x5 x6
+f2 x7 x8
 t2 x4 x5
 q1:-4 x5
 t2 x6 x5
@@ -1082,28 +812,10 @@ q1:-4 x5
 t2 x6 x5
 h1 x5
 h1 x6
-t2 x4 x5
+f2 x4 x5
 t1 x6
-h1 x4
-h1 x5
-t2 x6 x7
-t2 x4 x5
-h1 x6
-h1 x7
-h1 x4
-h1 x5
-t2 x6 x7
-t2 x4 x5
-h1 x6
-h1 x7
-t2 x3 x4
-t2 x6 x7
-h1 x3
-h1 x4
-t2 x3 x4
-h1 x3
-h1 x4
-t2 x3 x4
+f2 x6 x7
+f2 x3 x4
 t2 x2 x3
 q1:-4 x3
 t2 x4 x3
@@ -1122,14 +834,8 @@ t2 x4 x3
 h1 x2
 h1 x3
 h1 x4
-t2 x2 x3
+f2 x2 x3
 t1 x4
-h1 x2
-h1 x3
-t2 x2 x3
-h1 x2
-h1 x3
-t2 x2 x3
 f2 x1 x2
 t2 x0 x1
 q1:-4 x1
@@ -1183,14 +889,8 @@ t2 x3 x2
 h1 x4
 q1:-4 x3
 q1:-4 x2
-t2 x4 x5
+f2 x4 x5
 t2 x3 x2
-h1 x4
-h1 x5
-t2 x4 x5
-h1 x4
-h1 x5
-t2 x4 x5
 t2 x5 x6
 q1:-4 x6
 t2 x7 x6
@@ -1210,14 +910,8 @@ t1 x5
 h1 x6
 t1 x7
 h1 x5
-t2 x5 x6
+f2 x5 x6
 h1 x7
-h1 x5
-h1 x6
-t2 x5 x6
-h1 x5
-h1 x6
-t2 x5 x6
 f2 x4 x5
 f2 x3 x4
 t2 x2 x3
@@ -1237,14 +931,8 @@ q1:-4 x3
 t2 x4 x3
 h1 x3
 t1 x4
-t2 x2 x3
+f2 x2 x3
 h1 x4
-h1 x2
-h1 x3
-t2 x2 x3
-h1 x2
-h1 x3
-t2 x2 x3
 f2 x1 x2
 t2 x0 x1
 q1:-4 x1

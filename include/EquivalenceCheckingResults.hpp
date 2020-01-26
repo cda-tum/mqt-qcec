@@ -13,7 +13,7 @@
 
 namespace ec {
 	enum Equivalence {
-		Equivalent, NonEquivalent, NoInformation, ProbablyEquivalent
+		NonEquivalent, Equivalent, NoInformation, ProbablyEquivalent
 	};
 
 	enum Method {
@@ -76,16 +76,16 @@ namespace ec {
 				if (equivalence == Equivalent)
 					out << "Proven " << name << " equivalent";
 				else if (equivalence == NonEquivalent)
-					out << "[FALSE NEGATIVE] Expected " << name << " to be equivalent but shown non-equivalent";
+					out << "\033[1;31m[FALSE NEGATIVE]\033[0m Expected " << name << " to be equivalent but shown non-equivalent";
 				else if (equivalence == ProbablyEquivalent)
 					out << "Rightfully suggesting " << name << "to be equivalent";
 			} else if (expected == NonEquivalent) {
 				if (equivalence == Equivalent)
-					out << "[FALSE POSITIVE] Expected " << name << " to be non-equivalent but showed equivalent";
+					out << "\033[1;31m[FALSE POSITIVE]\033[0m Expected " << name << " to be non-equivalent but showed equivalent";
 				else if (equivalence == NonEquivalent)
 					out << "Proven " << name << " non-equivalent";
 				else if (equivalence == ProbablyEquivalent)
-					out << "Wrongfully suggesting " << name << "to be equivalent";
+					out << "\033[1;31mWrongfully suggesting " << name << "to be equivalent\033[0m";
 			} else if (expected == NoInformation) {
 				if (equivalence == Equivalent)
 					out << "Shown " << name << " equivalent";

@@ -8,6 +8,7 @@
 
 #include <memory>
 #include <array>
+#include <unordered_set>
 
 #include "EquivalenceChecker.hpp"
 #include "Operation.hpp"
@@ -36,6 +37,19 @@ namespace ec {
 		/// \param to DD to apply the operation to
 		/// \param dir LEFT or RIGHT
 		void applyGate(std::unique_ptr<qc::Operation>& op, dd::Edge& to, Direction dir = LEFT);
+
+		unsigned long long nodecount(const dd::Edge& e, std::unordered_set<dd::NodePtr>& visited) {
+			visited.insert(e.p);
+			unsigned long long sum = 1;
+			if(!dd->isTerminal(e)) {
+				for (const auto& edge: e.p->e) {
+					if (edge.p != nullptr && !visited.count(edge.p)) {
+						sum += nodecount(edge, visited);
+					}
+				}
+			}
+			return sum;
+		}
 
 	public:
 		ImprovedDDEquivalenceChecker(qc::QuantumComputation& qc1, qc::QuantumComputation& qc2, Method method = Proportional):

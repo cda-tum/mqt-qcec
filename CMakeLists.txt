@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 project(QCEC
-        VERSION 1.0.1
+        VERSION 1.0.2
         DESCRIPTION "A tool for equivalence checking of quantum circuits (based on decision diagrams)"
         LANGUAGES CXX)
 
