@@ -126,12 +126,14 @@ namespace ec {
 		while (it1 != end1 && it2 != end2) {
 			if(!cachedLeft) {
 				left = (*it1)->getDD(dd, line);
+				dd->incRef(left);
 				++it1;
 				cachedLeft = true;
 			}
 
 			if (!cachedRight) {
 				right = (*it2)->getInverseDD(dd, line);
+				dd->incRef(right);
 				++it2;
 				cachedRight = true;
 			}
@@ -142,12 +144,16 @@ namespace ec {
 
 			visited1.clear();
 			visited2.clear();
-			if (nodecount(lookLeft, visited1) <= nodecount(lookRight, visited2)) {
+			auto nc1 = nodecount(lookLeft, visited1);
+			auto nc2 = nodecount(lookRight, visited2);
+			if (nc1 <= nc2) {
 				results.result = lookLeft;
+				dd->decRef(left);
 				cachedLeft = false;
 				//performedSequence.push_back(LEFT);
 			} else {
 				results.result = lookRight;
+				dd->decRef(right);
 				cachedRight = false;
 				//performedSequence.push_back(RIGHT);
 			}
@@ -161,6 +167,7 @@ namespace ec {
 			results.result = dd->multiply(left, saved);
 			dd->incRef(results.result);
 			dd->decRef(saved);
+			dd->decRef(left);
 			dd->garbageCollect();
 			//performedSequence.push_back(LEFT);
 		}
@@ -170,6 +177,7 @@ namespace ec {
 			results.result = dd->multiply(saved, right);
 			dd->incRef(results.result);
 			dd->decRef(saved);
+			dd->decRef(right);
 			dd->garbageCollect();
 			//performedSequence.push_back(RIGHT);
 		}
