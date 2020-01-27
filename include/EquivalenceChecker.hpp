@@ -10,13 +10,17 @@
 #include <memory>
 
 #include "QuantumComputation.hpp"
-#include "DDpackage.h"
 #include "EquivalenceCheckingResults.hpp"
 
-#define DEBUG_OUTPUT 0
+#define DEBUG_MODE_EC 0
 
 namespace ec {
 	enum Direction: bool { LEFT = true, RIGHT = false };
+
+	struct Configuration {
+		bool augmentQubitRegisters = false;
+		bool printCSV = false;
+	};
 
 	class EquivalenceChecker {
 	protected:
@@ -32,44 +36,25 @@ namespace ec {
 		unsigned short nqubits2 = 0;
 		unsigned short nqubits = 0;
 
-		//std::vector<Direction> performedSequence{};
-
 		bool validInstance();
 
+		// apply swaps 'on' DD in order to change 'from' to 'to'
+		// where |from| >= |to|
+		void changePermutation(dd::Edge& on, qc::permutationMap& from, const qc::permutationMap& to, std::array<short, qc::MAX_QUBITS>& line, const Direction& dir = LEFT);
+
+		void augmentQubits(qc::QuantumComputation* circuit_to_augment, qc::QuantumComputation* circuit_to_match);
+
 	public:
-		EquivalenceChecker(qc::QuantumComputation& qc1, qc::QuantumComputation& qc2):
-		qc1(&qc1), qc2(&qc2) {
+		EquivalenceCheckingResults results;
 
-			dd = std::make_unique<dd::Package>();
-			dd->useMatrixNormalization(true);
-
-			filename1 = results.name1 = qc1.getName();
-			filename2 = results.name2 = qc2.getName();
-			results.name = filename1 + " and " + filename2;
-
-			nqubits1 = results.nqubits1 = qc1.getNqubits();
-			nqubits2 = results.nqubits2 = qc2.getNqubits();
-			nqubits = results.nqubits = std::max(nqubits1, nqubits2);
-
-			results.ngates1 = qc1.getNops();
-			results.ngates2 = qc2.getNops();
-		}
+		EquivalenceChecker(qc::QuantumComputation& qc1, qc::QuantumComputation& qc2);
 
 		virtual ~EquivalenceChecker() = default;
 
-		EquivalenceCheckingResults results;
+		// TODO: also allow equivalence by relative phase
+		static Equivalence equals(dd::Edge e, dd::Edge f);
 
-		const qc::QuantumComputation* getCircuit1() const {
-			return qc1;
-		}
-		const qc::QuantumComputation* getCircuit2() const {
-			return qc2;
-		}
-		const std::unique_ptr<dd::Package>& getDDPackage() const {
-			return dd;
-		}
-
-		virtual void check();
+		virtual void check(const Configuration& config);
 
 		void expectEquivalent() { results.expected = Equivalent; }
 		void expectNonEquivalent() { results.expected = NonEquivalent; }
@@ -84,13 +69,8 @@ namespace ec {
 			return results.print(out);
 		}
 
-		virtual std::ostream & printCSVEntry(std::ostream& out) {
-			return results.printCSVEntry(out);
-		}
-
-		virtual std::ostream & printCSVHeader(std::ostream& out) {
-			return ec::EquivalenceCheckingResults::printCSVHeader(out);
-		}
+		virtual std::ostream & printCSVEntry(std::ostream& out) { return results.printCSVEntry(out); }
+		virtual std::ostream & printCSVHeader(std::ostream& out) { return ec::EquivalenceCheckingResults::printCSVHeader(out); }
 
 		virtual bool error() {
 			return results.error();
@@ -100,17 +80,6 @@ namespace ec {
 			dd->export2Dot(results.result, filename.c_str());
 		}
 
-		/*virtual std::ostream& printSequence(std::ostream& out) {
-			for(auto& step: performedSequence) {
-				if(step == LEFT)
-					out << "\033[32m-> \033[0m";
-				else {
-					out << "\033[36m<- \033[0m";
-				}
-			}
-			out << '\n';
-			return out;
-		}*/
 	};
 
 

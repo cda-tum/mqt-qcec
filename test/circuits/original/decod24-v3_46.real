@@ -1,0 +1,22 @@
+# Function: decod24
+# Note: Embedding with constants 11
+# Used Library: EQ (gates: 9  quantum costs: 9)
+# This file have been taken from RevLib (www.revlib.org).
+.version 1.0
+.numvars 4
+.variables a b c d
+.inputs 1 1 c d
+.outputs a b c d
+.constants 11--
+.garbage ----
+.begin
+v+ c a
+t2 d c
+v+ c a
+v d a
+t2 a b
+t2 a d
+t2 d a
+t2 b c
+t2 c a
+.end

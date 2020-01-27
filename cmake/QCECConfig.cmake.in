@@ -1,0 +1,10 @@
+get_filename_component(QCEC_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
+include(CMakeFindDependencyMacro)
+
+find_dependency(QFR 1.0 REQUIRED CONFIG)
+
+if(NOT TARGET EC::QCEC)
+	include("${QCEC_CMAKE_DIR}/QCECTargets.cmake")
+endif()
+
+set(QFR_LIBRARIES EC::QCEC)

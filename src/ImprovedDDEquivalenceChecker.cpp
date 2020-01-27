@@ -3,7 +3,6 @@
  * See file README.md or go to http://iic.jku.at/eda/research/quantum/ for more information.
  */
 
-#include <chrono>
 #include <ImprovedDDEquivalenceChecker.hpp>
 
 namespace ec {
@@ -11,25 +10,62 @@ namespace ec {
 	/// \param op operation to apply
 	/// \param to DD to apply the operation to
 	/// \param dir LEFT or RIGHT
-	void ImprovedDDEquivalenceChecker::applyGate(std::unique_ptr<qc::Operation>& op, dd::Edge& to, Direction dir) {
+	void ImprovedDDEquivalenceChecker::applyGate(std::unique_ptr<qc::Operation>& op, dd::Edge& to, std::map<unsigned short, unsigned short>& permutation, Direction dir) {
+		#if DEBUG_MODE_EC
+		std::cout << "before: " << std::endl;
+		qc::QuantumComputation::printPermutationMap(permutation);
+		#endif
+
 		auto saved = to;
 		if (dir == LEFT) {
-			to = dd->multiply(op->getDD(dd, line), to);
+			to = dd->multiply(op->getDD(dd, line, permutation), to);
 		} else {
-			to = dd->multiply(to, op->getInverseDD(dd, line));
+			to = dd->multiply(to, op->getInverseDD(dd, line, permutation));
 		}
 		dd->incRef(to);
 		dd->decRef(saved);
 		dd->garbageCollect();
+
+		#if DEBUG_MODE_EC
+		std::cout << "after: " << std::endl;
+		qc::QuantumComputation::printPermutationMap(permutation);
+		std::cout << "-------" << std::endl;
+		#endif
 	}
 
 	/// Use dedicated method to check the equivalence of both provided circuits
-	void ImprovedDDEquivalenceChecker::check() {
+	void ImprovedDDEquivalenceChecker::check(const Configuration& config) {
+		if (method == Reference) {
+			EquivalenceChecker::check(config);
+			return;
+		}
+
 		if (!validInstance())
 			return;
 
 		auto start = std::chrono::high_resolution_clock::now();
-		results.result = dd->makeIdent(0, short(nqubits-1));
+
+		if (config.augmentQubitRegisters) {
+			augmentQubits(qc1, qc2);
+		} else {
+			if (qc1->getNqubits() != qc2->getNqubits()) {
+				std::cerr << "Circuits operate on different number of qubits and 'augmentQubitRegisters' is not enabled" << std::endl;
+				exit(1);
+			}
+		}
+
+		#if DEBUG_MODE_EC
+		std::cout << "QC1: ";
+		qc1->printRegisters();
+		qc1->print();
+		std::cout << "QC2: ";
+		qc2->printRegisters();
+		qc2->print();
+		#endif
+
+		qc::permutationMap perm1 = qc1->initialLayout;
+		qc::permutationMap perm2 = qc2->initialLayout;
+		results.result = qc1->createInitialMatrix(dd);
 		dd->incRef(results.result);
 
 		it1 = qc1->begin();
@@ -38,63 +74,62 @@ namespace ec {
 		end2 = qc2->end();
 
 		switch (method) {
-			case Reference:
-				EquivalenceChecker::check();
-				return;
-			case Naive:
-				checkNaive();
+			case Naive: checkNaive(perm1, perm2);
 				break;
-			case Proportional:
-				checkProportional();
+			case Proportional: checkProportional(perm1, perm2);
 				break;
-			case Lookahead:
-				checkLookahead();
+			case Lookahead: checkLookahead(perm1, perm2);
 				break;
+			default:
+				std::cerr << "Method " << toString(method) << " not supported by ImprovedDDEquivalenceChecker" << std::endl;
+				exit(1);
 		}
 
 		// finish first circuit
 		while (it1 != end1) {
-			applyGate(*it1, results.result, LEFT);
+			applyGate(*it1, results.result, perm1, LEFT);
 			++it1;
-			//performedSequence.push_back(LEFT);
 		}
 
 		//finish second circuit
 		while (it2 != end2) {
-			applyGate(*it2, results.result, RIGHT);
+			applyGate(*it2, results.result, perm2, RIGHT);
 			++it2;
-			//performedSequence.push_back(RIGHT);
 		}
 
-		if(dd->equals(results.result, dd->makeIdent(0, short(nqubits-1)))) {
-			results.equivalence = Equivalent;
-		} else {
-			results.equivalence = NonEquivalent;
-		}
+		changePermutation(results.result, perm1, qc1->outputPermutation, line, LEFT);
+		changePermutation(results.result, perm2, qc2->outputPermutation, line, RIGHT);
+		qc1->reduceAncillae(results.result, dd);
+		qc1->reduceGarbage(results.result, dd);
+
+		results.equivalence = equals(results.result, qc1->createInitialMatrix(dd));
+
+		#if DEBUG_MODE_EC
+		std::stringstream ss{};
+		ss << "result_improved_" << filename2 << ".dot";
+		dd->export2Dot(results.result, ss.str().c_str());
+		#endif
 
 		auto end = std::chrono::high_resolution_clock::now();
 		std::chrono::duration<double> diff = end - start;
 		results.time = diff.count();
 		results.maxActive = dd->maxActive;
-
 	}
 
 	/// Alternate between LEFT and RIGHT applications
-	void ImprovedDDEquivalenceChecker::checkNaive() {
+	void ImprovedDDEquivalenceChecker::checkNaive(qc::permutationMap& perm1, qc::permutationMap& perm2) {
 
 		while (it1 != end1 && it2 != end2) {
-			applyGate(*it1, results.result, LEFT);
-			applyGate(*it2, results.result, RIGHT);
+			applyGate(*it1, results.result, perm1, LEFT);
+			applyGate(*it2, results.result, perm2, RIGHT);
 			++it1;
 			++it2;
-			//performedSequence.push_back(LEFT);
-			//performedSequence.push_back(RIGHT);
 		}
 
 	}
 
 	/// Alternate according to the gate count ratio between LEFT and RIGHT applications
-	void ImprovedDDEquivalenceChecker::checkProportional() {
+	void ImprovedDDEquivalenceChecker::checkProportional(qc::permutationMap& perm1, qc::permutationMap& perm2) {
 
 		unsigned int ratio = (unsigned int)
 				std::round((double)std::max(qc1->getNops(), qc2->getNops()) / std::min(qc1->getNops(), qc2->getNops()));
@@ -102,22 +137,19 @@ namespace ec {
 		unsigned int ratio2 = (qc1->getNops() > qc2->getNops())? 1: ratio;
 
 		while (it1 != end1 && it2 != end2) {
-			for (int i = 0; i < ratio1 && it1 != end1; ++i) {
-				applyGate(*it1, results.result, LEFT);
+			for (unsigned int i = 0; i < ratio1 && it1 != end1; ++i) {
+				applyGate(*it1, results.result, perm1, LEFT);
 				++it1;
-				//performedSequence.push_back(LEFT);
 			}
-			for (int i = 0; i < ratio2 && it2 != end2; ++i) {
-				applyGate(*it2, results.result, RIGHT);
+			for (unsigned int i = 0; i < ratio2 && it2 != end2; ++i) {
+				applyGate(*it2, results.result, perm2, RIGHT);
 				++it2;
-				//performedSequence.push_back(RIGHT);
 			}
 		}
-
 	}
 
 	/// Look-ahead LEFT and RIGHT and choose the more promising option
-	void ImprovedDDEquivalenceChecker::checkLookahead() {
+	void ImprovedDDEquivalenceChecker::checkLookahead(qc::permutationMap& perm1, qc::permutationMap& perm2) {
 		dd::Edge lookLeft{}, lookRight{}, left{}, right{}, saved{};
 		bool cachedLeft = false, cachedRight = false;
 		std::unordered_set<dd::NodePtr> visited1{};
@@ -125,14 +157,14 @@ namespace ec {
 
 		while (it1 != end1 && it2 != end2) {
 			if(!cachedLeft) {
-				left = (*it1)->getDD(dd, line);
+				left = (*it1)->getDD(dd, line, perm1);
 				dd->incRef(left);
 				++it1;
 				cachedLeft = true;
 			}
 
 			if (!cachedRight) {
-				right = (*it2)->getInverseDD(dd, line);
+				right = (*it2)->getInverseDD(dd, line, perm2);
 				dd->incRef(right);
 				++it2;
 				cachedRight = true;
@@ -150,12 +182,10 @@ namespace ec {
 				results.result = lookLeft;
 				dd->decRef(left);
 				cachedLeft = false;
-				//performedSequence.push_back(LEFT);
 			} else {
 				results.result = lookRight;
 				dd->decRef(right);
 				cachedRight = false;
-				//performedSequence.push_back(RIGHT);
 			}
 			dd->incRef(results.result);
 			dd->decRef(saved);
@@ -169,7 +199,6 @@ namespace ec {
 			dd->decRef(saved);
 			dd->decRef(left);
 			dd->garbageCollect();
-			//performedSequence.push_back(LEFT);
 		}
 
 		if (cachedRight) {
@@ -179,7 +208,6 @@ namespace ec {
 			dd->decRef(saved);
 			dd->decRef(right);
 			dd->garbageCollect();
-			//performedSequence.push_back(RIGHT);
 		}
 
 	}

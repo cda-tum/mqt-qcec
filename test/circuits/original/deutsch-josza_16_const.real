@@ -1,0 +1,37 @@
+.numvars 16
+.variables x0 x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 x11 x12 x13 x14 x15
+.constants 0000000000000001
+.garbage ----------------
+.begin
+h1 x0
+h1 x1
+h1 x2
+h1 x3
+h1 x4
+h1 x5
+h1 x6
+h1 x7
+h1 x8
+h1 x9
+h1 x10
+h1 x11
+h1 x12
+h1 x13
+h1 x14
+h1 x15
+h1 x0
+h1 x1
+h1 x2
+h1 x3
+h1 x4
+h1 x5
+h1 x6
+h1 x7
+h1 x8
+h1 x9
+h1 x10
+h1 x11
+h1 x12
+h1 x13
+h1 x14
+.end

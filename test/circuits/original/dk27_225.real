@@ -1,0 +1,39 @@
+# Function: dk27
+# Used Library: MCT (Gates: 24, Quantum costs: 248)
+# This file have been taken from RevLib (www.revlib.org).
+.version  1.0
+# Created by tfc2real J. Rice Jan 2009
+# Parameters for Exorcism: -n 1 -r 1 -a 1 -b 0 -c 1
+# Templates applied in both directions
+.numvars 18
+.variables  f8 f7 f6 f5 f4 f3 f2 f1 f0 x8 x7 x6 x5 x4 x3 x2 x1 x0
+.inputs  0 0 0 0 0 0 0 0 0 x8 x7 x6 x5 x4 x3 x2 x1 x0
+.outputs  f8 f7 f6 f5 f4 f3 f2 f1 f0 x8 x7 x6 x5 x4 x3 x2 x1 x0
+.constants 000000000---------
+.garbage 111111111---------
+.begin
+t2 x2 f8
+t2 x4 f0
+t2 x4 f7
+t1 x7
+t3 x0 x7 f3
+t3 x1 x7 f5
+t2 x7 f0
+t2 x7 f1
+t3 x5 x7 f6
+t1 x4
+t3 x2 x4 f0
+t1 x2
+t4 x2 x4 x7 f0
+t4 x2 x4 x7 f1
+t1 x0
+t1 x1
+t1 x5
+t7 x0 x1 x2 x4 x5 x7 f2
+t7 x0 x1 x2 x4 x5 x7 f7
+t1 x7
+t1 x6
+t7 x1 x2 x4 x5 x6 x7 f2
+t1 x3
+t6 x0 x2 x3 x4 x7 f4
+.end

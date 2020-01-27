@@ -1,0 +1,56 @@
+# Function: 0410184
+# Used Library: NCT (gates: 46, quantum costs: 14)
+# This file have been taken from RevLib (www.revlib.org). 
+.version 1.0
+.numvars 14
+.variables x0 x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 x11 x12 x13
+.inputs x0 x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 x11 x12 x13
+.outputs x0 x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 x11 x12 x13
+.begin
+t2 x4 x3
+t2 x6 x5
+t2 x8 x7
+t2 x10 x9
+t2 x12 x11
+t2 x4 x2
+t3 x0 x1 x2
+t2 x6 x4
+t3 x2 x3 x4
+t2 x8 x6
+t3 x4 x5 x6
+t2 x10 x8
+t3 x6 x7 x8
+t2 x12 x10
+t3 x8 x9 x10
+t2 x12 x13
+t1 x3
+t1 x5
+t1 x7
+t1 x9
+t3 x10 x11 x13
+t2 x2 x3
+t2 x4 x5
+t2 x6 x7
+t2 x8 x9
+t2 x10 x11
+t3 x8 x9 x10
+t3 x6 x7 x8
+t1 x9
+t2 x12 x10
+t3 x4 x5 x6
+t1 x7
+t2 x10 x8
+t3 x2 x3 x4
+t1 x5
+t2 x8 x6
+t3 x0 x1 x2
+t1 x3
+t2 x6 x4
+t2 x4 x2
+t2 x1 x0
+t2 x4 x3
+t2 x6 x5
+t2 x8 x7
+t2 x10 x9
+t2 x12 x11
+.end

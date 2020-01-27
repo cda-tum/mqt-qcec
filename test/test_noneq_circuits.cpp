@@ -15,19 +15,18 @@ class NonEQCircuitsTest : public testing::TestWithParam<std::string> {
 protected:
 	qc::QuantumComputation qc_original;
 	qc::QuantumComputation qc_erroneous;
+	ec::Configuration config{};
 
 	std::string test_original_dir = "./circuits/original/";
 	std::string test_erroneous_dir = "./circuits/erroneous/";
 
 	void SetUp() override {
-		qc::Format format = qc::Real;
-		qc_original.import(test_original_dir + GetParam() + ".real", format);
-		qc_erroneous.import(test_erroneous_dir + GetParam() + ".real", format);
+		qc_original.import(test_original_dir + GetParam() + ".real");
+		qc_erroneous.import(test_erroneous_dir + GetParam() + ".real");
 	}
 
 	void TearDown() override {
-		qc_original.reset();
-		qc_erroneous.reset();
+
 	}
 
 };
@@ -47,7 +46,7 @@ INSTANTIATE_TEST_SUITE_P(SomeCircuits, NonEQCircuitsTest,
 TEST_P(NonEQCircuitsTest, NonEquivalenceReference) {
 	ec::EquivalenceChecker noneq(qc_original, qc_erroneous);
 	noneq.expectNonEquivalent();
-	noneq.check();
+	noneq.check(config);
 	noneq.printResult(std::cout);
 	EXPECT_EQ(noneq.results.equivalence, ec::NonEquivalent);
 }
@@ -55,7 +54,7 @@ TEST_P(NonEQCircuitsTest, NonEquivalenceReference) {
 TEST_P(NonEQCircuitsTest, NonEquivalenceReferenceFromImproved) {
 	ec::ImprovedDDEquivalenceChecker noneq_ref(qc_original, qc_erroneous, ec::Reference);
 	noneq_ref.expectNonEquivalent();
-	noneq_ref.check();
+	noneq_ref.check(config);
 	noneq_ref.printResult(std::cout);
 	EXPECT_EQ(noneq_ref.results.equivalence, ec::NonEquivalent);
 }
@@ -63,7 +62,7 @@ TEST_P(NonEQCircuitsTest, NonEquivalenceReferenceFromImproved) {
 TEST_P(NonEQCircuitsTest, NonEquivalenceProportional) {
 	ec::ImprovedDDEquivalenceChecker noneq_proportional(qc_original, qc_erroneous, ec::Proportional);
 	noneq_proportional.expectNonEquivalent();
-	noneq_proportional.check();
+	noneq_proportional.check(config);
 	noneq_proportional.printResult(std::cout);
 	EXPECT_EQ(noneq_proportional.results.equivalence, ec::NonEquivalent);
 }
@@ -71,7 +70,7 @@ TEST_P(NonEQCircuitsTest, NonEquivalenceProportional) {
 TEST_P(NonEQCircuitsTest, NonEquivalenceLookahed) {
 	ec::ImprovedDDEquivalenceChecker noneq_lookahead(qc_original, qc_erroneous, ec::Lookahead);
 	noneq_lookahead.expectNonEquivalent();
-	noneq_lookahead.check();
+	noneq_lookahead.check(config);
 	noneq_lookahead.printResult(std::cout);
 	EXPECT_EQ(noneq_lookahead.results.equivalence, ec::NonEquivalent);
 }
@@ -79,7 +78,7 @@ TEST_P(NonEQCircuitsTest, NonEquivalenceLookahed) {
 TEST_P(NonEQCircuitsTest, NonEquivalenceNaive) {
 	ec::ImprovedDDEquivalenceChecker noneq_naive(qc_original, qc_erroneous, ec::Naive);
 	noneq_naive.expectNonEquivalent();
-	noneq_naive.check();
+	noneq_naive.check(config);
 	noneq_naive.printResult(std::cout);
 	EXPECT_EQ(noneq_naive.results.equivalence, ec::NonEquivalent);
 }

@@ -15,19 +15,18 @@ class EQCircuitsTest : public testing::TestWithParam<std::string> {
 protected:
 	qc::QuantumComputation qc_original;
 	qc::QuantumComputation qc_alternative;
+	ec::Configuration config{};
 
 	std::string test_original_dir = "./circuits/original/";
 	std::string test_alternative_dir = "./circuits/alternative/";
 
 	void SetUp() override {
-		qc::Format format = qc::Real;
-		qc_original.import(test_original_dir + GetParam() + ".real", format);
-		qc_alternative.import(test_alternative_dir + GetParam() + ".real", format);
+		qc_original.import(test_original_dir + GetParam() + ".real");
+		qc_alternative.import(test_alternative_dir + GetParam() + ".real");
 	}
 
 	void TearDown() override {
-		qc_original.reset();
-		qc_alternative.reset();
+
 	}
 
 };
@@ -47,7 +46,7 @@ INSTANTIATE_TEST_SUITE_P(SomeCircuits, EQCircuitsTest,
 TEST_P(EQCircuitsTest, EquivalenceReference) {
 	ec::EquivalenceChecker eq(qc_original, qc_alternative);
 	eq.expectEquivalent();
-	eq.check();
+	eq.check(config);
 	eq.printResult(std::cout);
 	EXPECT_EQ(eq.results.equivalence, ec::Equivalent);
 }
@@ -55,7 +54,7 @@ TEST_P(EQCircuitsTest, EquivalenceReference) {
 TEST_P(EQCircuitsTest, EquivalenceReferenceFromImproved) {
 	ec::ImprovedDDEquivalenceChecker eq_ref(qc_original, qc_alternative, ec::Reference);
 	eq_ref.expectEquivalent();
-	eq_ref.check();
+	eq_ref.check(config);
 	eq_ref.printResult(std::cout);
 	EXPECT_EQ(eq_ref.results.equivalence, ec::Equivalent);
 }
@@ -63,7 +62,7 @@ TEST_P(EQCircuitsTest, EquivalenceReferenceFromImproved) {
 TEST_P(EQCircuitsTest, EquivalenceProportional) {
 	ec::ImprovedDDEquivalenceChecker eq_proportional(qc_original, qc_alternative, ec::Proportional);
 	eq_proportional.expectEquivalent();
-	eq_proportional.check();
+	eq_proportional.check(config);
 	eq_proportional.printResult(std::cout);
 	EXPECT_EQ(eq_proportional.results.equivalence, ec::Equivalent);
 }
@@ -71,7 +70,7 @@ TEST_P(EQCircuitsTest, EquivalenceProportional) {
 TEST_P(EQCircuitsTest, EquivalenceLookahead) {
 	ec::ImprovedDDEquivalenceChecker eq_lookahead(qc_original, qc_alternative, ec::Lookahead);
 	eq_lookahead.expectEquivalent();
-	eq_lookahead.check();
+	eq_lookahead.check(config);
 	eq_lookahead.printResult(std::cout);
 	EXPECT_EQ(eq_lookahead.results.equivalence, ec::Equivalent);
 }
@@ -79,7 +78,7 @@ TEST_P(EQCircuitsTest, EquivalenceLookahead) {
 TEST_P(EQCircuitsTest, EquivalenceNaive) {
 	ec::ImprovedDDEquivalenceChecker eq_naive(qc_original, qc_alternative, ec::Naive);
 	eq_naive.expectEquivalent();
-	eq_naive.check();
+	eq_naive.check(config);
 	eq_naive.printResult(std::cout);
 	EXPECT_EQ(eq_naive.results.equivalence, ec::Equivalent);
 }

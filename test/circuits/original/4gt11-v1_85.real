@@ -1,0 +1,18 @@
+# Function: 4gt11-v1
+# Checks, if input is greater than 11.
+# Note: Embedding with constant 1.
+# Used Library: MCT (gates: 4, quantum costs: 8)
+# This file have been taken from RevLib (www.revlib.org). 
+.version 1.0
+.numvars 5
+.variables a b c d e
+.inputs 1 b c d e
+.outputs g g g g f
+.constants 1----
+.garbage 1111-
+.begin
+t2 e a
+t1 e
+t3 c b a
+t2 a e
+.end

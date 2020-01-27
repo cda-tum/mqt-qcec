@@ -24,7 +24,8 @@ with the following available methods:
    - Reference,
    - Naive,
    - Proportional,
-   - Lookahead.
+   - Lookahead,
+   - CompilationFlow (as of version 1.1).
 
 For details on the available methods we refer to [iic.jku.at/eda/research/quantum_verification](http://iic.jku.at/eda/research/quantum_verification).
 
@@ -36,8 +37,9 @@ It can either be used as a **standalone executable** with command-line interface
   where *\<method\>* is one of
    - reference
    - naive
-   - proportional (**default**)
+   - proportional 
    - lookahead 
+   - compilationflow (**default**)
    
    The executable performs the equivalence check and prints its result to the standard output. If the `--print_csv` option is present, a CSV entry according to the following header is printed
    
@@ -45,55 +47,80 @@ It can either be used as a **standalone executable** with command-line interface
     filename1;nqubits1;ngates1;filename2;nqubits2;ngates2;expectedEquivalent;equivalent;method;time;maxActive
     ```
    
-- The library can be used by including the ```ImprovedDDEquivalenceChecker.hpp``` header file and
+- The library can be used by including, e.g., the ```CompilationFlowEquivalenceChecker.hpp``` header file and
     ```c++
-    std::string file1 = "PATH_TO_FILE_1";
-    qc::Format format1 = qc::{ Real | OpenQASM };
-    qc::QuantumComputation qc1;
-    qc1.import(file1, format1);
+    std::string file1 = "PATH_TO_FILE_1{.real | .qasm}";
+    qc::QuantumComputation qc1(file1);
     
-    std::string file2 = "PATH_TO_FILE_2";
-    qc::Format format2 = qc::{ Real | OpenQASM };
-    qc::QuantumComputation qc2;
-    qc2.import(file2, format2);
+    std::string file2 = "PATH_TO_FILE_2{.real | .qasm}";
+    qc::QuantumComputation qc2(file2);
     
     ec::Method method = ec::{ Naive | Proportional | Lookahead };
     auto eq = ec::ImprovedDDEquivalenceChecker(qc1, qc2, method);
-    eq.check();
-    eq.printResult(std::cout);
     ```
+  or
+  ```c++ 
+  auto eq = ec::CompilationFlowEquivalenceChecker(qc1, qc2);
+  ```
+  and then calling
+  ```c++
+  eq.check(ec::Configuration{});
+  eq.printResult(std::cout);
+  ```
     Results may also be accessed through the ```eq.results``` member.
 
 ### System requirements
 
-Building (and running) is continuously tested under Linux (Ubuntu 18.04) using gcc-7.4, gcc-9 and clang-9 and MacOS (Mojave 10.14) using AppleClang and gcc-9. 
+Building (and running) is continuously tested under Linux (Ubuntu 18.04) using gcc-7.4, gcc-9 and clang-9, MacOS (Mojave 10.14) using AppleClang and gcc-9, and Windows using MSVC 15.9. 
 However, the implementation should be compatible with any current C++ compiler supporting C++14 and a minimum CMake version of 3.10.
 
 ### Build and Run
 For building the library alone the CMake target `QCEC` is available, i.e.,
 ```commandline
 mkdir build && cd build
-cmake ..
-cmake --build . --target QCEC
+cmake .. -DCMAKE_BUILD_TYPE=Release
+cmake --build . --config Release  --target QCEC
+```
+
+Windows users using Visual Studio and the MSVC compiler need to build the project with
+```commandline
+mkdir build && cd build
+cmake .. -G "Visual Studio 15 2017" -A x64 -DCMAKE_BUILD_TYPE=Release
+cmake --build . --config Release --target QCEC
 ```
 
 To build the library and run a small demo, showcasing the tool's features, build the `QCEC_example` CMake target and run the resulting executable:
 
 ```commandline
-cmake --build . --target QCEC_example
+cmake --build . --config Release --target QCEC_example
 ./QCEC_example
 ```
 
 The standalone executable is built via:
 
 ```commandline 
-cmake --build . --target QCEC_app
+cmake --build . --target QCEC_app --config Release
 ```
 
-The repository also includes some (rudimentary) unit tests (using GoogleTest), which aim to ensure the correct behaviour of the tool. They can be built and executed in the following way:
+The repository also includes some unit tests (using GoogleTest), which aim to ensure the correct behaviour of the tool. They can be built and executed in the following way:
 ```commandline
-cmake --build . --target QCEC_test
+cmake --build . --config Release --target QCEC_test
 ./QCEC_test
+```
+
+The QCEC library and tool may be installed on the system by executing
+
+```commandline
+mkdir build && cd build
+cmake .. -DCMAKE_BUILD_TYPE=Release
+cmake --build . --config Release --target install
+```
+
+It can then also be included in other projects using the following CMake snippet
+
+```cmake
+find_package(QCEC)
+target_link_libraries(${TARGET_NAME} PRIVATE EC::QCEC)
 ```
 
 ## Reference

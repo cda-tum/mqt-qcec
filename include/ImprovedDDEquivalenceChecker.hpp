@@ -9,26 +9,27 @@
 #include <memory>
 #include <array>
 #include <unordered_set>
+#include <chrono>
 
 #include "EquivalenceChecker.hpp"
-#include "Operation.hpp"
 
 namespace ec {
 
 	class ImprovedDDEquivalenceChecker: public EquivalenceChecker {
+
+		/// Alternate between LEFT and RIGHT applications
+		void checkNaive(qc::permutationMap& perm1, qc::permutationMap& perm2);
+		/// Alternate according to the gate count ratio between LEFT and RIGHT applications
+		void checkProportional(qc::permutationMap& perm1, qc::permutationMap& perm2);
+		/// Look-ahead LEFT and RIGHT and choose the more promising option
+		void checkLookahead(qc::permutationMap& perm1, qc::permutationMap& perm2);
+
+	protected:
 		decltype(qc1->begin()) it1;
 		decltype(qc2->begin()) it2;
 		decltype(qc1->end()) end1;
 		decltype(qc1->end()) end2;
 
-		/// Alternate between LEFT and RIGHT applications
-		void checkNaive();
-		/// Alternate according to the gate count ratio between LEFT and RIGHT applications
-		void checkProportional();
-		/// Look-ahead LEFT and RIGHT and choose the more promising option
-		void checkLookahead();
-
-	protected:
 		std::array<short, qc::MAX_QUBITS> line{};
 		Method method = Proportional;
 
@@ -36,7 +37,7 @@ namespace ec {
 		/// \param op operation to apply
 		/// \param to DD to apply the operation to
 		/// \param dir LEFT or RIGHT
-		void applyGate(std::unique_ptr<qc::Operation>& op, dd::Edge& to, Direction dir = LEFT);
+		void applyGate(std::unique_ptr<qc::Operation>& op, dd::Edge& e, std::map<unsigned short, unsigned short>& permutation, Direction dir = LEFT);
 
 		unsigned long long nodecount(const dd::Edge& e, std::unordered_set<dd::NodePtr>& visited) {
 			visited.insert(e.p);
@@ -54,7 +55,7 @@ namespace ec {
 	public:
 		ImprovedDDEquivalenceChecker(qc::QuantumComputation& qc1, qc::QuantumComputation& qc2, Method method = Proportional):
 				EquivalenceChecker(qc1, qc2), method(method){
-			line.fill(-1);
+			line.fill(qc::LINE_DEFAULT);
 			results.method = method;
 		}
 
@@ -67,7 +68,7 @@ namespace ec {
 		}
 
 		/// Use dedicated method to check the equivalence of both provided circuits
-		void check() override;
+		void check(const Configuration& config) override;
 	};
 
 }

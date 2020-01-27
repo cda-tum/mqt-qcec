@@ -1,0 +1,16 @@
+# Function: ham3
+# Used Library: MCT+MCF (gates: 4, quantum costs: 10)
+# This file have been taken from RevLib (www.revlib.org).
+.version 1.0
+.numvars 3
+.variables a b c
+.inputs a b c
+.outputs a b c
+.constants ---
+.garbage ---
+.begin
+t3 b c a
+t2 a b
+f2 b c
+t2 a b
+.end

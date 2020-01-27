@@ -1,11 +1,18 @@
 add_executable(${PROJECT_NAME}_app ${CMAKE_CURRENT_SOURCE_DIR}/app.cpp)
 target_compile_features(${PROJECT_NAME}_app PUBLIC cxx_std_14)
 set_target_properties(${PROJECT_NAME}_app PROPERTIES CXX_EXTENSIONS OFF)
-target_compile_options(${PROJECT_NAME}_app PUBLIC -mtune=native -march=native -pipe)
-target_link_libraries(${PROJECT_NAME}_app PRIVATE ${PROJECT_NAME})
+target_link_libraries(${PROJECT_NAME}_app PRIVATE EC::${PROJECT_NAME})
+if(MSVC)
+	target_compile_options(${PROJECT_NAME}_app PUBLIC "/W4" "$<$<CONFIG:RELEASE>:/O2 /GL>")
+	target_link_options(${PROJECT_NAME}_app PUBLIC "$<$<CONFIG:Release>:/LTCG>")
+else()
+	target_compile_options(${PROJECT_NAME}_app PUBLIC -Wall $<$<CONFIG:DEBUG>:-g3 -Og -Wextra -Wpedantic -pedantic> $<$<CONFIG:RELEASE>:-O3 -mtune=native -march=native -DNDEBUG -g0>)
+endif()
 
 execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}_app ${CMAKE_BINARY_DIR}/${PROJECT_NAME}_app)
 
-file(COPY        ${CMAKE_CURRENT_SOURCE_DIR}/../extern/qfr/test/qelib1.inc
-     DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink ${CMAKE_CURRENT_BINARY_DIR}/qelib1.inc ${CMAKE_BINARY_DIR}/qelib1.inc)
+include(GNUInstallDirs)
+install(TARGETS ${PROJECT_NAME}_app
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+
+set_target_properties(${PROJECT_NAME}_app PROPERTIES EXPORT_NAME QCEC_app)

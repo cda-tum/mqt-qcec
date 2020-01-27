@@ -1,4 +1,10 @@
-add_subdirectory("${PROJECT_SOURCE_DIR}/extern/googletest" "extern/googletest")
+# fix cmake warnings for googletest when building shared libs
+if (APPLE AND BUILD_SHARED_LIBS)
+	set(CMAKE_MACOSX_RPATH ON)
+endif ()
+# Prevent overriding the parent project's compiler/linker settings on Windows
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+add_subdirectory("${PROJECT_SOURCE_DIR}/extern/googletest" "extern/googletest" EXCLUDE_FROM_ALL)
 mark_as_advanced(
 		BUILD_GMOCK BUILD_GTEST BUILD_SHARED_LIBS
 		gmock_build_tests gtest_build_samples gtest_build_tests
@@ -8,24 +14,38 @@ set_target_properties(gtest PROPERTIES FOLDER extern)
 set_target_properties(gtest_main PROPERTIES FOLDER extern)
 set_target_properties(gmock PROPERTIES FOLDER extern)
 set_target_properties(gmock_main PROPERTIES FOLDER extern)
+target_compile_features(gtest PUBLIC cxx_std_14)
+target_compile_features(gtest_main PUBLIC cxx_std_14)
+target_compile_features(gmock PUBLIC cxx_std_14)
+target_compile_features(gmock_main PUBLIC cxx_std_14)
 
 add_executable(${PROJECT_NAME}_example ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp)
 target_compile_features(${PROJECT_NAME}_example PUBLIC cxx_std_14)
 set_target_properties(${PROJECT_NAME}_example PROPERTIES CXX_EXTENSIONS OFF)
-target_compile_options(${PROJECT_NAME}_example PUBLIC -mtune=native -march=native -pipe)
 target_link_libraries(${PROJECT_NAME}_example PRIVATE ${PROJECT_NAME})
+if(MSVC)
+	target_compile_options(${PROJECT_NAME}_example PUBLIC "/W4" "$<$<CONFIG:RELEASE>:/O2 /GL>")
+	target_link_options(${PROJECT_NAME}_example PUBLIC "$<$<CONFIG:Release>:/LTCG>")
+else()
+	target_compile_options(${PROJECT_NAME}_example PUBLIC -Wall $<$<CONFIG:DEBUG>:-g3 -Og -Wextra -Wpedantic -pedantic> $<$<CONFIG:RELEASE>:-O3 -mtune=native -march=native -DNDEBUG -g0>)
+endif()
 
 macro(package_add_test TESTNAME)
 	# create an exectuable in which the tests will be stored
 	add_executable(${TESTNAME} ${ARGN})
 	# link the Google test infrastructure, mocking library, and a default main fuction to
 	# the test executable.  Remove g_test_main if writing your own main function.
-	target_link_libraries(${TESTNAME} PRIVATE ${PROJECT_NAME} gtest gmock gtest_main)
-	target_compile_options(${TESTNAME} PUBLIC -mtune=native -march=native -pipe)
+	target_link_libraries(${TESTNAME} PRIVATE EC::${PROJECT_NAME} gmock gtest_main)
 	set_property(TARGET ${TESTNAME} PROPERTY CXX_EXTENSIONS OFF)
 	if (COVERAGE)
 		target_compile_options(${TESTNAME} PRIVATE --coverage)
 		target_link_libraries(${TESTNAME} PRIVATE --coverage)
+	endif()
+	if(MSVC)
+		target_compile_options(${TESTNAME} PUBLIC "/W4" "$<$<CONFIG:RELEASE>:/O2 /GL>")
+		target_link_options(${TESTNAME} PUBLIC "$<$<CONFIG:Release>:/LTCG>")
+	else()
+		target_compile_options(${TESTNAME} PUBLIC -Wall $<$<CONFIG:DEBUG>:-g3 -Og -Wextra -Wpedantic -pedantic> $<$<CONFIG:RELEASE>:-O3 -mtune=native -march=native -DNDEBUG -g0>)
 	endif()
 
 	# gtest_discover_tests replaces gtest_add_tests,
@@ -38,11 +58,14 @@ macro(package_add_test TESTNAME)
 	set_target_properties(${TESTNAME} PROPERTIES FOLDER tests)
 endmacro()
 
-package_add_test(${PROJECT_NAME}_test ${CMAKE_CURRENT_SOURCE_DIR}/test_general.cpp ${CMAKE_CURRENT_SOURCE_DIR}/test_eq_circuits.cpp ${CMAKE_CURRENT_SOURCE_DIR}/test_noneq_circuits.cpp)
+package_add_test(${PROJECT_NAME}_test
+                 ${CMAKE_CURRENT_SOURCE_DIR}/test_general.cpp
+                 ${CMAKE_CURRENT_SOURCE_DIR}/test_functionality.cpp
+                 ${CMAKE_CURRENT_SOURCE_DIR}/test_eq_circuits.cpp
+                 ${CMAKE_CURRENT_SOURCE_DIR}/test_noneq_circuits.cpp
+                 ${CMAKE_CURRENT_SOURCE_DIR}/test_compilationflow.cpp)
 
 file(COPY        ${CMAKE_CURRENT_SOURCE_DIR}/circuits
-     DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-file(COPY        ${CMAKE_CURRENT_SOURCE_DIR}/../extern/qfr/test/qelib1.inc
      DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 # create symlinks

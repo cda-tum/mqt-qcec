@@ -1,12 +1,16 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.10...3.16)
+if(${CMAKE_VERSION} VERSION_LESS 3.12)
+	cmake_policy(VERSION ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION})
+endif()
+
 project(QCEC
-        VERSION 1.0.2
+        VERSION 1.1
         DESCRIPTION "A tool for equivalence checking of quantum circuits (based on decision diagrams)"
         LANGUAGES CXX)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
-
 SET(COVERAGE OFF CACHE BOOL "Coverage")
+option(BUILD_SHARED_LIBS "Build shared libraries (.dll/.so) instead of static ones (.lib/.a)" OFF)
 
 set(default_build_type "Release")
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
@@ -18,35 +22,35 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
 	             "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
 endif()
 
-find_package(Git QUIET)
-if(GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git")
-	# Update submodules as needed
-	option(GIT_SUBMODULE "Check submodules during build" ON)
-	if(GIT_SUBMODULE)
-		message(STATUS "Submodule update")
-		execute_process(COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive
+option(GIT_SUBMODULE "Check submodules during build" ON)
+macro(handle_submodule MODULENAME)
+	find_package(Git QUIET)
+	if(GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git" AND GIT_SUBMODULE)
+		message(STATUS "${MODULENAME} update")
+		execute_process(COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive --remote -- extern/${MODULENAME}
 		                WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 		                RESULT_VARIABLE GIT_SUBMOD_RESULT)
 		if(NOT GIT_SUBMOD_RESULT EQUAL "0")
-			message(FATAL_ERROR "git submodule update --init failed with ${GIT_SUBMOD_RESULT}, please checkout submodules")
+			message(FATAL_ERROR "git submodule update --init --recursive --remote -- extern/${MODULENAME} failed with ${GIT_SUBMOD_RESULT}.")
 		endif()
 	endif()
-endif()
 
-if(NOT EXISTS "${PROJECT_SOURCE_DIR}/extern/qfr/CMakeLists.txt")
-	message(FATAL_ERROR "DD package failed to download! GIT_SUBMODULE was turned off or failed. Please update submodules and try again.")
-endif()
+	if(NOT EXISTS "${PROJECT_SOURCE_DIR}/extern/${MODULENAME}/CMakeLists.txt")
+		message(FATAL_ERROR "${MODULENAME} failed to download! GIT_SUBMODULE was turned off or failed. Please update submodules and try again.")
+	endif()
+endmacro()
 
-if(NOT EXISTS "${PROJECT_SOURCE_DIR}/extern/googletest/CMakeLists.txt")
-	message(FATAL_ERROR "GoogleTest failed to download! GIT_SUBMODULE was turned off or failed. Please update submodules and try again.")
-endif()
+handle_submodule(qfr)
 
 add_subdirectory(src)
 
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
+	handle_submodule(googletest)
+
 	enable_testing()
 	include(GoogleTest)
 	add_subdirectory(test)
+
+	add_subdirectory(apps)
 endif()
 
-add_subdirectory(apps)

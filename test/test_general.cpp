@@ -6,48 +6,86 @@
 #include <iostream>
 #include <string>
 #include <sstream>
+#include <CompilationFlowEquivalenceChecker.hpp>
 
 #include "gtest/gtest.h"
+#include "gmock/gmock.h"
 #include "EquivalenceChecker.hpp"
 #include "ImprovedDDEquivalenceChecker.hpp"
+
+using ::testing::HasSubstr;
 
 class GeneralTest : public ::testing::Test {
 protected:
 	qc::QuantumComputation qc_original;
 	qc::QuantumComputation qc_alternative;
 
-	std::string test_original_dir = "./circuits/original/";
-	std::string test_alternative_dir = "./circuits/alternative/";
-
 	void TearDown() override {
-		qc_original.reset();
-		qc_alternative.reset();
+
 	}
 };
 
-TEST_F(GeneralTest, InvalidInstance) {
-	qc::Format format = qc::Format::Real;
-	qc_original.import(test_original_dir + "3_17_13.real", format);
-	qc_alternative.import(test_alternative_dir + "qft_16.real", format);
+TEST_F(GeneralTest, CSVOutput) {
+	qc_original.import("./circuits/test_original.real");
+	qc_alternative.import("./circuits/test_alternative.real");
 
 	ec::EquivalenceChecker ec(qc_original, qc_alternative);
-	ec.check();
-	EXPECT_TRUE(ec.error());
+	ec.expectEquivalent();
+	ec.check(ec::Configuration{});
+	EXPECT_NO_THROW(ec.exportResultAsDot("result.dot"));
+	EXPECT_FALSE(ec.error());
 
-	ec::ImprovedDDEquivalenceChecker iec(qc_original, qc_alternative);
-	iec.check();
-	EXPECT_TRUE(iec.error());
+	std::stringstream ss{};
+	ec.printCSVEntry(ss);
+	std::string csvEntry = ss.str();
+	std::string expectedEntry = "test_original;5;5;test_alternative;5;19;EQ  ;EQ  ;Reference;";
+	EXPECT_THAT(csvEntry, HasSubstr(expectedEntry));
+
+	ss.str("");
+	ss.clear();
+	ec.printCSVHeader(ss);
+	std::string csvHeader = ss.str();
+	std::string expectedHeader = "filename1;nqubits1;ngates1;filename2;nqubits2;ngates2;expectedEquivalent;equivalent;method;time;maxActive";
+	EXPECT_THAT(csvHeader, HasSubstr(expectedHeader));
 }
 
-TEST_F(GeneralTest, TooManyQubits) {
-	qc_original.import("./circuits/test_error.qasm", qc::OpenQASM);
-	qc_alternative.import("./circuits/test_error.qasm", qc::OpenQASM);
+TEST_F(GeneralTest, InvalidInstance) {
+	qc_original.import("./circuits/test_original.real");
+	qc_alternative.import("./circuits/test_error.qasm");
 
 	ec::EquivalenceChecker ec(qc_original, qc_alternative);
-	ec.check();
+	ec.check(ec::Configuration{});
+	EXPECT_EQ(ec.results.equivalence, ec::NoInformation);
 	EXPECT_TRUE(ec.error());
 
-	ec::ImprovedDDEquivalenceChecker iec(qc_original, qc_alternative);
-	iec.check();
-	EXPECT_TRUE(iec.error());
+	ec::CompilationFlowEquivalenceChecker cfec(qc_original, qc_alternative);
+	cfec.check(ec::Configuration{});
+	EXPECT_EQ(cfec.results.equivalence, ec::NoInformation);
+	EXPECT_TRUE(cfec.error());
+}
+
+TEST_F(GeneralTest, NonUnitary) {
+	std::string bell_circuit_measure = "OPENQASM 2.0;\nqreg q[2];\ncreg c[2];\nU(pi/2,0,pi) q[0];\nCX q[0],q[1];\nmeasure q[0] -> c[0];\n";
+	std::stringstream ss1{bell_circuit_measure};
+	ASSERT_NO_THROW(qc_original.import(ss1, qc::OpenQASM));
+	std::string bell_circuit = "OPENQASM 2.0;\nqreg q[2];\nU(pi/2,0,pi) q[0];\nCX q[0],q[1];\n";
+	std::stringstream ss2{bell_circuit};
+	ASSERT_NO_THROW(qc_alternative.import(ss2, qc::OpenQASM));
+	ec::EquivalenceChecker ec(qc_original, qc_alternative);
+	EXPECT_EXIT(ec.check(ec::Configuration{}), ::testing::ExitedWithCode(1),
+	            "Functionality not unitary.");
+
+	ec::EquivalenceChecker ec2(qc_alternative, qc_original);
+	EXPECT_EXIT(ec2.check(ec::Configuration{}), ::testing::ExitedWithCode(1),
+	            "Functionality not unitary.");
+}
+
+TEST_F(GeneralTest, SwitchDifferentlySizedCircuits) {
+	qc_original.import("./circuits/original/3_17_13.real");
+	qc_alternative.import("./circuits/transpiled/3_17_13_transpiled.qasm");
+
+	ec::EquivalenceChecker ec(qc_alternative, qc_original);
+	ec.check(ec::Configuration{true, true});
+	EXPECT_EQ(ec.results.equivalence, ec::Equivalent);
+	EXPECT_FALSE(ec.error());
 }

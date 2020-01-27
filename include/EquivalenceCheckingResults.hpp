@@ -13,14 +13,14 @@
 
 namespace ec {
 	enum Equivalence {
-		NonEquivalent, Equivalent, NoInformation, ProbablyEquivalent
+		NonEquivalent, Equivalent, NoInformation, ProbablyEquivalent, EquivalentUpToGlobalPhase
 	};
 
 	enum Method {
-		Reference, Naive, Proportional, Lookahead
+		Reference, Naive, Proportional, Lookahead, CompilationFlow
 	};
 
-	static std::string methodToString(const Method method) {
+	static std::string toString(const Method method) {
 		switch (method) {
 			case Reference:
 				return "Reference";
@@ -30,8 +30,26 @@ namespace ec {
 				return "Proportional";
 			case Lookahead:
 				return "Lookahead";
+			case CompilationFlow:
+				return "CompilationFlow";
 		}
-		return "Unknown strategy";
+		return " ";
+	}
+
+	static std::string toString(const Equivalence equivalence) {
+		switch (equivalence) {
+			case NonEquivalent:
+				return "NEQ ";
+			case Equivalent:
+				return "EQ  ";
+			case NoInformation:
+				return "    ";
+			case ProbablyEquivalent:
+				return "PEQ ";
+			case EquivalentUpToGlobalPhase:
+				return "EQGP";
+		}
+		return " ";
 	}
 
 	struct EquivalenceCheckingResults {
@@ -72,13 +90,16 @@ namespace ec {
 			out << "[" << time << "]\t";
 			if (equivalence == NoInformation) {
 				out << "No information on the equivalence of " << name;
-			} else if (expected == Equivalent || expected == ProbablyEquivalent) {
+			} else if (expected == Equivalent || expected == ProbablyEquivalent || expected == EquivalentUpToGlobalPhase) {
 				if (equivalence == Equivalent)
 					out << "Proven " << name << " equivalent";
 				else if (equivalence == NonEquivalent)
 					out << "\033[1;31m[FALSE NEGATIVE]\033[0m Expected " << name << " to be equivalent but shown non-equivalent";
 				else if (equivalence == ProbablyEquivalent)
 					out << "Rightfully suggesting " << name << "to be equivalent";
+				else if (equivalence == EquivalentUpToGlobalPhase) {
+					out << "Proven " << name << " equivalent up to global phase";
+				}
 			} else if (expected == NonEquivalent) {
 				if (equivalence == Equivalent)
 					out << "\033[1;31m[FALSE POSITIVE]\033[0m Expected " << name << " to be non-equivalent but showed equivalent";
@@ -86,6 +107,8 @@ namespace ec {
 					out << "Proven " << name << " non-equivalent";
 				else if (equivalence == ProbablyEquivalent)
 					out << "\033[1;31mWrongfully suggesting " << name << "to be equivalent\033[0m";
+				else if (equivalence == EquivalentUpToGlobalPhase)
+					out << "\033[1;31m[FALSE POSITIVE]\033[0m Expected " << name << " to be non-equivalent but showed equivalent up to global phase";
 			} else if (expected == NoInformation) {
 				if (equivalence == Equivalent)
 					out << "Shown " << name << " equivalent";
@@ -93,8 +116,10 @@ namespace ec {
 					out << "Shown " << name << " non-equivalent";
 				else if (equivalence == ProbablyEquivalent)
 					out << "Suggesting " << name << " to be-equivalent";
+				else if (equivalence == EquivalentUpToGlobalPhase)
+					out << "Shown " << name << " equivalent up to global phase";
 			}
-			out << " with " << methodToString(method) << " method (and a maximum of " << maxActive << " active nodes)\n";
+			out << " with " << toString(method) << " method (and a maximum of " << maxActive << " active nodes)\n";
 			return out;
 		}
 
@@ -106,7 +131,7 @@ namespace ec {
 		virtual std::ostream& printCSVEntry(std::ostream& out) {
 			if (error())
 				return out;
-			out << name1 << ";" << nqubits1 << ";" << ngates1 << ";" << name2 << ";" << nqubits2 << ";" << ngates2 << ";" << ((expected == Equivalent || expected == NonEquivalent)? std::to_string(expected): " ") << ";" << (equivalence == ec::Equivalent) << ";" << methodToString(method) << ";" << time << ";" << maxActive << std::endl;
+			out << name1 << ";" << nqubits1 << ";" << ngates1 << ";" << name2 << ";" << nqubits2 << ";" << ngates2 << ";" << toString(expected) << ";" << toString(equivalence) << ";" << toString(method) << ";" << time << ";" << maxActive << std::endl;
 			return out;
 		}
 	};

@@ -1,0 +1,24 @@
+# Function: hwb4
+# Used Library: MCF (gates: 11  quantum costs: 81)
+# This file has been taken from RevLib (www.revlib.org).
+.version 1.0
+.numvars 4
+.variables a b c d
+.inputs a b c d
+.outputs a b c d
+.constants ----
+.garbage ----
+.begin
+f4 c d a b
+f2 a b
+f3 d a c
+f2 a c
+f3 d a b
+f4 a c b d
+f3 a c d
+f3 b a d
+f2 a d
+f3 a b c
+f3 c b d
+.end
+
