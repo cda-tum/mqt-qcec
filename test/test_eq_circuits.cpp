@@ -9,6 +9,8 @@
 #include "gtest/gtest.h"
 #include "EquivalenceChecker.hpp"
 #include "ImprovedDDEquivalenceChecker.hpp"
+#include "CompilationFlowEquivalenceChecker.hpp"
+#include "PowerOfSimulationEquivalenceChecker.hpp"
 
 class EQCircuitsTest : public testing::TestWithParam<std::string> {
 
@@ -21,8 +23,8 @@ protected:
 	std::string test_alternative_dir = "./circuits/alternative/";
 
 	void SetUp() override {
-		qc_original.import(test_original_dir + GetParam() + ".real");
-		qc_alternative.import(test_alternative_dir + GetParam() + ".real");
+		qc_original.import(test_original_dir + GetParam());
+		qc_alternative.import(test_alternative_dir + GetParam());
 	}
 
 	void TearDown() override {
@@ -33,15 +35,16 @@ protected:
 
 INSTANTIATE_TEST_SUITE_P(SomeCircuits, EQCircuitsTest,
                          testing::Values(
-				"3_17_13",
-				"hwb7_59",
-				"hwb8_114",
-				"mod5adder_129",
-				"grover_5"),
+				"3_17_13.real",
+				"hwb7_59.real",
+				"hwb8_114.real",
+				"mod5adder_129.real",
+				"grover_5.real",
+				"grover.qasm"),
                          [](const testing::TestParamInfo<EQCircuitsTest::ParamType>& info) {
-			                 std::stringstream ss{};
-			                 ss << info.param;
-			                 return ss.str();});
+	                         auto s = info.param;
+	                         std::replace( s.begin(), s.end(), '.', '_');
+	                         return s;});
 
 TEST_P(EQCircuitsTest, EquivalenceReference) {
 	ec::EquivalenceChecker eq(qc_original, qc_alternative);
@@ -81,5 +84,21 @@ TEST_P(EQCircuitsTest, EquivalenceNaive) {
 	eq_naive.check(config);
 	eq_naive.printResult(std::cout);
 	EXPECT_EQ(eq_naive.results.equivalence, ec::Equivalent);
+}
+
+TEST_P(EQCircuitsTest, EquivalenceCompilationFlow) {
+	ec::CompilationFlowEquivalenceChecker eq_flow(qc_original, qc_alternative);
+	eq_flow.expectEquivalent();
+	eq_flow.check(config);
+	eq_flow.printResult(std::cout);
+	EXPECT_EQ(eq_flow.results.equivalence, ec::Equivalent);
+}
+
+TEST_P(EQCircuitsTest, EquivalencePowerOfSimulation) {
+	ec::PowerOfSimulationEquivalenceChecker eq_sim(qc_original, qc_alternative);
+	eq_sim.expectEquivalent();
+	eq_sim.check(config);
+	eq_sim.printResult(std::cout);
+	EXPECT_TRUE(eq_sim.results.consideredEquivalent());
 }
 

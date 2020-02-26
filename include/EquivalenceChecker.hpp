@@ -20,6 +20,10 @@ namespace ec {
 	struct Configuration {
 		bool augmentQubitRegisters = false;
 		bool printCSV = false;
+
+		// configuration options for PowerOfSimulation equivalence checker
+		double fidelity_limit = 0.999;
+		unsigned long long max_sims = 16;
 	};
 
 	class EquivalenceChecker {
@@ -38,11 +42,6 @@ namespace ec {
 
 		bool validInstance();
 
-		// apply swaps 'on' DD in order to change 'from' to 'to'
-		// where |from| >= |to|
-		void changePermutation(dd::Edge& on, qc::permutationMap& from, const qc::permutationMap& to, std::array<short, qc::MAX_QUBITS>& line, const Direction& dir = LEFT);
-
-		void augmentQubits(qc::QuantumComputation* circuit_to_augment, qc::QuantumComputation* circuit_to_match);
 
 	public:
 		EquivalenceCheckingResults results;
@@ -80,6 +79,7 @@ namespace ec {
 			dd->export2Dot(results.result, filename.c_str());
 		}
 
+		static void augmentQubits(qc::QuantumComputation* circuit_to_augment, qc::QuantumComputation* circuit_to_match);
 	};
 
 

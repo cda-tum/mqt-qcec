@@ -9,6 +9,8 @@
 #include "gtest/gtest.h"
 #include "EquivalenceChecker.hpp"
 #include "ImprovedDDEquivalenceChecker.hpp"
+#include "CompilationFlowEquivalenceChecker.hpp"
+#include "PowerOfSimulationEquivalenceChecker.hpp"
 
 class NonEQCircuitsTest : public testing::TestWithParam<std::string> {
 
@@ -21,8 +23,8 @@ protected:
 	std::string test_erroneous_dir = "./circuits/erroneous/";
 
 	void SetUp() override {
-		qc_original.import(test_original_dir + GetParam() + ".real");
-		qc_erroneous.import(test_erroneous_dir + GetParam() + ".real");
+		qc_original.import(test_original_dir + GetParam());
+		qc_erroneous.import(test_erroneous_dir + GetParam());
 	}
 
 	void TearDown() override {
@@ -33,15 +35,16 @@ protected:
 
 INSTANTIATE_TEST_SUITE_P(SomeCircuits, NonEQCircuitsTest,
                          testing::Values(
-				"3_17_13",
-				"hwb7_59",
-				"hwb8_114",
-				"grover_5"
+				"3_17_13.real",
+				"hwb7_59.real",
+				"hwb8_114.real",
+				"grover_5.real",
+				"grover.qasm"
 				),
                          [](const testing::TestParamInfo<NonEQCircuitsTest::ParamType>& info) {
-			                 std::stringstream ss{};
-			                 ss << info.param;
-			                 return ss.str();});
+	                         auto s = info.param;
+	                         std::replace( s.begin(), s.end(), '.', '_');
+	                         return s;});
 
 TEST_P(NonEQCircuitsTest, NonEquivalenceReference) {
 	ec::EquivalenceChecker noneq(qc_original, qc_erroneous);
@@ -83,4 +86,18 @@ TEST_P(NonEQCircuitsTest, NonEquivalenceNaive) {
 	EXPECT_EQ(noneq_naive.results.equivalence, ec::NonEquivalent);
 }
 
+TEST_P(NonEQCircuitsTest, NonEquivalenceCompilationFlow) {
+	ec::ImprovedDDEquivalenceChecker noneq_flow(qc_original, qc_erroneous);
+	noneq_flow.expectNonEquivalent();
+	noneq_flow.check(config);
+	noneq_flow.printResult(std::cout);
+	EXPECT_EQ(noneq_flow.results.equivalence, ec::NonEquivalent);
+}
 
+TEST_P(NonEQCircuitsTest, NonEquivalencePowerOfSimulation) {
+	ec::PowerOfSimulationEquivalenceChecker noneq_sim(qc_original, qc_erroneous);
+	noneq_sim.expectNonEquivalent();
+	noneq_sim.check(config);
+	noneq_sim.printResult(std::cout);
+	EXPECT_EQ(noneq_sim.results.equivalence, ec::NonEquivalent);
+}

@@ -14,8 +14,8 @@ namespace ec {
 		auto start = std::chrono::high_resolution_clock::now();
 
 		// reduce both circuits qubits to a minimum by stripping away idle qubits
-		qc1->stripTrailingIdleQubits();
-		qc2->stripTrailingIdleQubits();
+		qc1->stripIdleQubits();
+		qc2->stripIdleQubits();
 
 		#if DEBUG_MODE_EC
 		std::cout << "QC1: ";
@@ -33,6 +33,12 @@ namespace ec {
 		qc::permutationMap perm2 = qc2->initialLayout;
 		results.result = qc1->createInitialMatrix(dd);
 		dd->incRef(results.result);
+
+		#if DEBUG_MODE_EC
+		std::stringstream eiss{};
+		eiss << "flow_initial_" << filename1 << ".dot";
+		dd->export2Dot(results.result, eiss.str().c_str());
+		#endif
 
 		it1 = qc1->begin();
 		it2 = qc2->begin();
@@ -64,8 +70,8 @@ namespace ec {
 			++it2;
 		}
 
-		changePermutation(results.result, perm1, qc1->outputPermutation, line, LEFT);
-		changePermutation(results.result, perm2, qc2->outputPermutation, line, RIGHT);
+		qc::QuantumComputation::changePermutation(results.result, perm1, qc1->outputPermutation, line, dd, LEFT);
+		qc::QuantumComputation::changePermutation(results.result, perm2, qc2->outputPermutation, line, dd, RIGHT);
 		qc1->reduceAncillae(results.result, dd);
 		qc1->reduceGarbage(results.result, dd);
 

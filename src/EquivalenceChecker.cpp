@@ -37,7 +37,6 @@ void ec::EquivalenceChecker::check(const Configuration& config) {
 
 	qc::permutationMap perm1 = qc1->initialLayout;
 	dd::Edge e = qc1->createInitialMatrix(dd);
-	//dd::Edge e = dd->makeIdent(0, (short)(qc1->getNqubits()-1));
 	dd->incRef(e);
 
 	#if DEBUG_MODE_EC
@@ -70,7 +69,7 @@ void ec::EquivalenceChecker::check(const Configuration& config) {
 
 		dd->garbageCollect();
 	}
-	changePermutation(e, perm1, qc1->outputPermutation, line);
+	qc::QuantumComputation::changePermutation(e, perm1, qc1->outputPermutation, line, dd);
 	qc1->reduceAncillae(e, dd);
 	qc1->reduceGarbage(e, dd);
 
@@ -83,7 +82,6 @@ void ec::EquivalenceChecker::check(const Configuration& config) {
 
 	qc::permutationMap perm2 = qc2->initialLayout;
 	dd::Edge f = qc2->createInitialMatrix(dd);
-	//dd::Edge f = dd->makeIdent(0, (short)(qc2->getNqubits()-1));
 	dd->incRef(f);
 
 	#if DEBUG_MODE_EC
@@ -117,7 +115,7 @@ void ec::EquivalenceChecker::check(const Configuration& config) {
 
 		dd->garbageCollect();
 	}
-	changePermutation(f, perm2, qc2->outputPermutation, line);
+	qc::QuantumComputation::changePermutation(f, perm2, qc2->outputPermutation, line, dd);
 	qc2->reduceAncillae(f, dd);
 	qc2->reduceGarbage(f, dd);
 
@@ -161,82 +159,15 @@ bool ec::EquivalenceChecker::validInstance() {
 	return true;
 }
 
-void ec::EquivalenceChecker::changePermutation(dd::Edge& on, qc::permutationMap& from, const qc::permutationMap& to, std::array<short, qc::MAX_QUBITS>& line, const Direction& dir) {
-	assert(from.size() >= to.size());
-
-	#if DEBUG_MODE_EC
-	std::cout << "Trying to change: " << std::endl;
-	qc::QuantumComputation::printPermutationMap(from);
-	std::cout << "to: " << std::endl;
-	qc::QuantumComputation::printPermutationMap(to);
-	#endif
-
-	auto n = (short)(on.p->v + 1);
-
-	// iterate over (k,v) pairs of second permutation
-	for (const auto& kv: to) {
-		unsigned short i = kv.first;
-		unsigned short goal = kv.second;
-
-		// search for key in the first map
-		auto it = from.find(i);
-		if (it == from.end()) {
-			std::cerr << "Key " << it->first << " was not found in first permutation. This should never happen." << std::endl;
-			exit(1);
-		}
-		unsigned short current = it->second;
-
-		// permutations agree for this key value
-		if(current == goal) continue;
-
-		// search for goal value in first permutation
-		unsigned short j = 0;
-		for(const auto& pair: from) {
-			unsigned short value = pair.second;
-			if (value == goal) {
-				j = pair.first;
-				break;
-			}
-		}
-
-		// swap i and j
-		auto op = qc::StandardOperation(n, {i, j}, qc::SWAP);
-
-		#if DEBUG_MODE_EC
-		std::cout << "Apply SWAP: " << i << " " << j << std::endl;
-		#endif
-
-		op.setLine(line, from);
-		auto saved = on;
-		if (dir == LEFT) {
-			on = dd->multiply(op.getSWAPDD(dd, line, from), on);
-		} else {
-			on = dd->multiply(on, op.getSWAPDD(dd, line, from));
-		}
-		op.resetLine(line, from);
-		dd->incRef(on);
-		dd->decRef(saved);
-		dd->garbageCollect();
-
-		// update permutation
-		from.at(i) = goal;
-		from.at(j) = current;
-
-		#if DEBUG_MODE_EC
-		std::cout << "Changed permutation" << std::endl;
-		qc::QuantumComputation::printPermutationMap(from);
-		#endif
-	}
-
-}
 
 void ec::EquivalenceChecker::augmentQubits(qc::QuantumComputation* circuit_to_augment, qc::QuantumComputation* circuit_to_match) {
 	// handle the case when the circuits operate on different amounts of qubits (typically ancillaries or device qubits)
-	// it is assumed that these additional qubits are appended to the original list of qubits, i.e.
+	// it is assumed that these additional logical qubits are appended to the original list of qubits, i.e.
 	// if the smaller circuit has qubits
 	//      q0, q1, ..., qn,
 	// the larger circuit follows the structure
 	//      q0, q1, ..., qn, anc0, anc1, ..., ancm
+	// note this holds for LOGICAL qubits and not for the physical assignments.
 	if (circuit_to_augment->getNqubits() > circuit_to_match->getNqubits()) {
 		// switch circuits if wrong order was passed
 		augmentQubits(circuit_to_match, circuit_to_augment);
@@ -249,7 +180,19 @@ void ec::EquivalenceChecker::augmentQubits(qc::QuantumComputation* circuit_to_au
 	#if DEBUG_MODE_EC
 	std::cout << "Add additional qubits to circuit that shall be augmented" << std::endl;
 	#endif
-	circuit_to_augment->addAncillaryRegister(circuit_to_match->getNqubits() - circuit_to_augment->getNqubits());
+	unsigned short nancillae_to_augment = circuit_to_match->getNqubits() - circuit_to_augment->getNqubits();
+	unsigned short physical_qubit_index = 0;
+	for (int i=0; i<nancillae_to_augment; ++i) {
+		// find first unoccupied physical qubit
+		while (circuit_to_augment->initialLayout.count(physical_qubit_index)) {
+			physical_qubit_index++;
+		}
+		#if DEBUG_MODE_EC
+		std::cout << "Found unoccupied physical qubit: " << physical_qubit_index << std::endl;
+		#endif
+		circuit_to_augment->addAncillaryQubit(physical_qubit_index, -1);
+		physical_qubit_index++;
+	}
 	#if DEBUG_MODE_EC
 	std::cout << "Circuit to augment: ";
 	circuit_to_augment->printRegisters();
@@ -265,9 +208,6 @@ void ec::EquivalenceChecker::augmentQubits(qc::QuantumComputation* circuit_to_au
 		auto logical_qubit_index = circuit_to_match->getHighestLogicalQubitIndex();
 		removed.push_back(circuit_to_match->removeQubit(logical_qubit_index));
 	}
-	//for (unsigned short i = circuit_to_match->getNqubits()-1; i >= circuit_to_augment->getNqubitsWithoutAncillae(); --i) {
-	//	removed.push_back(circuit_to_match->removeQubit(i));
-	//}
 	#if DEBUG_MODE_EC
 	std::cout << "Circuit to match: ";
 	circuit_to_match->printRegisters();
@@ -287,8 +227,6 @@ void ec::EquivalenceChecker::augmentQubits(qc::QuantumComputation* circuit_to_au
 	std::cout << "Circuit to match: ";
 	circuit_to_match->printRegisters();
 	circuit_to_match->print();
-	//char c;
-	//std::cin >> c;
 	#endif
 
 }

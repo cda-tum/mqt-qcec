@@ -45,7 +45,7 @@ TEST_F(GeneralTest, CSVOutput) {
 	ss.clear();
 	ec.printCSVHeader(ss);
 	std::string csvHeader = ss.str();
-	std::string expectedHeader = "filename1;nqubits1;ngates1;filename2;nqubits2;ngates2;expectedEquivalent;equivalent;method;time;maxActive";
+	std::string expectedHeader = "filename1;nqubits1;ngates1;filename2;nqubits2;ngates2;expectedEquivalent;equivalent;method;time;maxActive;nsims";
 	EXPECT_THAT(csvHeader, HasSubstr(expectedHeader));
 }
 
@@ -86,6 +86,6 @@ TEST_F(GeneralTest, SwitchDifferentlySizedCircuits) {
 
 	ec::EquivalenceChecker ec(qc_alternative, qc_original);
 	ec.check(ec::Configuration{true, true});
-	EXPECT_EQ(ec.results.equivalence, ec::Equivalent);
+	EXPECT_TRUE(ec.results.equivalence == ec::Equivalent || ec.results.equivalence == ec::EquivalentUpToGlobalPhase);
 	EXPECT_FALSE(ec.error());
 }

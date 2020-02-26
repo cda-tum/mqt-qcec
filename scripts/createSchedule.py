@@ -5,9 +5,15 @@ import argparse
 
 if __name__ == '__main__':
     # set paths for all files
-    revlibPath = '../../Benchmarks/EquivalenceCheckingEvaluation/revlib/'
-    scheduleFilePath_ref = './schedule_ref.json'
-    scheduleFilePath_flow = './schedule_flow.json'
+    filepath = '../../Benchmarks/EquivalenceCheckingEvaluation/revlib/'
+    methods = ['Reference', 'Naive', 'Proportional', 'Lookahead', 'CompilationFlow', 'PowerOfSimulation']
+    benchmarks = ['o0', 'o1', 'o2', 'o3']
+
+    schedulepaths = {}
+    schedules = {}
+    for method in methods:
+        schedulepaths[method] = './schedule_' + method
+        schedules[method] = {}
 
     parser = argparse.ArgumentParser(description='Create schedule for running computations.')
     parser.add_argument("--exclude_all_timeout", action='store_true')
@@ -24,45 +30,32 @@ if __name__ == '__main__':
     else:
         data = {}
 
-    schedule_ref = {}
-    schedule_flow = {}
     for filename, d in data.items():
-        for benchmark in ['o0', 'o1', 'o2', 'o3']:
+        for benchmark in benchmarks:
             for method, results in d[benchmark].items():
-                if method in ['Reference', 'CompilationFlow']:
+                if method in methods:
                     if d[benchmark][method]['time'] is None:
-                        if method in ['Reference']:
-                            if filename not in schedule_ref:
-                                schedule_ref[filename] = {}
-                            if benchmark not in schedule_ref[filename]:
-                                schedule_ref[filename][benchmark] = []
-                            if method not in schedule_ref[filename][benchmark]:
-                                schedule_ref[filename][benchmark].append(method)
-                        else:
-                            if filename not in schedule_flow:
-                                schedule_flow[filename] = {}
-                            if benchmark not in schedule_flow[filename]:
-                                schedule_flow[filename][benchmark] = []
-                            if method not in schedule_flow[filename][benchmark]:
-                                schedule_flow[filename][benchmark].append(method)
+                        schedule = schedules[method]
+                        if filename not in schedule:
+                            schedule[filename] = {}
+                        if benchmark not in schedule[filename]:
+                            schedule[filename][benchmark] = []
+                        if method not in schedule[filename][benchmark]:
+                            schedule[filename][benchmark].append(method)
 
     if not args.exclude_all_timeout:
-        for f in os.listdir(revlibPath):
-            if os.path.isfile(os.path.join(revlibPath, f)) and not f.startswith('.'):
+        for f in os.listdir(filepath):
+            if os.path.isfile(os.path.join(filepath, f)) and not f.startswith('.'):
                 name = os.path.splitext(f)[0]
-                if name not in schedule_ref:
-                    schedule_ref[name] = {}
-                    for benchmark in ['o0', 'o1', 'o2', 'o3']:
-                        schedule_ref[name][benchmark] = ['Reference']
-                if name not in schedule_flow:
-                    schedule_flow[name] = {}
-                    for benchmark in ['o0', 'o1', 'o2', 'o3']:
-                        schedule_flow[name][benchmark] = ['CompilationFlow']
+                for method in methods:
+                    schedule = schedules[method]
+                    if name not in schedule:
+                        schedule[name] = {}
+                        for benchmark in benchmarks:
+                            schedule[name][benchmark] = [method]
 
-    with open(scheduleFilePath_ref, 'w') as scheduleFile_ref:
-        scheduleFile_ref.write(json.dumps(schedule_ref, indent=4))
-    scheduleFile_ref.close()
-
-    with open(scheduleFilePath_flow, 'w') as scheduleFile_flow:
-        scheduleFile_flow.write(json.dumps(schedule_flow, indent=4))
-    scheduleFile_flow.close()
+    for method in methods:
+        schedule = schedules[method]
+        schedulepath = schedulepaths[method]
+        with open(schedulepath, 'w') as schedulefile:
+            schedulefile.write(json.dumps(schedule, indent=4))

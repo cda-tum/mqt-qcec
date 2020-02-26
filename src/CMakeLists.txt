@@ -19,6 +19,8 @@ add_library(${PROJECT_NAME}
             ${CMAKE_CURRENT_SOURCE_DIR}/ImprovedDDEquivalenceChecker.cpp
             ${${PROJECT_NAME}_SOURCE_DIR}/include/CompilationFlowEquivalenceChecker.hpp
             ${CMAKE_CURRENT_SOURCE_DIR}/CompilationFlowEquivalenceChecker.cpp
+            ${${PROJECT_NAME}_SOURCE_DIR}/include/PowerOfSimulationEquivalenceChecker.hpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/PowerOfSimulationEquivalenceChecker.cpp
             )
 add_library(EC::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 target_include_directories(${PROJECT_NAME} PUBLIC
@@ -28,10 +30,15 @@ set_target_properties(${PROJECT_NAME} PROPERTIES CXX_EXTENSIONS OFF)
 
 option(TRY_USING_INSTALLED_QFR_LIBRARY "Attempt searching for installed version of QFR library and use it if found" ON)
 
-find_package(QFR 1.0 QUIET)
-if (QFR_FOUND AND TRY_USING_INSTALLED_QFR_LIBRARY)
-	message(STATUS "using installed QFR library")
-elseif (NOT TARGET QFR)
+if (TRY_USING_INSTALLED_QFR_LIBRARY)
+	find_package(QFR 1.0 QUIET)
+	if (QFR_FOUND)
+		message(STATUS "using installed QFR library")
+	else()
+		message(STATUS "using QFR submodule")
+		add_subdirectory("${PROJECT_SOURCE_DIR}/extern/qfr" "extern/qfr")
+	endif()
+else()
 	message(STATUS "using QFR submodule")
 	add_subdirectory("${PROJECT_SOURCE_DIR}/extern/qfr" "extern/qfr")
 endif ()

@@ -6,8 +6,10 @@
 #include <iostream>
 #include <string>
 #include <algorithm>
+#include <functional>
 
 #include "gtest/gtest.h"
+#include "PowerOfSimulationEquivalenceChecker.hpp"
 #include "CompilationFlowEquivalenceChecker.hpp"
 
 class CompilationFlowTest : public testing::TestWithParam<std::string> {
@@ -45,7 +47,7 @@ TEST_P(CompilationFlowTest, EquivalenceCompilationFlow) {
 	ec_flow.expectEquivalent();
 	ec_flow.check(config);
 	ec_flow.printResult(std::cout);
-	EXPECT_TRUE(ec_flow.results.equivalence == ec::Equivalent || ec_flow.results.equivalence == ec::EquivalentUpToGlobalPhase);
+	EXPECT_TRUE(ec_flow.results.consideredEquivalent());
 }
 
 TEST_P(CompilationFlowTest, EquivalenceReference) {
@@ -53,7 +55,7 @@ TEST_P(CompilationFlowTest, EquivalenceReference) {
 	eq.expectEquivalent();
 	eq.check(config);
 	eq.printResult(std::cout);
-	EXPECT_TRUE(eq.results.equivalence == ec::Equivalent || eq.results.equivalence == ec::EquivalentUpToGlobalPhase);
+	EXPECT_TRUE(eq.results.consideredEquivalent());
 }
 
 TEST_P(CompilationFlowTest, EquivalenceReferenceFromImproved) {
@@ -61,7 +63,7 @@ TEST_P(CompilationFlowTest, EquivalenceReferenceFromImproved) {
 	eq_ref.expectEquivalent();
 	eq_ref.check(config);
 	eq_ref.printResult(std::cout);
-	EXPECT_TRUE(eq_ref.results.equivalence == ec::Equivalent || eq_ref.results.equivalence == ec::EquivalentUpToGlobalPhase);
+	EXPECT_TRUE(eq_ref.results.consideredEquivalent());
 }
 
 TEST_P(CompilationFlowTest, EquivalenceNaive) {
@@ -69,7 +71,7 @@ TEST_P(CompilationFlowTest, EquivalenceNaive) {
 	eq_naive.expectEquivalent();
 	eq_naive.check(config);
 	eq_naive.printResult(std::cout);
-	EXPECT_TRUE(eq_naive.results.equivalence == ec::Equivalent || eq_naive.results.equivalence == ec::EquivalentUpToGlobalPhase);
+	EXPECT_TRUE(eq_naive.results.consideredEquivalent());
 }
 
 TEST_P(CompilationFlowTest, EquivalenceProportional) {
@@ -77,7 +79,7 @@ TEST_P(CompilationFlowTest, EquivalenceProportional) {
 	eq_proportional.expectEquivalent();
 	eq_proportional.check(config);
 	eq_proportional.printResult(std::cout);
-	EXPECT_TRUE(eq_proportional.results.equivalence == ec::Equivalent || eq_proportional.results.equivalence == ec::EquivalentUpToGlobalPhase);
+	EXPECT_TRUE(eq_proportional.results.consideredEquivalent());
 }
 
 TEST_P(CompilationFlowTest, EquivalenceLookahead) {
@@ -85,5 +87,13 @@ TEST_P(CompilationFlowTest, EquivalenceLookahead) {
 	eq_lookahead.expectEquivalent();
 	eq_lookahead.check(config);
 	eq_lookahead.printResult(std::cout);
-	EXPECT_TRUE(eq_lookahead.results.equivalence == ec::Equivalent || eq_lookahead.results.equivalence == ec::EquivalentUpToGlobalPhase);
+	EXPECT_TRUE(eq_lookahead.results.consideredEquivalent());
+}
+
+TEST_P(CompilationFlowTest, EquivalencePowerOfSimulation) {
+	ec::PowerOfSimulationEquivalenceChecker eq_sim(qc_original, qc_transpiled);
+	eq_sim.expectEquivalent();
+	eq_sim.check(config);
+	eq_sim.printResult(std::cout);
+	EXPECT_TRUE(eq_sim.results.consideredEquivalent());
 }

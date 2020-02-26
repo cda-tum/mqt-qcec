@@ -4,7 +4,6 @@
  */
 
 #include <iostream>
-#include <memory>
 #include <string>
 #include <locale>
 #include <algorithm>
@@ -12,6 +11,7 @@
 #include "EquivalenceChecker.hpp"
 #include "ImprovedDDEquivalenceChecker.hpp"
 #include "CompilationFlowEquivalenceChecker.hpp"
+#include "PowerOfSimulationEquivalenceChecker.hpp"
 
 void show_usage(const std::string& name) {
 	std::cerr << "Usage: " << name << " <PATH_TO_FILE_1> <PATH_TO_FILE_2> (<method>) (--augment_qubits || --print_csv)" << std::endl;
@@ -21,6 +21,7 @@ void show_usage(const std::string& name) {
 	std::cerr << "  Proportional                                                       " << std::endl;
 	std::cerr << "  Lookahead                                                          " << std::endl;
 	std::cerr << "  CompilationFlow (default)                                          " << std::endl;
+	std::cerr << "  PowerOfSimulation                                                  " << std::endl;
 	std::cerr << "Supported file formats:                                              " << std::endl;
 	std::cerr << "  .real                                                              " << std::endl;
 	std::cerr << "  .qasm                                                              " << std::endl;
@@ -54,7 +55,9 @@ int main(int argc, char** argv){
 			method = ec::Lookahead;
 		} else if (target_method == "compilationflow") {
 			method = ec::CompilationFlow;
-		} else {
+		} else if (target_method == "powerofsimulation") {
+			method = ec::PowerOfSimulation;
+		}else {
 			show_usage(argv[0]);
 			return 1;
 		}
@@ -89,6 +92,15 @@ int main(int argc, char** argv){
 	// perform equivalence check
 	if (method == ec::CompilationFlow) {
 		ec::CompilationFlowEquivalenceChecker ec(qc1, qc2);
+		ec.expectNothing();
+		ec.check(config);
+		if (config.printCSV) {
+			ec.printCSVEntry(std::cout);
+		} else {
+			ec.printResult(std::cout);
+		}
+	} else if (method == ec::PowerOfSimulation) {
+		ec::PowerOfSimulationEquivalenceChecker ec(qc1, qc2);
 		ec.expectNothing();
 		ec.check(config);
 		if (config.printCSV) {

@@ -12,8 +12,10 @@
 #include "EquivalenceChecker.hpp"
 #include "ImprovedDDEquivalenceChecker.hpp"
 #include "CompilationFlowEquivalenceChecker.hpp"
+#include "PowerOfSimulationEquivalenceChecker.hpp"
 
 int main() {
+
 	std::string test_original = "./circuits/test_original.real";
 	std::string test_alternative = "./circuits/test_alternative.real";
 	std::string test_erroneous = "./circuits/test_erroneous.real";

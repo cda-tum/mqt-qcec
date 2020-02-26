@@ -17,7 +17,7 @@ namespace ec {
 	};
 
 	enum Method {
-		Reference, Naive, Proportional, Lookahead, CompilationFlow
+		Reference, Naive, Proportional, Lookahead, CompilationFlow, PowerOfSimulation
 	};
 
 	static std::string toString(const Method method) {
@@ -32,6 +32,8 @@ namespace ec {
 				return "Lookahead";
 			case CompilationFlow:
 				return "CompilationFlow";
+			case PowerOfSimulation:
+				return "PowerOfSimulation";
 		}
 		return " ";
 	}
@@ -74,12 +76,19 @@ namespace ec {
 		Equivalence equivalence = NoInformation;
 		double time = 0.0;
 		unsigned long maxActive = 0;
+		unsigned long long nsims = 0;
+		unsigned long long basisState = 0;
+		fp fidelity = 0.0;
 		dd::Edge result = dd::Package::DDzero;
 
 		virtual ~EquivalenceCheckingResults() = default;
 
 		bool error() {
 			return tooManyQubits || differentNrQubits;
+		}
+
+		bool consideredEquivalent() {
+			return equivalence == Equivalent || equivalence == EquivalentUpToGlobalPhase || equivalence == ProbablyEquivalent;
 		}
 
 		virtual std::ostream& print(std::ostream& out) {
@@ -91,47 +100,71 @@ namespace ec {
 			if (equivalence == NoInformation) {
 				out << "No information on the equivalence of " << name;
 			} else if (expected == Equivalent || expected == ProbablyEquivalent || expected == EquivalentUpToGlobalPhase) {
-				if (equivalence == Equivalent)
+				if (equivalence == Equivalent) {
 					out << "Proven " << name << " equivalent";
-				else if (equivalence == NonEquivalent)
+				} else if (equivalence == NonEquivalent) {
 					out << "\033[1;31m[FALSE NEGATIVE]\033[0m Expected " << name << " to be equivalent but shown non-equivalent";
-				else if (equivalence == ProbablyEquivalent)
-					out << "Rightfully suggesting " << name << "to be equivalent";
-				else if (equivalence == EquivalentUpToGlobalPhase) {
+					if (method == PowerOfSimulation) {
+						out << " (performed " << nsims << " sims)";
+					}
+				} else if (equivalence == ProbablyEquivalent) {
+					out << "Rightfully suggesting " << name << " to be equivalent (performed " << nsims << " sims)";
+				} else if (equivalence == EquivalentUpToGlobalPhase) {
 					out << "Proven " << name << " equivalent up to global phase";
 				}
 			} else if (expected == NonEquivalent) {
 				if (equivalence == Equivalent)
 					out << "\033[1;31m[FALSE POSITIVE]\033[0m Expected " << name << " to be non-equivalent but showed equivalent";
-				else if (equivalence == NonEquivalent)
+				else if (equivalence == NonEquivalent) {
 					out << "Proven " << name << " non-equivalent";
-				else if (equivalence == ProbablyEquivalent)
-					out << "\033[1;31mWrongfully suggesting " << name << "to be equivalent\033[0m";
-				else if (equivalence == EquivalentUpToGlobalPhase)
+					if (method == PowerOfSimulation) {
+						out << " (performed " << nsims << " sims)";
+					}
+				} else if (equivalence == ProbablyEquivalent) {
+					out << "\033[1;31mWrongfully suggesting " << name << " to be equivalent (performed " << nsims << " sims)\033[0m";
+				} else if (equivalence == EquivalentUpToGlobalPhase) {
 					out << "\033[1;31m[FALSE POSITIVE]\033[0m Expected " << name << " to be non-equivalent but showed equivalent up to global phase";
+				}
 			} else if (expected == NoInformation) {
-				if (equivalence == Equivalent)
+				if (equivalence == Equivalent) {
 					out << "Shown " << name << " equivalent";
-				else if (equivalence == NonEquivalent)
+				} else if (equivalence == NonEquivalent) {
 					out << "Shown " << name << " non-equivalent";
-				else if (equivalence == ProbablyEquivalent)
-					out << "Suggesting " << name << " to be-equivalent";
-				else if (equivalence == EquivalentUpToGlobalPhase)
+					if (method == PowerOfSimulation) {
+						out << " (performed " << nsims << " sims)";
+					}
+				} else if (equivalence == ProbablyEquivalent) {
+					out << "Suggesting " << name << " to be-equivalent (performed " << nsims << " sims)";
+				} else if (equivalence == EquivalentUpToGlobalPhase) {
 					out << "Shown " << name << " equivalent up to global phase";
+				}
 			}
 			out << " with " << toString(method) << " method (and a maximum of " << maxActive << " active nodes)\n";
 			return out;
 		}
 
 		static std::ostream& printCSVHeader(std::ostream& out = std::cout) {
-			out << "filename1;nqubits1;ngates1;filename2;nqubits2;ngates2;expectedEquivalent;equivalent;method;time;maxActive" << std::endl;
+			out << "filename1;nqubits1;ngates1;filename2;nqubits2;ngates2;expectedEquivalent;equivalent;method;time;maxActive;nsims";
 			return out;
 		}
 
 		virtual std::ostream& printCSVEntry(std::ostream& out) {
 			if (error())
 				return out;
-			out << name1 << ";" << nqubits1 << ";" << ngates1 << ";" << name2 << ";" << nqubits2 << ";" << ngates2 << ";" << toString(expected) << ";" << toString(equivalence) << ";" << toString(method) << ";" << time << ";" << maxActive << std::endl;
+			out << name1 << ";" << nqubits1 << ";" << ngates1 << ";" << name2 << ";" << nqubits2 << ";" << ngates2 << ";" << toString(expected) << ";" << toString(equivalence) << ";" << toString(method) << ";";
+			if (timeout) {
+				out << "TO";
+			} else {
+				out << time ;
+			}
+			out << ";" << maxActive;
+			if (nsims > 0) {
+				out << ";" << nsims;
+			} else {
+				out << ";-";
+			}
+
+			out << std::endl;
 			return out;
 		}
 	};

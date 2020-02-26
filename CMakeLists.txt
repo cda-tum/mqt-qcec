@@ -4,7 +4,7 @@ if(${CMAKE_VERSION} VERSION_LESS 3.12)
 endif()
 
 project(QCEC
-        VERSION 1.1
+        VERSION 1.2
         DESCRIPTION "A tool for equivalence checking of quantum circuits (based on decision diagrams)"
         LANGUAGES CXX)
 
@@ -44,7 +44,8 @@ handle_submodule(qfr)
 
 add_subdirectory(src)
 
-if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
+option(BUILD_TESTS "Also build tests for QCEC project" OFF)
+if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME OR BUILD_TESTS)
 	handle_submodule(googletest)
 
 	enable_testing()

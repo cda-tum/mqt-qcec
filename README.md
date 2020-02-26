@@ -25,7 +25,8 @@ with the following available methods:
    - Naive,
    - Proportional,
    - Lookahead,
-   - CompilationFlow (as of version 1.1).
+   - CompilationFlow (as of version 1.1),
+   - PowerOfSimulation (as of version 1.2).
 
 For details on the available methods we refer to [iic.jku.at/eda/research/quantum_verification](http://iic.jku.at/eda/research/quantum_verification).
 
@@ -40,14 +41,15 @@ It can either be used as a **standalone executable** with command-line interface
    - proportional 
    - lookahead 
    - compilationflow (**default**)
+   - powerofsimulation
    
    The executable performs the equivalence check and prints its result to the standard output. If the `--print_csv` option is present, a CSV entry according to the following header is printed
    
     ```csv
-    filename1;nqubits1;ngates1;filename2;nqubits2;ngates2;expectedEquivalent;equivalent;method;time;maxActive
+    filename1;nqubits1;ngates1;filename2;nqubits2;ngates2;expectedEquivalent;equivalent;method;time;maxActive;nsims
     ```
    
-- The library can be used by including, e.g., the ```CompilationFlowEquivalenceChecker.hpp``` header file and
+- The library can be used by including, e.g., the appropriate header file and
     ```c++
     std::string file1 = "PATH_TO_FILE_1{.real | .qasm}";
     qc::QuantumComputation qc1(file1);
@@ -58,9 +60,12 @@ It can either be used as a **standalone executable** with command-line interface
     ec::Method method = ec::{ Naive | Proportional | Lookahead };
     auto eq = ec::ImprovedDDEquivalenceChecker(qc1, qc2, method);
     ```
-  or
   ```c++ 
   auto eq = ec::CompilationFlowEquivalenceChecker(qc1, qc2);
+  ```
+  or 
+  ```c++ 
+  auto eq = ec::PowerOfSimulationEquivalenceChecker(qc1, qc2);
   ```
   and then calling
   ```c++

@@ -5,6 +5,8 @@ from json2html import *
 import argparse
 
 if __name__ == '__main__':
+    methods = ['Reference', 'Naive', 'Proportional', 'Lookahead', 'CompilationFlow', 'PowerOfSimulation']
+    opt_levels = ['o0', 'o1', 'o2', 'o3']
     parser = argparse.ArgumentParser(description='Incorporate results.')
     parser.add_argument('--results_file')
     parser.add_argument('--optimization_level', nargs='?', const=1, type=int, default=1)
@@ -13,11 +15,11 @@ if __name__ == '__main__':
 
     # set paths for all files
     csvFilePath = args.results_file
-    jsonFilePath = '../results/results_compilationflow.json'
-    htmlFilePath = '../results/results_compilationflow.html'
-    allResultsCSVPath = '../results/all_results_compilationflow.csv'
+    jsonFilePath = '../results/results_evaluation.json'
+    htmlFilePath = '../results/results_evaluation.html'
+    allResultsCSVPath = '../results/all_results_evaluation.csv'
     # set header for csv entries
-    fieldnames = 'filename1;nqubits1;ngates1;filename2;nqubits2;ngates2;expectedEquivalent;equivalent;method;time;maxActive'.split(";")
+    fieldnames = 'filename1;nqubits1;ngates1;filename2;nqubits2;ngates2;expectedEquivalent;equivalent;method;time;maxActive;nsims'.split(";")
 
     # read in existing data
     if os.path.exists(jsonFilePath):
@@ -37,20 +39,14 @@ if __name__ == '__main__':
             if filename not in data:
                 data[filename] = {}
                 data[filename]['original_circuit'] = {'qubits': None, 'gates': None}
-                data[filename]['o0'] = {'qubits': None, 'gates': None, 
-                                                           'Reference': {'time': None, 'maxActive': None}, 
-                                                           'CompilationFlow': {'time': None, 'maxActive': None}}
-                data[filename]['o1'] = {'qubits': None, 'gates': None,
-                                                           'Reference': {'time': None, 'maxActive': None},
-                                                           'CompilationFlow': {'time': None, 'maxActive': None}}
-                data[filename]['o2'] = {'qubits': None, 'gates': None,
-                                                           'Reference': {'time': None, 'maxActive': None},
-                                                           'CompilationFlow': {'time': None, 'maxActive': None}}
-                data[filename]['o3'] = {'qubits': None, 'gates': None,
-                                                           'Reference': {'time': None, 'maxActive': None},
-                                                           'CompilationFlow': {'time': None, 'maxActive': None}}
+                for level in opt_levels:
+                    data[filename][level] = {'qubits': None, 'gates': None}
+                    for method in methods:
+                        data[filename][level][method] = {'time': None, 'maxActive': None}
+                        if method is 'PowerOfSimulation':
+                            data[filename][level][method]["nsims"] = None
 
-            if rows['method'] not in ['Reference', 'CompilationFlow']:
+            if rows['method'] not in methods:
                 continue
 
             # populate dictionaries
@@ -58,6 +54,8 @@ if __name__ == '__main__':
             data[filename][optimization_level]['qubits'] = rows['nqubits2']
             data[filename][optimization_level]['gates'] = rows['ngates2']
             data[filename][optimization_level][rows['method']] = {'time': rows['time'], 'maxActive': rows['maxActive']}
+            if rows['method'] is 'PowerOfSimulation':
+                data[filename][optimization_level][rows['method']]['nsims'] = rows['nsims']
 
     # output json file
     with open(jsonFilePath, 'w') as jsonFile:
@@ -72,41 +70,32 @@ if __name__ == '__main__':
     # generate csv for all results
     with open(allResultsCSVPath, 'w') as all_csv_results:
         header = ['name',
-                  'q_orig', 'g_orig',
-                  'q_o0', 'g_o0', 't_o0_ref', 'max_o0_ref', 't_o0_new', 'max_o0_new',
-                  'q_o1', 'g_o1', 't_o1_ref', 'max_o1_ref', 't_o1_new', 'max_o1_new',
-                  'q_o2', 'g_o2', 't_o2_ref', 'max_o2_ref', 't_o2_new', 'max_o2_new',
-                  'q_o3', 'g_o3', 't_o3_ref', 'max_o3_ref', 't_o3_new', 'max_o3_new']
+                  'q_orig', 'g_orig']
+        for opt_level in opt_levels:
+            header.append('q_' + opt_level)
+            header.append('g_' + opt_level)
+            for method in methods:
+                header.append('t_' + opt_level + '_' + method)
+                header.append('max_' + opt_level + '_' + method)
+                if method is 'PowerOfSimulation':
+                    header.append('nsims_' + opt_level)
+
         csvWriter = csv.DictWriter(all_csv_results, delimiter=';', fieldnames=header)
         csvWriter.writeheader()
         for name in data:
-            csvWriter.writerow({'name': name,
-                                'q_orig': data[name]['original_circuit']['qubits'], 
-                                'g_orig': data[name]['original_circuit']['gates'],
-                                'q_o0': data[name]['o0']['qubits'], 
-                                'g_o0': data[name]['o0']['gates'],
-                                't_o0_ref': data[name]['o0']['Reference']['time'], 
-                                'max_o0_ref': data[name]['o0']['Reference']['maxActive'],
-                                't_o0_new': data[name]['o0']['CompilationFlow']['time'],
-                                'max_o0_new': data[name]['o0']['CompilationFlow']['maxActive'],
+            elem = data[name]
+            row = {'name': name,
+                   'q_orig': elem['original_circuit']['qubits'],
+                   'g_orig': elem['original_circuit']['gates']}
+            for opt_level in opt_levels:
+                opt_elem = elem[opt_level]
+                row['q_'+opt_level] = opt_elem['qubits']
+                row['g_'+opt_level] = opt_elem['gates']
+                for method in methods:
+                    m_opt_elem = opt_elem[method]
+                    row['t_' + opt_level + '_' + method] = m_opt_elem['time']
+                    row['max_' + opt_level + '_' + method] = m_opt_elem['maxActive']
+                    if method is 'PowerOfSimulation':
+                        row['nsims_' + opt_level] = m_opt_elem['nsims']
 
-                                'q_o1': data[name]['o1']['qubits'],
-                                'g_o1': data[name]['o1']['gates'],
-                                't_o1_ref': data[name]['o1']['Reference']['time'],
-                                'max_o1_ref': data[name]['o1']['Reference']['maxActive'],
-                                't_o1_new': data[name]['o1']['CompilationFlow']['time'],
-                                'max_o1_new': data[name]['o1']['CompilationFlow']['maxActive'],
-
-                                'q_o2': data[name]['o2']['qubits'],
-                                'g_o2': data[name]['o2']['gates'],
-                                't_o2_ref': data[name]['o2']['Reference']['time'],
-                                'max_o2_ref': data[name]['o2']['Reference']['maxActive'],
-                                't_o2_new': data[name]['o2']['CompilationFlow']['time'],
-                                'max_o2_new': data[name]['o2']['CompilationFlow']['maxActive'],
-
-                                'q_o3': data[name]['o3']['qubits'],
-                                'g_o3': data[name]['o3']['gates'],
-                                't_o3_ref': data[name]['o3']['Reference']['time'],
-                                'max_o3_ref': data[name]['o3']['Reference']['maxActive'],
-                                't_o3_new': data[name]['o3']['CompilationFlow']['time'],
-                                'max_o3_new': data[name]['o3']['CompilationFlow']['maxActive']})
+            csvWriter.writerow(row)
