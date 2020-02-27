@@ -3,7 +3,7 @@ if(${CMAKE_VERSION} VERSION_LESS 3.12)
 	cmake_policy(VERSION ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION})
 endif()
 
-project(QCEC
+project(qcec
         VERSION 1.2
         DESCRIPTION "A tool for equivalence checking of quantum circuits (based on decision diagrams)"
         LANGUAGES CXX)

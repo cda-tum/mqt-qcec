@@ -15,4 +15,4 @@ include(GNUInstallDirs)
 install(TARGETS ${PROJECT_NAME}_app
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 
-set_target_properties(${PROJECT_NAME}_app PROPERTIES EXPORT_NAME QCEC_app)
+set_target_properties(${PROJECT_NAME}_app PROPERTIES EXPORT_NAME ${PROJECT_NAME}_app)

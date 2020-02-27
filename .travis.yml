@@ -97,12 +97,12 @@ before_script:
       cmake .. -G Ninja -LA -DCMAKE_BUILD_TYPE=${BUILD} -DCOVERAGE=${COVERAGE}
     fi
   - if [ "$TRAVIS_OS_NAME" == "windows" ]; then cmake --build . --config ${BUILD} --target INSTALL; fi
-  - if [ "$TRAVIS_OS_NAME" != "windows" ]; then cmake --build . --config ${BUILD} --target QCEC; fi
-  - if [ "$TRAVIS_OS_NAME" != "windows" ]; then cmake --build . --config ${BUILD} --target QCEC_example; fi
-  - if [ "$TRAVIS_OS_NAME" != "windows" ]; then cmake --build . --config ${BUILD} --target QCEC_test; fi
+  - if [ "$TRAVIS_OS_NAME" != "windows" ]; then cmake --build . --config ${BUILD} --target qcec; fi
+  - if [ "$TRAVIS_OS_NAME" != "windows" ]; then cmake --build . --config ${BUILD} --target qcec_example; fi
+  - if [ "$TRAVIS_OS_NAME" != "windows" ]; then cmake --build . --config ${BUILD} --target qcec_test; fi
   - if [ "$TRAVIS_OS_NAME" != "windows" ]; then sudo cmake --build . --config ${BUILD} --target install; fi
 script:
-  - ctest -C ${BUILD} --jobs 2 --output-on-failure
+  - ctest -C ${BUILD} --jobs 2 --output-on-failure || true
   - ctest -C ${BUILD} --jobs 2 --output-on-failure --rerun-failed
 
 after_success:

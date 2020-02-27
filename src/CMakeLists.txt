@@ -31,8 +31,8 @@ set_target_properties(${PROJECT_NAME} PROPERTIES CXX_EXTENSIONS OFF)
 option(TRY_USING_INSTALLED_QFR_LIBRARY "Attempt searching for installed version of QFR library and use it if found" ON)
 
 if (TRY_USING_INSTALLED_QFR_LIBRARY)
-	find_package(QFR 1.0 QUIET)
-	if (QFR_FOUND)
+	find_package(qfr 1.0 QUIET)
+	if (qfr_FOUND)
 		message(STATUS "using installed QFR library")
 	else()
 		message(STATUS "using QFR submodule")
@@ -43,7 +43,7 @@ else()
 	add_subdirectory("${PROJECT_SOURCE_DIR}/extern/qfr" "extern/qfr")
 endif ()
 
-target_link_libraries(${PROJECT_NAME} PUBLIC JKQ::QFR)
+target_link_libraries(${PROJECT_NAME} PUBLIC JKQ::qfr)
 
 # add coverage compiler and linker flag if COVERAGE is set
 if (COVERAGE)
@@ -69,21 +69,21 @@ endif()
 # installation instructions
 
 include(GNUInstallDirs)
-set(INSTALL_CONFIGDIR ${CMAKE_INSTALL_LIBDIR}/cmake/QCEC)
+set(INSTALL_CONFIGDIR ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME})
 
 install(TARGETS ${PROJECT_NAME}
-        EXPORT qcec-targets
+        EXPORT ${PROJECT_NAME}-targets
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
         INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
-set_target_properties(${PROJECT_NAME} PROPERTIES EXPORT_NAME QCEC)
+set_target_properties(${PROJECT_NAME} PROPERTIES EXPORT_NAME ${PROJECT_NAME})
 
 install(DIRECTORY ${${PROJECT_NAME}_SOURCE_DIR}/include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
-install(EXPORT qcec-targets
-        FILE QCECTargets.cmake
+install(EXPORT ${PROJECT_NAME}-targets
+        FILE ${PROJECT_NAME}Targets.cmake
         NAMESPACE JKQ::
         DESTINATION ${INSTALL_CONFIGDIR}
         )
@@ -91,24 +91,24 @@ install(EXPORT qcec-targets
 #Create a ConfigVersion.cmake file
 include(CMakePackageConfigHelpers)
 write_basic_package_version_file(
-		${CMAKE_CURRENT_BINARY_DIR}/QCECConfigVersion.cmake
+		${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
 		VERSION ${PROJECT_VERSION}
 		COMPATIBILITY AnyNewerVersion
 )
 
-configure_package_config_file(${${PROJECT_NAME}_SOURCE_DIR}/cmake/QCECConfig.cmake.in
-                              ${CMAKE_CURRENT_BINARY_DIR}/QCECConfig.cmake
+configure_package_config_file(${${PROJECT_NAME}_SOURCE_DIR}/cmake/${PROJECT_NAME}Config.cmake.in
+                              ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
                               INSTALL_DESTINATION ${INSTALL_CONFIGDIR}
                               )
 
 install(FILES
-        ${CMAKE_CURRENT_BINARY_DIR}/QCECConfig.cmake
-        ${CMAKE_CURRENT_BINARY_DIR}/QCECConfigVersion.cmake
+        ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
+        ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
         DESTINATION ${INSTALL_CONFIGDIR}
         )
 
 # exporting from the build tree
-export(EXPORT qcec-targets FILE ${CMAKE_CURRENT_BINARY_DIR}/QCECTargets.cmake NAMESPACE JKQ::)
+export(EXPORT ${PROJECT_NAME}-targets FILE ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Targets.cmake NAMESPACE JKQ::)
 
 # Register package in user's package registry
-export(PACKAGE QCEC)
+export(PACKAGE ${PROJECT_NAME})
