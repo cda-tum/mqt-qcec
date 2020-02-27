@@ -1,5 +1,5 @@
 FROM alpine:latest as builder
-RUN apk update && apk add g++ cmake
+RUN apk update && apk add g++ make cmake
 COPY . .
 RUN cmake -S . -B build -DGIT_SUBMODULE=OFF&& \
     cmake --build build --config Release --target QCEC_app
