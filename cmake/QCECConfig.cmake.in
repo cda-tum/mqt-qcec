@@ -3,8 +3,8 @@ include(CMakeFindDependencyMacro)
 
 find_dependency(QFR 1.0 REQUIRED CONFIG)
 
-if(NOT TARGET EC::QCEC)
+if(NOT TARGET JKQ::QCEC)
 	include("${QCEC_CMAKE_DIR}/QCECTargets.cmake")
 endif()
 
-set(QFR_LIBRARIES EC::QCEC)
+set(QCEC_LIBRARIES JKQ::QCEC)

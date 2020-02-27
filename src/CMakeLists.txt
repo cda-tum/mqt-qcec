@@ -22,7 +22,7 @@ add_library(${PROJECT_NAME}
             ${${PROJECT_NAME}_SOURCE_DIR}/include/PowerOfSimulationEquivalenceChecker.hpp
             ${CMAKE_CURRENT_SOURCE_DIR}/PowerOfSimulationEquivalenceChecker.cpp
             )
-add_library(EC::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
+add_library(JKQ::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 target_include_directories(${PROJECT_NAME} PUBLIC
                            $<BUILD_INTERFACE:${${PROJECT_NAME}_SOURCE_DIR}/include>)
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_14)
@@ -43,7 +43,7 @@ else()
 	add_subdirectory("${PROJECT_SOURCE_DIR}/extern/qfr" "extern/qfr")
 endif ()
 
-target_link_libraries(${PROJECT_NAME} PUBLIC QC::QFR)
+target_link_libraries(${PROJECT_NAME} PUBLIC JKQ::QFR)
 
 # add coverage compiler and linker flag if COVERAGE is set
 if (COVERAGE)
@@ -84,7 +84,7 @@ install(DIRECTORY ${${PROJECT_NAME}_SOURCE_DIR}/include/ DESTINATION ${CMAKE_INS
 
 install(EXPORT qcec-targets
         FILE QCECTargets.cmake
-        NAMESPACE EC::
+        NAMESPACE JKQ::
         DESTINATION ${INSTALL_CONFIGDIR}
         )
 
@@ -108,7 +108,7 @@ install(FILES
         )
 
 # exporting from the build tree
-export(EXPORT qcec-targets FILE ${CMAKE_CURRENT_BINARY_DIR}/QCECTargets.cmake NAMESPACE EC::)
+export(EXPORT qcec-targets FILE ${CMAKE_CURRENT_BINARY_DIR}/QCECTargets.cmake NAMESPACE JKQ::)
 
 # Register package in user's package registry
 export(PACKAGE QCEC)

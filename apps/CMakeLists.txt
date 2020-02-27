@@ -1,7 +1,7 @@
 add_executable(${PROJECT_NAME}_app ${CMAKE_CURRENT_SOURCE_DIR}/app.cpp)
 target_compile_features(${PROJECT_NAME}_app PUBLIC cxx_std_14)
 set_target_properties(${PROJECT_NAME}_app PROPERTIES CXX_EXTENSIONS OFF)
-target_link_libraries(${PROJECT_NAME}_app PRIVATE EC::${PROJECT_NAME})
+target_link_libraries(${PROJECT_NAME}_app PRIVATE JKQ::${PROJECT_NAME})
 if(MSVC)
 	target_compile_options(${PROJECT_NAME}_app PUBLIC "/W4" "$<$<CONFIG:RELEASE>:/O2 /GL>")
 	target_link_options(${PROJECT_NAME}_app PUBLIC "$<$<CONFIG:Release>:/LTCG>")

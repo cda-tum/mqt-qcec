@@ -125,7 +125,7 @@ It can then also be included in other projects using the following CMake snippet
 
 ```cmake
 find_package(QCEC)
-target_link_libraries(${TARGET_NAME} PRIVATE EC::QCEC)
+target_link_libraries(${TARGET_NAME} PRIVATE JKQ::QCEC)
 ```
 
 ## Reference
