@@ -102,8 +102,8 @@ before_script:
   - if [ "$TRAVIS_OS_NAME" != "windows" ]; then cmake --build . --config ${BUILD} --target qcec_test; fi
   - if [ "$TRAVIS_OS_NAME" != "windows" ]; then sudo cmake --build . --config ${BUILD} --target install; fi
 script:
-  - ctest -C ${BUILD} --jobs 2 --output-on-failure || true
-  - ctest -C ${BUILD} --jobs 2 --output-on-failure --rerun-failed
+  - if [ "$TRAVIS_OS_NAME" == "windows" ]; then cd test/${BUILD} && ./qcec_test.exe; fi
+  - if [ "$TRAVIS_OS_NAME" != "windows" ]; then cd test && ./qcec_test; fi
 
 after_success:
   - |
