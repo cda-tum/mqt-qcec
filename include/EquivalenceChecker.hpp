@@ -20,6 +20,7 @@ namespace ec {
 	struct Configuration {
 		bool augmentQubitRegisters = false;
 		bool printCSV = false;
+		bool trackMaxDDsize = false;
 
 		// configuration options for PowerOfSimulation equivalence checker
 		double fidelity_limit = 0.999;
@@ -40,8 +41,35 @@ namespace ec {
 		unsigned short nqubits2 = 0;
 		unsigned short nqubits = 0;
 
+		unsigned long long maxSize = 0;
+		double average = 0.;
+		size_t count = 0;
+		std::unordered_set<dd::NodePtr> visited{};
+		unsigned long long counter = 0;
+
+		void addToAverage(unsigned long long x) {
+			if (count == 0) {
+				average = count;
+			} else {
+				average = (average * count + double(x)) / double(count + 1);
+			}
+			++count;
+		}
+
 		bool validInstance();
 
+		unsigned long long nodecount(const dd::Edge& e, std::unordered_set<dd::NodePtr>& v) {
+			v.insert(e.p);
+			unsigned long long sum = 1;
+			if(!dd->isTerminal(e)) {
+				for (const auto& edge: e.p->e) {
+					if (edge.p != nullptr && !v.count(edge.p)) {
+						sum += nodecount(edge, v);
+					}
+				}
+			}
+			return sum;
+		}
 
 	public:
 		EquivalenceCheckingResults results;
