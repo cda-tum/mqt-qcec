@@ -91,12 +91,12 @@ TEST_P(PowerOfSimulationTest, NonEQRemoveGates) {
 
 	while (retries < max_retries && !success) {
 		unsigned short successes = 0;
-		for (int i=0; i<tries; ++i) {
+		for (unsigned short i=0; i<tries; ++i) {
 			std::set<unsigned long long> already_removed{};
 			qc_original.import(test_original_dir + std::get<0>(GetParam()) + ".real");
 			qc_transpiled.import(test_transpiled_dir + std::get<0>(GetParam()) + "_transpiled.qasm");
 
-			for (int j=0; j < gates_to_remove; ++j) {
+			for (unsigned short j=0; j < gates_to_remove; ++j) {
 				auto gate_to_remove = rng() % qc_transpiled.getNops();
 				while (already_removed.count(gate_to_remove)) {
 					gate_to_remove = rng() % qc_transpiled.getNops();

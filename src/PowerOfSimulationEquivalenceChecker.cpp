@@ -35,7 +35,40 @@ namespace ec {
 			#endif
 
 			dd::Edge in1 = dd->makeBasisState(qc1->getNqubits(), stimulusBits);
-			auto e = qc1->simulate(in1, dd);
+			std::array<short, qc::MAX_QUBITS> l{};
+			l.fill(qc::LINE_DEFAULT);
+			qc::permutationMap map = qc1->initialLayout;
+
+			dd::Edge e = in1;
+			dd->incRef(e);
+
+			#if DEBUG_MODE_SIMULATION
+				visited.clear();
+				auto nc = nodecount(e, visited);
+				maxSize = std::max(maxSize, nc-1);
+				addToAverage(nc-1);
+			#endif
+
+			for (auto & op : *qc1) {
+				auto tmp = dd->multiply(op->getDD(dd, l, map), e);
+				dd->incRef(tmp);
+				dd->decRef(e);
+				e = tmp;
+				dd->garbageCollect();
+
+				#if DEBUG_MODE_SIMULATION
+					visited.clear();
+					nc = nodecount(e, visited);
+					maxSize = std::max(maxSize, nc-1);
+					addToAverage(nc-1);
+				#endif
+			}
+
+			// correct permutation if necessary
+			qc::QuantumComputation::changePermutation(e, map, qc1->outputPermutation, l, dd);
+
+			qc1->reduceAncillae(e, dd);
+			qc1->reduceGarbage(e, dd);
 
 			#if DEBUG_MODE_SIMULATION
 			std::stringstream ss1 {};
@@ -45,7 +78,41 @@ namespace ec {
 			#endif
 
 			dd::Edge in2 = dd->makeBasisState(qc2->getNqubits(), stimulusBits);
-			auto f = qc2->simulate(in2, dd);
+
+			l.fill(qc::LINE_DEFAULT);
+			map = qc2->initialLayout;
+
+			dd::Edge f = in2;
+			dd->incRef(f);
+
+			#if DEBUG_MODE_SIMULATION
+				visited.clear();
+				nc = nodecount(f, visited);
+				maxSize = std::max(maxSize, nc-1);
+				addToAverage(nc-1);
+			#endif
+
+			for (auto & op : *qc2) {
+				auto tmp = dd->multiply(op->getDD(dd, l, map), f);
+				dd->incRef(tmp);
+				dd->decRef(f);
+				f = tmp;
+				dd->garbageCollect();
+
+				#if DEBUG_MODE_SIMULATION
+					visited.clear();
+					nc = nodecount(f, visited);
+					maxSize = std::max(maxSize, nc-1);
+					addToAverage(nc-1);
+				#endif
+			}
+
+			// correct permutation if necessary
+			qc::QuantumComputation::changePermutation(f, map, qc2->outputPermutation, l, dd);
+
+			qc2->reduceAncillae(f, dd);
+			qc2->reduceGarbage(f, dd);
+
 
 			#if DEBUG_MODE_SIMULATION
 			std::stringstream ss2 {};
@@ -108,6 +175,11 @@ namespace ec {
 		auto end = std::chrono::high_resolution_clock::now();
 		std::chrono::duration<double> diff = end - start;
 		results.time = diff.count();
+
+		#if DEBUG_MODE_SIMULATION
+		std::cout << "Max size: " << maxSize << std::endl;
+		std::cout << "Avg size: " << average << std::endl;
+		#endif
 	}
 
 }

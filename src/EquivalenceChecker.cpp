@@ -40,6 +40,15 @@ void ec::EquivalenceChecker::check(const Configuration& config) {
 	dd->incRef(e);
 
 	#if DEBUG_MODE_EC
+	visited.clear();
+	auto nc = nodecount(e, visited);
+	addToAverage(nc-1);
+	std::cout << "Initial: " << nc-1 << std::endl;
+	std::stringstream ss{};
+	ss << toString(results.method) << "_initial_L.dot";
+	dd->export2Dot(e, ss.str().c_str());
+	++counter;
+
 	std::stringstream eiss{};
 	eiss << "e_initial_" << filename1 << ".dot";
 	dd->export2Dot(e, eiss.str().c_str());
@@ -67,6 +76,17 @@ void ec::EquivalenceChecker::check(const Configuration& config) {
 		dd->decRef(e);
 		e = tmp;
 
+		#if DEBUG_MODE_EC
+			visited.clear();
+			nc = nodecount(e, visited);
+			maxSize = std::max(maxSize, nc);
+			addToAverage(nc-1);
+			std::cout << nc-1 << " L " << std::endl;
+			std::stringstream ss{};
+			ss << toString(results.method) << "_" << counter << "_L.dot";
+			dd->export2Dot(e, ss.str().c_str());
+			++counter;
+		#endif
 		dd->garbageCollect();
 	}
 	qc::QuantumComputation::changePermutation(e, perm1, qc1->outputPermutation, line, dd);
@@ -85,6 +105,15 @@ void ec::EquivalenceChecker::check(const Configuration& config) {
 	dd->incRef(f);
 
 	#if DEBUG_MODE_EC
+	visited.clear();
+	nc = nodecount(f, visited);
+	addToAverage(nc-1);
+	std::cout << "Initial: " << nc-1 << std::endl;
+	ss = std::stringstream("");
+	ss << toString(results.method) << "_initial_R.dot";
+	dd->export2Dot(f, ss.str().c_str());
+	counter = 1;
+
 	std::stringstream fiss{};
 	fiss << "f_initial_" << filename2 << ".dot";
 	dd->export2Dot(f, fiss.str().c_str());
@@ -113,6 +142,18 @@ void ec::EquivalenceChecker::check(const Configuration& config) {
 		dd->decRef(f);
 		f = tmp;
 
+		#if DEBUG_MODE_EC
+			visited.clear();
+			nc = nodecount(f, visited);
+			maxSize = std::max(maxSize, nc);
+			addToAverage(nc-1);
+			std::cout << nc-1 << " R " << std::endl;
+			std::stringstream ss{};
+			ss << toString(results.method) << "_" << counter << "_R.dot";
+			dd->export2Dot(f, ss.str().c_str());
+			++counter;
+		#endif
+
 		dd->garbageCollect();
 	}
 	qc::QuantumComputation::changePermutation(f, perm2, qc2->outputPermutation, line, dd);
@@ -134,6 +175,13 @@ void ec::EquivalenceChecker::check(const Configuration& config) {
 		dd->decRef(e);
 		dd->decRef(f);
 		dd->incRef(results.result);
+		#if DEBUG_MODE_EC
+			visited.clear();
+			nc = nodecount(results.result, visited);
+			maxSize = std::max(maxSize, nc);
+			addToAverage(nc-1);
+			std::cout << nc-1 << " NEQ " << std::endl;
+		#endif
 	} else {
 		results.result = e;
 		dd->decRef(f);
@@ -142,6 +190,8 @@ void ec::EquivalenceChecker::check(const Configuration& config) {
 	std::stringstream ss{};
 	ss << "result_" << filename2 << ".dot";
 	dd->export2Dot(results.result, ss.str().c_str());
+	std::cout << "Max size: " << maxSize << std::endl;
+	std::cout << "Avg size: " << average << std::endl;
 	#endif
 
 	auto end = std::chrono::high_resolution_clock::now();

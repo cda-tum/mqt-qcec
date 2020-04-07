@@ -68,6 +68,18 @@ namespace ec {
 		results.result = qc1->createInitialMatrix(dd);
 		dd->incRef(results.result);
 
+		#if DEBUG_MODE_EC
+		visited.clear();
+		auto nc = nodecount(results.result, visited);
+		maxSize = std::max(maxSize, nc);
+		addToAverage(nc-1);
+		std::cout << "Initial: " << nc-1 << std::endl;
+		std::stringstream ss{};
+		ss << toString(results.method) << "_Initial.dot";
+		dd->export2Dot(results.result, ss.str().c_str());
+		++counter;
+		#endif
+
 		it1 = qc1->begin();
 		it2 = qc2->begin();
 		end1 = qc1->end();
@@ -89,12 +101,36 @@ namespace ec {
 		while (it1 != end1) {
 			applyGate(*it1, results.result, perm1, LEFT);
 			++it1;
+
+			#if DEBUG_MODE_EC
+				visited.clear();
+				nc = nodecount(results.result, visited);
+				maxSize = std::max(maxSize, nc);
+				addToAverage(nc-1);
+				std::cout << nc-1 << " L " << std::endl;
+				std::stringstream ss{};
+				ss << toString(results.method) << "_" << counter << "_L.dot";
+				dd->export2Dot(results.result, ss.str().c_str());
+				++counter;
+			#endif
 		}
 
 		//finish second circuit
 		while (it2 != end2) {
 			applyGate(*it2, results.result, perm2, RIGHT);
 			++it2;
+
+			#if DEBUG_MODE_EC
+				visited.clear();
+				nc = nodecount(results.result, visited);
+				maxSize = std::max(maxSize, nc);
+				addToAverage(nc-1);
+				std::cout << nc-1 << " R " << std::endl;
+				std::stringstream ss{};
+				ss << toString(results.method) << "_" << counter << "_R.dot";
+				dd->export2Dot(results.result, ss.str().c_str());
+				++counter;
+			#endif
 		}
 
 		qc::QuantumComputation::changePermutation(results.result, perm1, qc1->outputPermutation, line, dd, LEFT);
@@ -108,6 +144,8 @@ namespace ec {
 		std::stringstream ss{};
 		ss << "result_improved_" << filename2 << ".dot";
 		dd->export2Dot(results.result, ss.str().c_str());
+		std::cout << "Avg size: " << average << std::endl;
+		std::cout << "Max size: " << maxSize << std::endl;
 		#endif
 
 		auto end = std::chrono::high_resolution_clock::now();
@@ -121,7 +159,33 @@ namespace ec {
 
 		while (it1 != end1 && it2 != end2) {
 			applyGate(*it1, results.result, perm1, LEFT);
+
+			#if DEBUG_MODE_EC
+			visited.clear();
+			auto nc = nodecount(results.result, visited);
+			maxSize = std::max(maxSize, nc);
+			addToAverage(nc-1);
+			std::cout << nc-1 << " L " << std::endl;
+			std::stringstream ss{};
+			ss << toString(results.method) << "_" << counter << "_L.dot";
+			dd->export2Dot(results.result, ss.str().c_str());
+			++counter;
+			#endif
+
 			applyGate(*it2, results.result, perm2, RIGHT);
+
+			#if DEBUG_MODE_EC
+			visited.clear();
+			nc = nodecount(results.result, visited);
+			maxSize = std::max(maxSize, nc);
+			addToAverage(nc-1);
+			std::cout << nc-1 << " R " << std::endl;
+			ss = std::stringstream("");
+			ss << toString(results.method) << "_" << counter << "_R.dot";
+			dd->export2Dot(results.result, ss.str().c_str());
+			++counter;
+			#endif
+
 			++it1;
 			++it2;
 		}
@@ -140,10 +204,34 @@ namespace ec {
 			for (unsigned int i = 0; i < ratio1 && it1 != end1; ++i) {
 				applyGate(*it1, results.result, perm1, LEFT);
 				++it1;
+
+				#if DEBUG_MODE_EC
+				visited.clear();
+				auto nc = nodecount(results.result, visited);
+				maxSize = std::max(maxSize, nc);
+				addToAverage(nc-1);
+				std::cout << nc-1 << " L " << std::endl;
+				std::stringstream ss{};
+				ss << toString(results.method) << "_" << counter << "_L.dot";
+				dd->export2Dot(results.result, ss.str().c_str());
+				++counter;
+				#endif
 			}
 			for (unsigned int i = 0; i < ratio2 && it2 != end2; ++i) {
 				applyGate(*it2, results.result, perm2, RIGHT);
 				++it2;
+
+				#if DEBUG_MODE_EC
+				visited.clear();
+				auto nc = nodecount(results.result, visited);
+				maxSize = std::max(maxSize, nc);
+				addToAverage(nc-1);
+				std::cout << nc-1 << " R " << std::endl;
+				std::stringstream ss{};
+				ss << toString(results.method) << "_" << counter << "_R.dot";
+				dd->export2Dot(results.result, ss.str().c_str());
+				++counter;
+				#endif
 			}
 		}
 	}
@@ -178,14 +266,39 @@ namespace ec {
 			visited2.clear();
 			auto nc1 = nodecount(lookLeft, visited1);
 			auto nc2 = nodecount(lookRight, visited2);
+
+			#if DEBUG_MODE_EC
+			std::cout << "(" << nc1 << "/" << nc2 << ") ";
+			#endif
+
 			if (nc1 <= nc2) {
 				results.result = lookLeft;
 				dd->decRef(left);
 				cachedLeft = false;
+
+				#if DEBUG_MODE_EC
+				maxSize = std::max(maxSize, nc1);
+				addToAverage(nc1-1);
+				std::cout << "L " << std::endl;
+				std::stringstream ss{};
+				ss << toString(results.method) << "_" << counter << "_L.dot";
+				dd->export2Dot(results.result, ss.str().c_str());
+				++counter;
+				#endif
 			} else {
 				results.result = lookRight;
 				dd->decRef(right);
 				cachedRight = false;
+
+				#if DEBUG_MODE_EC
+				maxSize = std::max(maxSize, nc2);
+				addToAverage(nc2-1);
+				std::cout << "R " << std::endl;
+				std::stringstream ss{};
+				ss << toString(results.method) << "_" << counter << "_R.dot";
+				dd->export2Dot(results.result, ss.str().c_str());
+				++counter;
+				#endif
 			}
 			dd->incRef(results.result);
 			dd->decRef(saved);
@@ -199,6 +312,18 @@ namespace ec {
 			dd->decRef(saved);
 			dd->decRef(left);
 			dd->garbageCollect();
+
+			#if DEBUG_MODE_EC
+			visited.clear();
+			auto nc = nodecount(results.result, visited);
+			maxSize = std::max(maxSize, nc);
+			addToAverage(nc-1);
+			std::cout << nc-1 << " L " << std::endl;
+			std::stringstream ss{};
+			ss << toString(results.method) << "_" << counter << "_L.dot";
+			dd->export2Dot(results.result, ss.str().c_str());
+			++counter;
+			#endif
 		}
 
 		if (cachedRight) {
@@ -208,6 +333,18 @@ namespace ec {
 			dd->decRef(saved);
 			dd->decRef(right);
 			dd->garbageCollect();
+
+			#if DEBUG_MODE_EC
+			visited.clear();
+			auto nc = nodecount(results.result, visited);
+			maxSize = std::max(maxSize, nc);
+			addToAverage(nc-1);
+			std::cout << nc-1 << " R " << std::endl;
+			std::stringstream ss{};
+			ss << toString(results.method) << "_" << counter << "_R.dot";
+			dd->export2Dot(results.result, ss.str().c_str());
+			++counter;
+			#endif
 		}
 
 	}

@@ -13,9 +13,9 @@
 #include "ImprovedDDEquivalenceChecker.hpp"
 
 namespace ec {
-	using CostFunction = std::function<unsigned short(qc::Gate, unsigned short)>;
+	using CostFunction = std::function<unsigned short(const qc::Gate&, unsigned short)>;
 
-	unsigned short IBMCostFunction(qc::Gate gate, unsigned short nc);
+	unsigned short IBMCostFunction(const qc::Gate& gate, unsigned short nc);
 
 	class CompilationFlowEquivalenceChecker: public ImprovedDDEquivalenceChecker {
 

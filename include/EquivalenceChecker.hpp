@@ -49,7 +49,7 @@ namespace ec {
 
 		void addToAverage(unsigned long long x) {
 			if (count == 0) {
-				average = count;
+				average = static_cast<double>(x);
 			} else {
 				average = (average * count + double(x)) / double(count + 1);
 			}
