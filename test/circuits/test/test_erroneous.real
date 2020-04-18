@@ -1,0 +1,22 @@
+.numvars 3
+.variables q0 q1 q2
+.begin
+h1 q1
+t2 q1 q2
+
+h1 q0
+t2 q1 q0
+q1:-4 q0
+t2 q2 q0
+q1:4 q0
+t2 q1 q0
+q1:-4 q0
+q1:4 q1
+t2 q2 q0
+t2 q2 q1
+q1:4 q0
+h1 q0
+q1:-4 q1
+#q1:4 q2
+
+.end

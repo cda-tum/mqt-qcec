@@ -1,6 +1,6 @@
 /*
  * This file is part of IIC-JKU QCEC library which is released under the MIT license.
- * See file README.md or go to http://iic.jku.at/eda/research/quantum/ for more information.
+ * See file README.md or go to http://iic.jku.at/eda/research/quantum_verification/ for more information.
  */
 
 #include <iostream>
@@ -11,7 +11,6 @@
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
 #include "EquivalenceChecker.hpp"
-#include "ImprovedDDEquivalenceChecker.hpp"
 
 using ::testing::HasSubstr;
 
@@ -26,8 +25,8 @@ protected:
 };
 
 TEST_F(GeneralTest, CSVOutput) {
-	qc_original.import("./circuits/test_original.real");
-	qc_alternative.import("./circuits/test_alternative.real");
+	qc_original.import("./circuits/test/test_original.real");
+	qc_alternative.import("./circuits/test/test_alternative.real");
 
 	ec::EquivalenceChecker ec(qc_original, qc_alternative);
 	ec.expectEquivalent();
@@ -38,7 +37,7 @@ TEST_F(GeneralTest, CSVOutput) {
 	std::stringstream ss{};
 	ec.printCSVEntry(ss);
 	std::string csvEntry = ss.str();
-	std::string expectedEntry = "test_original;5;5;test_alternative;5;19;EQ  ;EQ  ;Reference;";
+	std::string expectedEntry = "test_original;3;4;test_alternative;3;16;EQ  ;EQ  ;Reference;";
 	EXPECT_THAT(csvEntry, HasSubstr(expectedEntry));
 
 	ss.str("");
@@ -50,8 +49,8 @@ TEST_F(GeneralTest, CSVOutput) {
 }
 
 TEST_F(GeneralTest, InvalidInstance) {
-	qc_original.import("./circuits/test_original.real");
-	qc_alternative.import("./circuits/test_error.qasm");
+	qc_original.import("./circuits/test/test_original.real");
+	qc_alternative.import("./circuits/test/test_error.qasm");
 
 	ec::EquivalenceChecker ec(qc_original, qc_alternative);
 	ec.check(ec::Configuration{});
@@ -81,10 +80,10 @@ TEST_F(GeneralTest, NonUnitary) {
 }
 
 TEST_F(GeneralTest, SwitchDifferentlySizedCircuits) {
-	qc_original.import("./circuits/original/3_17_13.real");
-	qc_alternative.import("./circuits/transpiled/3_17_13_transpiled.qasm");
+	qc_original.import("./circuits/original/dk27_225.real");
+	qc_alternative.import("./circuits/transpiled/dk27_225_transpiled.qasm");
 
-	ec::EquivalenceChecker ec(qc_alternative, qc_original);
+	ec::CompilationFlowEquivalenceChecker ec(qc_alternative, qc_original);
 	ec.check(ec::Configuration{true, true});
 	EXPECT_TRUE(ec.results.equivalence == ec::Equivalent || ec.results.equivalence == ec::EquivalentUpToGlobalPhase);
 	EXPECT_FALSE(ec.error());

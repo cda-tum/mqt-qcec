@@ -1,6 +1,6 @@
 /*
  * This file is part of IIC-JKU QCEC library which is released under the MIT license.
- * See file README.md or go to http://iic.jku.at/eda/research/quantum/ for more information.
+ * See file README.md or go to http://iic.jku.at/eda/research/quantum_verification/ for more information.
  */
 
 #include <iostream>
@@ -18,8 +18,8 @@ protected:
 	qc::QuantumComputation qc_alternative;
 	ec::Configuration config{true};
 
-	std::string test_original = "./circuits/original/test.real";
-	std::string test_alternative_dir = "./circuits/alternative/";
+	std::string test_original = "./circuits/test/test.real";
+	std::string test_alternative_dir = "./circuits/test/";
 
 	void SetUp() override {
 		qc_original.import(test_original);
@@ -97,7 +97,7 @@ TEST_P(FunctionalityTest, CompilationFlow) {
 }
 
 TEST_F(FunctionalityTest, test2) {
-	test_original = "./circuits/original/test2.real";
+	test_original = "./circuits/test/test2.real";
 	qc_original.import(test_original);
 	qc_alternative.import(test_alternative_dir + "test2_optimized.qasm");
 

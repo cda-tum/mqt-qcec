@@ -1,6 +1,6 @@
 /*
  * This file is part of IIC-JKU QCEC library which is released under the MIT license.
- * See file README.md or go to http://iic.jku.at/eda/research/quantum/ for more information.
+ * See file README.md or go to http://iic.jku.at/eda/research/quantum_verification/ for more information.
  */
 
 #ifndef QUANTUMCIRCUITEQUIVALENCECHECKING_IMPROVEDDDEQUIVALENCECHECKER_HPP
@@ -25,10 +25,10 @@ namespace ec {
 		void checkLookahead(qc::permutationMap& perm1, qc::permutationMap& perm2);
 
 	protected:
-		decltype(qc1->begin()) it1;
-		decltype(qc2->begin()) it2;
-		decltype(qc1->end()) end1;
-		decltype(qc1->end()) end2;
+		decltype(qc1.begin()) it1;
+		decltype(qc2.begin()) it2;
+		decltype(qc1.end()) end1;
+		decltype(qc1.end()) end2;
 
 		std::array<short, qc::MAX_QUBITS> line{};
 		Method method = Proportional;

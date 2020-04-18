@@ -1,6 +1,6 @@
 /*
  * This file is part of IIC-JKU QCEC library which is released under the MIT license.
- * See file README.md or go to http://iic.jku.at/eda/research/quantum/ for more information.
+ * See file README.md or go to http://iic.jku.at/eda/research/quantum_verification/ for more information.
  */
 
 #ifndef QUANTUMCIRCUITEQUIVALENCECHECKING_BASERESULTS_HPP

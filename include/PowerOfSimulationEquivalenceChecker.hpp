@@ -1,6 +1,7 @@
-//
-// Created by Lukas Burgholzer on 21.02.20.
-//
+/*
+ * This file is part of IIC-JKU QCEC library which is released under the MIT license.
+ * See file README.md or go to http://iic.jku.at/eda/research/quantum_verification/ for more information.
+ */
 
 #ifndef QCEC_POWEROFSIMULATIONEQUIVALENCECHECKER_HPP
 #define QCEC_POWEROFSIMULATIONEQUIVALENCECHECKER_HPP
@@ -39,11 +40,11 @@ namespace ec {
 			line.fill(-1);
 
 			// reduce both circuits qubits to a minimum by stripping away idle qubits
-			this->qc1->stripIdleQubits();
-			this->qc2->stripIdleQubits();
+			qc1.stripIdleQubits();
+			qc2.stripIdleQubits();
 
 			// augment the smaller circuit with ancillary qubits and change the qubits in the larger circuit to ancillary
-			augmentQubits(this->qc1, this->qc2);
+			augmentQubits(qc1, qc2);
 			nqubits_for_stimuli = qc1.getNqubitsWithoutAncillae();
 
 			if(seed == 0) {

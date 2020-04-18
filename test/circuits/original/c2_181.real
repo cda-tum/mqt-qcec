@@ -1,0 +1,126 @@
+# Used Library: MCT (gates: 116, quantum costs: 368)
+# This file have been taken from RevLib (www.revlib.org). 
+.version 1.0
+.numvars 35 
+.variables x0 x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 x11 x12 x13 x14 x15 x16 x17 x18 x19 x20 x21 x22 x23 x24 x25 x26 x27 x28 x29 x30 x31 x32 x33 x34
+.inputs x0 x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 x11 x12 x13 x14 x15 x16 x17 x18 x19 x20 x21 x22 x23 x24 x25 x26 x27 x28 x29 x30 x31 x32 x33 x34
+.outputs x0 x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 x11 x12 x13 x14 x15 x16 x17 x18 x19 x20 x21 x22 x23 x24 x25 x26 x27 x28 x29 x30 x31 x32 x33 x34
+.begin
+t3 x0 x1 x2
+t3 x3 x4 x5
+t3 x6 x7 x9
+t3 x10 x11 x12
+t3 x13 x14 x16
+t3 x17 x18 x20
+t3 x21 x22 x24
+t3 x25 x26 x27
+t3 x28 x29 x31
+t3 x32 x33 x34
+t2 x0 x1
+t2 x3 x4
+t2 x6 x7
+t2 x10 x11
+t2 x13 x14
+t2 x17 x18
+t2 x21 x22
+t2 x25 x26
+t2 x28 x29
+t2 x32 x33
+t3 x7 x11 x8
+t3 x14 x18 x15
+t3 x22 x26 x23
+t3 x29 x33 x30
+t3 x15 x23 x19
+t3 x2 x4 x5
+t3 x9 x11 x12
+t3 x16 x18 x20
+t3 x24 x26 x27
+t3 x31 x33 x34
+t3 x5 x8 x12
+t3 x20 x23 x27
+t3 x12 x19 x27
+t3 x12 x15 x20
+t3 x27 x30 x34
+t3 x5 x7 x9
+t3 x12 x14 x16
+t3 x20 x22 x24
+t3 x27 x29 x31
+t3 x15 x23 x19
+t3 x7 x11 x8
+t3 x14 x18 x15
+t3 x22 x26 x23
+t3 x29 x33 x30
+t2 x2 x4
+t2 x5 x7
+t2 x9 x11
+t2 x12 x14
+t2 x16 x18
+t2 x20 x22
+t2 x24 x26
+t2 x27 x29
+t2 x31 x33
+t1 x1
+t1 x4
+t1 x7
+t1 x11
+t1 x14
+t1 x18
+t1 x22
+t1 x26
+t1 x29
+t2 x3 x4
+t2 x6 x7
+t2 x10 x11
+t2 x13 x14
+t2 x17 x18
+t2 x21 x22
+t2 x25 x26
+t2 x28 x29
+t3 x7 x11 x8
+t3 x14 x18 x15
+t3 x22 x26 x23
+t3 x15 x23 x19
+t3 x5 x7 x9
+t3 x12 x14 x16
+t3 x20 x22 x24
+t3 x27 x29 x31
+t3 x12 x15 x20
+t3 x12 x19 x27
+t3 x5 x8 x12
+t3 x20 x23 x27
+t3 x2 x4 x5
+t3 x9 x11 x12
+t3 x16 x18 x20
+t3 x24 x26 x27
+t3 x15 x23 x19
+t3 x7 x11 x8
+t3 x14 x18 x15
+t3 x22 x26 x23
+t2 x3 x4
+t2 x6 x7
+t2 x10 x11
+t2 x13 x14
+t2 x17 x18
+t2 x21 x22
+t2 x25 x26
+t2 x28 x29
+t3 x0 x1 x2
+t3 x3 x4 x5
+t3 x6 x7 x9
+t3 x10 x11 x12
+t3 x13 x14 x16
+t3 x17 x18 x20
+t3 x21 x22 x24
+t3 x25 x26 x27
+t3 x28 x29 x31
+t1 x1
+t1 x4
+t1 x7
+t1 x11
+t1 x14
+t1 x18
+t1 x22
+t1 x26
+t1 x29
+.end
+

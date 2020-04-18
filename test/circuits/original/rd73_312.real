@@ -1,0 +1,86 @@
+# This file has been generated using RevKit 1.1 (www.revkit.org)
+# Command Line:
+# ./tools/bdd_synthesis.py --filename rd73_69.pla --realname rd73_69.real
+# Based on the approach proposed in R. Wille and R. Drechsler. BDD-based synthesis of reversible logic for large functions. In Design Automation Conf., pages 270-275, 2009.
+.version 2.0
+.numvars 25
+.variables x0 x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 x11 x12 x13 x14 x15 x16 x17 x18 x19 x20 x21 x22 x23 x24
+.inputs x1 x2 x3 x4 x5 x6 x7 0 0 0 1 0 1 0 0 1 0 0 0 0 0 0 0 0 0
+.outputs  g g g g g g g g g g g g g s2 g s0 g g g g g g g g s1
+.constants -------000101001000000000
+.garbage 1111111111111-1-11111111-
+.begin
+t2 x5 x7
+t3 x5 x6 x7
+t2 x6 x7
+t3 x5 x6 x8
+t2 x8 x9
+t3 x0 x7 x9
+t3 x0 x8 x9
+t2 x0 x10
+t2 x7 x10
+t3 x0 x8 x10
+t3 x0 x7 x10
+t2 x10 x11
+t3 x4 x9 x11
+t3 x4 x10 x11
+t2 x4 x12
+t2 x9 x12
+t3 x4 x10 x12
+t3 x4 x9 x12
+t2 x12 x13
+t3 x1 x11 x13
+t3 x1 x12 x13
+t1 x11
+t3 x1 x11 x12
+t3 x1 x12 x11
+t2 x11 x14
+t3 x2 x13 x14
+t3 x2 x11 x14
+t1 x13
+t3 x2 x13 x11
+t3 x2 x11 x13
+t2 x13 x14
+t3 x3 x14 x13
+t2 x5 x15
+t2 x6 x15
+t2 x0 x15
+t1 x15
+t2 x4 x15
+t1 x15
+t2 x1 x15
+t1 x15
+t2 x2 x15
+t1 x15
+t2 x3 x15
+t1 x15
+t2 x0 x16
+t3 x0 x7 x16
+t2 x7 x16
+t2 x4 x17
+t3 x4 x16 x17
+t2 x16 x17
+t2 x9 x18
+t3 x4 x16 x18
+t3 x4 x9 x18
+t2 x18 x19
+t3 x1 x17 x19
+t3 x1 x18 x19
+t3 x0 x8 x20
+t2 x20 x21
+t3 x4 x9 x21
+t3 x4 x20 x21
+t2 x21 x22
+t3 x1 x18 x22
+t3 x1 x21 x22
+t2 x22 x23
+t3 x2 x19 x23
+t3 x2 x22 x23
+t3 x4 x20 x24
+t2 x24 x21
+t3 x1 x21 x24
+t2 x24 x22
+t3 x2 x22 x24
+t2 x24 x23
+t3 x3 x23 x24
+.end

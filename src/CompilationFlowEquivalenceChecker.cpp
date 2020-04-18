@@ -1,6 +1,6 @@
 /*
  * This file is part of IIC-JKU QCEC library which is released under the MIT license.
- * See file README.md or go to http://iic.jku.at/eda/research/quantum/ for more information.
+ * See file README.md or go to http://iic.jku.at/eda/research/quantum_verification/ for more information.
  */
 
 #include "CompilationFlowEquivalenceChecker.hpp"
@@ -14,8 +14,8 @@ namespace ec {
 		auto start = std::chrono::high_resolution_clock::now();
 
 		// reduce both circuits qubits to a minimum by stripping away idle qubits
-		qc1->stripIdleQubits();
-		qc2->stripIdleQubits();
+		qc1.stripIdleQubits();
+		qc2.stripIdleQubits();
 
 		#if DEBUG_MODE_EC
 		std::cout << "QC1: ";
@@ -29,9 +29,9 @@ namespace ec {
 		// augment the smaller circuit with ancillary qubits and change the qubits in the larger circuit to ancillary
 		augmentQubits(qc1, qc2);
 
-		qc::permutationMap perm1 = qc1->initialLayout;
-		qc::permutationMap perm2 = qc2->initialLayout;
-		results.result = qc1->createInitialMatrix(dd);
+		qc::permutationMap perm1 = qc1.initialLayout;
+		qc::permutationMap perm2 = qc2.initialLayout;
+		results.result = qc1.createInitialMatrix(dd);
 		dd->incRef(results.result);
 
 		#if DEBUG_MODE_EC
@@ -45,10 +45,10 @@ namespace ec {
 		dd->export2Dot(results.result, eiss.str().c_str());
 		#endif
 
-		it1 = qc1->begin();
-		it2 = qc2->begin();
-		end1 = qc1->end();
-		end2 = qc2->end();
+		it1 = qc1.begin();
+		it2 = qc2.begin();
+		end1 = qc1.end();
+		end2 = qc2.end();
 
 		while (it1 != end1 && it2 != end2) {
 
@@ -130,12 +130,12 @@ namespace ec {
 			#endif
 		}
 
-		qc::QuantumComputation::changePermutation(results.result, perm1, qc1->outputPermutation, line, dd, LEFT);
-		qc::QuantumComputation::changePermutation(results.result, perm2, qc2->outputPermutation, line, dd, RIGHT);
-		qc1->reduceAncillae(results.result, dd);
-		qc1->reduceGarbage(results.result, dd);
+		qc::QuantumComputation::changePermutation(results.result, perm1, qc1.outputPermutation, line, dd, LEFT);
+		qc::QuantumComputation::changePermutation(results.result, perm2, qc2.outputPermutation, line, dd, RIGHT);
+		qc1.reduceAncillae(results.result, dd);
+		qc1.reduceGarbage(results.result, dd);
 
-		results.equivalence = equals(results.result, qc1->createInitialMatrix(dd));
+		results.equivalence = equals(results.result, qc1.createInitialMatrix(dd));
 
 		#if DEBUG_MODE_EC
 		std::stringstream ss{};

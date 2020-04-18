@@ -1,12 +1,13 @@
 /*
  * This file is part of IIC-JKU QCEC library which is released under the MIT license.
- * See file README.md or go to http://iic.jku.at/eda/research/quantum/ for more information.
+ * See file README.md or go to http://iic.jku.at/eda/research/quantum_verification/ for more information.
  */
 
 #include <iostream>
 #include <string>
 #include <algorithm>
 #include <functional>
+#include <future>
 
 #include "gtest/gtest.h"
 #include "PowerOfSimulationEquivalenceChecker.hpp"
@@ -17,15 +18,15 @@ class CompilationFlowTest : public testing::TestWithParam<std::string> {
 protected:
 	qc::QuantumComputation qc_original;
 	qc::QuantumComputation qc_transpiled;
-	ec::Configuration config;
 
 	std::string test_original_dir = "./circuits/original/";
 	std::string test_transpiled_dir = "./circuits/transpiled/";
 
+	int timeout = 60;
+
 	void SetUp() override {
 		qc_original.import(test_original_dir + GetParam() + ".real");
 		qc_transpiled.import(test_transpiled_dir + GetParam() + "_transpiled.qasm");
-		config.augmentQubitRegisters = true;
 	}
 
 	void TearDown() override {
@@ -36,7 +37,26 @@ protected:
 
 INSTANTIATE_TEST_SUITE_P(CompilationFlowTest, CompilationFlowTest,
                          testing::Values(
-		                         "4gt11_84", "4gt11-v1_85", "deutsch-josza_16_const", "3_17_13", "3_17_15", "4_49_16", "4gt4-v0_72", "4mod5-v0_18", "4mod5-v0_19", "ham3_103", "0410184_169", "decod24-v1_42", "decod24-v3_46", "hwb4_51", "rd32-v0_67", "dk27_225"),
+		                         "dk27_225",
+		                         "pcler8_248",
+		                         "5xp1_194",
+		                         "alu1_198",
+		                         "mlp4_245",
+		                         "dk17_224",
+		                         "add6_196",
+		                         "C7552_205",
+		                         "cu_219",
+		                         "example2_231",
+		                         "c2_181",
+		                         "rd73_312",
+		                         "cm150a_210",
+		                         "cm163a_213",
+		                         "c2_182",
+		                         "sym9_317",
+		                         "mod5adder_306",
+		                         "rd84_313",
+		                         "cm151a_211",
+		                         "apla_203"),
                          [](const testing::TestParamInfo<CompilationFlowTest::ParamType>& info) {
 							 auto s = info.param;
 							 std::replace( s.begin(), s.end(), '-', '_');
@@ -45,55 +65,14 @@ INSTANTIATE_TEST_SUITE_P(CompilationFlowTest, CompilationFlowTest,
 TEST_P(CompilationFlowTest, EquivalenceCompilationFlow) {
 	ec::CompilationFlowEquivalenceChecker ec_flow(qc_original, qc_transpiled);
 	ec_flow.expectEquivalent();
-	ec_flow.check(config);
-	ec_flow.printResult(std::cout);
-	EXPECT_TRUE(ec_flow.results.consideredEquivalent());
-}
+	auto future = std::async(std::launch::async, [&ec_flow]() {
+		ec_flow.check(ec::Configuration{true});
+	});
 
-TEST_P(CompilationFlowTest, EquivalenceReference) {
-	ec::EquivalenceChecker eq(qc_original, qc_transpiled);
-	eq.expectEquivalent();
-	eq.check(config);
-	eq.printResult(std::cout);
-	EXPECT_TRUE(eq.results.consideredEquivalent());
-}
+	if(future.wait_for(std::chrono::seconds(timeout)) == std::future_status::timeout) {
+		ec_flow.results.timeout = true;
+	}
 
-TEST_P(CompilationFlowTest, EquivalenceReferenceFromImproved) {
-	ec::ImprovedDDEquivalenceChecker eq_ref(qc_original, qc_transpiled, ec::Reference);
-	eq_ref.expectEquivalent();
-	eq_ref.check(config);
-	eq_ref.printResult(std::cout);
-	EXPECT_TRUE(eq_ref.results.consideredEquivalent());
-}
-
-TEST_P(CompilationFlowTest, EquivalenceNaive) {
-	ec::ImprovedDDEquivalenceChecker eq_naive(qc_original, qc_transpiled, ec::Naive);
-	eq_naive.expectEquivalent();
-	eq_naive.check(config);
-	eq_naive.printResult(std::cout);
-	EXPECT_TRUE(eq_naive.results.consideredEquivalent());
-}
-
-TEST_P(CompilationFlowTest, EquivalenceProportional) {
-	ec::ImprovedDDEquivalenceChecker eq_proportional(qc_original, qc_transpiled, ec::Proportional);
-	eq_proportional.expectEquivalent();
-	eq_proportional.check(config);
-	eq_proportional.printResult(std::cout);
-	EXPECT_TRUE(eq_proportional.results.consideredEquivalent());
-}
-
-TEST_P(CompilationFlowTest, EquivalenceLookahead) {
-	ec::ImprovedDDEquivalenceChecker eq_lookahead(qc_original, qc_transpiled, ec::Lookahead);
-	eq_lookahead.expectEquivalent();
-	eq_lookahead.check(config);
-	eq_lookahead.printResult(std::cout);
-	EXPECT_TRUE(eq_lookahead.results.consideredEquivalent());
-}
-
-TEST_P(CompilationFlowTest, EquivalencePowerOfSimulation) {
-	ec::PowerOfSimulationEquivalenceChecker eq_sim(qc_original, qc_transpiled);
-	eq_sim.expectEquivalent();
-	eq_sim.check(config);
-	eq_sim.printResult(std::cout);
-	EXPECT_TRUE(eq_sim.results.consideredEquivalent());
+	ec_flow.results.printCSVEntry(std::cout);
+	EXPECT_TRUE(ec_flow.results.timeout || ec_flow.results.consideredEquivalent());
 }

@@ -12,7 +12,7 @@ The tool builds upon [our decision diagram (DD) package](https://github.com/iic-
 
 For more information, please visit [iic.jku.at/eda/research/quantum_verification](http://iic.jku.at/eda/research/quantum_verification).
 
-If you have any questions, feel free to contact us via [iic_quantum@jku.at](mailto:iic_quantum@jku.at) or by creating an issue on GitHub.
+If you have any questions, feel free to contact us via [iic-quantum@jku.at](mailto:iic-quantum@jku.at) or by creating an issue on GitHub.
 
 ## Usage
 

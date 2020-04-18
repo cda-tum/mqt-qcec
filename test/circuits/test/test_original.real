@@ -1,0 +1,8 @@
+.numvars 3
+.variables q0 q1 q2
+.begin
+h1 q1
+t2 q1 q2
+t3 q2 q1 q0
+t2 q2 q1
+.end

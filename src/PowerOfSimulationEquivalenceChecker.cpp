@@ -1,6 +1,6 @@
 /*
  * This file is part of IIC-JKU QCEC library which is released under the MIT license.
- * See file README.md or go to http://iic.jku.at/eda/research/quantum/ for more information.
+ * See file README.md or go to http://iic.jku.at/eda/research/quantum_verification/ for more information.
  */
 
 #include "PowerOfSimulationEquivalenceChecker.hpp"
@@ -34,10 +34,10 @@ namespace ec {
 			std::cout << "\033[32mSim " << results.nsims << ": " << results.basisState << "\033[0m" << std::endl;
 			#endif
 
-			dd::Edge in1 = dd->makeBasisState(qc1->getNqubits(), stimulusBits);
+			dd::Edge in1 = dd->makeBasisState(qc1.getNqubits(), stimulusBits);
 			std::array<short, qc::MAX_QUBITS> l{};
 			l.fill(qc::LINE_DEFAULT);
-			qc::permutationMap map = qc1->initialLayout;
+			qc::permutationMap map = qc1.initialLayout;
 
 			dd::Edge e = in1;
 			dd->incRef(e);
@@ -49,7 +49,7 @@ namespace ec {
 				addToAverage(nc-1);
 			#endif
 
-			for (auto & op : *qc1) {
+			for (auto & op : qc1) {
 				auto tmp = dd->multiply(op->getDD(dd, l, map), e);
 				dd->incRef(tmp);
 				dd->decRef(e);
@@ -65,10 +65,10 @@ namespace ec {
 			}
 
 			// correct permutation if necessary
-			qc::QuantumComputation::changePermutation(e, map, qc1->outputPermutation, l, dd);
+			qc::QuantumComputation::changePermutation(e, map, qc1.outputPermutation, l, dd);
 
-			qc1->reduceAncillae(e, dd);
-			qc1->reduceGarbage(e, dd);
+			qc1.reduceAncillae(e, dd);
+			qc1.reduceGarbage(e, dd);
 
 			#if DEBUG_MODE_SIMULATION
 			std::stringstream ss1 {};
@@ -77,10 +77,10 @@ namespace ec {
 			std::cout << "[after 1st circ] Complex count: " << dd->cn.count << std::endl;
 			#endif
 
-			dd::Edge in2 = dd->makeBasisState(qc2->getNqubits(), stimulusBits);
+			dd::Edge in2 = dd->makeBasisState(qc2.getNqubits(), stimulusBits);
 
 			l.fill(qc::LINE_DEFAULT);
-			map = qc2->initialLayout;
+			map = qc2.initialLayout;
 
 			dd::Edge f = in2;
 			dd->incRef(f);
@@ -92,7 +92,7 @@ namespace ec {
 				addToAverage(nc-1);
 			#endif
 
-			for (auto & op : *qc2) {
+			for (auto & op : qc2) {
 				auto tmp = dd->multiply(op->getDD(dd, l, map), f);
 				dd->incRef(tmp);
 				dd->decRef(f);
@@ -108,10 +108,10 @@ namespace ec {
 			}
 
 			// correct permutation if necessary
-			qc::QuantumComputation::changePermutation(f, map, qc2->outputPermutation, l, dd);
+			qc::QuantumComputation::changePermutation(f, map, qc2.outputPermutation, l, dd);
 
-			qc2->reduceAncillae(f, dd);
-			qc2->reduceGarbage(f, dd);
+			qc2.reduceAncillae(f, dd);
+			qc2.reduceGarbage(f, dd);
 
 
 			#if DEBUG_MODE_SIMULATION

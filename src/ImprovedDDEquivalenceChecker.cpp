@@ -1,6 +1,6 @@
 /*
  * This file is part of IIC-JKU QCEC library which is released under the MIT license.
- * See file README.md or go to http://iic.jku.at/eda/research/quantum/ for more information.
+ * See file README.md or go to http://iic.jku.at/eda/research/quantum_verification/ for more information.
  */
 
 #include <ImprovedDDEquivalenceChecker.hpp>
@@ -48,7 +48,7 @@ namespace ec {
 		if (config.augmentQubitRegisters) {
 			augmentQubits(qc1, qc2);
 		} else {
-			if (qc1->getNqubits() != qc2->getNqubits()) {
+			if (qc1.getNqubits() != qc2.getNqubits()) {
 				std::cerr << "Circuits operate on different number of qubits and 'augmentQubitRegisters' is not enabled" << std::endl;
 				exit(1);
 			}
@@ -63,9 +63,9 @@ namespace ec {
 		qc2->print();
 		#endif
 
-		qc::permutationMap perm1 = qc1->initialLayout;
-		qc::permutationMap perm2 = qc2->initialLayout;
-		results.result = qc1->createInitialMatrix(dd);
+		qc::permutationMap perm1 = qc1.initialLayout;
+		qc::permutationMap perm2 = qc2.initialLayout;
+		results.result = qc1.createInitialMatrix(dd);
 		dd->incRef(results.result);
 
 		#if DEBUG_MODE_EC
@@ -80,10 +80,10 @@ namespace ec {
 		++counter;
 		#endif
 
-		it1 = qc1->begin();
-		it2 = qc2->begin();
-		end1 = qc1->end();
-		end2 = qc2->end();
+		it1 = qc1.begin();
+		it2 = qc2.begin();
+		end1 = qc1.end();
+		end2 = qc2.end();
 
 		switch (method) {
 			case Naive: checkNaive(perm1, perm2);
@@ -133,12 +133,12 @@ namespace ec {
 			#endif
 		}
 
-		qc::QuantumComputation::changePermutation(results.result, perm1, qc1->outputPermutation, line, dd, LEFT);
-		qc::QuantumComputation::changePermutation(results.result, perm2, qc2->outputPermutation, line, dd, RIGHT);
-		qc1->reduceAncillae(results.result, dd);
-		qc1->reduceGarbage(results.result, dd);
+		qc::QuantumComputation::changePermutation(results.result, perm1, qc1.outputPermutation, line, dd, LEFT);
+		qc::QuantumComputation::changePermutation(results.result, perm2, qc2.outputPermutation, line, dd, RIGHT);
+		qc1.reduceAncillae(results.result, dd);
+		qc1.reduceGarbage(results.result, dd);
 
-		results.equivalence = equals(results.result, qc1->createInitialMatrix(dd));
+		results.equivalence = equals(results.result, qc1.createInitialMatrix(dd));
 
 		#if DEBUG_MODE_EC
 		std::stringstream ss{};
@@ -196,9 +196,9 @@ namespace ec {
 	void ImprovedDDEquivalenceChecker::checkProportional(qc::permutationMap& perm1, qc::permutationMap& perm2) {
 
 		unsigned int ratio = (unsigned int)
-				std::round((double)std::max(qc1->getNops(), qc2->getNops()) / std::min(qc1->getNops(), qc2->getNops()));
-		unsigned int ratio1 = (qc1->getNops() > qc2->getNops())? ratio: 1;
-		unsigned int ratio2 = (qc1->getNops() > qc2->getNops())? 1: ratio;
+				std::round((double)std::max(qc1.getNops(), qc2.getNops()) / std::min(qc1.getNops(), qc2.getNops()));
+		unsigned int ratio1 = (qc1.getNops() > qc2.getNops())? ratio: 1;
+		unsigned int ratio2 = (qc1.getNops() > qc2.getNops())? 1: ratio;
 
 		while (it1 != end1 && it2 != end2) {
 			for (unsigned int i = 0; i < ratio1 && it1 != end1; ++i) {

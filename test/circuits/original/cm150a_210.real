@@ -1,0 +1,68 @@
+# Function: cm150a
+# Used Library: MCT (Gates: 53, Quantum costs: 1096)
+# This file have been taken from RevLib (www.revlib.org).
+.version  1.0
+# Created by tfc2real J. Rice Jan 2009
+# Parameters for Exorcism: -n 1 -r 1 -a 0 -b 1 -c 1
+# Templates applied in both directions
+.numvars 22
+.variables  f0 x20 x19 x18 x17 x16 x15 x14 x13 x12 x11 x10 x9 x8 x7 x6 x5 x4 x3 x2 x1 x0
+.inputs  0 x20 x19 x18 x17 x16 x15 x14 x13 x12 x11 x10 x9 x8 x7 x6 x5 x4 x3 x2 x1 x0
+.outputs  f0 x20 x19 x18 x17 x16 x15 x14 x13 x12 x11 x10 x9 x8 x7 x6 x5 x4 x3 x2 x1 x0
+.constants 0---------------------
+.garbage 111111111111111111111-
+.begin
+t2 x20 f0
+t1 x20
+t1 x15
+t7 x15 x16 x17 x18 x19 x20 f0
+t1 x7
+t7 x7 x16 x17 x18 x19 x20 f0
+t6 x7 x16 x17 x18 x20 f0
+t1 x18
+t1 x11
+t7 x11 x16 x17 x18 x19 x20 f0
+t1 x3
+t7 x3 x16 x17 x18 x19 x20 f0
+t6 x3 x16 x17 x18 x20 f0
+t1 x18
+t1 x17
+t1 x13
+t7 x13 x16 x17 x18 x19 x20 f0
+t1 x5
+t7 x5 x16 x17 x18 x19 x20 f0
+t6 x5 x16 x17 x18 x20 f0
+t1 x18
+t1 x9
+t7 x9 x16 x17 x18 x19 x20 f0
+t1 x1
+t7 x1 x16 x17 x18 x19 x20 f0
+t6 x1 x16 x17 x18 x20 f0
+t1 x18
+t1 x17
+t1 x16
+t1 x14
+t7 x14 x16 x17 x18 x19 x20 f0
+t1 x6
+t7 x6 x16 x17 x18 x19 x20 f0
+t6 x6 x16 x17 x18 x20 f0
+t1 x18
+t1 x10
+t7 x10 x16 x17 x18 x19 x20 f0
+t1 x2
+t7 x2 x16 x17 x18 x19 x20 f0
+t6 x2 x16 x17 x18 x20 f0
+t1 x18
+t1 x17
+t1 x12
+t7 x12 x16 x17 x18 x19 x20 f0
+t1 x4
+t7 x4 x16 x17 x18 x19 x20 f0
+t6 x4 x16 x17 x18 x20 f0
+t1 x18
+t1 x8
+t7 x8 x16 x17 x18 x19 x20 f0
+t1 x19
+t1 x0
+t7 x0 x16 x17 x18 x19 x20 f0
+.end

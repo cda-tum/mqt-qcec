@@ -72,10 +72,8 @@ endmacro()
 package_add_test(${PROJECT_NAME}_test
                  ${CMAKE_CURRENT_SOURCE_DIR}/test_general.cpp
                  ${CMAKE_CURRENT_SOURCE_DIR}/test_functionality.cpp
-                 ${CMAKE_CURRENT_SOURCE_DIR}/test_eq_circuits.cpp
-                 ${CMAKE_CURRENT_SOURCE_DIR}/test_noneq_circuits.cpp
-                 ${CMAKE_CURRENT_SOURCE_DIR}/test_compilationflow.cpp
-                 ${CMAKE_CURRENT_SOURCE_DIR}/test_powerofsimulation.cpp)
+                 ${CMAKE_CURRENT_SOURCE_DIR}/test_journal.cpp
+                 ${CMAKE_CURRENT_SOURCE_DIR}/test_compilationflow.cpp)
 
 add_custom_command(TARGET ${PROJECT_NAME}_test
                    POST_BUILD

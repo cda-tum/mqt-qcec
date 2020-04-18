@@ -1,0 +1,37 @@
+# Function: pcler8
+# Used Library: MCT (Gates: 22, Quantum costs: 327)
+# This file have been taken from RevLib (www.revlib.org).
+.version  1.0
+# Created by tfc2real J. Rice Jan 2009
+# Parameters for Exorcism: -n 1 -r 1 -a 0 -b 1 -c 1
+# Templates applied in both directions
+.numvars 21
+.variables  f4 f3 f2 f1 f0 x15 x14 x13 x12 x11 x10 x9 x8 x7 x6 x5 x4 x3 x2 x1 x0
+.inputs  0 0 0 0 0 x15 x14 x13 x12 x11 x10 x9 x8 x7 x6 x5 x4 x3 x2 x1 x0
+.outputs  f4 f3 f2 f1 f0 x15 x14 x13 x12 x11 x10 x9 x8 x7 x6 x5 x4 x3 x2 x1 x0
+.constants 00000----------------
+.garbage 1111111111111111-----
+.begin
+t5 x2 x3 x4 x5 f0
+t6 x3 x8 x10 x14 x15 f4
+t1 f0
+t1 f1
+t1 f2
+t1 f3
+t1 x9
+t6 x2 x3 x4 x5 x9 f1
+t4 x4 x5 x9 f0
+t1 x11
+t4 x4 x5 x11 f1
+t7 x2 x3 x4 x5 x9 x11 f2
+t1 x12
+t4 x4 x5 x12 f2
+t8 x2 x3 x4 x5 x9 x11 x12 f3
+t1 x13
+t4 x4 x5 x13 f3
+t1 x4
+t4 x0 x4 x5 f0
+t4 x4 x5 x7 f3
+t4 x4 x5 x6 f2
+t4 x1 x4 x5 f1
+.end
