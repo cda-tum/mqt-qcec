@@ -15,14 +15,8 @@ void ec::EquivalenceChecker::check(const Configuration& config) {
 
 	auto start = std::chrono::high_resolution_clock::now();
 
-	if (config.augmentQubitRegisters) {
-		augmentQubits(qc1, qc2);
-	} else {
-		if (qc1.getNqubits() != qc2.getNqubits()) {
-			std::cerr << "Circuits operate on different number of qubits and 'augmentQubitRegisters' is not enabled" << std::endl;
-			exit(1);
-		}
-	}
+	augmentQubits(qc1, qc2);
+
 	#if DEBUG_MODE_EC
 	std::cout << "QC1: ";
 	qc1->printRegisters();

@@ -18,7 +18,6 @@ namespace ec {
 	enum Direction: bool { LEFT = true, RIGHT = false };
 
 	struct Configuration {
-		bool augmentQubitRegisters = false;
 		bool printCSV = false;
 
 		// configuration options for PowerOfSimulation equivalence checker
@@ -80,6 +79,7 @@ namespace ec {
 		// TODO: also allow equivalence by relative phase
 		static Equivalence equals(dd::Edge e, dd::Edge f);
 
+		virtual void check() { check(Configuration{}); };
 		virtual void check(const Configuration& config);
 
 		void expectEquivalent() { results.expected = Equivalent; }
@@ -91,11 +91,14 @@ namespace ec {
 			return dd->size(results.result) - 1;
 		}
 
+		virtual std::ostream& printResult() { return printResult(std::cout); }
 		virtual std::ostream& printResult(std::ostream& out) {
 			return results.print(out);
 		}
 
+		virtual std::ostream & printCSVEntry() { return printCSVEntry(std::cout); }
 		virtual std::ostream & printCSVEntry(std::ostream& out) { return results.printCSVEntry(out); }
+		virtual std::ostream & printCSVHeader() { return printCSVHeader(std::cout); }
 		virtual std::ostream & printCSVHeader(std::ostream& out) { return ec::EquivalenceCheckingResults::printCSVHeader(out); }
 
 		virtual bool error() {

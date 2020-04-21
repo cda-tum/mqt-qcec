@@ -56,6 +56,7 @@ namespace ec {
 
 		/// Use dedicated method to check the equivalence of both provided circuits
 		void check(const Configuration& config) override;
+		void check() override { return check(Configuration{}); }
 	};
 
 }

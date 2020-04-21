@@ -16,7 +16,7 @@ class FunctionalityTest : public testing::TestWithParam<std::string> {
 protected:
 	qc::QuantumComputation qc_original;
 	qc::QuantumComputation qc_alternative;
-	ec::Configuration config{true};
+	ec::Configuration config{};
 
 	std::string test_original = "./circuits/test/test.real";
 	std::string test_alternative_dir = "./circuits/test/";
@@ -24,11 +24,6 @@ protected:
 	void SetUp() override {
 		qc_original.import(test_original);
 	}
-
-	void TearDown() override {
-
-	}
-
 };
 
 INSTANTIATE_TEST_SUITE_P(TestCircuits, FunctionalityTest,

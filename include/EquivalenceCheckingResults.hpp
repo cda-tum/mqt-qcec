@@ -83,14 +83,15 @@ namespace ec {
 
 		virtual ~EquivalenceCheckingResults() = default;
 
-		bool error() {
+		bool error() const {
 			return tooManyQubits || differentNrQubits;
 		}
 
-		bool consideredEquivalent() {
+		bool consideredEquivalent() const {
 			return equivalence == Equivalent || equivalence == EquivalentUpToGlobalPhase || equivalence == ProbablyEquivalent;
 		}
 
+		virtual std::ostream& print() { return print(std::cout); }
 		virtual std::ostream& print(std::ostream& out) {
 			if (error()) {
 				out << name << ": No equivalence check performed!\n";
@@ -148,6 +149,7 @@ namespace ec {
 			return out;
 		}
 
+		virtual std::ostream& printCSVEntry() { return printCSVEntry(std::cout ); }
 		virtual std::ostream& printCSVEntry(std::ostream& out) {
 			if (error())
 				return out;

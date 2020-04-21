@@ -71,12 +71,11 @@ if __name__ == '__main__':
 
                     c = subprocess.Popen(['timeout',
                                           args.timeout,
-                                          './QCEC_app',
+                                          './qcec_app',
                                           revlibPath + benchmark + '.real',
                                           transpiledfile,
                                           method,
-                                         '--augment_qubits',
-                                          '--print_csv'],
+                                          '--csv'],
                                          stdout=csvFile,
                                          stderr=subprocess.PIPE,
                                          universal_newlines=True)

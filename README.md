@@ -14,12 +14,12 @@ This tool can be used for checking the equivalence of two quantum circuits provi
  * `OpenQASM` (e.g. used by IBM's [Qiskit](https://github.com/Qiskit/qiskit)),
  
  with the following available methods:
-- **Reference** - Construct and compare the DD for both circuits [[1, Section III.B]](https://arxiv.org/abs/2004.08420),
-- ![G \rightarrow \mathbb{I} \leftarrow G'](https://render.githubusercontent.com/render/math?math=G%20%5Crightarrow%20%5Cmathbb%7BI%7D%20%5Cleftarrow%20G') - Starting from the identity *I*, either apply gates from *G* or (inverted) gates from *G'* according to one of the following strategies [[1, Section IV.A]](https://arxiv.org/abs/2004.08420)
-    - **Naive** - Alternate between applications of *G* and *G'* [[1, Section V.A]](https://arxiv.org/abs/2004.08420),
-    - **Proportional** - Proportionally apply gates according to the gate count ratio of *G* and *G'* [[1, Section V.B]](https://arxiv.org/abs/2004.08420),
-    - **Lookahead** - Always apply the gate yielding the smaller DD [[1, Section V.C]](https://arxiv.org/abs/2004.08420),
-- **Simulation** - Conduct up to *16* simulation runs to prove non-equivalence or give a strong indication of equivalence [[1, Section IV.B]](https://arxiv.org/abs/2004.08420),
+- **Reference** - Construct and compare the DD for both circuits [[1, Section III.B]](https://arxiv.org/pdf/2004.08420.pdf#page=5),
+- ![G \rightarrow \mathbb{I} \leftarrow G'](https://render.githubusercontent.com/render/math?math=G%20%5Crightarrow%20%5Cmathbb%7BI%7D%20%5Cleftarrow%20G') - Starting from the identity *I*, either apply gates from *G* or (inverted) gates from *G'* according to one of the following strategies [[1, Section IV.A]](https://arxiv.org/pdf/2004.08420.pdf#page=6)
+    - **Naive** - Alternate between applications of *G* and *G'* [[1, Section V.A]](https://arxiv.org/pdf/2004.08420.pdf#page=8),
+    - **Proportional** - Proportionally apply gates according to the gate count ratio of *G* and *G'* [[1, Section V.B]](https://arxiv.org/pdf/2004.08420.pdf#page=8),
+    - **Lookahead** - Always apply the gate yielding the smaller DD [[1, Section V.C]](https://arxiv.org/pdf/2004.08420.pdf#page=8),
+- **Simulation** - Conduct simulation runs to prove non-equivalence or give a strong indication of equivalence [[1, Section IV.B]](https://arxiv.org/pdf/2004.08420.pdf#page=7),
 
 The tool builds upon [our decision diagram (DD) package](https://github.com/iic-jku/dd_package.git) as well as [our quantum functionality representation (QFR)](https://github.com/iic-jku/qfr.git). For more information, please visit [iic.jku.at/eda/research/quantum_verification](http://iic.jku.at/eda/research/quantum_verification). 
 
@@ -30,7 +30,7 @@ If you have any questions, feel free to contact us via [iic-quantum@jku.at](mail
 This tool can either be used as a **standalone executable** with command-line interface, or as a **library** for the incorporation in other projects.
 - The standalone executable is launched in the following way:
     ```commandline
-    qcec_app <PATH_TO_FILE_1> <PATH_TO_FILE_2> (<method>) (--augment_qubits || --print_csv)
+    qcec_app <PATH_TO_FILE_1> <PATH_TO_FILE_2> (<method>)
     ```
   where *\<method\>* is one of
    - reference
@@ -39,14 +39,12 @@ This tool can either be used as a **standalone executable** with command-line in
    - lookahead 
    - simulation
    
-   The executable performs the equivalence check and prints its result to the standard output. If the `--print_csv` option is present, a CSV entry according to the following header is printed
+  The ```simulation``` method has two optional parameters ```--nsims r``` and ```--fid F```, controlling the maximum number of simulations *r* (default: *16*) and the considered fidelity limit *F* (default *0.999*), respectively.
+      
+   The executable performs the equivalence check and prints its result to the standard output. If the `--csv` option is present, a CSV entry according to the following header is printed
     ```csv
    filename1;nqubits1;ngates1;filename2;nqubits2;ngates2;expectedEquivalent;equivalent;method;time;maxActive;nsims
    ```
-   
-   The `--augment_qubits` flag is used to handle circuits acting on different numbers of qubits, where the additional qubits of the larger circuit are treated as ancillary qubits.
-   
-   
    
 - Internally the library works in the following way
     - Import both input files into a `qc::QuantumComputation` object
@@ -68,11 +66,11 @@ This tool can either be used as a **standalone executable** with command-line in
         ```
     - Perform the actual equivalence check
         ```c++
-        eq.check(ec::Configuration{});
+        eq.check();
         ```
     - Print the results
         ```c++
-        eq.printResult(std::cout);
+        eq.printResult();
         ```
         or access them through the ```eq.results``` member.
   

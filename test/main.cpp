@@ -39,8 +39,8 @@ int main() {
 
 	for (auto& eq: eqs) {
 		eq->expectEquivalent();
-		eq->check(ec::Configuration{});
-		eq->printResult(std::cout);
+		eq->check();
+		eq->printResult();
 	}
 
 	std::cout << "\n--------------------------------------------------\n\n";
@@ -55,8 +55,8 @@ int main() {
 
 	for (auto& noneq: noneqs) {
 		noneq->expectNonEquivalent();
-		noneq->check(ec::Configuration{});
-		noneq->printResult(std::cout);
+		noneq->check();
+		noneq->printResult();
 	}
 	return 0;
 }

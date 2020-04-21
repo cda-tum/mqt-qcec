@@ -18,10 +18,6 @@ class GeneralTest : public ::testing::Test {
 protected:
 	qc::QuantumComputation qc_original;
 	qc::QuantumComputation qc_alternative;
-
-	void TearDown() override {
-
-	}
 };
 
 TEST_F(GeneralTest, CSVOutput) {
@@ -30,7 +26,7 @@ TEST_F(GeneralTest, CSVOutput) {
 
 	ec::EquivalenceChecker ec(qc_original, qc_alternative);
 	ec.expectEquivalent();
-	ec.check(ec::Configuration{});
+	ec.check();
 	EXPECT_NO_THROW(ec.exportResultAsDot("result.dot"));
 	EXPECT_FALSE(ec.error());
 
@@ -53,12 +49,12 @@ TEST_F(GeneralTest, InvalidInstance) {
 	qc_alternative.import("./circuits/test/test_error.qasm");
 
 	ec::EquivalenceChecker ec(qc_original, qc_alternative);
-	ec.check(ec::Configuration{});
+	ec.check();
 	EXPECT_EQ(ec.results.equivalence, ec::NoInformation);
 	EXPECT_TRUE(ec.error());
 
 	ec::CompilationFlowEquivalenceChecker cfec(qc_original, qc_alternative);
-	cfec.check(ec::Configuration{});
+	cfec.check();
 	EXPECT_EQ(cfec.results.equivalence, ec::NoInformation);
 	EXPECT_TRUE(cfec.error());
 }
@@ -71,11 +67,11 @@ TEST_F(GeneralTest, NonUnitary) {
 	std::stringstream ss2{bell_circuit};
 	ASSERT_NO_THROW(qc_alternative.import(ss2, qc::OpenQASM));
 	ec::EquivalenceChecker ec(qc_original, qc_alternative);
-	EXPECT_EXIT(ec.check(ec::Configuration{}), ::testing::ExitedWithCode(1),
+	EXPECT_EXIT(ec.check(), ::testing::ExitedWithCode(1),
 	            "Functionality not unitary.");
 
 	ec::EquivalenceChecker ec2(qc_alternative, qc_original);
-	EXPECT_EXIT(ec2.check(ec::Configuration{}), ::testing::ExitedWithCode(1),
+	EXPECT_EXIT(ec2.check(), ::testing::ExitedWithCode(1),
 	            "Functionality not unitary.");
 }
 
@@ -84,7 +80,7 @@ TEST_F(GeneralTest, SwitchDifferentlySizedCircuits) {
 	qc_alternative.import("./circuits/transpiled/dk27_225_transpiled.qasm");
 
 	ec::CompilationFlowEquivalenceChecker ec(qc_alternative, qc_original);
-	ec.check(ec::Configuration{true, true});
+	ec.check();
 	EXPECT_TRUE(ec.results.equivalence == ec::Equivalent || ec.results.equivalence == ec::EquivalentUpToGlobalPhase);
 	EXPECT_FALSE(ec.error());
 }

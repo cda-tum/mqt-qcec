@@ -14,22 +14,24 @@
 #include "PowerOfSimulationEquivalenceChecker.hpp"
 
 void show_usage(const std::string& name) {
-	std::cerr << "Usage: " << name << " <PATH_TO_FILE_1> <PATH_TO_FILE_2> (<method>) (--augment_qubits || --print_csv)" << std::endl;
-	std::cerr << "Supported file formats:                                              " << std::endl;
-	std::cerr << "  .real                                                              " << std::endl;
-	std::cerr << "  .qasm                                                              " << std::endl;
-	std::cerr << "Available methods:                                                   " << std::endl;
-	std::cerr << "  reference                                                          " << std::endl;
-	std::cerr << "  naive                                                              " << std::endl;
-	std::cerr << "  proportional                                                       " << std::endl;
-	std::cerr << "  lookahead                                                          " << std::endl;
-	std::cerr << "  simulation                                                         " << std::endl;
-	std::cerr << "--print_csv:              Print results as csv string                " << std::endl;
-	std::cerr << "--augment_qubits:         Add fictional qubits to smaller circuit    " << std::endl;
+	std::cerr << "Usage: " << name << " <PATH_TO_FILE_1> <PATH_TO_FILE_2> <method>                          " << std::endl;
+	std::cerr << "Supported file formats:                                                                   " << std::endl;
+	std::cerr << "  .real                                                                                   " << std::endl;
+	std::cerr << "  .qasm                                                                                   " << std::endl;
+	std::cerr << "Available methods:                                                                        " << std::endl;
+	std::cerr << "  reference                                                                               " << std::endl;
+	std::cerr << "  naive                                                                                   " << std::endl;
+	std::cerr << "  proportional (default)                                                                  " << std::endl;
+	std::cerr << "  lookahead                                                                               " << std::endl;
+	std::cerr << "  simulation                                                                              " << std::endl;
+	std::cerr << "Options:                                                                                  " << std::endl;
+	std::cerr << "  --csv:                          Print results as csv string                             " << std::endl;
+	std::cerr << "  --nsims r (default 16):         Number of simulations to conduct (for simulation method)" << std::endl;
+	std::cerr << "  --fid F (default 0.999):        Fidelity limit for comparison (for simulation method)   " << std::endl;
 }
 
 int main(int argc, char** argv){
-	if (argc < 3 || argc > 7) {
+	if (argc < 3) {
 		show_usage(argv[0]);
 		return 1;
 	}
@@ -70,10 +72,43 @@ int main(int argc, char** argv){
 			std::string cmd = argv[i];
 			std::transform(cmd.begin(), cmd.end(), cmd.begin(), [](unsigned char c) { return ::tolower(c); });
 
-			if (cmd == "--print_csv") {
+			if (cmd == "--csv") {
 				config.printCSV = true;
-			} else if (cmd == "--augment_qubits") {
-				config.augmentQubitRegisters = true;
+			} else if (cmd == "--nsims") {
+				++i;
+				if (i >= argc) {
+					show_usage(argv[0]);
+					return 1;
+				}
+				cmd = argv[i];
+				std::transform(cmd.begin(), cmd.end(), cmd.begin(), [](unsigned char c) { return ::tolower(c); });
+				try {
+					config.max_sims = std::stoull(cmd);
+				} catch (std::exception& e) {
+					std::cerr << e.what() << std::endl;
+					show_usage(argv[0]);
+					return 1;
+				}
+			} else if (cmd == "--fid") {
+				++i;
+				if (i >= argc) {
+					show_usage(argv[0]);
+					return 1;
+				}
+				cmd = argv[i];
+				std::transform(cmd.begin(), cmd.end(), cmd.begin(), [](unsigned char c) { return ::tolower(c); });
+				try {
+					config.fidelity_limit = std::stod(cmd);
+					if (config.fidelity_limit < 0. || config.fidelity_limit > 1.) {
+						std::cerr << "Fidelity should be between 0 and 1" << std::endl;
+						show_usage(argv[0]);
+						return 1;
+					}
+				} catch (std::exception& e) {
+					std::cerr << e.what() << std::endl;
+					show_usage(argv[0]);
+					return 1;
+				}
 			} else {
 				show_usage(argv[0]);
 				return 1;
@@ -94,27 +129,27 @@ int main(int argc, char** argv){
 		ec.expectNothing();
 		ec.check(config);
 		if (config.printCSV) {
-			ec.printCSVEntry(std::cout);
+			ec.printCSVEntry();
 		} else {
-			ec.printResult(std::cout);
+			ec.printResult();
 		}
 	} else if (method == ec::PowerOfSimulation) {
 		ec::PowerOfSimulationEquivalenceChecker ec(qc1, qc2);
 		ec.expectNothing();
 		ec.check(config);
 		if (config.printCSV) {
-			ec.printCSVEntry(std::cout);
+			ec.printCSVEntry();
 		} else {
-			ec.printResult(std::cout);
+			ec.printResult();
 		}
 	} else {
 		ec::ImprovedDDEquivalenceChecker ec(qc1, qc2, method);
 		ec.expectNothing();
 		ec.check(config);
 		if (config.printCSV) {
-			ec.printCSVEntry(std::cout);
+			ec.printCSVEntry();
 		} else {
-			ec.printResult(std::cout);
+			ec.printResult();
 		}
 	}
 

@@ -86,10 +86,6 @@ protected:
 		avg_sims = 0.;
 	}
 
-	void TearDown() override {
-
-	}
-
 	void addToStatistics(unsigned short try_count, double time, unsigned short nsims) {
 		if (try_count == 0) {
 			min_time = max_time = avg_time = time;
@@ -171,7 +167,7 @@ TEST_P(JournalTestNonEQ, PowerOfSimulation) {
 			noneq_sim.expectNonEquivalent();
 			noneq_sim.check(config);
 			std::cout << "[" << i << "] ";
-			noneq_sim.results.printCSVEntry(std::cout);
+			noneq_sim.printCSVEntry();
 			addToStatistics(i, noneq_sim.results.time, noneq_sim.results.nsims);
 			if(noneq_sim.results.equivalence == ec::NonEquivalent) {
 				successes++;
@@ -217,7 +213,6 @@ protected:
 		}
 		transpiled_file = ss.str();
 	}
-
 };
 
 INSTANTIATE_TEST_SUITE_P(Journal, JournalTestEQ,
@@ -265,7 +260,7 @@ TEST_P(JournalTestEQ, EQReference) {
 		equivalenceChecker.results.timeout = true;
 	}
 
-	equivalenceChecker.results.printCSVEntry(std::cout);
+	equivalenceChecker.printCSVEntry();
 	EXPECT_TRUE(equivalenceChecker.results.timeout || equivalenceChecker.results.consideredEquivalent());
 }
 
@@ -284,7 +279,7 @@ TEST_P(JournalTestEQ, EQNaive) {
 		equivalenceChecker.results.timeout = true;
 	}
 
-	equivalenceChecker.results.printCSVEntry(std::cout);
+	equivalenceChecker.printCSVEntry();
 	EXPECT_TRUE(equivalenceChecker.results.timeout || equivalenceChecker.results.consideredEquivalent());
 }
 
@@ -303,7 +298,7 @@ TEST_P(JournalTestEQ, EQProportional) {
 		equivalenceChecker.results.timeout = true;
 	}
 
-	equivalenceChecker.results.printCSVEntry(std::cout);
+	equivalenceChecker.printCSVEntry();
 	EXPECT_TRUE(equivalenceChecker.results.timeout || equivalenceChecker.results.consideredEquivalent());
 }
 
@@ -322,7 +317,7 @@ TEST_P(JournalTestEQ, EQLookahead) {
 		equivalenceChecker.results.timeout = true;
 	}
 
-	equivalenceChecker.results.printCSVEntry(std::cout);
+	equivalenceChecker.printCSVEntry();
 	EXPECT_TRUE(equivalenceChecker.results.timeout || equivalenceChecker.results.consideredEquivalent());
 }
 
@@ -341,6 +336,6 @@ TEST_P(JournalTestEQ, EQPowerOfSimulation) {
 		equivalenceChecker.results.timeout = true;
 	}
 
-	equivalenceChecker.results.printCSVEntry(std::cout);
+	equivalenceChecker.printCSVEntry();
 	EXPECT_TRUE(equivalenceChecker.results.timeout || equivalenceChecker.results.consideredEquivalent());
 }

@@ -63,7 +63,7 @@ namespace ec {
 		};
 
 		void check(const Configuration& config) override;
-
+		void check() override { return check(Configuration{}); }
 	};
 
 }

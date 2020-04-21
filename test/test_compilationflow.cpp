@@ -28,11 +28,6 @@ protected:
 		qc_original.import(test_original_dir + GetParam() + ".real");
 		qc_transpiled.import(test_transpiled_dir + GetParam() + "_transpiled.qasm");
 	}
-
-	void TearDown() override {
-
-	}
-
 };
 
 INSTANTIATE_TEST_SUITE_P(CompilationFlowTest, CompilationFlowTest,
@@ -73,6 +68,6 @@ TEST_P(CompilationFlowTest, EquivalenceCompilationFlow) {
 		ec_flow.results.timeout = true;
 	}
 
-	ec_flow.results.printCSVEntry(std::cout);
+	ec_flow.printCSVEntry();
 	EXPECT_TRUE(ec_flow.results.timeout || ec_flow.results.consideredEquivalent());
 }
