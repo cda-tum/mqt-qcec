@@ -1,6 +1,7 @@
 [![Build Status](https://travis-ci.com/iic-jku/qcec.svg?branch=master)](https://travis-ci.com/iic-jku/qcec)
 [![codecov](https://codecov.io/gh/iic-jku/qcec/branch/master/graph/badge.svg)](https://codecov.io/gh/iic-jku/qcec)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![arXiv](https://img.shields.io/static/v1?label=arXiv&message=2004.08420&color=inactive)](https://arxiv.org/abs/2004.08420) 
 
 # QCEC - A tool for **Q**uantum **C**ircuit **E**quivalence **C**hecking
 
@@ -130,13 +131,25 @@ target_link_libraries(${TARGET_NAME} PRIVATE JKQ::qcec)
 
 ## Reference
 
-If you use our tool for your research, we will be thankful if you refer to it by citing the following publication:
+If you use our tool for your research, we will be thankful if you refer to it by citing the following publication (provided in BibTeX or biblatex style):
 
 ```bibtex
-@article{burgholzer2020improved,
-    title={Improved DD-based Equivalence Checking of Quantum Circuits},
-    author={Burgholzer, Lukas and Wille, Robert},
-    journal={Asia and South Pacific Design Automation Conference (ASP-DAC)},
-    year={2020}
+@misc{burgholzer2020advanced,
+    author = {Burgholzer, Lukas and Wille, Robert},
+    title = {Advanced Equivalence Checking of Quantum Circuits},
+    archivePrefix = "arXiv", 
+    note = {arXiv:2004.08420},
+    year = 2020
+}
+```
+
+```bibtex 
+@online{burgholzer2020advanced,
+    author       = {Burgholzer, Lukas and Wille, Robert},
+    title        = {Advanced Equivalence Checking of Quantum Circuits},
+    date         = {2020-04-21},
+    eprinttype   = {arxiv},
+    eprint       = {2004.08420},
+    eprintclass  = {quant-ph},
 }
 ```
