@@ -15,16 +15,15 @@
 
 void show_usage(const std::string& name) {
 	std::cerr << "Usage: " << name << " <PATH_TO_FILE_1> <PATH_TO_FILE_2> (<method>) (--augment_qubits || --print_csv)" << std::endl;
-	std::cerr << "Available methods:                                                   " << std::endl;
-	std::cerr << "  Reference                                                          " << std::endl;
-	std::cerr << "  Naive                                                              " << std::endl;
-	std::cerr << "  Proportional                                                       " << std::endl;
-	std::cerr << "  Lookahead                                                          " << std::endl;
-	std::cerr << "  CompilationFlow (default)                                          " << std::endl;
-	std::cerr << "  PowerOfSimulation                                                  " << std::endl;
 	std::cerr << "Supported file formats:                                              " << std::endl;
 	std::cerr << "  .real                                                              " << std::endl;
 	std::cerr << "  .qasm                                                              " << std::endl;
+	std::cerr << "Available methods:                                                   " << std::endl;
+	std::cerr << "  reference                                                          " << std::endl;
+	std::cerr << "  naive                                                              " << std::endl;
+	std::cerr << "  proportional                                                       " << std::endl;
+	std::cerr << "  lookahead                                                          " << std::endl;
+	std::cerr << "  simulation                                                         " << std::endl;
 	std::cerr << "--print_csv:              Print results as csv string                " << std::endl;
 	std::cerr << "--augment_qubits:         Add fictional qubits to smaller circuit    " << std::endl;
 }
@@ -40,7 +39,7 @@ int main(int argc, char** argv){
 	std::string file2 = argv[2];
 
 	// get method
-	ec::Method method = ec::CompilationFlow;
+	ec::Method method = ec::Proportional;
 	if (argc >= 4){
 		std::string target_method = argv[3];
 		std::transform(target_method.begin(), target_method.end(), target_method.begin(), [](unsigned char c) { return ::tolower(c); });
@@ -55,7 +54,7 @@ int main(int argc, char** argv){
 			method = ec::Lookahead;
 		} else if (target_method == "compilationflow") {
 			method = ec::CompilationFlow;
-		} else if (target_method == "powerofsimulation") {
+		} else if (target_method == "simulation") {
 			method = ec::PowerOfSimulation;
 		}else {
 			show_usage(argv[0]);
