@@ -129,7 +129,6 @@ namespace ec {
 		qc::QuantumComputation::changePermutation(results.result, perm1, qc1.outputPermutation, line, dd, LEFT);
 		qc::QuantumComputation::changePermutation(results.result, perm2, qc2.outputPermutation, line, dd, RIGHT);
 		qc1.reduceAncillae(results.result, dd);
-		qc1.reduceGarbage(results.result, dd);
 
 		results.equivalence = equals(results.result, qc1.createInitialMatrix(dd));
 

@@ -85,7 +85,6 @@ void ec::EquivalenceChecker::check(const Configuration& config) {
 	}
 	qc::QuantumComputation::changePermutation(e, perm1, qc1.outputPermutation, line, dd);
 	qc1.reduceAncillae(e, dd);
-	qc1.reduceGarbage(e, dd);
 
 	#if DEBUG_MODE_EC
 	std::cout << "-------" << std::endl << std::endl;
@@ -152,7 +151,6 @@ void ec::EquivalenceChecker::check(const Configuration& config) {
 	}
 	qc::QuantumComputation::changePermutation(f, perm2, qc2.outputPermutation, line, dd);
 	qc2.reduceAncillae(f, dd);
-	qc2.reduceGarbage(f, dd);
 
 	#if DEBUG_MODE_EC
 	std::stringstream fss{};
