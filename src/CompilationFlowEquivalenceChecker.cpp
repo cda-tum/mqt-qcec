@@ -53,26 +53,26 @@ namespace ec {
 		while (it1 != end1 && it2 != end2) {
 
 			// apply possible swaps
-			while (it1 != end1 && dynamic_cast<qc::StandardOperation *>(it1->get())->getGate() == qc::SWAP) {
+			while (it1 != end1 && (*it1)->getType() == qc::SWAP) {
 				applyGate(*it1, results.result, perm1, LEFT);
 				++it1;
 			}
 
-			while (it2 != end2 && dynamic_cast<qc::StandardOperation *>(it2->get())->getGate() == qc::SWAP) {
+			while (it2 != end2 && (*it2)->getType() == qc::SWAP) {
 				applyGate(*it2, results.result, perm2, RIGHT);
 				++it2;
 			}
 
 			if (it1 != end1 && it2 != end2) {
-				unsigned short cost1 = costFunction(dynamic_cast<qc::StandardOperation *>(it1->get())->getGate(), (*it1)->getControls().size());
-				unsigned short cost2 = costFunction(dynamic_cast<qc::StandardOperation *>(it2->get())->getGate(), (*it2)->getControls().size());
+				unsigned short cost1 = costFunction((*it1)->getType(), (*it1)->getControls().size());
+				unsigned short cost2 = costFunction((*it2)->getType(), (*it2)->getControls().size());
 
 				for (int i = 0; i < cost2 && it1 != end1; ++i) {
 					applyGate(*it1, results.result, perm1, LEFT);
 					++it1;
 
 					// apply possible swaps
-					while (it1 != end1 && dynamic_cast<qc::StandardOperation *>(it1->get())->getGate() == qc::SWAP) {
+					while (it1 != end1 && (*it1)->getType() == qc::SWAP) {
 						applyGate(*it1, results.result, perm1, LEFT);
 						++it1;
 					}
@@ -90,7 +90,7 @@ namespace ec {
 					++it2;
 
 					// apply possible swaps
-					while (it2 != end2 && dynamic_cast<qc::StandardOperation *>(it2->get())->getGate() == qc::SWAP) {
+					while (it2 != end2 && (*it2)->getType() == qc::SWAP) {
 						applyGate(*it2, results.result, perm2, RIGHT);
 						++it2;
 					}
@@ -151,7 +151,7 @@ namespace ec {
 
 	}
 
-	unsigned short IBMCostFunction(const qc::Gate& gate, unsigned short nc) {
+	unsigned short IBMCostFunction(const qc::OpType& gate, unsigned short nc) {
 		switch (gate) {
 			case qc::I:
 				return 1;
@@ -209,8 +209,11 @@ namespace ec {
 			case qc::Pdag:
 				return IBMCostFunction(qc::X, nc) + IBMCostFunction(qc::X, nc-1);
 
+			case qc::Compound:
+				return 1; // this assumes that compound operations only arise from single qubit fusion
+
 			default:
-				std::cerr << "No cost for gate" << std::endl;
+				std::cerr << "No cost for gate " << gate << std::endl;
 				exit(1);
 		}
 	}

@@ -17,6 +17,7 @@
 #include <algorithm>
 
 #include "EquivalenceChecker.hpp"
+#include "CircuitOptimizer.hpp"
 
 #define DEBUG_MODE_SIMULATION 0
 
@@ -60,6 +61,13 @@ namespace ec {
 			distribution = std::uniform_int_distribution<unsigned long long>(0, (unsigned long long) (std::pow((long double) 2, nqubits_for_stimuli) - 1));
 			stimuliGenerator = [&]() { return distribution(mt); };
 			dd->useMatrixNormalization(false);
+
+			// optimization pass
+			//qc::CircuitOptimizer::swapGateFusion(qc1);
+			//qc::CircuitOptimizer::singleGateFusion(qc1);
+
+			//qc::CircuitOptimizer::swapGateFusion(qc2);
+			//qc::CircuitOptimizer::singleGateFusion(qc2);
 		};
 
 		void check(const Configuration& config) override;

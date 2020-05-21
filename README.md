@@ -5,9 +5,11 @@
 
 # QCEC - A tool for **Q**uantum **C**ircuit **E**quivalence **C**hecking
 
-A tool for quantum circuit equivalence checking by the [Institute for Integrated Circuits](http://iic.jku.at/eda/) at the [Johannes Kepler University Linz](https://jku.at) based on methods proposed in [[1]](https://arxiv.org/abs/2004.08420). 
+A tool for quantum circuit equivalence checking by the [Institute for Integrated Circuits](http://iic.jku.at/eda/) at the [Johannes Kepler University Linz](https://jku.at) based on methods proposed in [[1]](https://arxiv.org/abs/2004.08420), [[2]](). 
 
 [[1]](https://arxiv.org/abs/2004.08420) L. Burgholzer and R. Wille, **"Advanced Equivalence Checking for Quantum Circuits"**, arXiv:2004.08420 (2020)
+
+[[2]]() L. Burgholzer, R. Raymond, and R. Wille, "Verifying Results of the IBM Qiskit Quantum Circuit Compilation Flow", *in submission*
 
 This tool can be used for checking the equivalence of two quantum circuits provided in any of the following formats:
  * `Real` (e.g. from [RevLib](http://revlib.org)),
@@ -20,6 +22,7 @@ This tool can be used for checking the equivalence of two quantum circuits provi
     - **Proportional** - Proportionally apply gates according to the gate count ratio of *G* and *G'* [[1, Section V.B]](https://arxiv.org/pdf/2004.08420.pdf#page=8),
     - **Lookahead** - Always apply the gate yielding the smaller DD [[1, Section V.C]](https://arxiv.org/pdf/2004.08420.pdf#page=8),
 - **Simulation** - Conduct simulation runs to prove non-equivalence or give a strong indication of equivalence [[1, Section IV.B]](https://arxiv.org/pdf/2004.08420.pdf#page=7),
+- **Verification of compilation results** - A dedicated scheme for verifying results of the IBM Qiskit Compilation Flow explicitly exploiting certain knowledge about the compilation process. [[2]]()
 
 The tool builds upon [our decision diagram (DD) package](https://github.com/iic-jku/dd_package.git) as well as [our quantum functionality representation (QFR)](https://github.com/iic-jku/qfr.git). For more information, please visit [iic.jku.at/eda/research/quantum_verification](http://iic.jku.at/eda/research/quantum_verification). 
 
@@ -38,6 +41,7 @@ This tool can either be used as a **standalone executable** with command-line in
    - proportional (**default**)
    - lookahead 
    - simulation
+   - compilationflow
    
   The ```simulation``` method has two optional parameters ```--nsims r``` and ```--fid F```, controlling the maximum number of simulations *r* (default: *16*) and the considered fidelity limit *F* (default *0.999*), respectively.
       
@@ -63,6 +67,10 @@ This tool can either be used as a **standalone executable** with command-line in
         or 
         ```c++ 
         auto eq = ec::PowerOfSimulationEquivalenceChecker(qc1, qc2);
+        ```
+        or 
+        ```c++ 
+        auto eq = ec::CompilationFlowEquivalenceChecker(qc1, qc2);
         ```
     - Perform the actual equivalence check
         ```c++

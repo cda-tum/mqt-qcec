@@ -24,6 +24,7 @@ void show_usage(const std::string& name) {
 	std::cerr << "  proportional (default)                                                                  " << std::endl;
 	std::cerr << "  lookahead                                                                               " << std::endl;
 	std::cerr << "  simulation                                                                              " << std::endl;
+	std::cerr << "  compilationflow                                                                         " << std::endl;
 	std::cerr << "Options:                                                                                  " << std::endl;
 	std::cerr << "  --csv:                          Print results as csv string                             " << std::endl;
 	std::cerr << "  --nsims r (default 16):         Number of simulations to conduct (for simulation method)" << std::endl;
