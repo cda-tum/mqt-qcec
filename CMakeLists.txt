@@ -4,7 +4,7 @@ if(${CMAKE_VERSION} VERSION_LESS 3.12)
 endif()
 
 project(qcec
-        VERSION 1.2.5
+        VERSION 1.2.6
         DESCRIPTION "A tool for equivalence checking of quantum circuits (based on decision diagrams)"
         LANGUAGES CXX)
 

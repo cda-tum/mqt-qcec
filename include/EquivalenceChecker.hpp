@@ -56,13 +56,20 @@ namespace ec {
 
 		bool validInstance();
 
-		unsigned long long nodecount(const dd::Edge& e, std::unordered_set<dd::NodePtr>& v) {
-			v.insert(e.p);
-			unsigned long long sum = 1;
-			if(!dd::Package::isTerminal(e)) {
-				for (const auto& edge: e.p->e) {
-					if (edge.p != nullptr && !v.count(edge.p)) {
-						sum += nodecount(edge, v);
+		static unsigned int nodecount(dd::Edge& e, std::unordered_set<dd::NodePtr>& v) {
+			unsigned int sum = 0;
+			std::queue<dd::Edge*> q{};
+			q.push(&e);
+			while (!q.empty()) {
+				auto node = q.front();
+				q.pop();
+				++sum;
+				if (dd::Package::isTerminal(*node))
+					continue;
+
+				for (auto edge : node->p->e) {
+					if (edge.p != nullptr && v.insert(edge.p).second) {
+						q.push(&edge);
 					}
 				}
 			}
