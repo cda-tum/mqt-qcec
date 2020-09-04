@@ -30,8 +30,25 @@ namespace ec {
 		decltype(qc1.end()) end1;
 		decltype(qc1.end()) end2;
 
-		std::array<short, qc::MAX_QUBITS> line{};
 		Method method = Proportional;
+
+		/// Create the initial matrix used for the G->I<-G' scheme.
+		/// [1 0] if the qubit is no ancillary or it is acted upon by both circuits
+		/// [0 1]
+		///
+		/// [1 0] for an ancillary that is present in one circuit and not acted upon in the other
+		/// [0 0]
+		/// \return initial matrix
+		dd::Edge createInitialMatrix();
+
+		/// Create the goal matrix used for the G->I<-G' scheme.
+		/// [1 0] if the qubit is no ancillary
+		/// [0 1]
+		///
+		/// [1 0] for an ancillary that is present in either circuit
+		/// [0 0]
+		/// \return goal matrix
+		dd::Edge createGoalMatrix();
 
 		/// Take operation and apply it either from the left or (inverted) from the right
 		/// \param op operation to apply
@@ -42,7 +59,6 @@ namespace ec {
 	public:
 		ImprovedDDEquivalenceChecker(qc::QuantumComputation& qc1, qc::QuantumComputation& qc2, Method method = Proportional):
 				EquivalenceChecker(qc1, qc2), method(method){
-			line.fill(qc::LINE_DEFAULT);
 			results.method = method;
 		}
 

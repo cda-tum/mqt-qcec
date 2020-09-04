@@ -13,10 +13,6 @@ namespace ec {
 
 		auto start = std::chrono::high_resolution_clock::now();
 
-		// reduce both circuits qubits to a minimum by stripping away idle qubits
-		qc1.stripIdleQubits();
-		qc2.stripIdleQubits();
-
 		#if DEBUG_MODE_EC
 		std::cout << "QC1: ";
 		qc1->printRegisters();
@@ -26,13 +22,9 @@ namespace ec {
 		qc2->print();
 		#endif
 
-		// augment the smaller circuit with ancillary qubits and change the qubits in the larger circuit to ancillary
-		augmentQubits(qc1, qc2);
-
-		qc::permutationMap perm1 = qc1.initialLayout;
-		qc::permutationMap perm2 = qc2.initialLayout;
-		results.result = qc1.createInitialMatrix(dd);
-		dd->incRef(results.result);
+		qc::permutationMap perm1 = initial1;
+		qc::permutationMap perm2 = initial2;
+		results.result = createInitialMatrix();
 
 		#if DEBUG_MODE_EC
 		visited.clear();
@@ -130,11 +122,15 @@ namespace ec {
 			#endif
 		}
 
-		qc::QuantumComputation::changePermutation(results.result, perm1, qc1.outputPermutation, line, dd, LEFT);
-		qc::QuantumComputation::changePermutation(results.result, perm2, qc2.outputPermutation, line, dd, RIGHT);
-		qc1.reduceAncillae(results.result, dd);
+		qc::QuantumComputation::changePermutation(results.result, perm1, output1, line, dd, LEFT);
+		qc::QuantumComputation::changePermutation(results.result, perm2, output2, line, dd, RIGHT);
+		results.result = reduceGarbage(results.result, garbage1, LEFT);
+		results.result = reduceGarbage(results.result, garbage2, RIGHT);
+		results.result = reduceAncillae(results.result, ancillary1, LEFT);
+		results.result = reduceAncillae(results.result, ancillary2, RIGHT);
 
-		results.equivalence = equals(results.result, qc1.createInitialMatrix(dd));
+		auto goal_matrix = createGoalMatrix();
+		results.equivalence = equals(results.result, goal_matrix);
 
 		#if DEBUG_MODE_EC
 		std::stringstream ss{};

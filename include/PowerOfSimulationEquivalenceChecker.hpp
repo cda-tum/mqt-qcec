@@ -33,19 +33,13 @@ namespace ec {
 		unsigned short nqubits_for_stimuli = 0;
 		std::array<short, qc::MAX_QUBITS> line{};
 
+		unsigned long long seed = 0;
 		std::mt19937_64 mt;
 		std::uniform_int_distribution<unsigned long long> distribution;
 
 	public:
-		PowerOfSimulationEquivalenceChecker(qc::QuantumComputation& qc1, qc::QuantumComputation& qc2, unsigned long seed = 0): EquivalenceChecker(qc1, qc2) {
-			line.fill(-1);
-
-			// reduce both circuits qubits to a minimum by stripping away idle qubits
-			qc1.stripIdleQubits();
-			qc2.stripIdleQubits();
-
+		PowerOfSimulationEquivalenceChecker(qc::QuantumComputation& qc1, qc::QuantumComputation& qc2, unsigned long seed = 0): EquivalenceChecker(qc1, qc2), seed(seed) {
 			// augment the smaller circuit with ancillary qubits and change the qubits in the larger circuit to ancillary
-			augmentQubits(qc1, qc2);
 			nqubits_for_stimuli = qc1.getNqubitsWithoutAncillae();
 
 			if(seed == 0) {
@@ -60,7 +54,7 @@ namespace ec {
 			}
 			distribution = std::uniform_int_distribution<unsigned long long>(0, (unsigned long long) (std::pow((long double) 2, nqubits_for_stimuli) - 1));
 			stimuliGenerator = [&]() { return distribution(mt); };
-			dd->useMatrixNormalization(false);
+			dd->setMode(dd::Vector);
 
 			// optimization pass
 			//qc::CircuitOptimizer::swapGateFusion(qc1);

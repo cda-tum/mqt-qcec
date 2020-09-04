@@ -7,13 +7,14 @@
 
 A tool for quantum circuit equivalence checking by the [Institute for Integrated Circuits](http://iic.jku.at/eda/) at the [Johannes Kepler University Linz](https://jku.at) based on methods proposed in [[1]](https://arxiv.org/abs/2004.08420), [2]. 
 
-[[1]](https://arxiv.org/abs/2004.08420) L. Burgholzer and R. Wille, **"Advanced Equivalence Checking for Quantum Circuits"**, arXiv:2004.08420 (2020)
+[[1]](https://arxiv.org/abs/2004.08420) L. Burgholzer and R. Wille. **"Advanced Equivalence Checking for Quantum Circuits"**. arXiv:2004.08420, 2020
 
-[2] L. Burgholzer, R. Raymond, and R. Wille, **"Verifying Results of the IBM Qiskit Quantum Circuit Compilation Flow"**, *in submission*
+[2] L. Burgholzer, R. Raymond, and R. Wille. **"Verifying Results of the IBM Qiskit Quantum Circuit Compilation Flow"**. In International Conference on Quantum Computing and Engineering (QCE), 2020
 
 This tool can be used for checking the equivalence of two quantum circuits provided in any of the following formats:
  * `Real` (e.g. from [RevLib](http://revlib.org)),
  * `OpenQASM` (e.g. used by IBM's [Qiskit](https://github.com/Qiskit/qiskit)),
+ * `TFC` (e.g. from [Reversible Logic Synthesis Benchmarks Page](http://webhome.cs.uvic.ca/~dmaslov/mach-read.html))
  
  with the following available methods:
 - **Reference** - Construct and compare the DD for both circuits [[1, Section III.B]](https://arxiv.org/pdf/2004.08420.pdf#page=5),
@@ -53,10 +54,10 @@ This tool can either be used as a **standalone executable** with command-line in
 - Internally the library works in the following way
     - Import both input files into a `qc::QuantumComputation` object
         ```c++
-        std::string file1 = "PATH_TO_FILE_1{.real | .qasm}";
+        std::string file1 = "PATH_TO_FILE_1{.real | .qasm | .tfc}";
         qc::QuantumComputation qc1(file1);
         
-        std::string file2 = "PATH_TO_FILE_2{.real | .qasm}";
+        std::string file2 = "PATH_TO_FILE_2{.real | .qasm | .tfc}";
         qc::QuantumComputation qc2(file2);
         ```
     - Instantiate an `ec::EquivalenceChecker` object with both circuits
@@ -84,7 +85,7 @@ This tool can either be used as a **standalone executable** with command-line in
   
 ### System requirements
 
-Building (and running) is continuously tested under Linux (Ubuntu 18.04) using gcc-7.4, gcc-9 and clang-9, MacOS (Mojave 10.14) using AppleClang and gcc-9, and Windows using MSVC 15.9. 
+Building (and running) is continuously tested under Linux (Ubuntu 18.04) using gcc-7.4, gcc-10 and clang-9, MacOS (Mojave 10.15) using AppleClang and gcc-10, and Windows using MSVC 15.9. 
 However, the implementation should be compatible with any current C++ compiler supporting C++14 and a minimum CMake version of 3.10.
 
 ### Configure, Build, and Install
@@ -128,7 +129,13 @@ In order to build the library execute the following in the project's main direct
 
 ## Reference
 
-If you use our tool for your research, we will be thankful if you refer to it by citing the following publication (provided in BibTeX or biblatex style):
+If you use our tool for your research, we will be thankful if you refer to it by citing the appropriate publication (provided in BibTeX or biblatex style):
+
+<details open>
+<summary>[1] L. Burgholzer and R. Wille. "Advanced Equivalence Checking for Quantum Circuits". arXiv:2004.08420, 2020</summary>
+
+<details>
+<summary>bibtex</summary>
 
 ```bibtex
 @misc{burgholzer2020advanced,
@@ -140,6 +147,11 @@ If you use our tool for your research, we will be thankful if you refer to it by
 }
 ```
 
+</details>
+
+<details>
+<summary>biblatex</summary>
+
 ```bibtex 
 @online{burgholzer2020advanced,
     author       = {Burgholzer, Lukas and Wille, Robert},
@@ -150,3 +162,40 @@ If you use our tool for your research, we will be thankful if you refer to it by
     eprintclass  = {quant-ph},
 }
 ```
+
+</details>
+
+</details>
+
+<details open>
+<summary>[2] L. Burgholzer, R. Raymond, and R. Wille. "Verifying Results of the IBM Qiskit Quantum Circuit Compilation Flow". In International Conference on Quantum Computing and Engineering (QCE), 2020</summary>
+
+<details>
+<summary>bibtex</summary>
+
+```bibtex
+@inproceedings{burgholzer2020verifyingResultsIBM,
+  title = {Verifying results of the {{IBM Qiskit}} quantum circuit compilation flow},
+  booktitle = {International Conference on Quantum Computing and Engineering},
+  author = {Burgholzer, Lukas and Raymond, Rudy and Wille, Robert},
+  year = {2020}
+}
+```
+
+</details>
+
+<details>
+<summary>biblatex</summary>
+
+```bibtex 
+@inproceedings{burgholzer2020verifyingResultsIBM,
+  title = {Verifying results of the {{IBM Qiskit}} quantum circuit compilation flow},
+  author = {Burgholzer, Lukas and Raymond, Rudy and Wille, Robert},
+  date = {2020},
+  eventtitle = {International Conference on Quantum Computing and Engineering}
+}
+```
+
+</details>
+
+</details>

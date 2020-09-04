@@ -8,6 +8,7 @@
 
 #include <string>
 #include <memory>
+#include <chrono>
 
 #include "QuantumComputation.hpp"
 #include "EquivalenceCheckingResults.hpp"
@@ -23,6 +24,7 @@ namespace ec {
 		// configuration options for PowerOfSimulation equivalence checker
 		double fidelity_limit = 0.999;
 		unsigned long long max_sims = 16;
+		unsigned long long timeout = 60000;
 	};
 
 	class EquivalenceChecker {
@@ -39,11 +41,26 @@ namespace ec {
 		unsigned short nqubits2 = 0;
 		unsigned short nqubits = 0;
 
+		std::bitset<qc::MAX_QUBITS> ancillary1{};
+		std::bitset<qc::MAX_QUBITS> ancillary2{};
+		std::bitset<qc::MAX_QUBITS> garbage1{};
+		std::bitset<qc::MAX_QUBITS> garbage2{};
+
+		qc::permutationMap initial1;
+		qc::permutationMap initial2;
+		qc::permutationMap output1;
+		qc::permutationMap output2;
+
+		std::array<short, qc::MAX_QUBITS> line{};
+
 		unsigned long long maxSize = 0;
 		double average = 0.;
 		size_t count = 0;
 		std::unordered_set<dd::NodePtr> visited{};
 		unsigned long long counter = 0;
+
+		dd::Edge reduceAncillae(dd::Edge& e, std::bitset<qc::MAX_QUBITS>& ancillary, bool regular = true);
+		dd::Edge reduceGarbage(dd::Edge& e, std::bitset<qc::MAX_QUBITS>& garbage, bool regular = true);
 
 		void addToAverage(unsigned long long x) {
 			if (count == 0) {
@@ -83,7 +100,7 @@ namespace ec {
 
 		virtual ~EquivalenceChecker() = default;
 
-		// TODO: also allow equivalence by relative phase
+		// TODO: also allow equivalence by relative phase or up to a permutation of the outputs
 		static Equivalence equals(dd::Edge e, dd::Edge f);
 
 		virtual void check() { check(Configuration{}); };
@@ -112,8 +129,8 @@ namespace ec {
 			return results.error();
 		}
 
-		void exportResultAsDot(const std::string& filename) {
-			dd->export2Dot(results.result, filename.c_str());
+		void exportResultAsDot(const std::string& filename) const {
+			dd::export2Dot(results.result, filename);
 		}
 
 		static void augmentQubits(qc::QuantumComputation& circuit_to_augment, qc::QuantumComputation& circuit_to_match);

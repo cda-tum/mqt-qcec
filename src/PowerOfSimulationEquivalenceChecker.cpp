@@ -28,7 +28,7 @@ namespace ec {
 				new_stimulus = stimuli.insert(stimuliGenerator());
 			}
 			results.basisState = *new_stimulus.first;
-			std::bitset<64> stimulusBits(results.basisState);
+			std::bitset<qc::MAX_QUBITS> stimulusBits(results.basisState);
 
 			#if DEBUG_MODE_SIMULATION
 			std::cout << "\033[32mSim " << results.nsims << ": " << results.basisState << "\033[0m" << std::endl;
@@ -37,7 +37,7 @@ namespace ec {
 			dd::Edge in1 = dd->makeBasisState(qc1.getNqubits(), stimulusBits);
 			std::array<short, qc::MAX_QUBITS> l{};
 			l.fill(qc::LINE_DEFAULT);
-			qc::permutationMap map = qc1.initialLayout;
+			qc::permutationMap map = initial1;
 
 			dd::Edge e = in1;
 			dd->incRef(e);
@@ -65,9 +65,10 @@ namespace ec {
 			}
 
 			// correct permutation if necessary
-			qc::QuantumComputation::changePermutation(e, map, qc1.outputPermutation, l, dd);
+			qc::QuantumComputation::changePermutation(e, map, output1, l, dd);
 
-			qc1.reduceAncillae(e, dd);
+			e = reduceAncillae(e, ancillary1);
+			e = reduceGarbage(e, garbage1);
 
 			#if DEBUG_MODE_SIMULATION
 			std::stringstream ss1 {};
@@ -79,7 +80,7 @@ namespace ec {
 			dd::Edge in2 = dd->makeBasisState(qc2.getNqubits(), stimulusBits);
 
 			l.fill(qc::LINE_DEFAULT);
-			map = qc2.initialLayout;
+			map = initial2;
 
 			dd::Edge f = in2;
 			dd->incRef(f);
@@ -107,9 +108,10 @@ namespace ec {
 			}
 
 			// correct permutation if necessary
-			qc::QuantumComputation::changePermutation(f, map, qc2.outputPermutation, l, dd);
+			qc::QuantumComputation::changePermutation(f, map, output2, l, dd);
 
-			qc2.reduceAncillae(f, dd);
+			f = reduceAncillae(f, ancillary2);
+			f = reduceGarbage(f, garbage2);
 
 			#if DEBUG_MODE_SIMULATION
 			std::stringstream ss2 {};

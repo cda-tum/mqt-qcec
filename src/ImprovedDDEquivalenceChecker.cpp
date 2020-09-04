@@ -6,6 +6,52 @@
 #include <ImprovedDDEquivalenceChecker.hpp>
 
 namespace ec {
+	dd::Edge ImprovedDDEquivalenceChecker::createInitialMatrix() {
+		dd::Edge e = dd->makeIdent(0, short(nqubits-1));
+		dd->incRef(e);
+
+		std::bitset<qc::MAX_QUBITS> ancillary{};
+		for (int q=nqubits-1; q>=0; --q) {
+			if (qc1.logicalQubitIsAncillary(q) && qc2.logicalQubitIsAncillary(q)) {
+				bool found1 = false;
+				bool isidle1 = false;
+				for (const auto& in1: initial1) {
+					if (in1.second == q) {
+						found1 = true;
+						isidle1 = qc1.isIdleQubit(in1.first);
+						break;
+					}
+				}
+				bool found2 = false;
+				bool isidle2 = false;
+				for (const auto& in2: initial2) {
+					if (in2.second == q) {
+						found2 = true;
+						isidle2 = qc2.isIdleQubit(in2.first);
+						break;
+					}
+				}
+
+				// qubit only really exists or is acted on in one of the circuits
+				if ((found1 ^ found2) || (isidle1 ^ isidle2)) {
+					ancillary.set(q);
+				}
+			}
+		}
+		e = reduceAncillae(e, ancillary);
+		return e;
+	}
+
+	dd::Edge ImprovedDDEquivalenceChecker::createGoalMatrix() {
+		auto goalMatrix = dd->makeIdent(0, short(nqubits - 1));
+		dd->incRef(goalMatrix);
+		goalMatrix = reduceAncillae(goalMatrix, ancillary2, RIGHT);
+		goalMatrix = reduceGarbage(goalMatrix, garbage2, RIGHT);
+		goalMatrix = reduceAncillae(goalMatrix, ancillary1, LEFT);
+		goalMatrix = reduceGarbage(goalMatrix, garbage1, LEFT);
+		return goalMatrix;
+	}
+
 	/// Take operation and apply it either from the left or (inverted) from the right
 	/// \param op operation to apply
 	/// \param to DD to apply the operation to
@@ -15,6 +61,10 @@ namespace ec {
 		std::cout << "before: " << std::endl;
 		qc::QuantumComputation::printPermutationMap(permutation);
 		#endif
+
+		// set appropriate qubit count to generate correct DD
+		auto nq = op->getNqubits();
+		op->setNqubits(nqubits);
 
 		auto saved = to;
 		if (dir == LEFT) {
@@ -26,6 +76,8 @@ namespace ec {
 		dd->decRef(saved);
 		dd->garbageCollect();
 
+		// reset qubit count
+		op->setNqubits(nq);
 		#if DEBUG_MODE_EC
 		std::cout << "after: " << std::endl;
 		qc::QuantumComputation::printPermutationMap(permutation);
@@ -45,8 +97,6 @@ namespace ec {
 
 		auto start = std::chrono::high_resolution_clock::now();
 
-		augmentQubits(qc1, qc2);
-
 		#if DEBUG_MODE_EC
 		std::cout << "QC1: ";
 		qc1->printRegisters();
@@ -56,10 +106,9 @@ namespace ec {
 		qc2->print();
 		#endif
 
-		qc::permutationMap perm1 = qc1.initialLayout;
-		qc::permutationMap perm2 = qc2.initialLayout;
-		results.result = qc1.createInitialMatrix(dd);
-		dd->incRef(results.result);
+		qc::permutationMap perm1 = initial1;
+		qc::permutationMap perm2 = initial2;
+		results.result = createInitialMatrix();
 
 		#if DEBUG_MODE_EC
 		visited.clear();
@@ -126,11 +175,15 @@ namespace ec {
 			#endif
 		}
 
-		qc::QuantumComputation::changePermutation(results.result, perm1, qc1.outputPermutation, line, dd, LEFT);
-		qc::QuantumComputation::changePermutation(results.result, perm2, qc2.outputPermutation, line, dd, RIGHT);
-		qc1.reduceAncillae(results.result, dd);
+		qc::QuantumComputation::changePermutation(results.result, perm1, output1, line, dd, LEFT);
+		qc::QuantumComputation::changePermutation(results.result, perm2, output2, line, dd, RIGHT);
+		results.result = reduceGarbage(results.result, garbage1, LEFT);
+		results.result = reduceGarbage(results.result, garbage2, RIGHT);
+		results.result = reduceAncillae(results.result, ancillary1, LEFT);
+		results.result = reduceAncillae(results.result, ancillary2, RIGHT);
 
-		results.equivalence = equals(results.result, qc1.createInitialMatrix(dd));
+		auto goal_matrix = createGoalMatrix();
+		results.equivalence = equals(results.result, goal_matrix);
 
 		#if DEBUG_MODE_EC
 		std::stringstream ss{};
@@ -237,15 +290,21 @@ namespace ec {
 
 		while (it1 != end1 && it2 != end2) {
 			if(!cachedLeft) {
+				auto nq = (*it1)->getNqubits();
+				(*it1)->setNqubits(nqubits);
 				left = (*it1)->getDD(dd, line, perm1);
 				dd->incRef(left);
+				(*it1)->setNqubits(nq);
 				++it1;
 				cachedLeft = true;
 			}
 
 			if (!cachedRight) {
+				auto nq = (*it2)->getNqubits();
+				(*it2)->setNqubits(nqubits);
 				right = (*it2)->getInverseDD(dd, line, perm2);
 				dd->incRef(right);
+				(*it2)->setNqubits(nq);
 				++it2;
 				cachedRight = true;
 			}
