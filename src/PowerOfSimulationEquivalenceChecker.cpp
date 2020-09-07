@@ -67,8 +67,8 @@ namespace ec {
 			// correct permutation if necessary
 			qc::QuantumComputation::changePermutation(e, map, output1, l, dd);
 
-			e = reduceAncillae(e, ancillary1);
 			e = reduceGarbage(e, garbage1);
+			e = reduceAncillae(e, ancillary1);
 
 			#if DEBUG_MODE_SIMULATION
 			std::stringstream ss1 {};
@@ -110,8 +110,8 @@ namespace ec {
 			// correct permutation if necessary
 			qc::QuantumComputation::changePermutation(f, map, output2, l, dd);
 
-			f = reduceAncillae(f, ancillary2);
 			f = reduceGarbage(f, garbage2);
+			f = reduceAncillae(f, ancillary2);
 
 			#if DEBUG_MODE_SIMULATION
 			std::stringstream ss2 {};
