@@ -569,6 +569,9 @@ namespace ec {
 		auto c = dd->cn.mulCached(f.w, e.w);
 		f.w = dd->cn.lookup(c);
 		dd->cn.releaseCached(c);
+		// Quick-fix for normalization bug
+		if (CN::mag2(f.w) > 1.0)
+			f.w = CN::ONE;
 		dd->incRef(f);
 		return f;
 	}
