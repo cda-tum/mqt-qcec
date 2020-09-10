@@ -182,8 +182,7 @@ namespace ec {
 		results.result = reduceAncillae(results.result, ancillary1, LEFT);
 		results.result = reduceAncillae(results.result, ancillary2, RIGHT);
 
-		auto goal_matrix = createGoalMatrix();
-		results.equivalence = equals(results.result, goal_matrix);
+		results.equivalence = equals(results.result, createGoalMatrix());
 
 		#if DEBUG_MODE_EC
 		std::stringstream ss{};

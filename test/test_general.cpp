@@ -67,12 +67,10 @@ TEST_F(GeneralTest, NonUnitary) {
 	std::stringstream ss2{bell_circuit};
 	ASSERT_NO_THROW(qc_alternative.import(ss2, qc::OpenQASM));
 	ec::EquivalenceChecker ec(qc_original, qc_alternative);
-	EXPECT_EXIT(ec.check(), ::testing::ExitedWithCode(1),
-	            "Functionality not unitary.");
+	EXPECT_THROW(ec.check(), qc::QFRException);
 
 	ec::EquivalenceChecker ec2(qc_alternative, qc_original);
-	EXPECT_EXIT(ec2.check(), ::testing::ExitedWithCode(1),
-	            "Functionality not unitary.");
+	EXPECT_THROW(ec.check(), qc::QFRException);
 }
 
 TEST_F(GeneralTest, SwitchDifferentlySizedCircuits) {

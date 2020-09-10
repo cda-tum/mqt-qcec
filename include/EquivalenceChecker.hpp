@@ -60,8 +60,9 @@ namespace ec {
 		unsigned long long counter = 0;
 
 		dd::Edge reduceAncillae(dd::Edge& e, std::bitset<qc::MAX_QUBITS>& ancillary, bool regular = true);
+		dd::Edge reduceAncillaeRecursion(dd::Edge& e, std::bitset<qc::MAX_QUBITS>& ancillary, unsigned short lowerbound, bool regular = true);
 		dd::Edge reduceGarbage(dd::Edge& e, std::bitset<qc::MAX_QUBITS>& garbage, bool regular = true);
-
+		dd::Edge reduceGarbageRecursion(dd::Edge& e, std::bitset<qc::MAX_QUBITS>& garbage, unsigned short lowerbound, bool regular = true);
 		void addToAverage(unsigned long long x) {
 			if (count == 0) {
 				average = static_cast<double>(x);
