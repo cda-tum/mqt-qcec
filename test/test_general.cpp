@@ -60,7 +60,7 @@ TEST_F(GeneralTest, InvalidInstance) {
 }
 
 TEST_F(GeneralTest, NonUnitary) {
-	std::string bell_circuit_measure = "OPENQASM 2.0;\nqreg q[2];\ncreg c[2];\nU(pi/2,0,pi) q[0];\nCX q[0],q[1];\nmeasure q[0] -> c[0];\n";
+	std::string bell_circuit_measure = "OPENQASM 2.0;\nqreg q[2];\ncreg c[2];\nU(pi/2,0,pi) q[0];\nCX q[0],q[1];\nreset q[0];\n";
 	std::stringstream ss1{bell_circuit_measure};
 	ASSERT_NO_THROW(qc_original.import(ss1, qc::OpenQASM));
 	std::string bell_circuit = "OPENQASM 2.0;\nqreg q[2];\nU(pi/2,0,pi) q[0];\nCX q[0],q[1];\n";
@@ -81,4 +81,29 @@ TEST_F(GeneralTest, SwitchDifferentlySizedCircuits) {
 	ec.check();
 	EXPECT_TRUE(ec.results.equivalence == ec::Equivalent || ec.results.equivalence == ec::EquivalentUpToGlobalPhase);
 	EXPECT_FALSE(ec.error());
+}
+
+TEST_F(GeneralTest, MeasurementPermutation) {
+	std::string bell_circuit_measure =
+			"OPENQASM 2.0;\n"
+            "qreg q[2];\n"
+			"creg c[2];\n"
+            "U(pi/2,0,pi) q[0];\n"
+			"CX q[0],q[1];\n"
+			"measure q[0] -> c[1];\n"
+			"measure q[1] -> c[0];\n";
+	std::stringstream ss1{bell_circuit_measure};
+	ASSERT_NO_THROW(qc_original.import(ss1, qc::OpenQASM));
+	std::string bell_circuit =
+			"// i 0 1\n"
+            "// o 1 0\n"
+			"OPENQASM 2.0;\n"
+            "qreg q[2];\n"
+            "U(pi/2,0,pi) q[0];\n"
+            "CX q[0],q[1];\n";
+	std::stringstream ss2{bell_circuit};
+	ASSERT_NO_THROW(qc_alternative.import(ss2, qc::OpenQASM));
+	ec::EquivalenceChecker ec(qc_original, qc_alternative);
+	ASSERT_NO_THROW(ec.check());
+	EXPECT_TRUE(ec.results.consideredEquivalent());
 }

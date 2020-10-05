@@ -163,6 +163,68 @@ namespace ec {
 		}
 	}
 
+	/// Take operation and apply it either from the left or (inverted) from the right
+	/// \param op operation to apply
+	/// \param to DD to apply the operation to
+	/// \param dir LEFT or RIGHT
+	void EquivalenceChecker::applyGate(std::unique_ptr<qc::Operation>& op, dd::Edge& to, std::map<unsigned short, unsigned short>& permutation, Direction dir) {
+		// set appropriate qubit count to generate correct DD
+		auto nq = op->getNqubits();
+		op->setNqubits(nqubits);
+
+		auto saved = to;
+		if (dir == LEFT) {
+			to = dd->multiply(op->getDD(dd, line, permutation), to);
+		} else {
+			to = dd->multiply(to, op->getInverseDD(dd, line, permutation));
+		}
+		dd->incRef(to);
+		dd->decRef(saved);
+		dd->garbageCollect();
+
+		// reset qubit count
+		op->setNqubits(nq);
+	}
+
+	void EquivalenceChecker::applyGate(decltype(qc1.begin())& opIt, dd::Edge& to, std::map<unsigned short, unsigned short>& permutation, decltype(qc1.end())& end, Direction dir) {
+
+		auto&& op = *opIt;
+
+		// Measurements at the end of the circuit are considered NOPs. They may provide output permutation information
+		if (op->getType() == qc::Measure) {
+			auto atEnd = opIt;
+			bool onlyMeasurementsRemaining = true;
+			while (atEnd != end) {
+				if (op->getType() != qc::Measure) {
+					onlyMeasurementsRemaining = false;
+					break;
+				}
+				++atEnd;
+			}
+
+			if (!onlyMeasurementsRemaining) {
+				throw QCECException("Intermediate measurements currently not supported. Defer your measurements to the end.");
+			}
+
+			for (size_t i=0; i<op->getNcontrols(); ++i) {
+				auto qubitidx = op->getControls().at(i).qubit;
+				auto bitidx = op->getTargets().at(i);
+				auto current = permutation.at(qubitidx);
+				if (qubitidx != bitidx && current != bitidx) {
+					for (auto&& p: permutation) {
+						if (p.second == bitidx) {
+							p.second = current;
+							break;
+						}
+					}
+					permutation.at(qubitidx) = bitidx;
+				}
+			}
+		} else {
+			applyGate(op, to, permutation, dir);
+		}
+	}
+
 	void EquivalenceChecker::check(const Configuration& config) {
 		results.method = Reference;
 
@@ -184,6 +246,8 @@ namespace ec {
 		dd::Edge e = dd->makeIdent(0, short(nqubits-1));
 		dd->incRef(e);
 		e = reduceAncillae(e, ancillary1);
+		it1 = qc1.begin();
+		end1 = qc1.end();
 
 		#if DEBUG_MODE_EC
 		visited.clear();
@@ -200,42 +264,9 @@ namespace ec {
 		dd->export2Dot(e, eiss.str().c_str());
 		#endif
 
-		for (auto& op : qc1) {
-
-			#if DEBUG_MODE_EC
-			std::cout << "before: " << std::endl;
-			qc::QuantumComputation::printPermutationMap(perm1);
-			#endif
-			// set appropriate qubit count to generate correct DD
-			auto nq = op->getNqubits();
-			op->setNqubits(nqubits);
-
-			auto tmp = dd->multiply(op->getDD(dd, line, perm1), e);
-
-			#if DEBUG_MODE_EC
-			std::cout << "after: " << std::endl;
-			qc::QuantumComputation::printPermutationMap(perm1);
-			#endif
-
-			dd->incRef(tmp);
-			dd->decRef(e);
-			e = tmp;
-
-			#if DEBUG_MODE_EC
-			visited.clear();
-			nc = nodecount(e, visited);
-			maxSize = std::max(maxSize, nc);
-			addToAverage(nc-1);
-			std::cout << nc-1 << " L " << std::endl;
-			std::stringstream ss{};
-			ss << toString(results.method) << "_" << counter << "_L.dot";
-			dd->export2Dot(e, ss.str().c_str());
-			++counter;
-			#endif
-			dd->garbageCollect();
-
-			// reset qubit count
-			op->setNqubits(nq);
+		while (it1 != end1) {
+			applyGate(it1, e, perm1, end1);
+			++it1;
 		}
 		qc::QuantumComputation::changePermutation(e, perm1, output1, line, dd);
 		e = reduceAncillae(e, ancillary1);
@@ -252,6 +283,8 @@ namespace ec {
 		dd::Edge f = dd->makeIdent(0, short(nqubits-1));
 		dd->incRef(f);
 		f = reduceAncillae(f, ancillary2);
+		it2 = qc2.begin();
+		end2 = qc2.end();
 
 		#if DEBUG_MODE_EC
 		visited.clear();
@@ -268,43 +301,9 @@ namespace ec {
 		dd->export2Dot(f, fiss.str().c_str());
 		#endif
 
-		for (auto& op : qc2) {
-
-			#if DEBUG_MODE_EC
-			std::cout << "before: " << std::endl;
-			qc::QuantumComputation::printPermutationMap(perm2);
-			#endif
-			// set appropriate qubit count to generate correct DD
-			auto nq = op->getNqubits();
-			op->setNqubits(nqubits);
-
-			auto tmp = dd->multiply(op->getDD(dd, line, perm2), f);
-
-			#if DEBUG_MODE_EC
-			std::cout << "after: " << std::endl;
-			qc::QuantumComputation::printPermutationMap(perm2);
-			std::cout << "-------" << std::endl;
-			#endif
-
-			dd->incRef(tmp);
-			dd->decRef(f);
-			f = tmp;
-
-			#if DEBUG_MODE_EC
-			visited.clear();
-			nc = nodecount(f, visited);
-			maxSize = std::max(maxSize, nc);
-			addToAverage(nc-1);
-			std::cout << nc-1 << " R " << std::endl;
-			std::stringstream ss{};
-			ss << toString(results.method) << "_" << counter << "_R.dot";
-			dd->export2Dot(f, ss.str().c_str());
-			++counter;
-			#endif
-			dd->garbageCollect();
-
-			// reset qubit count
-			op->setNqubits(nq);
+		while (it2 != end2) {
+			applyGate(it2, f, perm2, end2);
+			++it2;
 		}
 		qc::QuantumComputation::changePermutation(f, perm2, output2, line, dd);
 		f = reduceAncillae(f, ancillary2);

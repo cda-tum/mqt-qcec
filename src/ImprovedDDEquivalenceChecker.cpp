@@ -52,39 +52,6 @@ namespace ec {
 		return goalMatrix;
 	}
 
-	/// Take operation and apply it either from the left or (inverted) from the right
-	/// \param op operation to apply
-	/// \param to DD to apply the operation to
-	/// \param dir LEFT or RIGHT
-	void ImprovedDDEquivalenceChecker::applyGate(std::unique_ptr<qc::Operation>& op, dd::Edge& to, std::map<unsigned short, unsigned short>& permutation, Direction dir) {
-		#if DEBUG_MODE_EC
-		std::cout << "before: " << std::endl;
-		qc::QuantumComputation::printPermutationMap(permutation);
-		#endif
-
-		// set appropriate qubit count to generate correct DD
-		auto nq = op->getNqubits();
-		op->setNqubits(nqubits);
-
-		auto saved = to;
-		if (dir == LEFT) {
-			to = dd->multiply(op->getDD(dd, line, permutation), to);
-		} else {
-			to = dd->multiply(to, op->getInverseDD(dd, line, permutation));
-		}
-		dd->incRef(to);
-		dd->decRef(saved);
-		dd->garbageCollect();
-
-		// reset qubit count
-		op->setNqubits(nq);
-		#if DEBUG_MODE_EC
-		std::cout << "after: " << std::endl;
-		qc::QuantumComputation::printPermutationMap(permutation);
-		std::cout << "-------" << std::endl;
-		#endif
-	}
-
 	/// Use dedicated method to check the equivalence of both provided circuits
 	void ImprovedDDEquivalenceChecker::check(const Configuration& config) {
 		if (method == Reference) {
@@ -141,7 +108,7 @@ namespace ec {
 
 		// finish first circuit
 		while (it1 != end1) {
-			applyGate(*it1, results.result, perm1, LEFT);
+			applyGate(it1, results.result, perm1, end1, LEFT);
 			++it1;
 
 			#if DEBUG_MODE_EC
@@ -159,7 +126,7 @@ namespace ec {
 
 		//finish second circuit
 		while (it2 != end2) {
-			applyGate(*it2, results.result, perm2, RIGHT);
+			applyGate(it2, results.result, perm2, end2, RIGHT);
 			++it2;
 
 			#if DEBUG_MODE_EC
@@ -202,7 +169,7 @@ namespace ec {
 	void ImprovedDDEquivalenceChecker::checkNaive(qc::permutationMap& perm1, qc::permutationMap& perm2) {
 
 		while (it1 != end1 && it2 != end2) {
-			applyGate(*it1, results.result, perm1, LEFT);
+			applyGate(it1, results.result, perm1, end1, LEFT);
 
 			#if DEBUG_MODE_EC
 			visited.clear();
@@ -216,7 +183,7 @@ namespace ec {
 			++counter;
 			#endif
 
-			applyGate(*it2, results.result, perm2, RIGHT);
+			applyGate(it2, results.result, perm2, end2, RIGHT);
 
 			#if DEBUG_MODE_EC
 			visited.clear();
@@ -246,7 +213,7 @@ namespace ec {
 
 		while (it1 != end1 && it2 != end2) {
 			for (unsigned int i = 0; i < ratio1 && it1 != end1; ++i) {
-				applyGate(*it1, results.result, perm1, LEFT);
+				applyGate(it1, results.result, perm1, end1, LEFT);
 				++it1;
 
 				#if DEBUG_MODE_EC
@@ -262,7 +229,7 @@ namespace ec {
 				#endif
 			}
 			for (unsigned int i = 0; i < ratio2 && it2 != end2; ++i) {
-				applyGate(*it2, results.result, perm2, RIGHT);
+				applyGate(it2, results.result, perm2, end2, RIGHT);
 				++it2;
 
 				#if DEBUG_MODE_EC
@@ -289,6 +256,10 @@ namespace ec {
 
 		while (it1 != end1 && it2 != end2) {
 			if(!cachedLeft) {
+				// stop if measurement is encountered
+				if ((*it1)->getType() == qc::Measure)
+					break;
+
 				auto nq = (*it1)->getNqubits();
 				(*it1)->setNqubits(nqubits);
 				left = (*it1)->getDD(dd, line, perm1);
@@ -299,6 +270,10 @@ namespace ec {
 			}
 
 			if (!cachedRight) {
+				// stop if measurement is encountered
+				if ((*it2)->getType() == qc::Measure)
+					break;
+
 				auto nq = (*it2)->getNqubits();
 				(*it2)->setNqubits(nqubits);
 				right = (*it2)->getInverseDD(dd, line, perm2);

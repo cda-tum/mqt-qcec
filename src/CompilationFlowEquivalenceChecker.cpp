@@ -60,7 +60,7 @@ namespace ec {
 				unsigned short cost2 = costFunction((*it2)->getType(), (*it2)->getControls().size());
 
 				for (int i = 0; i < cost2 && it1 != end1; ++i) {
-					applyGate(*it1, results.result, perm1, LEFT);
+					applyGate(it1, results.result, perm1, end1, LEFT);
 					++it1;
 
 					// apply possible swaps
@@ -78,7 +78,7 @@ namespace ec {
 				}
 
 				for (int i = 0; i < cost1 && it2 != end2; ++i) {
-					applyGate(*it2, results.result, perm2, RIGHT);
+					applyGate(it2, results.result, perm2, end2, RIGHT);
 					++it2;
 
 					// apply possible swaps
@@ -98,7 +98,7 @@ namespace ec {
 		}
 		// finish first circuit
 		while (it1 != end1) {
-			applyGate(*it1, results.result, perm1, LEFT);
+			applyGate(it1, results.result, perm1, end1, LEFT);
 			++it1;
 
 			#if DEBUG_MODE_EC
@@ -111,7 +111,7 @@ namespace ec {
 
 		//finish second circuit
 		while (it2 != end2) {
-			applyGate(*it2, results.result, perm2, RIGHT);
+			applyGate(it2, results.result, perm2, end2, RIGHT);
 			++it2;
 
 			#if DEBUG_MODE_EC

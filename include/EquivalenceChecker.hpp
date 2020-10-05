@@ -27,6 +27,16 @@ namespace ec {
 		unsigned long long timeout = 60000;
 	};
 
+	class QCECException : public std::invalid_argument {
+		std::string msg;
+	public:
+		explicit QCECException(std::string  msg) : std::invalid_argument("QCEC Exception"), msg(std::move(msg)) { }
+
+		const char *what() const noexcept override {
+			return msg.c_str();
+		}
+	};
+
 	class EquivalenceChecker {
 	protected:
 		std::string filename1{};
@@ -51,6 +61,11 @@ namespace ec {
 		qc::permutationMap output1;
 		qc::permutationMap output2;
 
+		decltype(qc1.begin()) it1;
+		decltype(qc2.begin()) it2;
+		decltype(qc1.end()) end1;
+		decltype(qc1.end()) end2;
+
 		std::array<short, qc::MAX_QUBITS> line{};
 
 		unsigned long long maxSize = 0;
@@ -63,6 +78,14 @@ namespace ec {
 		dd::Edge reduceAncillaeRecursion(dd::Edge& e, std::bitset<qc::MAX_QUBITS>& ancillary, unsigned short lowerbound, bool regular = true);
 		dd::Edge reduceGarbage(dd::Edge& e, std::bitset<qc::MAX_QUBITS>& garbage, bool regular = true);
 		dd::Edge reduceGarbageRecursion(dd::Edge& e, std::bitset<qc::MAX_QUBITS>& garbage, unsigned short lowerbound, bool regular = true);
+
+		/// Take operation and apply it either from the left or (inverted) from the right
+		/// \param op operation to apply
+		/// \param to DD to apply the operation to
+		/// \param dir LEFT or RIGHT
+		void applyGate(std::unique_ptr<qc::Operation>& op, dd::Edge& to, std::map<unsigned short, unsigned short>& permutation, Direction dir = LEFT);
+		void applyGate(decltype(qc1.begin())& opIt, dd::Edge& to, std::map<unsigned short, unsigned short>& permutation, decltype(qc1.end())& end , Direction dir = LEFT);
+
 		void addToAverage(unsigned long long x) {
 			if (count == 0) {
 				average = static_cast<double>(x);

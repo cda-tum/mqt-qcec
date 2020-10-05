@@ -12,10 +12,8 @@ namespace ec {
 		fidelity_limit = config.fidelity_limit;
 		max_sims = config.max_sims;
 		results.nsims = 0;
-
-		#if DEBUG_MODE_SIMULATION
-		std::cout << "Simulating max. " << max_sims << " times with target fidelity " << fidelity_limit << std::endl;
-		#endif
+		end1 = qc1.end();
+		end2 = qc2.end();
 
 		if (!validInstance())
 			return;
@@ -29,102 +27,36 @@ namespace ec {
 			}
 			results.basisState = *new_stimulus.first;
 			std::bitset<qc::MAX_QUBITS> stimulusBits(results.basisState);
+			line.fill(qc::LINE_DEFAULT);
 
-			#if DEBUG_MODE_SIMULATION
-			std::cout << "\033[32mSim " << results.nsims << ": " << results.basisState << "\033[0m" << std::endl;
-			#endif
-
-			dd::Edge in1 = dd->makeBasisState(qc1.getNqubits(), stimulusBits);
-			std::array<short, qc::MAX_QUBITS> l{};
-			l.fill(qc::LINE_DEFAULT);
 			qc::permutationMap map = initial1;
-
-			dd::Edge e = in1;
+			dd::Edge e = dd->makeBasisState(nqubits, stimulusBits);
 			dd->incRef(e);
+			it1 = qc1.begin();
 
-			#if DEBUG_MODE_SIMULATION
-				visited.clear();
-				auto nc = nodecount(e, visited);
-				maxSize = std::max(maxSize, nc-1);
-				addToAverage(nc-1);
-			#endif
-
-			for (auto & op : qc1) {
-				auto tmp = dd->multiply(op->getDD(dd, l, map), e);
-				dd->incRef(tmp);
-				dd->decRef(e);
-				e = tmp;
-				dd->garbageCollect();
-
-				#if DEBUG_MODE_SIMULATION
-					visited.clear();
-					nc = nodecount(e, visited);
-					maxSize = std::max(maxSize, nc-1);
-					addToAverage(nc-1);
-				#endif
+			while (it1 != end1) {
+				applyGate(it1, e, map, end1);
+				++it1;
 			}
-
 			// correct permutation if necessary
-			qc::QuantumComputation::changePermutation(e, map, output1, l, dd);
-
+			qc::QuantumComputation::changePermutation(e, map, output1, line, dd);
 			e = reduceGarbage(e, garbage1);
-			e = reduceAncillae(e, ancillary1);
 
-			#if DEBUG_MODE_SIMULATION
-			std::stringstream ss1 {};
-			ss1 << "e_" << filename1 << "_sim_" << results.nsims << ".dot";
-			dd->export2Dot(e, ss1.str().c_str(), true);
-			std::cout << "[after 1st circ] Complex count: " << dd->cn.count << std::endl;
-			#endif
-
-			dd::Edge in2 = dd->makeBasisState(qc2.getNqubits(), stimulusBits);
-
-			l.fill(qc::LINE_DEFAULT);
 			map = initial2;
-
-			dd::Edge f = in2;
+			dd::Edge f = dd->makeBasisState(nqubits, stimulusBits);;
 			dd->incRef(f);
+			it2 = qc2.begin();
 
-			#if DEBUG_MODE_SIMULATION
-				visited.clear();
-				nc = nodecount(f, visited);
-				maxSize = std::max(maxSize, nc-1);
-				addToAverage(nc-1);
-			#endif
-
-			for (auto & op : qc2) {
-				auto tmp = dd->multiply(op->getDD(dd, l, map), f);
-				dd->incRef(tmp);
-				dd->decRef(f);
-				f = tmp;
-				dd->garbageCollect();
-
-				#if DEBUG_MODE_SIMULATION
-					visited.clear();
-					nc = nodecount(f, visited);
-					maxSize = std::max(maxSize, nc-1);
-					addToAverage(nc-1);
-				#endif
+			while (it2 != end2) {
+				applyGate(it2, f, map, end2);
+				++it2;
 			}
 
 			// correct permutation if necessary
-			qc::QuantumComputation::changePermutation(f, map, output2, l, dd);
-
+			qc::QuantumComputation::changePermutation(f, map, output2, line, dd);
 			f = reduceGarbage(f, garbage2);
-			f = reduceAncillae(f, ancillary2);
-
-			#if DEBUG_MODE_SIMULATION
-			std::stringstream ss2 {};
-			ss2 << "f_" << filename1 << "_sim_" << results.nsims << ".dot";
-			dd->export2Dot(f, ss2.str().c_str(), true);
-			std::cout << "[after 2nd circ] Complex count: " << dd->cn.count << std::endl;
-			#endif
 
 			results.fidelity = dd->fidelity(e, f);
-
-			#if DEBUG_MODE_SIMULATION
-			std::cout << "\033[33mFidelity: " << results.fidelity << "\033[0m" << std::endl;
-			#endif
 
 			results.nsims++;
 			results.maxActive = std::max(dd->maxActive, results.maxActive);
@@ -134,23 +66,12 @@ namespace ec {
 				dd->decRef(e);
 				dd->decRef(f);
 				dd->garbageCollect(true);
-
-				#if DEBUG_MODE_SIMULATION
-				std::cout << "[after success] Complex count: " << dd->cn.count << std::endl;
-				if (dd->cn.count > 4) {
-					std::cout << "\033[33m!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\033[0m" << std::endl;
-				}
-				#endif
 				break;
 			} else if (results.nsims == (unsigned long long) std::pow((long double)2, nqubits_for_stimuli)) {
 				results.equivalence = Equivalent;
 				dd->decRef(e);
 				dd->decRef(f);
 				dd->garbageCollect(true);
-
-				#if DEBUG_MODE_SIMULATION
-				std::cout << "[after success] Complex count: " << dd->cn.count << std::endl;
-				#endif
 				break;
 			} else {
 				results.equivalence = ProbablyEquivalent;
@@ -165,20 +86,12 @@ namespace ec {
 					printCSVEntry(std::cout);
 					std::cout << std::flush;
 				}
-				#if DEBUG_MODE_SIMULATION
-				std::cout << "[end of sim] Complex count: " << dd->cn.count << std::endl;
-				#endif
 			}
 		}
 
 		auto end = std::chrono::high_resolution_clock::now();
 		std::chrono::duration<double> diff = end - start;
 		results.time = diff.count();
-
-		#if DEBUG_MODE_SIMULATION
-		std::cout << "Max size: " << maxSize << std::endl;
-		std::cout << "Avg size: " << average << std::endl;
-		#endif
 	}
 
 }

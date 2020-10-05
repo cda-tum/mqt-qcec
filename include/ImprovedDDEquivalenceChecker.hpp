@@ -25,10 +25,6 @@ namespace ec {
 		void checkLookahead(qc::permutationMap& perm1, qc::permutationMap& perm2);
 
 	protected:
-		decltype(qc1.begin()) it1;
-		decltype(qc2.begin()) it2;
-		decltype(qc1.end()) end1;
-		decltype(qc1.end()) end2;
 
 		Method method = Proportional;
 
@@ -49,12 +45,6 @@ namespace ec {
 		/// [0 0]
 		/// \return goal matrix
 		dd::Edge createGoalMatrix();
-
-		/// Take operation and apply it either from the left or (inverted) from the right
-		/// \param op operation to apply
-		/// \param to DD to apply the operation to
-		/// \param dir LEFT or RIGHT
-		void applyGate(std::unique_ptr<qc::Operation>& op, dd::Edge& e, std::map<unsigned short, unsigned short>& permutation, Direction dir = LEFT);
 
 	public:
 		ImprovedDDEquivalenceChecker(qc::QuantumComputation& qc1, qc::QuantumComputation& qc2, Method method = Proportional):
