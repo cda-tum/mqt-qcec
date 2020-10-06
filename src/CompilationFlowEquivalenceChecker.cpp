@@ -205,12 +205,15 @@ namespace ec {
 			case qc::Pdag:
 				return IBMCostFunction(qc::X, nc) + IBMCostFunction(qc::X, nc-1);
 
-			case qc::Compound:
-				return 1; // this assumes that compound operations only arise from single qubit fusion
+			case qc::Compound: // this assumes that compound operations only arise from single qubit fusion
+			case qc::Measure:
+			case qc::Barrier:
+			case qc::ShowProbabilities:
+			case qc::Snapshot:
+				return 1; // these operations are assumed to incur no cost, but to advance the procedure 1 is used
 
 			default:
-				std::cerr << "No cost for gate " << gate << std::endl;
-				exit(1);
+				throw QCECException("No cost for gate " + std::to_string(gate));
 		}
 	}
 }
