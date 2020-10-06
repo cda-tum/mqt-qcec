@@ -1,20 +1,22 @@
 [![Build Status](https://travis-ci.com/iic-jku/qcec.svg?branch=master)](https://travis-ci.com/iic-jku/qcec)
 [![codecov](https://codecov.io/gh/iic-jku/qcec/branch/master/graph/badge.svg)](https://codecov.io/gh/iic-jku/qcec)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![arXiv](https://img.shields.io/static/v1?label=arXiv&message=2004.08420&color=inactive)](https://arxiv.org/abs/2004.08420) 
+[![arXiv](https://img.shields.io/static/v1?label=arXiv&message=2004.08420&color=inactive)](https://arxiv.org/abs/2004.08420)
+[![arXiv](https://img.shields.io/static/v1?label=arXiv&message=2009.02376&color=inactive)](https://arxiv.org/abs/2009.02376)
 
 # QCEC - A tool for **Q**uantum **C**ircuit **E**quivalence **C**hecking
 
 A tool for quantum circuit equivalence checking by the [Institute for Integrated Circuits](http://iic.jku.at/eda/) at the [Johannes Kepler University Linz](https://jku.at) based on methods proposed in [[1]](https://arxiv.org/abs/2004.08420), [[2]](https://arxiv.org/abs/2009.02376). 
 
-[[1]](https://arxiv.org/abs/2004.08420) L. Burgholzer and R. Wille. **"Advanced Equivalence Checking for Quantum Circuits"**. arXiv:2004.08420, 2020
+[[1]](https://arxiv.org/abs/2004.08420) L. Burgholzer and R. Wille. **"Advanced Equivalence Checking for Quantum Circuits"**. Transactions on Computer Aided Design of Integrated Circuits and Systems (TCAD), 2021 (pre-print [arXiv:2004.08420](https://arxiv.org/abs/2004.08420))
 
-[[2]](https://arxiv.org/abs/2009.02376) L. Burgholzer, R. Raymond, and R. Wille. **"Verifying Results of the IBM Qiskit Quantum Circuit Compilation Flow"**. In International Conference on Quantum Computing and Engineering (QCE), 2020
+[[2]](https://arxiv.org/abs/2009.02376) L. Burgholzer, R. Raymond, and R. Wille. **"Verifying Results of the IBM Qiskit Quantum Circuit Compilation Flow"**. In International Conference on Quantum Computing and Engineering (QCE), 2020 (pre-print [arXiv:2009.02376](https://arxiv.org/abs/2009.02376))
 
 This tool can be used for checking the equivalence of two quantum circuits provided in any of the following formats:
  * `Real` (e.g. from [RevLib](http://revlib.org)),
  * `OpenQASM` (e.g. used by IBM's [Qiskit](https://github.com/Qiskit/qiskit)),
  * `TFC` (e.g. from [Reversible Logic Synthesis Benchmarks Page](http://webhome.cs.uvic.ca/~dmaslov/mach-read.html))
+ * `QC` (e.g. from [Feynman](https://github.com/meamy/feynman))
  
  with the following available methods:
 - **Reference** - Construct and compare the DD for both circuits [[1, Section III.B]](https://arxiv.org/pdf/2004.08420.pdf#page=5),
@@ -25,7 +27,7 @@ This tool can be used for checking the equivalence of two quantum circuits provi
 - **Simulation** - Conduct simulation runs to prove non-equivalence or give a strong indication of equivalence [[1, Section IV.B]](https://arxiv.org/pdf/2004.08420.pdf#page=7),
 - **Verification of compilation results** - A dedicated scheme for verifying results of the IBM Qiskit Compilation Flow explicitly exploiting certain knowledge about the compilation process. [[2]](https://arxiv.org/abs/2009.02376)
 
-The tool builds upon [our decision diagram (DD) package](https://github.com/iic-jku/dd_package.git) as well as [our quantum functionality representation (QFR)](https://github.com/iic-jku/qfr.git). For more information, please visit [iic.jku.at/eda/research/quantum_verification](http://iic.jku.at/eda/research/quantum_verification). 
+The tool builds upon [our decision diagram (DD) package](https://github.com/iic-jku/dd_package.git) as well as [our quantum functionality representation (QFR)](https://github.com/iic-jku/qfr.git). For more information, please visit [iic.jku.at/eda/research/quantum_verification](http://iic.jku.at/eda/research/quantum_verification). If you want to visually explore decision diagrams for quantum computing, check out our installation-free web-tool [QDDVis](https://iic.jku.at/eda/research/quantum_dd/tool/).
 
 If you have any questions, feel free to contact us via [iic-quantum@jku.at](mailto:iic-quantum@jku.at) or by creating an issue on GitHub.
 
@@ -132,46 +134,21 @@ In order to build the library execute the following in the project's main direct
 If you use our tool for your research, we will be thankful if you refer to it by citing the appropriate publication (provided in BibTeX or biblatex style):
 
 <details open>
-<summary>[1] L. Burgholzer and R. Wille. "Advanced Equivalence Checking for Quantum Circuits". arXiv:2004.08420, 2020</summary>
-
-<details>
-<summary>bibtex</summary>
+<summary>[1] L. Burgholzer and R. Wille. "Advanced Equivalence Checking for Quantum Circuits". IEEE Trans. on CAD of Integrated Circuits and Systems (TCAD), 2021</summary>
 
 ```bibtex
-@misc{burgholzer2020advanced,
+@article{burgholzer2020advanced,
     author = {Burgholzer, Lukas and Wille, Robert},
     title = {Advanced Equivalence Checking of Quantum Circuits},
-    archivePrefix = "arXiv", 
-    note = {arXiv:2004.08420},
-    year = 2020
+    year = 2021,
+    journaltitle = {{IEEE} Trans. on {CAD} of Integrated Circuits and Systems}
 }
 ```
-
-</details>
-
-<details>
-<summary>biblatex</summary>
-
-```bibtex 
-@online{burgholzer2020advanced,
-    author       = {Burgholzer, Lukas and Wille, Robert},
-    title        = {Advanced Equivalence Checking of Quantum Circuits},
-    date         = {2020-04-21},
-    eprinttype   = {arxiv},
-    eprint       = {2004.08420},
-    eprintclass  = {quant-ph},
-}
-```
-
-</details>
 
 </details>
 
 <details open>
 <summary>[2] L. Burgholzer, R. Raymond, and R. Wille. "Verifying Results of the IBM Qiskit Quantum Circuit Compilation Flow". In International Conference on Quantum Computing and Engineering (QCE), 2020</summary>
-
-<details>
-<summary>bibtex</summary>
 
 ```bibtex
 @inproceedings{burgholzer2020verifyingResultsIBM,
@@ -184,18 +161,5 @@ If you use our tool for your research, we will be thankful if you refer to it by
 
 </details>
 
-<details>
-<summary>biblatex</summary>
 
-```bibtex 
-@inproceedings{burgholzer2020verifyingResultsIBM,
-  title = {Verifying results of the {{IBM Qiskit}} quantum circuit compilation flow},
-  author = {Burgholzer, Lukas and Raymond, Rudy and Wille, Robert},
-  date = {2020},
-  eventtitle = {International Conference on Quantum Computing and Engineering}
-}
-```
 
-</details>
-
-</details>

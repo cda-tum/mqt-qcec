@@ -14,11 +14,12 @@
 #include "PowerOfSimulationEquivalenceChecker.hpp"
 
 void show_usage(const std::string& name) {
-	std::cerr << "Usage: " << name << " <PATH_TO_FILE_1> <PATH_TO_FILE_2> <method>                          " << std::endl;
+	std::cerr << "Usage: " << name << " <PATH_TO_FILE_1> <PATH_TO_FILE_2> (<method>)                        " << std::endl;
 	std::cerr << "Supported file formats:                                                                   " << std::endl;
 	std::cerr << "  .real                                                                                   " << std::endl;
 	std::cerr << "  .qasm                                                                                   " << std::endl;
 	std::cerr << "  .tfc                                                                                    " << std::endl;
+	std::cerr << "  .qc                                                                                     " << std::endl;
 	std::cerr << "Available methods:                                                                        " << std::endl;
 	std::cerr << "  reference                                                                               " << std::endl;
 	std::cerr << "  naive                                                                                   " << std::endl;
