@@ -108,7 +108,7 @@ namespace ec {
 				if (dd::Package::isTerminal(*node))
 					continue;
 
-				for (auto edge : node->p->e) {
+				for (auto& edge : node->p->e) {
 					if (edge.p != nullptr && v.insert(edge.p).second) {
 						q.push(&edge);
 					}

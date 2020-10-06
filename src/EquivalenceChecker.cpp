@@ -211,7 +211,7 @@ namespace ec {
 				auto bitidx = op->getTargets().at(i);
 				auto current = permutation.at(qubitidx);
 				if (qubitidx != bitidx && current != bitidx) {
-					for (auto&& p: permutation) {
+					for (auto& p: permutation) {
 						if (p.second == bitidx) {
 							p.second = current;
 							break;
