@@ -20,6 +20,7 @@ namespace ec {
 
 	struct Configuration {
 		bool printCSV = false;
+		fp tolerance = CN::TOLERANCE;
 
 		// configuration options for PowerOfSimulation equivalence checker
 		double fidelity_limit = 0.999;
@@ -134,6 +135,8 @@ namespace ec {
 		void expectNonEquivalent() { results.expected = NonEquivalent; }
 		void expectNothing() { results.expected = NoInformation; }
 		void suggestEquivalent() { results.expected = ProbablyEquivalent; }
+
+		static void setTolerance(fp tol) { dd::Package::setComplexNumberTolerance(tol); }
 
 		unsigned int getResultingDDSize() {
 			return dd->size(results.result) - 1;

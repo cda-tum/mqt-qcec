@@ -231,6 +231,8 @@ namespace ec {
 		if (!validInstance())
 			return;
 
+		setTolerance(config.tolerance);
+
 		auto start = std::chrono::high_resolution_clock::now();
 
 		#if DEBUG_MODE_EC

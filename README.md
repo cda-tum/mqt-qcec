@@ -45,7 +45,8 @@ This tool can either be used as a **standalone executable** with command-line in
    - lookahead 
    - simulation
    - compilationflow
-   
+  
+  An optional parameter ```--tol e``` allows to specify the numerical tolerance *e* (default: *1e-13*) used during the computation.   
   The ```simulation``` method has two optional parameters ```--nsims r``` and ```--fid F```, controlling the maximum number of simulations *r* (default: *16*) and the considered fidelity limit *F* (default *0.999*), respectively.
       
    The executable performs the equivalence check and prints its result to the standard output. If the `--csv` option is present, a CSV entry according to the following header is printed

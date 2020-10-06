@@ -11,6 +11,7 @@ namespace ec {
 		results.method = PowerOfSimulation;
 		fidelity_limit = config.fidelity_limit;
 		max_sims = config.max_sims;
+		setTolerance(config.tolerance);
 		results.nsims = 0;
 		end1 = qc1.end();
 		end2 = qc2.end();
