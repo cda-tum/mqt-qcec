@@ -147,6 +147,11 @@ namespace ec {
 			return results.print(out);
 		}
 
+		virtual std::ostream& printJSONResult(bool printStatistics) { return printJSONResult(std::cout, printStatistics); }
+		virtual std::ostream& printJSONResult(std::ostream& out, bool printStatistics) {
+			return results.printJSON(out, printStatistics);
+		}
+
 		virtual std::ostream & printCSVEntry() { return printCSVEntry(std::cout); }
 		virtual std::ostream & printCSVEntry(std::ostream& out) { return results.printCSVEntry(out); }
 		virtual std::ostream & printCSVHeader() { return printCSVHeader(std::cout); }

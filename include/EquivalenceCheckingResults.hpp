@@ -144,6 +144,34 @@ namespace ec {
 			return out;
 		}
 
+		virtual std::ostream& printJSON(bool printStatistics) { return printJSON(std::cout, printStatistics); }
+		virtual std::ostream& printJSON(std::ostream& out, bool printStatistics) {
+			out << "{\n";
+			out << "\t\"circuit1\": {\n";
+			out << "\t\t\"name\": \"" << name1 << "\",\n";
+			out << "\t\t\"n_qubits\": " << nqubits1 << ",\n";
+			out << "\t\t\"n_gates\": " << ngates1 << "\n";
+			out << "\t},\n";
+			out << "\t\"circuit2\": {\n";
+			out << "\t\t\"name\": \"" << name2 << "\",\n";
+			out << "\t\t\"n_qubits\": " << nqubits2 << ",\n";
+			out << "\t\t\"n_gates\": " << ngates2 << "\n";
+			out << "\t},\n";
+			out << "\t\"equivalence\": \"" << toString(equivalence) << "\"";
+			if (printStatistics) {
+				out << ",\n\t\"statistics\": {\n";
+				out << "\t\t\"verification_time\": " << (timeout? "\"timeout\"": std::to_string(time)) << ",\n";
+				out << "\t\t\"max_nodes\": " << maxActive << ",\n";
+				out << "\t\t\"method\": \"" << toString(method) << "\"";
+				if (method == PowerOfSimulation) {
+					out << ",\n\t\t\"n_sims\": " << nsims;
+				}
+				out << "\n\t}";
+			}
+			out << "\n}\n";
+			return out;
+		}
+
 		static std::ostream& printCSVHeader(std::ostream& out = std::cout) {
 			out << "filename1;nqubits1;ngates1;filename2;nqubits2;ngates2;expectedEquivalent;equivalent;method;time;maxActive;nsims";
 			return out;

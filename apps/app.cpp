@@ -14,7 +14,7 @@
 #include "PowerOfSimulationEquivalenceChecker.hpp"
 
 void show_usage(const std::string& name) {
-	std::cerr << "Usage: " << name << " <PATH_TO_FILE_1> <PATH_TO_FILE_2> (<method>)                        " << std::endl;
+	std::cerr << "Usage: " << name << " <PATH_TO_FILE_1> <PATH_TO_FILE_2> (--method <method>)               " << std::endl;
 	std::cerr << "Supported file formats:                                                                   " << std::endl;
 	std::cerr << "  .real                                                                                   " << std::endl;
 	std::cerr << "  .qasm                                                                                   " << std::endl;
@@ -28,6 +28,7 @@ void show_usage(const std::string& name) {
 	std::cerr << "  simulation                                                                              " << std::endl;
 	std::cerr << "  compilationflow                                                                         " << std::endl;
 	std::cerr << "Options:                                                                                  " << std::endl;
+	std::cerr << "  --ps:                           Print statistics                                        " << std::endl;
 	std::cerr << "  --csv:                          Print results as csv string                             " << std::endl;
 	std::cerr << "  --tol e (default 1e-13):        Numerical tolerance used during computation             " << std::endl;
 	std::cerr << "  --nsims r (default 16):         Number of simulations to conduct (for simulation method)" << std::endl;
@@ -36,7 +37,14 @@ void show_usage(const std::string& name) {
 
 int main(int argc, char** argv){
 	if (argc < 3) {
-		show_usage(argv[0]);
+		if (argc == 2) {
+			std::string cmd = argv[1];
+			std::transform(cmd.begin(), cmd.end(), cmd.begin(), [](unsigned char c) { return ::tolower(c); });
+			if (cmd == "--help" || cmd == "-h")
+				show_usage(argv[0]);
+		} else {
+			show_usage(argv[0]);
+		}
 		return 1;
 	}
 
@@ -46,6 +54,7 @@ int main(int argc, char** argv){
 
 	ec::Configuration config{};
 	ec::Method method = ec::Proportional;
+	bool printStatistics = false;
 
 	// parse configuration options
 	if (argc >= 4) {
@@ -105,7 +114,17 @@ int main(int argc, char** argv){
 					show_usage(argv[0]);
 					return 1;
 				}
-			} else {
+			} else if (cmd == "--ps") {
+				printStatistics = true;
+			} else if (cmd == "--method"){
+				++i;
+				if (i >= argc) {
+					show_usage(argv[0]);
+					return 1;
+				}
+				cmd = argv[i];
+				std::transform(cmd.begin(), cmd.end(), cmd.begin(), [](unsigned char c) { return ::tolower(c); });
+
 				// try to extract method
 				if (cmd == "reference") {
 					method = ec::Reference;
@@ -123,6 +142,9 @@ int main(int argc, char** argv){
 					show_usage(argv[0]);
 					return 1;
 				}
+			} else {
+				show_usage(argv[0]);
+				return 1;
 			}
 		}
 	}
@@ -139,7 +161,7 @@ int main(int argc, char** argv){
 		if (config.printCSV) {
 			ec.printCSVEntry();
 		} else {
-			ec.printResult();
+			ec.printJSONResult(printStatistics);
 		}
 	} else if (method == ec::PowerOfSimulation) {
 		ec::PowerOfSimulationEquivalenceChecker ec(qc1, qc2);
@@ -148,7 +170,7 @@ int main(int argc, char** argv){
 		if (config.printCSV) {
 			ec.printCSVEntry();
 		} else {
-			ec.printResult();
+			ec.printJSONResult(printStatistics);
 		}
 	} else {
 		ec::ImprovedDDEquivalenceChecker ec(qc1, qc2, method);
@@ -157,7 +179,7 @@ int main(int argc, char** argv){
 		if (config.printCSV) {
 			ec.printCSVEntry();
 		} else {
-			ec.printResult();
+			ec.printJSONResult(printStatistics);
 		}
 	}
 

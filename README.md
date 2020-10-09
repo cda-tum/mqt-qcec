@@ -3,10 +3,11 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![arXiv](https://img.shields.io/static/v1?label=arXiv&message=2004.08420&color=inactive)](https://arxiv.org/abs/2004.08420)
 [![arXiv](https://img.shields.io/static/v1?label=arXiv&message=2009.02376&color=inactive)](https://arxiv.org/abs/2009.02376)
+[![toolset: JKQ](https://img.shields.io/badge/toolset-JKQ-blue)](https://github.com/iic-jku/jkq)
 
-# QCEC - A tool for **Q**uantum **C**ircuit **E**quivalence **C**hecking
+# JKQ QCEC - A JKQ tool for **Q**uantum **C**ircuit **E**quivalence **C**hecking
 
-A tool for quantum circuit equivalence checking by the [Institute for Integrated Circuits](http://iic.jku.at/eda/) at the [Johannes Kepler University Linz](https://jku.at) based on methods proposed in [[1]](https://arxiv.org/abs/2004.08420), [[2]](https://arxiv.org/abs/2009.02376). 
+A JKQ tool for quantum circuit equivalence checking by the [Institute for Integrated Circuits](http://iic.jku.at/eda/) at the [Johannes Kepler University Linz](https://jku.at) based on methods proposed in [[1]](https://arxiv.org/abs/2004.08420), [[2]](https://arxiv.org/abs/2009.02376). 
 
 [[1]](https://arxiv.org/abs/2004.08420) L. Burgholzer and R. Wille. **"Advanced Equivalence Checking for Quantum Circuits"**. Transactions on Computer Aided Design of Integrated Circuits and Systems (TCAD), 2021 (pre-print [arXiv:2004.08420](https://arxiv.org/abs/2004.08420))
 
@@ -27,16 +28,16 @@ This tool can be used for checking the equivalence of two quantum circuits provi
 - **Simulation** - Conduct simulation runs to prove non-equivalence or give a strong indication of equivalence [[1, Section IV.B]](https://arxiv.org/pdf/2004.08420.pdf#page=7),
 - **Verification of compilation results** - A dedicated scheme for verifying results of the IBM Qiskit Compilation Flow explicitly exploiting certain knowledge about the compilation process. [[2]](https://arxiv.org/abs/2009.02376)
 
-The tool builds upon [our decision diagram (DD) package](https://github.com/iic-jku/dd_package.git) as well as [our quantum functionality representation (QFR)](https://github.com/iic-jku/qfr.git). For more information, please visit [iic.jku.at/eda/research/quantum_verification](http://iic.jku.at/eda/research/quantum_verification). If you want to visually explore decision diagrams for quantum computing, check out our installation-free web-tool [QDDVis](https://iic.jku.at/eda/research/quantum_dd/tool/).
+The tool builds upon [our decision diagram (DD) package](https://github.com/iic-jku/dd_package.git) as well as [our quantum functionality representation (QFR)](https://github.com/iic-jku/qfr.git). For more information, please visit [iic.jku.at/eda/research/quantum_verification](http://iic.jku.at/eda/research/quantum_verification). If you want to visually explore decision diagrams for quantum computing, check out our installation-free web-tool [JKQ DDVis](https://iic.jku.at/eda/research/quantum_dd/tool/).
 
-If you have any questions, feel free to contact us via [iic-quantum@jku.at](mailto:iic-quantum@jku.at) or by creating an issue on GitHub.
+If you have any questions, feel free to contact us via [iic-quantum@jku.at](mailto:iic-quantum@jku.at) or by creating an issue on [GitHub](https://guthub.com/iic-jku/qcec/issues).
 
 ## Usage
 
 This tool can either be used as a **standalone executable** with command-line interface, or as a **library** for the incorporation in other projects.
 - The standalone executable is launched in the following way:
     ```commandline
-    qcec_app <PATH_TO_FILE_1> <PATH_TO_FILE_2> (<method>)
+    qcec_app <PATH_TO_FILE_1> <PATH_TO_FILE_2> (--method <method>)
     ```
   where *\<method\>* is one of
    - reference
@@ -49,7 +50,8 @@ This tool can either be used as a **standalone executable** with command-line in
   An optional parameter ```--tol e``` allows to specify the numerical tolerance *e* (default: *1e-13*) used during the computation.   
   The ```simulation``` method has two optional parameters ```--nsims r``` and ```--fid F```, controlling the maximum number of simulations *r* (default: *16*) and the considered fidelity limit *F* (default *0.999*), respectively.
       
-   The executable performs the equivalence check and prints its result to the standard output. If the `--csv` option is present, a CSV entry according to the following header is printed
+   The executable performs the equivalence check and prints its result to the standard output. Per default, this produces JSON formatted output. Additional statistics (e.g., verification time, maximum number of nodes, required simulations, etc.) can be obtained by additionally providing the `--ps` flag.
+  If the `--csv` flag is present, a CSV entry according to the following header is printed
     ```csv
    filename1;nqubits1;ngates1;filename2;nqubits2;ngates2;expectedEquivalent;equivalent;method;time;maxActive;nsims
    ```
@@ -132,7 +134,7 @@ In order to build the library execute the following in the project's main direct
 
 ## Reference
 
-If you use our tool for your research, we will be thankful if you refer to it by citing the appropriate publication (provided in BibTeX or biblatex style):
+If you use our tool for your research, we will be thankful if you refer to it by citing the appropriate publication:
 
 <details open>
 <summary>[1] L. Burgholzer and R. Wille. "Advanced Equivalence Checking for Quantum Circuits". IEEE Trans. on CAD of Integrated Circuits and Systems (TCAD), 2021</summary>
@@ -140,7 +142,7 @@ If you use our tool for your research, we will be thankful if you refer to it by
 ```bibtex
 @article{burgholzer2020advanced,
     author = {Burgholzer, Lukas and Wille, Robert},
-    title = {Advanced Equivalence Checking of Quantum Circuits},
+    title = {Advanced Equivalence Checking for Quantum Circuits},
     year = 2021,
     journaltitle = {{IEEE} Trans. on {CAD} of Integrated Circuits and Systems}
 }
