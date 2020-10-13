@@ -41,15 +41,25 @@ macro(handle_submodule MODULENAME)
 endmacro()
 
 handle_submodule(qfr)
+handle_submodule(json)
 
 add_subdirectory(src)
 
 option(BUILD_TESTS "Also build tests for QCEC project" OFF)
-if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME OR BUILD_TESTS)
+if (BUILD_TESTS)
 	enable_testing()
 	include(GoogleTest)
 	add_subdirectory(test)
+endif ()
 
+# only build apps if this is the main project
+if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
 	add_subdirectory(apps)
+endif()
+
+option(BUILD_BINDINGS "Also build Python bindings for QCEC project" OFF)
+if(BUILD_BINDINGS)
+	handle_submodule(pybind11)
+	handle_submodule(pybind11_json)
 endif()
 
