@@ -48,7 +48,7 @@ endif ()
 set(JSON_BuildTests OFF CACHE INTERNAL "")
 # add nlohmann::json library
 add_subdirectory("${PROJECT_SOURCE_DIR}/extern/json" "extern/json")
-if (BUILD_BINDINGS)
+if (BUILD_QCEC_BINDINGS)
 	target_compile_options(nlohmann_json INTERFACE -fvisibility=hidden)
 	target_compile_options(qfr PUBLIC -fvisibility=hidden)
 endif ()
