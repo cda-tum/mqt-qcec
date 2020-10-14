@@ -52,7 +52,7 @@ class CMakeBuild(build_ext):
             cmake_args += ['-DCMAKE_BUILD_TYPE=' + cfg]
             build_args += ['--', '-j2']
 
-        cmake_args += ['-DBUILD_BINDINGS=ON']
+        cmake_args += ['-DBUILD_QCEC_BINDINGS=ON']
 
         env = os.environ.copy()
         env['CXXFLAGS'] = '{} -DVERSION_INFO=\\"{}\\"'.format(env.get('CXXFLAGS', ''),
