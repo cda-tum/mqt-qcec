@@ -5,9 +5,12 @@
 [submodule "extern/json"]
 	path = extern/json
 	url = https://github.com/nlohmann/json.git
+	branch = develop
 [submodule "extern/pybind11"]
 	path = extern/pybind11
 	url = https://github.com/pybind/pybind11.git
+	branch = master
 [submodule "extern/pybind11_json"]
 	path = extern/pybind11_json
 	url = https://github.com/pybind/pybind11_json.git
+	branch = master

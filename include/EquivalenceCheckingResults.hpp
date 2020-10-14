@@ -10,15 +10,35 @@
 #include <iostream>
 
 #include "DDpackage.h"
+#include "nlohmann/json.hpp"
 
 namespace ec {
 	enum Equivalence {
 		NonEquivalent, Equivalent, NoInformation, ProbablyEquivalent, EquivalentUpToGlobalPhase
 	};
 
+	// map ec::Equivalence values to JSON as strings
+	NLOHMANN_JSON_SERIALIZE_ENUM( Equivalence, {
+		{NonEquivalent, "not equivalent"},
+		{Equivalent, "equivalent"},
+		{EquivalentUpToGlobalPhase, "equivalent up to global phase"},
+		{ProbablyEquivalent, "probably equivalent"},
+		{NoInformation, "no information"},
+	})
+
 	enum Method {
 		Reference, Naive, Proportional, Lookahead, CompilationFlow, PowerOfSimulation
 	};
+
+	// map ec::Method values to JSON as strings
+	NLOHMANN_JSON_SERIALIZE_ENUM( ec::Method, {
+		{ec::Reference, "reference"},
+		{ec::Naive, "naive"},
+		{ec::Proportional, "proportional"},
+		{ec::Lookahead, "lookahead"},
+		{ec::PowerOfSimulation, "simulation"},
+		{ec::CompilationFlow, "compilationflow"}
+	})
 
 	static std::string toString(const Method method) {
 		switch (method) {
@@ -170,6 +190,37 @@ namespace ec {
 			}
 			out << "\n}\n";
 			return out;
+		}
+
+		virtual nlohmann::json produceJSON(bool statistics) {
+			nlohmann::json resultJSON{};
+			resultJSON["circuit1"] = {};
+			auto& circuit1 = resultJSON["circuit1"];
+			circuit1["name"] = name1;
+			circuit1["n_qubits"] = nqubits1;
+			circuit1["n_gates"] = ngates1;
+
+			resultJSON["circuit2"] = {};
+			auto& circuit2 = resultJSON["circuit2"];
+			circuit2["name"] = name2;
+			circuit2["n_qubits"] = nqubits2;
+			circuit2["n_gates"] = ngates2;
+
+			resultJSON["equivalence"] = equivalence;
+			if (statistics) {
+				resultJSON["statistics"] = {};
+				auto& stats = resultJSON["statistics"];
+				if (timeout)
+					stats["timeout"] = timeout;
+				stats["verification_time"] = time;
+				stats["max_nodes"] = maxActive;
+				stats["method"] = method;
+				if (method == PowerOfSimulation) {
+					stats["n_sims"] = nsims;
+				}
+			}
+
+			return resultJSON;
 		}
 
 		static std::ostream& printCSVHeader(std::ostream& out = std::cout) {

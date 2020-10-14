@@ -20,6 +20,7 @@ namespace ec {
 
 	struct Configuration {
 		bool printCSV = false;
+		bool printStatistics = false;
 		fp tolerance = CN::TOLERANCE;
 
 		// configuration options for PowerOfSimulation equivalence checker

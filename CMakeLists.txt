@@ -4,7 +4,7 @@ if(${CMAKE_VERSION} VERSION_LESS 3.12)
 endif()
 
 project(qcec
-        VERSION 1.4.0
+        VERSION 1.4.5
         DESCRIPTION "A JKQ tool for quantum circuit equivalence checking (JKQ QCEC)"
         LANGUAGES CXX)
 
@@ -45,8 +45,8 @@ handle_submodule(json)
 
 add_subdirectory(src)
 
-option(BUILD_TESTS "Also build tests for QCEC project" OFF)
-if (BUILD_TESTS)
+option(BUILD_QCEC_TESTS "Also build tests for QCEC project" OFF)
+if (BUILD_QCEC_TESTS)
 	enable_testing()
 	include(GoogleTest)
 	add_subdirectory(test)
@@ -61,5 +61,6 @@ option(BUILD_BINDINGS "Also build Python bindings for QCEC project" OFF)
 if(BUILD_BINDINGS)
 	handle_submodule(pybind11)
 	handle_submodule(pybind11_json)
+	add_subdirectory(jkq/qcec)
 endif()
 

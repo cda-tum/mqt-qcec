@@ -34,7 +34,7 @@ If you have any questions, feel free to contact us via [iic-quantum@jku.at](mail
 
 ## Usage
 
-This tool can either be used as a **standalone executable** with command-line interface, or as a **library** for the incorporation in other projects.
+This tool can either be used as a **standalone executable** with command-line interface, or as a **library** for the incorporation in other projects. [Python bindings](#python-bindings) are available since version 1.4.5. 
 - The standalone executable is launched in the following way:
     ```commandline
     qcec_app <PATH_TO_FILE_1> <PATH_TO_FILE_2> (--method <method>)
@@ -59,10 +59,10 @@ This tool can either be used as a **standalone executable** with command-line in
 - Internally the library works in the following way
     - Import both input files into a `qc::QuantumComputation` object
         ```c++
-        std::string file1 = "PATH_TO_FILE_1{.real | .qasm | .tfc}";
+        std::string file1 = "<PATH_TO_FILE_1>";
         qc::QuantumComputation qc1(file1);
         
-        std::string file2 = "PATH_TO_FILE_2{.real | .qasm | .tfc}";
+        std::string file2 = "<PATH_TO_FILE_2>";
         qc::QuantumComputation qc2(file2);
         ```
     - Instantiate an `ec::EquivalenceChecker` object with both circuits
@@ -90,7 +90,7 @@ This tool can either be used as a **standalone executable** with command-line in
   
 ### System requirements
 
-Building (and running) is continuously tested under Linux (Ubuntu 18.04) using gcc-7.4, gcc-10 and clang-9, MacOS (Mojave 10.15) using AppleClang and gcc-10, and Windows using MSVC 15.9. 
+Building (and running) is continuously tested under Linux (Ubuntu 20.04) using gcc-9.3, gcc-10 and clang-11, MacOS (Catalina 10.15) using AppleClang and gcc-10, and Windows using MSVC 15.9. 
 However, the implementation should be compatible with any current C++ compiler supporting C++14 and a minimum CMake version of 3.10.
 
 ### Configure, Build, and Install
@@ -131,6 +131,28 @@ In order to build the library execute the following in the project's main direct
     find_package(qcec)
     target_link_libraries(${TARGET_NAME} PRIVATE JKQ::qcec)
     ```
+
+### Python Bindings
+
+Running `pip install .` in the main project directory creates Python bindings for the JKQ QCEC tool. Then, using it in Python is as simple as:
+```python
+from jkq import qcec
+qcec.verify({"file1": "<PATH_TO_FILE_1>", "file2:": "<PATH_TO_FILE_2>"})
+```
+The full list of parameters as described in [Usage](#usage) which can be passed to `qcec.verify(...)` as a Python dictionary, are:
+```python
+instance = {
+    "file1":  "<PATH_TO_FILE_1>", # required
+    "file2":  "<PATH_TO_FILE_2>", # required
+    "method": "proportional",
+    "tolerance": 1e-13,
+    "nsims": 16,
+    "fidelity": 0.999,
+    "statistics": False,
+    "csv": False,
+}
+```
+
 
 ## Reference
 

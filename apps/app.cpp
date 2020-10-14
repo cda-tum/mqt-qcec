@@ -54,7 +54,6 @@ int main(int argc, char** argv){
 
 	ec::Configuration config{};
 	ec::Method method = ec::Proportional;
-	bool printStatistics = false;
 
 	// parse configuration options
 	if (argc >= 4) {
@@ -115,7 +114,7 @@ int main(int argc, char** argv){
 					return 1;
 				}
 			} else if (cmd == "--ps") {
-				printStatistics = true;
+				config.printStatistics = true;
 			} else if (cmd == "--method"){
 				++i;
 				if (i >= argc) {
@@ -161,7 +160,7 @@ int main(int argc, char** argv){
 		if (config.printCSV) {
 			ec.printCSVEntry();
 		} else {
-			ec.printJSONResult(printStatistics);
+			ec.printJSONResult(config.printStatistics);
 		}
 	} else if (method == ec::PowerOfSimulation) {
 		ec::PowerOfSimulationEquivalenceChecker ec(qc1, qc2);
@@ -170,7 +169,7 @@ int main(int argc, char** argv){
 		if (config.printCSV) {
 			ec.printCSVEntry();
 		} else {
-			ec.printJSONResult(printStatistics);
+			ec.printJSONResult(config.printStatistics);
 		}
 	} else {
 		ec::ImprovedDDEquivalenceChecker ec(qc1, qc2, method);
@@ -179,7 +178,7 @@ int main(int argc, char** argv){
 		if (config.printCSV) {
 			ec.printCSVEntry();
 		} else {
-			ec.printJSONResult(printStatistics);
+			ec.printJSONResult(config.printStatistics);
 		}
 	}
 
