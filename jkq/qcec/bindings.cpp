@@ -1,5 +1,5 @@
 /*
- * This file is part of IIC-JKU QCEC library which is released under the MIT license.
+ * This file is part of JKQ QCEC library which is released under the MIT license.
  * See file README.md or go to http://iic.jku.at/eda/research/quantum/ for more information.
  */
 
@@ -96,7 +96,7 @@ nl::json verify(const py::object& instance) {
 	return ec->results.produceJSON(config.printStatistics);
 }
 
-PYBIND11_MODULE(_qcec, m) {
+PYBIND11_MODULE(pyqcec, m) {
 	m.doc() = "pybind11 for the JKQ QCEC quantum circuit equivalence checking tool";
 	m.attr("__name__") = "jkq.qcec";
 	m.def("verify", &verify, "verify the equivalence of two circuits");

@@ -4,7 +4,7 @@ import sys
 import platform
 import subprocess
 
-from setuptools import setup, Extension
+from setuptools import setup, Extension, find_packages
 from setuptools.command.build_ext import build_ext
 from distutils.version import LooseVersion
 
@@ -25,8 +25,8 @@ class CMakeBuild(build_ext):
 
         if platform.system() == "Windows":
             cmake_version = LooseVersion(re.search(r'version\s*([\d.]+)', out.decode()).group(1))
-            if cmake_version < '3.1.0':
-                raise RuntimeError("CMake >= 3.1.0 is required on Windows")
+            if cmake_version < '3.10.0':
+                raise RuntimeError("CMake >= 3.10.0 is required for this project")
 
         for ext in self.extensions:
             self.build_extension(ext)
@@ -60,18 +60,46 @@ class CMakeBuild(build_ext):
         if not os.path.exists(self.build_temp):
             os.makedirs(self.build_temp)
         subprocess.check_call(['cmake', ext.sourcedir] + cmake_args, cwd=self.build_temp, env=env)
-        subprocess.check_call(['cmake', '--build', '.', '--target', '_qcec'] + build_args, cwd=self.build_temp)
+        subprocess.check_call(['cmake', '--build', '.', '--target', ext.name] + build_args, cwd=self.build_temp)
 
+
+README_PATH = os.path.join(os.path.abspath(os.path.dirname(__file__)),
+                           'README.md')
+with open(README_PATH) as readme_file:
+    README = readme_file.read()
 
 setup(
-    name='qcec',
+    name='jkq.qcec',
     version='1.0.0',
     author='Lukas Burgholzer',
     author_email='lukas.burgholzer@jku.at',
     description='JKQ QCEC - A JKQ tool for Quantum Circuit Equivalence Checking',
-    long_description='',
-    ext_modules=[CMakeExtension('_qcec')],
+    long_description=README,
+    long_description_content_type="text/markdown",
+    license="MIT",
+    url="https://github.com/iic-jku/qcec",
+    ext_modules=[CMakeExtension('pyqcec')],
     cmdclass=dict(build_ext=CMakeBuild),
     zip_safe=False,
-    packages=['jkq.qcec']
+    packages=find_packages(),
+    classifiers=[
+        'Development Status :: 4 - Beta',
+        "Programming Language :: Python :: 3",
+        "Programming Language :: C++",
+        "License :: OSI Approved :: MIT License",
+        "Operating System :: Microsoft :: Windows",
+        "Operating System :: MacOS",
+        "Operating System :: POSIX :: Linux",
+        "Intended Audience :: Science/Research",
+        "Natural Language :: English",
+        "Topic :: Scientific/Engineering :: Electronic Design Automation (EDA)",
+    ],
+    keywords="jkq quantum verification",
+    project_urls={
+        'Source': 'https://github.com/iic-jku/qcec/',
+        'Tracker': 'https://github.com/iic-jku/qcec/issues',
+        'Research': 'https://iic.jku.at/eda/research/quantum_verification',
+    },
+    python_requires='>=3',
+    setup_requires=['cmake>=3.10']
 )
