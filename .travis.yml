@@ -34,7 +34,7 @@ jobs:
       name: 'Build Ubuntu GCC'
       script:
         - cmake -B build -S .
-        - cmake --build build --target qcec --parallel 2
+        - cmake --build build --target qcec --parallel 8
 
     - <<: *build
       name: 'Build Ubuntu Clang-11'
@@ -56,14 +56,14 @@ jobs:
       os: windows
       script:
         - cmake -B build -S . -G "Visual Studio 15 2017" -A x64 -LA -DCMAKE_BUILD_TYPE='Release'
-        - cmake --build build --config 'Release' --target qcec --parallel 2
+        - cmake --build build --config 'Release' --target qcec --parallel 8
 
     - &test
       stage: test
       name: 'Test Ubuntu GCC'
       script:
         - cmake -B build -S . -DBUILD_QCEC_TESTS=ON -DGIT_SUBMODULE=OFF
-        - sudo cmake --build build --target install --parallel 2
+        - sudo cmake --build build --target install --parallel 8
         - cd build && ./qcec_test
 
     - <<: *test
@@ -86,15 +86,15 @@ jobs:
       os: windows
       script:
         - cmake -B build -S . -G "Visual Studio 15 2017" -A x64 -LA -DCMAKE_BUILD_TYPE='Release' -DBUILD_QCEC_TESTS=ON
-        - cmake --build build --config 'Release' --target INSTALL --parallel 2;
+        - cmake --build build --config 'Release' --target INSTALL --parallel 8;
         - cd build/test/Release && ./qcec_test.exe;
 
-    - stage: coverage
+    - <<: *test
       name: 'Coverage'
       before_install: sudo apt-get -y install lcov
       script:
         - cmake -B build -S . -DCMAKE_BUILD_TYPE='Debug' -DCOVERAGE=1 -DBUILD_QCEC_TESTS=ON
-        - cmake --build build --target qcec_test --parallel 2
+        - cmake --build build --target qcec_test --parallel 8
         - cd build && ./qcec_test
       after_success:
         - |
@@ -112,6 +112,8 @@ jobs:
       env:
         - TWINE_USERNAME=__token__
         # Note: TWINE_PASSWORD is set to a PyPI API token in Travis settings
+        - CIBW_MANYLINUX_X86_64_IMAGE="manylinux2014"
+        - CIBW_BEFORE_BUILD_LINUX="pip install cmake>=3.10"
         - CIBW_BUILD="cp3?-*"
         - CIBW_SKIP="*-win32 *-manylinux_i686"
         - CIBW_TEST_COMMAND="python -c \"from jkq import qcec\""
