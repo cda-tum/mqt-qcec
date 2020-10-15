@@ -1,0 +1,9 @@
+extraction:
+  cpp:
+    prepare:
+      packages:
+        - "cmake"
+    configure:
+      command: "cmake -S . -B build -DBUILD_QCEC_TESTS=ON -DGIT_SUBMODULE=OFF"
+    index:
+      build_command: "cmake --build build --parallel 4"
