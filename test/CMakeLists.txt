@@ -47,6 +47,9 @@ macro(package_add_test TESTNAME)
 	# link the Google test infrastructure, mocking library, and a default main fuction to
 	# the test executable.  Remove g_test_main if writing your own main function.
 	target_link_libraries(${TESTNAME} PRIVATE JKQ::${PROJECT_NAME} gmock gtest_main)
+	if (BUILD_QCEC_BINDINGS)
+		target_compile_options(${TESTNAME} PUBLIC -fvisibility=hidden)
+	endif ()
 	set_property(TARGET ${TESTNAME} PROPERTY CXX_EXTENSIONS OFF)
 	if (COVERAGE)
 		target_compile_options(${TESTNAME} PRIVATE --coverage)

@@ -90,7 +90,7 @@ This tool can either be used as a **standalone executable** with command-line in
   
 ### System requirements
 
-Building (and running) is continuously tested under Linux (Ubuntu 20.04) using gcc-9.3, gcc-10 and clang-11, MacOS (Catalina 10.15) using AppleClang and gcc-10, and Windows using MSVC 15.9. 
+Building (and running) is continuously tested under Linux (Ubuntu 20.04) using gcc-9.3 and clang-11, MacOS (Catalina 10.15) using AppleClang and gcc-10, and Windows using Microsoft Visual Studio 2017. 
 However, the implementation should be compatible with any current C++ compiler supporting C++14 and a minimum CMake version of 3.10.
 
 ### Configure, Build, and Install

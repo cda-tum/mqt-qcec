@@ -2,126 +2,74 @@ language: cpp
 os: linux
 dist: focal
 
+addons:
+  apt:
+    packages:
+      - cmake
+      - ninja-build
+  homebrew:
+    packages:
+      - gcc@10
+      - cmake
+      - ninja
+
 jobs:
   include:
-    - os: linux
-      dist: focal
-      compiler: "gcc"
-      env: BUILD='Debug' CC=gcc CXX=g++ COVERAGE=1 COV_EXE=gcov
-      addons:
-        apt:
-          packages:
-            - cmake
-            - ninja-build
-            - lcov
+    - compiler: gcc
 
-    - os: linux
-      dist: focal
-      compiler: "gcc"
-      env: BUILD='Release' CC=gcc CXX=g++ COVERAGE=0
-      addons:
-        apt:
-          packages:
-            - cmake
-            - ninja-build
-
-    - os: linux
-      dist: focal
-      compiler: "gcc"
-      env: BUILD='Release' CC=gcc-10 CXX=g++-10 COVERAGE=0
-      addons:
-        apt:
-          sources:
-            - sourceline: 'ppa:ubuntu-toolchain-r/test'
-          packages:
-            - cmake
-            - ninja-build
-            - gcc-10
-            - g++-10
-
-    - os: linux
-      dist: focal
-      compiler: "clang"
-      env: BUILD='Release' CC=clang-11 CXX=clang++-11 COVERAGE=0
+    - env: CC=clang-11 CXX=clang++-11
       addons:
         apt:
           sources:
             - sourceline: 'deb http://apt.llvm.org/focal/ llvm-toolchain-focal-11 main'
               key_url: 'https://apt.llvm.org/llvm-snapshot.gpg.key'
           packages:
+            - clang-11
             - cmake
             - ninja-build
-            - clang-11
 
     - os: osx
       osx_image: xcode12
-      compiler: "clang"
-      env: BUILD='Release' CC=clang CXX=clang++ COVERAGE=0
-      addons:
-        homebrew:
-          packages:
-            - cmake
-            - ninja
 
     - os: osx
       osx_image: xcode12
-      compiler: "gcc"
-      env: BUILD='Release' CC=gcc-10 CXX=g++-10 COVERAGE=0
-      addons:
-        homebrew:
-          packages:
-            - cmake
-            - ninja
-            - gcc@10
+      env: CC=gcc-10 CXX=g++-10
 
     - os: windows
-      env: BUILD='Release' CC=gcc CXX=g++ COVERAGE=0
+      script:
+        - cmake -B build -S . -G "Visual Studio 15 2017" -A x64 -LA -DCMAKE_BUILD_TYPE='Release' -DBUILD_QCEC_TESTS=ON -DGIT_SUBMODULE=OFF
+        - cmake --build build --config 'Release' --target INSTALL --parallel 2;
+        - cd build/test/Release && ./qcec_test.exe;
 
-install:
-  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then
-    export PATH="$(brew --prefix llvm)/bin:$PATH";
-    fi
-  - echo ${CC}
-  - echo ${CXX}
-  - ${CXX} --version
-  - cmake --version
+    - stage: coverage
+      before_install:
+        - sudo apt-get -y install lcov
+      script:
+        - cmake -B build -S . -G Ninja -DCMAKE_BUILD_TYPE='Debug' -DCOVERAGE=1 -DBUILD_QCEC_TESTS=ON -DGIT_SUBMODULE=OFF
+        - cmake --build build --target qcec_test;
+        - cd build && ./qcec_test
+      after_success:
+        - |
+          lcov --gcov-tool gcov --capture --directory . --base-directory . --output-file coverage.info
+          lcov --remove coverage.info '/usr/*' '*/extern/*' '*/EquivalenceCheckingResults*' --output-file coverage.info
+          lcov --list coverage.info
+          bash <(curl -s https://codecov.io/bash) -f coverage.info -t 7473cb74-fb9e-4c19-90b6-0b5aab6ccdfc || echo "Codecov did not collect coverage reports"
 
-before_script:
-  - mkdir -p build && cd build
-  - |
-    if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then
-      cmake .. -G "Visual Studio 15 2017" -A x64 -LA -DCMAKE_BUILD_TYPE=${BUILD} -DCOVERAGE=${COVERAGE} -DBUILD_QCEC_TESTS=ON
-    else
-      cmake .. -G Ninja -LA -DCMAKE_BUILD_TYPE=${BUILD} -DCOVERAGE=${COVERAGE} -DBUILD_QCEC_TESTS=ON -DBUILD_QCEC_BINDINGS=ON
-    fi
-  - |
-    if [ "$TRAVIS_OS_NAME" == "windows" ]; then
-      cmake --build . --config ${BUILD} --target INSTALL;
-    else
-      cmake --build . --config ${BUILD} --target qcec;
-      cmake --build . --config ${BUILD} --target qcec_example;
-      cmake --build . --config ${BUILD} --target qcec_test;
-      sudo cmake --build . --config ${BUILD} --target install;
-    fi
+#    - stage: deploy
+#      language: python
+#      python: 3.8
+#      install: pip install .
+#      script:
+#        - python -c "from jkq import qcec"
+#      deploy:
+#        provider: pypi
+#        username: __token__
+#        password:
+#          secure: "JPVi6JM4YId3E9gDTN6fBKEU4PB8Ow/3COyZB2di0AVWW9sj+finIIxGrMwefz6Vp0mVT6EZc6np3lxS48hvQ4oNKmaJjvfNkF+51akUcKTR2FZWzPl4C+Xs+r/V979u+v1UJJDbVX3fPo5yAQ/ftwEnQpluO1QcylA+mjim36R+OFQnF11ZCG8QXjkKIEYhxlWNXRcBX4AvEF1PGH7Jv0ckdPrcJ1rZ2R755PGi33q4fJsjG+0UbDhMQTHjbSt7dFAuGcDpwZueYsnZ18GNomFXSL3XsscaUld+dxOOlQyUYMCngXNqZJlLlSYkzPbkSzDF4HUJPvvURVfhhLrlB/0qoEFk+3OiKykj6vnViJbRcLbgNKDhkk5L9y+SaNgs+X9yDffuHusCDDX4iizELGAtdnsKOKilBqy/kfamczbNGVxETbHT+i131cYy2XKqndSrNEK1JXwAvd9oc+oH6BS1GA0xDtq4PgFwx/mlyy5Mw8pJNb/gpjeM/IrCx7FtTBlUj2wLieSmnQIJABFb+xPVBC5waBS3x6GfJjOEZiDTB6m+W3I2d8cANpYtgp/TZXYuTv4PlLOgbeUREmXWQ1bvFXEyCuU7BeR2G7BO9zjoO1gwhCjh6i4NALTgcgwhV7EUARvC9GM6zerznBS0diwxOC3+AI7sqw4Bvk933uw="
+#        distributions: sdist bdist_wheel
+#        skip_existing: true
+
 script:
-  - |
-    if [ "$TRAVIS_OS_NAME" == "windows" ]; then
-      cd test/${BUILD};
-      ./qcec_test.exe;
-      cd ../../;
-    else
-      cd test;
-      ./qcec_test;
-      cd ..;
-    fi
-
-after_success:
-  - |
-    if [[ -n "${COV_EXE}" ]]; then
-      # Create lcov report
-      lcov --gcov-tool ${COV_EXE} --capture --directory . --base-directory . --output-file coverage.info
-      lcov --remove coverage.info '/usr/*' '*/extern/*' '*/EquivalenceCheckingResults*' --output-file coverage.info # filter system-files
-      lcov --list coverage.info # debug info
-      # Uploading report to CodeCov
-      bash <(curl -s https://codecov.io/bash) -f coverage.info -t 7473cb74-fb9e-4c19-90b6-0b5aab6ccdfc || echo "Codecov did not collect coverage reports"
-    fi
+  - cmake -B build -S . -G Ninja -DCMAKE_BUILD_TYPE='Release' -DBUILD_QCEC_TESTS=ON -DGIT_SUBMODULE=OFF
+  - sudo cmake --build build --target install
+  - cd build && ./qcec_test
