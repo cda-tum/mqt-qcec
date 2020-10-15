@@ -14,7 +14,6 @@ stages:
 language: cpp
 os: linux
 dist: focal
-arch: arm64-graviton2
 group: edge
 virt: lxd
 addons:
@@ -24,10 +23,10 @@ addons:
         key_url: 'https://apt.llvm.org/llvm-snapshot.gpg.key'
     packages:
       - cmake
+      - clang-11
   homebrew:
     packages:
       - gcc@10
-    update: false
 
 jobs:
   include:
@@ -39,8 +38,14 @@ jobs:
         - cmake --build build --target qcec --parallel 8
 
     - <<: *build
+      name: 'Build ARM Ubuntu GCC'
+      arch: arm64-graviton2
+      addons:
+        apt: cmake
+
+    - <<: *build
       name: 'Build Ubuntu Clang'
-      before_script: CC=clang CXX=clang++
+      before_script: CC=clang-11 CXX=clang++-11
 
     - <<: *build
       name: 'Build MacOS Clang'
@@ -69,8 +74,14 @@ jobs:
         - cd build && ./qcec_test
 
     - <<: *test
+      name: 'Test ARM Ubuntu GCC'
+      arch: arm64-graviton2
+      addons:
+        apt: cmake
+
+    - <<: *test
       name: 'Test Ubuntu Clang'
-      before_script: CC=clang CXX=clang++
+      before_script: CC=clang-11 CXX=clang++-11
 
     - <<: *test
       name: 'Test MacOS Clang'
@@ -127,6 +138,12 @@ jobs:
             python3 -m twine upload --verbose --skip-existing wheelhouse/*.whl
           fi
       services: docker
+
+    - <<: *deploy
+      name: 'Deploy Ubuntu ARM'
+      arch: arm64-graviton2
+      addons:
+        apt: cmake
 
     - <<: *deploy
       name: 'Deploy MacOS'
