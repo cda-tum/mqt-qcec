@@ -6,8 +6,7 @@
 # each stage must pass before the next can be run
 stages:
     - build # build the main library actually works
-    - test # running unit tests
-    - coverage # creating coverage report
+    - test # running unit tests + coverage
     - deploy # deploying to pypi
 
 #defaults
@@ -134,6 +133,7 @@ jobs:
     - &deploy
       stage: deploy
       name: 'Deploy Ubuntu'
+      virt: vm
       language: python
       install: python3 -m pip install cibuildwheel==1.6.3
       script: python3 -m cibuildwheel --output-dir wheelhouse
@@ -157,6 +157,7 @@ jobs:
     - <<: *deploy
       name: 'Deploy Ubuntu ARM'
       arch: arm64-graviton2
+      virt: vm
 
     - <<: *deploy
       name: 'Deploy MacOS'
