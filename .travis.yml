@@ -14,6 +14,9 @@ stages:
 language: cpp
 os: linux
 dist: focal
+arch: arm64-graviton2
+group: edge
+virt: lxd
 addons:
   apt:
     sources:
