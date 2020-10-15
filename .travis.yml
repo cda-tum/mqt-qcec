@@ -24,7 +24,6 @@ addons:
         key_url: 'https://apt.llvm.org/llvm-snapshot.gpg.key'
     packages:
       - cmake
-      - clang-11
   homebrew:
     packages:
       - gcc@10
@@ -40,8 +39,8 @@ jobs:
         - cmake --build build --target qcec --parallel 8
 
     - <<: *build
-      name: 'Build Ubuntu Clang-11'
-      before_script: CC=clang-11 CXX=clang++-11
+      name: 'Build Ubuntu Clang'
+      before_script: CC=clang CXX=clang++
 
     - <<: *build
       name: 'Build MacOS Clang'
@@ -70,8 +69,8 @@ jobs:
         - cd build && ./qcec_test
 
     - <<: *test
-      name: 'Test Ubuntu Clang-11'
-      before_script: CC=clang-11 CXX=clang++-11
+      name: 'Test Ubuntu Clang'
+      before_script: CC=clang CXX=clang++
 
     - <<: *test
       name: 'Test MacOS Clang'
