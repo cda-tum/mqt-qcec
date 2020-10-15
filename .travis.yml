@@ -18,12 +18,8 @@ group: edge
 virt: lxd
 addons:
   apt:
-    sources:
-      - sourceline: 'deb http://apt.llvm.org/focal/ llvm-toolchain-focal-11 main'
-        key_url: 'https://apt.llvm.org/llvm-snapshot.gpg.key'
     packages:
       - cmake
-      - clang-11
   homebrew:
     packages:
       - gcc@10
@@ -40,14 +36,20 @@ jobs:
     - <<: *build
       name: 'Build ARM Ubuntu GCC'
       arch: arm64-graviton2
-      addons:
-        apt: cmake
       script:
         - cmake -B build -S . -DCMAKE_CXX_FLAGS="-march=armv8.2-a+fp16+rcpc+dotprod+crypto -mtune=neoverse-n1"
         - cmake --build build --target qcec --parallel 8
 
     - <<: *build
       name: 'Build Ubuntu Clang'
+      addons:
+        apt:
+          sources:
+            - sourceline: 'deb http://apt.llvm.org/focal/ llvm-toolchain-focal-11 main'
+              key_url:    'https://apt.llvm.org/llvm-snapshot.gpg.key'
+          packages:
+            - cmake
+            - clang-11
       before_script: CC=clang-11 CXX=clang++-11
 
     - <<: *build
@@ -79,8 +81,6 @@ jobs:
     - <<: *test
       name: 'Test ARM Ubuntu GCC'
       arch: arm64-graviton2
-      addons:
-        apt: cmake
       script:
         - cmake -B build -S . -DBUILD_QCEC_TESTS=ON -DGIT_SUBMODULE=OFF -DCMAKE_CXX_FLAGS="-march=armv8.2-a+fp16+rcpc+dotprod+crypto -mtune=neoverse-n1"
         - sudo cmake --build build --target install --parallel 8
@@ -88,6 +88,14 @@ jobs:
 
     - <<: *test
       name: 'Test Ubuntu Clang'
+      addons:
+        apt:
+          sources:
+            - sourceline: 'deb http://apt.llvm.org/focal/ llvm-toolchain-focal-11 main'
+              key_url:    'https://apt.llvm.org/llvm-snapshot.gpg.key'
+          packages:
+            - cmake
+            - clang-11
       before_script: CC=clang-11 CXX=clang++-11
 
     - <<: *test
@@ -133,7 +141,7 @@ jobs:
         - TWINE_USERNAME=__token__
         # Note: TWINE_PASSWORD is set to a PyPI API token in Travis settings
         - CIBW_MANYLINUX_X86_64_IMAGE="manylinux2014"
-        - CIBW_BEFORE_BUILD_LINUX="pip install cmake>=3.10; sudo apt-get install libssl-dev"
+        - CIBW_BEFORE_BUILD_LINUX="pip install cmake>=3.10; apt-get -y install libssl-dev"
         - CIBW_BUILD="cp3?-*"
         - CIBW_SKIP="*-win32 *-manylinux_i686"
         - CIBW_TEST_COMMAND="python -c \"from jkq import qcec\""
@@ -149,8 +157,6 @@ jobs:
     - <<: *deploy
       name: 'Deploy Ubuntu ARM'
       arch: arm64-graviton2
-      addons:
-        apt: cmake
 
     - <<: *deploy
       name: 'Deploy MacOS'
