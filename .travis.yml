@@ -141,7 +141,8 @@ jobs:
         - TWINE_USERNAME=__token__
         # Note: TWINE_PASSWORD is set to a PyPI API token in Travis settings
         - CIBW_MANYLINUX_X86_64_IMAGE="manylinux2014"
-        - CIBW_BEFORE_BUILD_LINUX="pip install cmake>=3.10; yum install openssl"
+        - CIBW_BEFORE_ALL_LINUX="yum install -y openssl-devel"
+        - CIBW_BEFORE_BUILD_LINUX="pip install cmake>=3.10"
         - CIBW_BUILD="cp3?-*"
         - CIBW_SKIP="*-win32 *-manylinux_i686"
         - CIBW_TEST_COMMAND="python -c \"from jkq import qcec\""
