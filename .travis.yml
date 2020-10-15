@@ -1,52 +1,100 @@
+###
+### This file is part of IIC-JKU QCEC library which is released under the MIT license.
+### See file README.md or go to http://iic.jku.at/eda/research/quantum_verification/ for more information.
+###
+
+# each stage must pass before the next can be run
+stages:
+    - build # build the main library actually works
+    - test # running unit tests
+    - coverage # creating coverage report
+    - deploy # deploying to pypi
+
+#defaults
 language: cpp
 os: linux
 dist: focal
-
 addons:
   apt:
+    sources:
+      - sourceline: 'deb http://apt.llvm.org/focal/ llvm-toolchain-focal-11 main'
+        key_url: 'https://apt.llvm.org/llvm-snapshot.gpg.key'
     packages:
       - cmake
-      - ninja-build
+      - clang-11
   homebrew:
     packages:
       - gcc@10
-      - cmake
-      - ninja
+    update: false
 
 jobs:
   include:
-    - compiler: gcc
-
-    - env: CC=clang-11 CXX=clang++-11
-      addons:
-        apt:
-          sources:
-            - sourceline: 'deb http://apt.llvm.org/focal/ llvm-toolchain-focal-11 main'
-              key_url: 'https://apt.llvm.org/llvm-snapshot.gpg.key'
-          packages:
-            - clang-11
-            - cmake
-            - ninja-build
-
-    - os: osx
-      osx_image: xcode12
-
-    - os: osx
-      osx_image: xcode12
-      env: CC=gcc-10 CXX=g++-10
-
-    - os: windows
+    - &build
+      stage: build
+      name: 'Build Ubuntu GCC'
       script:
-        - cmake -B build -S . -G "Visual Studio 15 2017" -A x64 -LA -DCMAKE_BUILD_TYPE='Release' -DBUILD_QCEC_TESTS=ON -DGIT_SUBMODULE=OFF
+        - cmake -B build -S .
+        - cmake --build build --target qcec --parallel 2
+
+    - <<: *build
+      name: 'Build Ubuntu Clang-11'
+      before_script: CC=clang-11 CXX=clang++-11
+
+    - <<: *build
+      name: 'Build MacOS Clang'
+      os: osx
+      osx_image: xcode12
+
+    - <<: *build
+      name: 'Build MacOS GCC-10'
+      os: osx
+      osx_image: xcode12
+      before_script: CC=gcc-10 CXX=g++-10
+
+    - <<: *build
+      name: 'Build Windows'
+      os: windows
+      script:
+        - cmake -B build -S . -G "Visual Studio 15 2017" -A x64 -LA -DCMAKE_BUILD_TYPE='Release'
+        - cmake --build build --config 'Release' --target qcec --parallel 2
+
+    - &test
+      stage: test
+      name: 'Test Ubuntu GCC'
+      script:
+        - cmake -B build -S . -DBUILD_QCEC_TESTS=ON -DGIT_SUBMODULE=OFF
+        - sudo cmake --build build --target install --parallel 2
+        - cd build && ./qcec_test
+
+    - <<: *test
+      name: 'Test Ubuntu Clang-11'
+      before_script: CC=clang-11 CXX=clang++-11
+
+    - <<: *test
+      name: 'Test MacOS Clang'
+      os: osx
+      osx_image: xcode12
+
+    - <<: *test
+      name: 'Test MacOS GCC-10'
+      os: osx
+      osx_image: xcode12
+      before_script: CC=gcc-10 CXX=g++-10
+
+    - <<: *test
+      name: 'Test Windows'
+      os: windows
+      script:
+        - cmake -B build -S . -G "Visual Studio 15 2017" -A x64 -LA -DCMAKE_BUILD_TYPE='Release' -DBUILD_QCEC_TESTS=ON
         - cmake --build build --config 'Release' --target INSTALL --parallel 2;
         - cd build/test/Release && ./qcec_test.exe;
 
     - stage: coverage
-      before_install:
-        - sudo apt-get -y install lcov
+      name: 'Coverage'
+      before_install: sudo apt-get -y install lcov
       script:
-        - cmake -B build -S . -G Ninja -DCMAKE_BUILD_TYPE='Debug' -DCOVERAGE=1 -DBUILD_QCEC_TESTS=ON -DGIT_SUBMODULE=OFF
-        - cmake --build build --target qcec_test;
+        - cmake -B build -S . -DCMAKE_BUILD_TYPE='Debug' -DCOVERAGE=1 -DBUILD_QCEC_TESTS=ON
+        - cmake --build build --target qcec_test --parallel 2
         - cd build && ./qcec_test
       after_success:
         - |
@@ -55,21 +103,39 @@ jobs:
           lcov --list coverage.info
           bash <(curl -s https://codecov.io/bash) -f coverage.info -t 7473cb74-fb9e-4c19-90b6-0b5aab6ccdfc || echo "Codecov did not collect coverage reports"
 
-#    - stage: deploy
-#      language: python
-#      python: 3.8
-#      install: pip install .
-#      script:
-#        - python -c "from jkq import qcec"
-#      deploy:
-#        provider: pypi
-#        username: __token__
-#        password:
-#          secure: "JPVi6JM4YId3E9gDTN6fBKEU4PB8Ow/3COyZB2di0AVWW9sj+finIIxGrMwefz6Vp0mVT6EZc6np3lxS48hvQ4oNKmaJjvfNkF+51akUcKTR2FZWzPl4C+Xs+r/V979u+v1UJJDbVX3fPo5yAQ/ftwEnQpluO1QcylA+mjim36R+OFQnF11ZCG8QXjkKIEYhxlWNXRcBX4AvEF1PGH7Jv0ckdPrcJ1rZ2R755PGi33q4fJsjG+0UbDhMQTHjbSt7dFAuGcDpwZueYsnZ18GNomFXSL3XsscaUld+dxOOlQyUYMCngXNqZJlLlSYkzPbkSzDF4HUJPvvURVfhhLrlB/0qoEFk+3OiKykj6vnViJbRcLbgNKDhkk5L9y+SaNgs+X9yDffuHusCDDX4iizELGAtdnsKOKilBqy/kfamczbNGVxETbHT+i131cYy2XKqndSrNEK1JXwAvd9oc+oH6BS1GA0xDtq4PgFwx/mlyy5Mw8pJNb/gpjeM/IrCx7FtTBlUj2wLieSmnQIJABFb+xPVBC5waBS3x6GfJjOEZiDTB6m+W3I2d8cANpYtgp/TZXYuTv4PlLOgbeUREmXWQ1bvFXEyCuU7BeR2G7BO9zjoO1gwhCjh6i4NALTgcgwhV7EUARvC9GM6zerznBS0diwxOC3+AI7sqw4Bvk933uw="
-#        distributions: sdist bdist_wheel
-#        skip_existing: true
+    - &deploy
+      stage: deploy
+      name: 'Deploy Ubuntu'
+      language: python
+      install: python3 -m pip install cibuildwheel==1.6.3
+      script: python3 -m cibuildwheel --output-dir wheelhouse
+      env:
+        - TWINE_USERNAME=__token__
+        # Note: TWINE_PASSWORD is set to a PyPI API token in Travis settings
+        - CIBW_TEST_COMMAND="python3 -c \"from jkq import qcec\""
+        - CC=gcc CXX=g++
+      after_success:
+        - |
+          if [[ $TRAVIS_TAG ]]; then
+            python3 -m pip install twine
+            python3 -m twine upload --verbose --skip-existing wheelhouse/*.whl
+          fi
+      services: docker
 
-script:
-  - cmake -B build -S . -G Ninja -DCMAKE_BUILD_TYPE='Release' -DBUILD_QCEC_TESTS=ON -DGIT_SUBMODULE=OFF
-  - sudo cmake --build build --target install
-  - cd build && ./qcec_test
+    - <<: *deploy
+      name: 'Deploy MacOS'
+      os: osx
+      osx_image: xcode12
+      language: shell
+      services: # docker not available on MacOS
+
+    - <<: *deploy
+      name: 'Deploy Windows'
+      os: windows
+      language: shell
+      services: # docker not available on Windows
+      before_install:
+        - choco install python --version 3.8.0
+        - export PATH="/c/Python38:/c/Python38/Scripts:$PATH"
+        # make sure it's on PATH as 'python3'
+        - ln -s /c/Python38/python.exe /c/Python38/python3.exe
