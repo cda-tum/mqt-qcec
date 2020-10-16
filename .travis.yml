@@ -1,5 +1,5 @@
 ###
-### This file is part of IIC-JKU QCEC library which is released under the MIT license.
+### This file is part of JKQ QCEC library which is released under the MIT license.
 ### See file README.md or go to http://iic.jku.at/eda/research/quantum_verification/ for more information.
 ###
 
@@ -29,18 +29,16 @@ jobs:
       stage: build
       name: 'Build Ubuntu GCC'
       script:
-        - cmake -B build -S .
+        - cmake -B build -S . -DGIT_SUBMODULE=OFF
         - cmake --build build --target qcec --parallel 8
 
     - <<: *build
       name: 'Build ARM Ubuntu GCC'
       arch: arm64-graviton2
-      script:
-        - cmake -B build -S . -DCMAKE_CXX_FLAGS="-march=armv8.2-a+fp16+rcpc+dotprod+crypto -mtune=neoverse-n1"
-        - cmake --build build --target qcec --parallel 8
 
     - <<: *build
       name: 'Build Ubuntu Clang'
+      compiler: clang-11
       addons:
         apt:
           sources:
@@ -49,7 +47,7 @@ jobs:
           packages:
             - cmake
             - clang-11
-      before_script: CC=clang-11 CXX=clang++-11
+      #before_script: CC=clang-11 CXX=clang++-11
 
     - <<: *build
       name: 'Build MacOS Clang'
@@ -60,13 +58,14 @@ jobs:
       name: 'Build MacOS GCC-10'
       os: osx
       osx_image: xcode12
-      before_script: CC=gcc-10 CXX=g++-10
+      compiler: gcc-10
+      #before_script: CC=gcc-10 CXX=g++-10
 
     - <<: *build
       name: 'Build Windows'
       os: windows
       script:
-        - cmake -B build -S . -G "Visual Studio 15 2017" -A x64 -LA -DCMAKE_BUILD_TYPE='Release'
+        - cmake -B build -S . -G "Visual Studio 15 2017" -A x64 -LA -DCMAKE_BUILD_TYPE='Release' -DGIT_SUBMODULE=OFF
         - cmake --build build --config 'Release' --target qcec --parallel 8
 
     - &test
@@ -80,10 +79,6 @@ jobs:
     - <<: *test
       name: 'Test ARM Ubuntu GCC'
       arch: arm64-graviton2
-      script:
-        - cmake -B build -S . -DBUILD_QCEC_TESTS=ON -DGIT_SUBMODULE=OFF -DCMAKE_CXX_FLAGS="-march=armv8.2-a+fp16+rcpc+dotprod+crypto -mtune=neoverse-n1"
-        - sudo cmake --build build --target install --parallel 8
-        - cd build && ./qcec_test
 
     - <<: *test
       name: 'Test Ubuntu Clang'
@@ -95,7 +90,8 @@ jobs:
           packages:
             - cmake
             - clang-11
-      before_script: CC=clang-11 CXX=clang++-11
+      compiler: clang-11
+      #before_script: CC=clang-11 CXX=clang++-11
 
     - <<: *test
       name: 'Test MacOS Clang'
@@ -106,13 +102,14 @@ jobs:
       name: 'Test MacOS GCC-10'
       os: osx
       osx_image: xcode12
-      before_script: CC=gcc-10 CXX=g++-10
+      compiler: gcc-10
+      #before_script: CC=gcc-10 CXX=g++-10
 
     - <<: *test
       name: 'Test Windows'
       os: windows
       script:
-        - cmake -B build -S . -G "Visual Studio 15 2017" -A x64 -LA -DCMAKE_BUILD_TYPE='Release' -DBUILD_QCEC_TESTS=ON
+        - cmake -B build -S . -G "Visual Studio 15 2017" -A x64 -LA -DCMAKE_BUILD_TYPE='Release' -DBUILD_QCEC_TESTS=ON -DGIT_SUBMODULE=OFF
         - cmake --build build --config 'Release' --target INSTALL --parallel 8;
         - cd build/test/Release && ./qcec_test.exe;
 
@@ -121,7 +118,7 @@ jobs:
       arch: arm64-graviton2
       before_install: sudo apt-get -y install lcov
       script:
-        - cmake -B build -S . -DCMAKE_BUILD_TYPE='Debug' -DCOVERAGE=1 -DBUILD_QCEC_TESTS=ON
+        - cmake -B build -S . -DCMAKE_BUILD_TYPE='Debug' -DCOVERAGE=1 -DBUILD_QCEC_TESTS=ON -DGIT_SUBMODULE=OFF
         - cmake --build build --target qcec_test --parallel 8
         - cd build && ./qcec_test
       after_success:
@@ -174,5 +171,4 @@ jobs:
       before_install:
         - choco install python --version 3.8.0
         - export PATH="/c/Python38:/c/Python38/Scripts:$PATH"
-        # make sure it's on PATH as 'python3'
         - ln -s /c/Python38/python.exe /c/Python38/python3.exe
