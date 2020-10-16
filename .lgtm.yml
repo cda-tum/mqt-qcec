@@ -1,3 +1,15 @@
+path_classifiers:
+  test:
+    - test
+    - src/extern/qfr/test
+    - src/extern/qfr/extern/dd_package/test
+    - src/extern/qfr/extern/dd_package/extern/googletest
+    - src/scripts
+  library:
+    - src/extern/json
+    - src/extern/pybind11
+    - src/extern/pybind11_json
+
 extraction:
   cpp:
     prepare:
@@ -6,10 +18,4 @@ extraction:
     configure:
       command: "cmake -S . -B build -DBUILD_QCEC_TESTS=ON -DGIT_SUBMODULE=OFF"
     index:
-      filters:
-        - exclude: "src/extern/qfr/extern/dd_package/extern/googletest/*"
-        - exclude: "src/extern/json/*"
-        - exclude: "src/extern/pybind11/*"
-        - exclude: "src/extern/pybind11_json/*"
-        - exclude: "src/scripts/*"
       build_command: "cmake --build build --parallel 4"
