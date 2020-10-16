@@ -118,6 +118,7 @@ jobs:
 
     - <<: *test
       name: 'Coverage'
+      arch: arm64-graviton2
       before_install: sudo apt-get -y install lcov
       script:
         - cmake -B build -S . -DCMAKE_BUILD_TYPE='Debug' -DCOVERAGE=1 -DBUILD_QCEC_TESTS=ON
@@ -133,7 +134,6 @@ jobs:
     - &deploy
       stage: deploy
       name: 'Deploy Ubuntu'
-      virt: vm
       language: python
       install: python3 -m pip install cibuildwheel==1.6.3
       script: python3 -m cibuildwheel --output-dir wheelhouse
@@ -141,7 +141,7 @@ jobs:
         - TWINE_USERNAME=__token__
         # Note: TWINE_PASSWORD is set to a PyPI API token in Travis settings
         - CIBW_MANYLINUX_X86_64_IMAGE="manylinux2014"
-        - CIBW_BEFORE_ALL_LINUX="yum install -y openssl-devel"
+        - CIBW_BEFORE_ALL_LINUX="yum install libtool perl-core zlib-devel -y; curl -O -L https://github.com/openssl/openssl/archive/OpenSSL_1_1_1h.tar.gz; tar -zxvf OpenSSL_1_1_1h.tar.gz; cd openssl-OpenSSL_1_1_1h; ./config --prefix=/usr/local/openssl --openssldir=/usr/local/openssl shared zlib; make; make install; echo \"/usr/local/openssl/lib\" >> /etc/ld.so.conf.d/openssl-1.1.1h.conf; ldconfig -v"
         - CIBW_BEFORE_BUILD_LINUX="pip install cmake>=3.10"
         - CIBW_BUILD="cp3?-*"
         - CIBW_SKIP="*-win32 *-manylinux_i686"
@@ -158,7 +158,6 @@ jobs:
     - <<: *deploy
       name: 'Deploy Ubuntu ARM'
       arch: arm64-graviton2
-      virt: vm
 
     - <<: *deploy
       name: 'Deploy MacOS'
