@@ -1,31 +1,27 @@
 ###
-### This file is part of IIC-JKU QCEC library which is released under the MIT license.
+### This file is part of JKQ QCEC library which is released under the MIT license.
 ### See file README.md or go to http://iic.jku.at/eda/research/quantum_verification/ for more information.
 ###
 
 # each stage must pass before the next can be run
 stages:
     - build # build the main library actually works
-    - test # running unit tests
-    - coverage # creating coverage report
+    - test # running unit tests + coverage
     - deploy # deploying to pypi
 
 #defaults
 language: cpp
 os: linux
 dist: focal
+group: edge
+virt: lxd
 addons:
   apt:
-    sources:
-      - sourceline: 'deb http://apt.llvm.org/focal/ llvm-toolchain-focal-11 main'
-        key_url: 'https://apt.llvm.org/llvm-snapshot.gpg.key'
     packages:
       - cmake
-      - clang-11
   homebrew:
     packages:
       - gcc@10
-    update: false
 
 jobs:
   include:
@@ -33,11 +29,23 @@ jobs:
       stage: build
       name: 'Build Ubuntu GCC'
       script:
-        - cmake -B build -S .
+        - cmake -B build -S . -DGIT_SUBMODULE=OFF
         - cmake --build build --target qcec --parallel 8
 
     - <<: *build
-      name: 'Build Ubuntu Clang-11'
+      name: 'Build ARM Ubuntu GCC'
+      arch: arm64-graviton2
+
+    - <<: *build
+      name: 'Build Ubuntu Clang'
+      addons:
+        apt:
+          sources:
+            - sourceline: 'deb http://apt.llvm.org/focal/ llvm-toolchain-focal-11 main'
+              key_url:    'https://apt.llvm.org/llvm-snapshot.gpg.key'
+          packages:
+            - cmake
+            - clang-11
       before_script: CC=clang-11 CXX=clang++-11
 
     - <<: *build
@@ -55,7 +63,7 @@ jobs:
       name: 'Build Windows'
       os: windows
       script:
-        - cmake -B build -S . -G "Visual Studio 15 2017" -A x64 -LA -DCMAKE_BUILD_TYPE='Release'
+        - cmake -B build -S . -G "Visual Studio 15 2017" -A x64 -LA -DCMAKE_BUILD_TYPE='Release' -DGIT_SUBMODULE=OFF
         - cmake --build build --config 'Release' --target qcec --parallel 8
 
     - &test
@@ -67,7 +75,19 @@ jobs:
         - cd build && ./qcec_test
 
     - <<: *test
-      name: 'Test Ubuntu Clang-11'
+      name: 'Test ARM Ubuntu GCC'
+      arch: arm64-graviton2
+
+    - <<: *test
+      name: 'Test Ubuntu Clang'
+      addons:
+        apt:
+          sources:
+            - sourceline: 'deb http://apt.llvm.org/focal/ llvm-toolchain-focal-11 main'
+              key_url:    'https://apt.llvm.org/llvm-snapshot.gpg.key'
+          packages:
+            - cmake
+            - clang-11
       before_script: CC=clang-11 CXX=clang++-11
 
     - <<: *test
@@ -85,15 +105,16 @@ jobs:
       name: 'Test Windows'
       os: windows
       script:
-        - cmake -B build -S . -G "Visual Studio 15 2017" -A x64 -LA -DCMAKE_BUILD_TYPE='Release' -DBUILD_QCEC_TESTS=ON
+        - cmake -B build -S . -G "Visual Studio 15 2017" -A x64 -LA -DCMAKE_BUILD_TYPE='Release' -DBUILD_QCEC_TESTS=ON -DGIT_SUBMODULE=OFF
         - cmake --build build --config 'Release' --target INSTALL --parallel 8;
         - cd build/test/Release && ./qcec_test.exe;
 
     - <<: *test
       name: 'Coverage'
+      arch: arm64-graviton2
       before_install: sudo apt-get -y install lcov
       script:
-        - cmake -B build -S . -DCMAKE_BUILD_TYPE='Debug' -DCOVERAGE=1 -DBUILD_QCEC_TESTS=ON
+        - cmake -B build -S . -DCMAKE_BUILD_TYPE='Debug' -DCOVERAGE=1 -DBUILD_QCEC_TESTS=ON -DGIT_SUBMODULE=OFF
         - cmake --build build --target qcec_test --parallel 8
         - cd build && ./qcec_test
       after_success:
@@ -106,6 +127,7 @@ jobs:
     - &deploy
       stage: deploy
       name: 'Deploy Ubuntu'
+      virt: vm
       language: python
       install: python3 -m pip install cibuildwheel==1.6.3
       script: python3 -m cibuildwheel --output-dir wheelhouse
@@ -113,9 +135,10 @@ jobs:
         - TWINE_USERNAME=__token__
         # Note: TWINE_PASSWORD is set to a PyPI API token in Travis settings
         - CIBW_MANYLINUX_X86_64_IMAGE="manylinux2014"
-        - CIBW_BEFORE_BUILD_LINUX="pip install cmake>=3.10"
+        - CIBW_MANYLINUX_AARCH64_IMAGE="manylinux2014"
         - CIBW_BUILD="cp3?-*"
         - CIBW_SKIP="*-win32 *-manylinux_i686"
+        - CIBW_BUILD_VERBOSITY=1
         - CIBW_TEST_COMMAND="python -c \"from jkq import qcec\""
         - CC=gcc CXX=g++
       after_success:
@@ -127,19 +150,20 @@ jobs:
       services: docker
 
     - <<: *deploy
+      name: 'Deploy Ubuntu ARM'
+      arch: arm64-graviton2
+
+    - <<: *deploy
       name: 'Deploy MacOS'
       os: osx
       osx_image: xcode12
       language: shell
-      services: # docker not available on MacOS
 
     - <<: *deploy
       name: 'Deploy Windows'
       os: windows
       language: shell
-      services: # docker not available on Windows
       before_install:
         - choco install python --version 3.8.0
         - export PATH="/c/Python38:/c/Python38/Scripts:$PATH"
-        # make sure it's on PATH as 'python3'
         - ln -s /c/Python38/python.exe /c/Python38/python3.exe
