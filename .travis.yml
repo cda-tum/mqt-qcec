@@ -25,111 +25,111 @@ addons:
 
 jobs:
   include:
-    - &build
-      stage: build
-      name: 'Build Ubuntu GCC'
-      script:
-        - cmake -B build -S .
-        - cmake --build build --target qcec --parallel 8
-
-    - <<: *build
-      name: 'Build ARM Ubuntu GCC'
-      arch: arm64-graviton2
-      script:
-        - cmake -B build -S . -DCMAKE_CXX_FLAGS="-march=armv8.2-a+fp16+rcpc+dotprod+crypto -mtune=neoverse-n1"
-        - cmake --build build --target qcec --parallel 8
-
-    - <<: *build
-      name: 'Build Ubuntu Clang'
-      addons:
-        apt:
-          sources:
-            - sourceline: 'deb http://apt.llvm.org/focal/ llvm-toolchain-focal-11 main'
-              key_url:    'https://apt.llvm.org/llvm-snapshot.gpg.key'
-          packages:
-            - cmake
-            - clang-11
-      before_script: CC=clang-11 CXX=clang++-11
-
-    - <<: *build
-      name: 'Build MacOS Clang'
-      os: osx
-      osx_image: xcode12
-
-    - <<: *build
-      name: 'Build MacOS GCC-10'
-      os: osx
-      osx_image: xcode12
-      before_script: CC=gcc-10 CXX=g++-10
-
-    - <<: *build
-      name: 'Build Windows'
-      os: windows
-      script:
-        - cmake -B build -S . -G "Visual Studio 15 2017" -A x64 -LA -DCMAKE_BUILD_TYPE='Release'
-        - cmake --build build --config 'Release' --target qcec --parallel 8
-
-    - &test
-      stage: test
-      name: 'Test Ubuntu GCC'
-      script:
-        - cmake -B build -S . -DBUILD_QCEC_TESTS=ON -DGIT_SUBMODULE=OFF
-        - sudo cmake --build build --target install --parallel 8
-        - cd build && ./qcec_test
-
-    - <<: *test
-      name: 'Test ARM Ubuntu GCC'
-      arch: arm64-graviton2
-      script:
-        - cmake -B build -S . -DBUILD_QCEC_TESTS=ON -DGIT_SUBMODULE=OFF -DCMAKE_CXX_FLAGS="-march=armv8.2-a+fp16+rcpc+dotprod+crypto -mtune=neoverse-n1"
-        - sudo cmake --build build --target install --parallel 8
-        - cd build && ./qcec_test
-
-    - <<: *test
-      name: 'Test Ubuntu Clang'
-      addons:
-        apt:
-          sources:
-            - sourceline: 'deb http://apt.llvm.org/focal/ llvm-toolchain-focal-11 main'
-              key_url:    'https://apt.llvm.org/llvm-snapshot.gpg.key'
-          packages:
-            - cmake
-            - clang-11
-      before_script: CC=clang-11 CXX=clang++-11
-
-    - <<: *test
-      name: 'Test MacOS Clang'
-      os: osx
-      osx_image: xcode12
-
-    - <<: *test
-      name: 'Test MacOS GCC-10'
-      os: osx
-      osx_image: xcode12
-      before_script: CC=gcc-10 CXX=g++-10
-
-    - <<: *test
-      name: 'Test Windows'
-      os: windows
-      script:
-        - cmake -B build -S . -G "Visual Studio 15 2017" -A x64 -LA -DCMAKE_BUILD_TYPE='Release' -DBUILD_QCEC_TESTS=ON
-        - cmake --build build --config 'Release' --target INSTALL --parallel 8;
-        - cd build/test/Release && ./qcec_test.exe;
-
-    - <<: *test
-      name: 'Coverage'
-      arch: arm64-graviton2
-      before_install: sudo apt-get -y install lcov
-      script:
-        - cmake -B build -S . -DCMAKE_BUILD_TYPE='Debug' -DCOVERAGE=1 -DBUILD_QCEC_TESTS=ON
-        - cmake --build build --target qcec_test --parallel 8
-        - cd build && ./qcec_test
-      after_success:
-        - |
-          lcov --gcov-tool gcov --capture --directory . --base-directory . --output-file coverage.info
-          lcov --remove coverage.info '/usr/*' '*/extern/*' '*/EquivalenceCheckingResults*' --output-file coverage.info
-          lcov --list coverage.info
-          bash <(curl -s https://codecov.io/bash) -f coverage.info -t 7473cb74-fb9e-4c19-90b6-0b5aab6ccdfc || echo "Codecov did not collect coverage reports"
+#    - &build
+#      stage: build
+#      name: 'Build Ubuntu GCC'
+#      script:
+#        - cmake -B build -S .
+#        - cmake --build build --target qcec --parallel 8
+#
+#    - <<: *build
+#      name: 'Build ARM Ubuntu GCC'
+#      arch: arm64-graviton2
+#      script:
+#        - cmake -B build -S . -DCMAKE_CXX_FLAGS="-march=armv8.2-a+fp16+rcpc+dotprod+crypto -mtune=neoverse-n1"
+#        - cmake --build build --target qcec --parallel 8
+#
+#    - <<: *build
+#      name: 'Build Ubuntu Clang'
+#      addons:
+#        apt:
+#          sources:
+#            - sourceline: 'deb http://apt.llvm.org/focal/ llvm-toolchain-focal-11 main'
+#              key_url:    'https://apt.llvm.org/llvm-snapshot.gpg.key'
+#          packages:
+#            - cmake
+#            - clang-11
+#      before_script: CC=clang-11 CXX=clang++-11
+#
+#    - <<: *build
+#      name: 'Build MacOS Clang'
+#      os: osx
+#      osx_image: xcode12
+#
+#    - <<: *build
+#      name: 'Build MacOS GCC-10'
+#      os: osx
+#      osx_image: xcode12
+#      before_script: CC=gcc-10 CXX=g++-10
+#
+#    - <<: *build
+#      name: 'Build Windows'
+#      os: windows
+#      script:
+#        - cmake -B build -S . -G "Visual Studio 15 2017" -A x64 -LA -DCMAKE_BUILD_TYPE='Release'
+#        - cmake --build build --config 'Release' --target qcec --parallel 8
+#
+#    - &test
+#      stage: test
+#      name: 'Test Ubuntu GCC'
+#      script:
+#        - cmake -B build -S . -DBUILD_QCEC_TESTS=ON -DGIT_SUBMODULE=OFF
+#        - sudo cmake --build build --target install --parallel 8
+#        - cd build && ./qcec_test
+#
+#    - <<: *test
+#      name: 'Test ARM Ubuntu GCC'
+#      arch: arm64-graviton2
+#      script:
+#        - cmake -B build -S . -DBUILD_QCEC_TESTS=ON -DGIT_SUBMODULE=OFF -DCMAKE_CXX_FLAGS="-march=armv8.2-a+fp16+rcpc+dotprod+crypto -mtune=neoverse-n1"
+#        - sudo cmake --build build --target install --parallel 8
+#        - cd build && ./qcec_test
+#
+#    - <<: *test
+#      name: 'Test Ubuntu Clang'
+#      addons:
+#        apt:
+#          sources:
+#            - sourceline: 'deb http://apt.llvm.org/focal/ llvm-toolchain-focal-11 main'
+#              key_url:    'https://apt.llvm.org/llvm-snapshot.gpg.key'
+#          packages:
+#            - cmake
+#            - clang-11
+#      before_script: CC=clang-11 CXX=clang++-11
+#
+#    - <<: *test
+#      name: 'Test MacOS Clang'
+#      os: osx
+#      osx_image: xcode12
+#
+#    - <<: *test
+#      name: 'Test MacOS GCC-10'
+#      os: osx
+#      osx_image: xcode12
+#      before_script: CC=gcc-10 CXX=g++-10
+#
+#    - <<: *test
+#      name: 'Test Windows'
+#      os: windows
+#      script:
+#        - cmake -B build -S . -G "Visual Studio 15 2017" -A x64 -LA -DCMAKE_BUILD_TYPE='Release' -DBUILD_QCEC_TESTS=ON
+#        - cmake --build build --config 'Release' --target INSTALL --parallel 8;
+#        - cd build/test/Release && ./qcec_test.exe;
+#
+#    - <<: *test
+#      name: 'Coverage'
+#      arch: arm64-graviton2
+#      before_install: sudo apt-get -y install lcov
+#      script:
+#        - cmake -B build -S . -DCMAKE_BUILD_TYPE='Debug' -DCOVERAGE=1 -DBUILD_QCEC_TESTS=ON
+#        - cmake --build build --target qcec_test --parallel 8
+#        - cd build && ./qcec_test
+#      after_success:
+#        - |
+#          lcov --gcov-tool gcov --capture --directory . --base-directory . --output-file coverage.info
+#          lcov --remove coverage.info '/usr/*' '*/extern/*' '*/EquivalenceCheckingResults*' --output-file coverage.info
+#          lcov --list coverage.info
+#          bash <(curl -s https://codecov.io/bash) -f coverage.info -t 7473cb74-fb9e-4c19-90b6-0b5aab6ccdfc || echo "Codecov did not collect coverage reports"
 
     - &deploy
       stage: deploy
@@ -141,7 +141,8 @@ jobs:
         - TWINE_USERNAME=__token__
         # Note: TWINE_PASSWORD is set to a PyPI API token in Travis settings
         - CIBW_MANYLINUX_X86_64_IMAGE="manylinux2014"
-        - CIBW_BEFORE_ALL_LINUX="yum install libtool perl-core zlib-devel -y; curl -O -L https://github.com/openssl/openssl/archive/OpenSSL_1_1_1h.tar.gz; tar -zxvf OpenSSL_1_1_1h.tar.gz; cd openssl-OpenSSL_1_1_1h; ./config --prefix=/usr/local/openssl --openssldir=/usr/local/openssl shared zlib; make; make install; echo \"/usr/local/openssl/lib\" >> /etc/ld.so.conf.d/openssl-1.1.1h.conf; ldconfig -v"
+        - CIBW_MANYLINUX_AARCH64_IMAGE="manylinux2014"
+        #- CIBW_BEFORE_ALL_LINUX="yum install libtool perl-core zlib-devel -y; curl -O -L https://github.com/openssl/openssl/archive/OpenSSL_1_1_1h.tar.gz; tar -zxvf OpenSSL_1_1_1h.tar.gz; cd openssl-OpenSSL_1_1_1h; ./config --prefix=/usr/local/openssl --openssldir=/usr/local/openssl shared zlib; make; make install; echo \"/usr/local/openssl/lib\" >> /etc/ld.so.conf.d/openssl-1.1.1h.conf; ldconfig -v"
         - CIBW_BEFORE_BUILD_LINUX="pip install cmake>=3.10"
         - CIBW_BUILD="cp3?-*"
         - CIBW_SKIP="*-win32 *-manylinux_i686"
@@ -159,20 +160,20 @@ jobs:
       name: 'Deploy Ubuntu ARM'
       arch: arm64-graviton2
 
-    - <<: *deploy
-      name: 'Deploy MacOS'
-      os: osx
-      osx_image: xcode12
-      language: shell
-      services: # docker not available on MacOS
-
-    - <<: *deploy
-      name: 'Deploy Windows'
-      os: windows
-      language: shell
-      services: # docker not available on Windows
-      before_install:
-        - choco install python --version 3.8.0
-        - export PATH="/c/Python38:/c/Python38/Scripts:$PATH"
-        # make sure it's on PATH as 'python3'
-        - ln -s /c/Python38/python.exe /c/Python38/python3.exe
+#    - <<: *deploy
+#      name: 'Deploy MacOS'
+#      os: osx
+#      osx_image: xcode12
+#      language: shell
+#      services: # docker not available on MacOS
+#
+#    - <<: *deploy
+#      name: 'Deploy Windows'
+#      os: windows
+#      language: shell
+#      services: # docker not available on Windows
+#      before_install:
+#        - choco install python --version 3.8.0
+#        - export PATH="/c/Python38:/c/Python38/Scripts:$PATH"
+#        # make sure it's on PATH as 'python3'
+#        - ln -s /c/Python38/python.exe /c/Python38/python3.exe
