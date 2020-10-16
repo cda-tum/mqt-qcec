@@ -63,7 +63,7 @@ with open(README_PATH) as readme_file:
 
 setup(
     name='jkq.qcec',
-    version='1.5.0a1',
+    version='1.5.0b1',
     author='Lukas Burgholzer',
     author_email='lukas.burgholzer@jku.at',
     description='JKQ QCEC - A JKQ tool for Quantum Circuit Equivalence Checking',
@@ -76,7 +76,7 @@ setup(
     zip_safe=False,
     packages=find_packages(),
     classifiers=[
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 4 - Beta',
         "Programming Language :: Python :: 3",
         "Programming Language :: C++",
         "License :: OSI Approved :: MIT License",

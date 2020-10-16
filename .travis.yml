@@ -138,6 +138,7 @@ jobs:
         - CIBW_MANYLINUX_AARCH64_IMAGE="manylinux2014"
         - CIBW_BUILD="cp3?-*"
         - CIBW_SKIP="*-win32 *-manylinux_i686"
+        - CIBW_BUILD_VERBOSITY=1
         - CIBW_TEST_COMMAND="python -c \"from jkq import qcec\""
         - CC=gcc CXX=g++
       after_success:
@@ -157,13 +158,11 @@ jobs:
       os: osx
       osx_image: xcode12
       language: shell
-      #services: # docker not available on MacOS
 
     - <<: *deploy
       name: 'Deploy Windows'
       os: windows
       language: shell
-      #services: # docker not available on Windows
       before_install:
         - choco install python --version 3.8.0
         - export PATH="/c/Python38:/c/Python38/Scripts:$PATH"
