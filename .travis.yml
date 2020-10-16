@@ -143,9 +143,9 @@ jobs:
         # Note: TWINE_PASSWORD is set to a PyPI API token in Travis settings
         - CIBW_MANYLINUX_X86_64_IMAGE="manylinux2014"
         - CIBW_MANYLINUX_AARCH64_IMAGE="manylinux2014"
-        - CIBW_BEFORE_ALL_LINUX="yum install -y cmake libtool perl-core zlib-devel; curl -O -L https://github.com/openssl/openssl/archive/OpenSSL_1_1_1h.tar.gz; tar -zxvf OpenSSL_1_1_1h.tar.gz; cd openssl-OpenSSL_1_1_1h; ./config shared zlib; make; make install_sw install_ssldirs; ln -s /usr/local/ssl/lib/libssl.so.1.1 /lib64/libssl.so.1.1; ln -s /usr/local/ssl/lib/libcrypto.so.1.1 /lib64/libcrypto.so.1.1;"
+        - CIBW_BEFORE_ALL_LINUX="yum install -y cmake libtool"
+        #- CIBW_BEFORE_ALL_LINUX="yum install -y cmake libtool perl-core; curl -O -L https://github.com/openssl/openssl/archive/OpenSSL_1_1_1h.tar.gz; tar -zxvf OpenSSL_1_1_1h.tar.gz; cd openssl-OpenSSL_1_1_1h; ./config no-tests no-fips; make; make install_sw install_ssldirs > /dev/null; ln -s /usr/local/ssl/lib/libssl.so.1.1 /lib64/libssl.so.1.1; ln -s /usr/local/ssl/lib/libcrypto.so.1.1 /lib64/libcrypto.so.1.1;"
         #- CIBW_BEFORE_BUILD_LINUX="pip install cmake>=3.16"
-        - CIBW_BEFORE_BUILD="cmake --version"
         - CIBW_BUILD_VERBOSITY=3
         - CIBW_BUILD="cp3?-*"
         - CIBW_SKIP="*-win32 *-manylinux_i686"
