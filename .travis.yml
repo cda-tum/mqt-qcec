@@ -38,7 +38,6 @@ jobs:
 
     - <<: *build
       name: 'Build Ubuntu Clang'
-      compiler: clang-11
       addons:
         apt:
           sources:
@@ -47,7 +46,7 @@ jobs:
           packages:
             - cmake
             - clang-11
-      #before_script: CC=clang-11 CXX=clang++-11
+      before_script: CC=clang-11 CXX=clang++-11
 
     - <<: *build
       name: 'Build MacOS Clang'
@@ -58,8 +57,7 @@ jobs:
       name: 'Build MacOS GCC-10'
       os: osx
       osx_image: xcode12
-      compiler: gcc-10
-      #before_script: CC=gcc-10 CXX=g++-10
+      before_script: CC=gcc-10 CXX=g++-10
 
     - <<: *build
       name: 'Build Windows'
@@ -90,8 +88,7 @@ jobs:
           packages:
             - cmake
             - clang-11
-      compiler: clang-11
-      #before_script: CC=clang-11 CXX=clang++-11
+      before_script: CC=clang-11 CXX=clang++-11
 
     - <<: *test
       name: 'Test MacOS Clang'
@@ -102,8 +99,7 @@ jobs:
       name: 'Test MacOS GCC-10'
       os: osx
       osx_image: xcode12
-      compiler: gcc-10
-      #before_script: CC=gcc-10 CXX=g++-10
+      before_script: CC=gcc-10 CXX=g++-10
 
     - <<: *test
       name: 'Test Windows'
@@ -161,13 +157,13 @@ jobs:
       os: osx
       osx_image: xcode12
       language: shell
-      services: # docker not available on MacOS
+      #services: # docker not available on MacOS
 
     - <<: *deploy
       name: 'Deploy Windows'
       os: windows
       language: shell
-      services: # docker not available on Windows
+      #services: # docker not available on Windows
       before_install:
         - choco install python --version 3.8.0
         - export PATH="/c/Python38:/c/Python38/Scripts:$PATH"
