@@ -70,7 +70,7 @@ setup(
     long_description=README,
     long_description_content_type="text/markdown",
     license="MIT",
-    url="https://github.com/iic-jku/qcec",
+    url="https://iic.jku.at/eda/research/quantum_verification",
     ext_modules=[CMakeExtension('pyqcec')],
     cmdclass=dict(build_ext=CMakeBuild),
     zip_safe=False,

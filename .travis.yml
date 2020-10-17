@@ -144,7 +144,9 @@ jobs:
       after_success:
         - |
           if [[ $TRAVIS_TAG ]]; then
+            python3 setup.py sdist
             python3 -m pip install twine
+            python3 -m twine upload --verbose --skip-existing dist/*
             python3 -m twine upload --verbose --skip-existing wheelhouse/*.whl
           fi
       services: docker

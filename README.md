@@ -7,7 +7,7 @@
 
 # JKQ QCEC - A JKQ tool for **Q**uantum **C**ircuit **E**quivalence **C**hecking
 
-A JKQ tool for quantum circuit equivalence checking by the [Institute for Integrated Circuits](http://iic.jku.at/eda/) at the [Johannes Kepler University Linz](https://jku.at) based on methods proposed in [[1]](https://arxiv.org/abs/2004.08420), [[2]](https://arxiv.org/abs/2009.02376). 
+A JKQ tool for Quantum Circuit Equivalence Checking by the [Institute for Integrated Circuits](http://iic.jku.at/eda/) at the [Johannes Kepler University Linz](https://jku.at) based on methods proposed in [[1]](https://arxiv.org/abs/2004.08420), [[2]](https://arxiv.org/abs/2009.02376). 
 
 [[1]](https://arxiv.org/abs/2004.08420) L. Burgholzer and R. Wille. **"Advanced Equivalence Checking for Quantum Circuits"**. IEEE Transactions on Computer Aided Design of Integrated Circuits and Systems (TCAD), 2021 (pre-print [arXiv:2004.08420](https://arxiv.org/abs/2004.08420))
 
