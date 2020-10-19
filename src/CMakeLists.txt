@@ -31,7 +31,7 @@ set_target_properties(${PROJECT_NAME} PROPERTIES CXX_EXTENSIONS OFF)
 option(TRY_USING_INSTALLED_QFR_LIBRARY "Attempt searching for installed version of QFR library and use it if found" OFF)
 
 if (TRY_USING_INSTALLED_QFR_LIBRARY)
-	find_package(qfr 1.0 QUIET)
+	find_package(qfr 1.1.0 QUIET)
 	if (qfr_FOUND)
 		message(STATUS "using installed QFR library")
 	else()
