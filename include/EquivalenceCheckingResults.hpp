@@ -232,21 +232,26 @@ namespace ec {
 		virtual std::ostream& printCSVEntry(std::ostream& out) {
 			if (error())
 				return out;
-			out << name1 << ";" << nqubits1 << ";" << ngates1 << ";" << name2 << ";" << nqubits2 << ";" << ngates2 << ";" << toString(expected) << ";" << toString(equivalence) << ";" << toString(method) << ";";
-			if (timeout) {
-				out << "TO";
-			} else {
-				out << time ;
-			}
-			out << ";" << maxActive;
-			if (nsims > 0) {
-				out << ";" << nsims;
-			} else {
-				out << ";-";
-			}
-
-			out << std::endl;
+			out << produceCSVEntry() << std::endl;
 			return out;
+		}
+		virtual std::string produceCSVEntry() {
+			if (error())
+				return "";
+			std::stringstream ss{};
+			ss << name1 << ";" << nqubits1 << ";" << ngates1 << ";" << name2 << ";" << nqubits2 << ";" << ngates2 << ";" << toString(expected) << ";" << toString(equivalence) << ";" << toString(method) << ";";
+			if (timeout) {
+				ss << "TO";
+			} else {
+				ss << time ;
+			}
+			ss << ";" << maxActive;
+			if (nsims > 0) {
+				ss << ";" << nsims;
+			} else {
+				ss << ";-";
+			}
+			return ss.str();
 		}
 	};
 }

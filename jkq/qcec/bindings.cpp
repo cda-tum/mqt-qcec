@@ -93,7 +93,11 @@ nl::json verify(const py::object& instance) {
 		return {"error", ss.str()};
 	}
 
-	return ec->results.produceJSON(config.printStatistics);
+	auto result = ec->results.produceJSON(config.printStatistics);
+	if (config.printCSV)
+		result["csv"] = ec->results.produceCSVEntry();
+
+	return result;
 }
 
 PYBIND11_MODULE(pyqcec, m) {
