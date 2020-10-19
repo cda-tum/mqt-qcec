@@ -15,6 +15,17 @@ namespace ec {
 
 		auto start = std::chrono::high_resolution_clock::now();
 
+		qc::CircuitOptimizer::swapGateFusion(qc1);
+		qc::CircuitOptimizer::swapGateFusion(qc2);
+
+		qc::CircuitOptimizer::singleQubitGateFusion(qc1);
+		qc::CircuitOptimizer::singleQubitGateFusion(qc2);
+
+		if (config.removeDiagonalGatesBeforeMeasure) {
+			qc::CircuitOptimizer::removeDiagonalGatesBeforeMeasure(qc1);
+			qc::CircuitOptimizer::removeDiagonalGatesBeforeMeasure(qc2);
+		}
+
 		#if DEBUG_MODE_EC
 		std::cout << "QC1: ";
 		qc1->printRegisters();

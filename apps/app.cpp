@@ -14,25 +14,30 @@
 #include "PowerOfSimulationEquivalenceChecker.hpp"
 
 void show_usage(const std::string& name) {
-	std::cerr << "Usage: " << name << " <PATH_TO_FILE_1> <PATH_TO_FILE_2> (--method <method>)               " << std::endl;
-	std::cerr << "Supported file formats:                                                                   " << std::endl;
-	std::cerr << "  .real                                                                                   " << std::endl;
-	std::cerr << "  .qasm                                                                                   " << std::endl;
-	std::cerr << "  .tfc                                                                                    " << std::endl;
-	std::cerr << "  .qc                                                                                     " << std::endl;
-	std::cerr << "Available methods:                                                                        " << std::endl;
-	std::cerr << "  reference                                                                               " << std::endl;
-	std::cerr << "  naive                                                                                   " << std::endl;
-	std::cerr << "  proportional (default)                                                                  " << std::endl;
-	std::cerr << "  lookahead                                                                               " << std::endl;
-	std::cerr << "  simulation                                                                              " << std::endl;
-	std::cerr << "  compilationflow                                                                         " << std::endl;
-	std::cerr << "Options:                                                                                  " << std::endl;
-	std::cerr << "  --ps:                           Print statistics                                        " << std::endl;
-	std::cerr << "  --csv:                          Print results as csv string                             " << std::endl;
-	std::cerr << "  --tol e (default 1e-13):        Numerical tolerance used during computation             " << std::endl;
-	std::cerr << "  --nsims r (default 16):         Number of simulations to conduct (for simulation method)" << std::endl;
-	std::cerr << "  --fid F (default 0.999):        Fidelity limit for comparison (for simulation method)   " << std::endl;
+	std::cerr << "Usage: " << name << " <PATH_TO_FILE_1> <PATH_TO_FILE_2> (--method <method>)                       " << std::endl;
+	std::cerr << "Supported file formats:                                                                           " << std::endl;
+	std::cerr << "  .real                                                                                           " << std::endl;
+	std::cerr << "  .qasm                                                                                           " << std::endl;
+	std::cerr << "  .tfc                                                                                            " << std::endl;
+	std::cerr << "  .qc                                                                                             " << std::endl;
+	std::cerr << "Available methods:                                                                                " << std::endl;
+	std::cerr << "  reference                                                                                       " << std::endl;
+	std::cerr << "  naive                                                                                           " << std::endl;
+	std::cerr << "  proportional (default)                                                                          " << std::endl;
+	std::cerr << "  lookahead                                                                                       " << std::endl;
+	std::cerr << "  simulation                                                                                      " << std::endl;
+	std::cerr << "  compilationflow                                                                                 " << std::endl;
+	std::cerr << "Result Options:                                                                                   " << std::endl;
+	std::cerr << "  --ps:                                   Print statistics                                        " << std::endl;
+	std::cerr << "  --csv:                                  Print results as csv string                             " << std::endl;
+	std::cerr << "Verification Parameters:                                                                          " << std::endl;
+	std::cerr << "  --tol e (default 1e-13):                Numerical tolerance used during computation             " << std::endl;
+	std::cerr << "  --nsims r (default 16):                 Number of simulations to conduct (for simulation method)" << std::endl;
+	std::cerr << "  --fid F (default 0.999):                Fidelity limit for comparison (for simulation method)   " << std::endl;
+	std::cerr << "Optimization Options:                                                                             " << std::endl;
+	std::cerr << "  --swapGateFusion:                       reconstruct SWAP operations                             " << std::endl;
+	std::cerr << "  --singleQubitGateFusion:                fuse consecutive single qubit gates                     " << std::endl;
+	std::cerr << "  --removeDiagonalGatesBeforeMeasure:     remove diagonal gates before measurements               " << std::endl;
 }
 
 int main(int argc, char** argv){
@@ -141,6 +146,12 @@ int main(int argc, char** argv){
 					show_usage(argv[0]);
 					return 1;
 				}
+			} else if (cmd == "--swapGateFusion") {
+				config.swapGateFusion = true;
+			} else if (cmd == "--singleQubitGateFusion") {
+				config.singleQubitGateFusion = true;
+			} else if (cmd == "--removeDiagonalGatesBeforeMeasure") {
+				config.removeDiagonalGatesBeforeMeasure = true;
 			} else {
 				show_usage(argv[0]);
 				return 1;

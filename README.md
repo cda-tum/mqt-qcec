@@ -1,9 +1,10 @@
-[![Build Status](https://travis-ci.com/iic-jku/qcec.svg?branch=master)](https://travis-ci.com/iic-jku/qcec)
-[![codecov](https://codecov.io/gh/iic-jku/qcec/branch/master/graph/badge.svg)](https://codecov.io/gh/iic-jku/qcec)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![arXiv](https://img.shields.io/static/v1?label=arXiv&message=2004.08420&color=inactive)](https://arxiv.org/abs/2004.08420)
-[![arXiv](https://img.shields.io/static/v1?label=arXiv&message=2009.02376&color=inactive)](https://arxiv.org/abs/2009.02376)
-[![toolset: JKQ](https://img.shields.io/badge/toolset-JKQ-blue)](https://github.com/iic-jku/jkq)
+[![PyPI](https://img.shields.io/pypi/v/jkq.qcec?logo=pypi&style=plastic)](https://pypi.org/project/jkq.qcec/)
+[![Travis (.com) branch](https://img.shields.io/travis/com/iic-jku/qcec/master?logo=travis&style=plastic)](https://travis-ci.com/iic-jku/qcec)
+[![Codecov branch](https://img.shields.io/codecov/c/github/iic-jku/qcec/master?label=codecov&logo=codecov&style=plastic)](https://codecov.io/gh/iic-jku/qcec)
+![GitHub](https://img.shields.io/github/license/iic-jku/qcec?style=plastic)
+[![arXiv](https://img.shields.io/static/v1?label=arXiv&message=2004.08420&color=inactive&style=plastic)](https://arxiv.org/abs/2004.08420)
+[![arXiv](https://img.shields.io/static/v1?label=arXiv&message=2009.02376&color=inactive&style=plastic)](https://arxiv.org/abs/2009.02376)
+[![toolset: JKQ](https://img.shields.io/badge/toolset-JKQ-blue?style=plastic)](https://github.com/iic-jku/jkq)
 
 # JKQ QCEC - A JKQ tool for **Q**uantum **C**ircuit **E**quivalence **C**hecking
 
@@ -34,59 +35,93 @@ If you have any questions, feel free to contact us via [iic-quantum@jku.at](mail
 
 ## Usage
 
-This tool can either be used as a **standalone executable** with command-line interface, or as a **library** for the incorporation in other projects. [Python bindings](#python-bindings) are available since version 1.4.5. 
-- The standalone executable is launched in the following way:
-    ```commandline
-    qcec_app <PATH_TO_FILE_1> <PATH_TO_FILE_2> (--method <method>)
+JKQ QCEC is mainly developed as a C++ library with a [commandline interface](#command-line-executable). However, using it in Python is as easy as
+```bash
+pip install jkq.qcec
+```
+and then in Python
+```python
+from jkq import qcec
+qcec.verify(...)
+```
+where the `verify` function is defined as follows:
+```python
+"""
+Interface to the JKQ QCEC tool for verifying quantum circuits
+
+Params:
+    file1 – Path to first file (required)
+    file2 – Path to second file (required)
+    method – Equivalence checking method to use (reference | naive | *proportional* | lookahead | simulation | compilation flow)
+    tolerance – Numerical tolerance used during computation
+    nsims – Number of simulations to conduct (for simulation method)
+    fidelity – Fidelity limit for comparison (for simulation method)
+    csv – Create CSV string for result
+    statistics – Print statistics
+    swapGateFusion – Optimization pass reconstructing SWAP operations
+    singleQubitGateFusion – Optimization pass fusing consecutive single qubit gates
+    removeDiagonalGatesBeforeMeasure – Optimization pass removing diagonal gates before measurements
+Returns:
+    JSON object containing results
+"""
+def verify(file1: Union[str, bytes, PathLike],
+            file2: Union[str, bytes, PathLike],
+            method: Method = Method.proportional,
+            tolerance: float = 1e-13,
+            nsims: int = 16,
+            fidelity: float = 0.999,
+            csv: bool = False,
+            statistics: bool = False,
+            swapGateFusion: bool = False,
+            singleQubitGateFusion: bool = False,
+            removeDiagonalGatesBeforeMeasure: bool = False) -> object
+```
+### Command-line Executable
+JKQ QCEC also provides a **standalone executable** with command-line interface called `qcec_app`.
+It provides the same options as the Python module as flags (e.g., `--ps` for printing statistics, or `--method <method>`for setting the method). Per default, this produces JSON formatted output.
+If the `--csv` flag is present, a CSV entry according to the following header is printed
+```csv
+filename1;nqubits1;ngates1;filename2;nqubits2;ngates2;expectedEquivalent;equivalent;method;time;maxActive;nsims
+```
+For a full list of options, call `qcec_app --help`.
+
+### Library Organisation
+Internally the JKQ QCEC library works in the following way
+- Import both input files into a `qc::QuantumComputation` object
+    ```c++
+    std::string file1 = "<PATH_TO_FILE_1>";
+    qc::QuantumComputation qc1(file1);
+    
+    std::string file2 = "<PATH_TO_FILE_2>";
+    qc::QuantumComputation qc2(file2);
     ```
-  where *\<method\>* is one of
-   - reference
-   - naive
-   - proportional (**default**)
-   - lookahead 
-   - simulation
-   - compilationflow
-  
-  An optional parameter ```--tol e``` allows to specify the numerical tolerance *e* (default: *1e-13*) used during the computation.   
-  The ```simulation``` method has two optional parameters ```--nsims r``` and ```--fid F```, controlling the maximum number of simulations *r* (default: *16*) and the considered fidelity limit *F* (default *0.999*), respectively.
-      
-   The executable performs the equivalence check and prints its result to the standard output. Per default, this produces JSON formatted output. Additional statistics (e.g., verification time, maximum number of nodes, required simulations, etc.) can be obtained by additionally providing the `--ps` flag.
-  If the `--csv` flag is present, a CSV entry according to the following header is printed
-    ```csv
-   filename1;nqubits1;ngates1;filename2;nqubits2;ngates2;expectedEquivalent;equivalent;method;time;maxActive;nsims
-   ```
-   
-- Internally the library works in the following way
-    - Import both input files into a `qc::QuantumComputation` object
-        ```c++
-        std::string file1 = "<PATH_TO_FILE_1>";
-        qc::QuantumComputation qc1(file1);
-        
-        std::string file2 = "<PATH_TO_FILE_2>";
-        qc::QuantumComputation qc2(file2);
-        ```
-    - Instantiate an `ec::EquivalenceChecker` object with both circuits
-        ```c++
-        ec::Method method = ec::{ Reference | Naive | Proportional | Lookahead };
-        auto eq = ec::ImprovedDDEquivalenceChecker(qc1, qc2, method);
-        ```
-        or 
-        ```c++ 
-        auto eq = ec::PowerOfSimulationEquivalenceChecker(qc1, qc2);
-        ```
-        or 
-        ```c++ 
-        auto eq = ec::CompilationFlowEquivalenceChecker(qc1, qc2);
-        ```
-    - Perform the actual equivalence check
-        ```c++
-        eq.check();
-        ```
-    - Print the results
-        ```c++
-        eq.printResult();
-        ```
-        or access them through the ```eq.results``` member.
+- Instantiate an `ec::EquivalenceChecker` object with both circuits
+    ```c++
+    ec::Method method = ec::{ Reference | Naive | Proportional | Lookahead };
+    auto eq = ec::ImprovedDDEquivalenceChecker(qc1, qc2, method);
+    ```
+    or 
+    ```c++ 
+    auto eq = ec::PowerOfSimulationEquivalenceChecker(qc1, qc2);
+    ```
+    or 
+    ```c++ 
+    auto eq = ec::CompilationFlowEquivalenceChecker(qc1, qc2);
+    ```
+- Set configuration options, e.g.,
+    ```c++
+    ec::Configuration config{};
+    config.printStatistics = true;
+    ```
+- Perform the actual equivalence check
+    ```c++
+    eq.check(config);
+    ```
+- Print the results
+    ```c++
+    ec.printJSONResult(config.printStatistics);
+    ```
+    or access them through the ```eq.results``` member.
   
 ### System requirements
 
@@ -131,28 +166,6 @@ In order to build the library execute the following in the project's main direct
     find_package(qcec)
     target_link_libraries(${TARGET_NAME} PRIVATE JKQ::qcec)
     ```
-
-### Python Bindings
-
-Running `pip install .` in the main project directory creates Python bindings for the JKQ QCEC tool. Then, using it in Python is as simple as:
-```python
-from jkq import qcec
-qcec.verify({"file1": "<PATH_TO_FILE_1>", "file2:": "<PATH_TO_FILE_2>"})
-```
-The full list of parameters as described in [Usage](#usage) which can be passed to `qcec.verify(...)` as a Python dictionary, are:
-```python
-instance = {
-    "file1":  "<PATH_TO_FILE_1>", # required
-    "file2":  "<PATH_TO_FILE_2>", # required
-    "method": "proportional",
-    "tolerance": 1e-13,
-    "nsims": 16,
-    "fidelity": 0.999,
-    "statistics": False,
-    "csv": False,
-}
-```
-
 
 ## Reference
 

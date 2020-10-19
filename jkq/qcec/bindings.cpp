@@ -14,48 +14,50 @@ namespace py = pybind11;
 namespace nl = nlohmann;
 using namespace pybind11::literals;
 
-
-nl::json verify(const py::object& instance) {
+// private c++ binding function (json) -> json
+nl::json _verify(const nl::json& instance) {
 	if (!instance.contains("file1") || !instance.contains("file2")) {
-		return {"error", R"("file1" and "file2" need to be specified in config)"};
+		return {{"error", R"("file1" and "file2" need to be specified in config)"}};
 	}
-	std::string file1 = instance["file1"].cast<std::string>();
-	std::string file2 = instance["file2"].cast<std::string>();
+	std::string file1 = instance["file1"].get<std::string>();
+	std::string file2 = instance["file2"].get<std::string>();
 
 	ec::Configuration config{};
 	ec::Method method = ec::Proportional;
 	if (instance.contains("method")) {
-		try {
-			method = instance["method"].cast<ec::Method>();
-		} catch(std::exception const& e) {
-			try {
-				nl::from_json(instance["method"].cast<std::string>(), method);
-			} catch(std::exception const& e) {
-				std::stringstream ss{};
-				ss << "Could not parse method: " << e.what();
-				return {"error", ss.str()};
-			}
-		}
+		nl::from_json(instance["method"].get<std::string>(), method);
 	}
 
 	if (instance.contains("tolerance")) {
-		config.tolerance = instance["tolerance"].cast<fp>();
+		config.tolerance = instance["tolerance"].get<fp>();
 	}
 
 	if (instance.contains("nsims")) {
-		config.max_sims = instance["nsims"].cast<unsigned long long>();
+		config.max_sims = instance["nsims"].get<unsigned long long>();
 	}
 
 	if (instance.contains("fidelity")) {
-		config.fidelity_limit = instance["fidelity"].cast<fp>();
+		config.fidelity_limit = instance["fidelity"].get<fp>();
 	}
 
 	if (instance.contains("csv")) {
-		config.printCSV = instance["csv"].cast<bool>();
+		config.printCSV = instance["csv"].get<bool>();
 	}
 
 	if (instance.contains("statistics")) {
-		config.printStatistics = instance["statistics"].cast<bool>();
+		config.printStatistics = instance["statistics"].get<bool>();
+	}
+
+	if (instance.contains("swapGateFusion")) {
+		config.swapGateFusion = instance["swapGateFusion"].get<bool>();
+	}
+
+	if (instance.contains("singleQubitGateFusion")) {
+		config.singleQubitGateFusion = instance["singleQubitGateFusion"].get<bool>();
+	}
+
+	if (instance.contains("removeDiagonalGatesBeforeMeasure")) {
+		config.removeDiagonalGatesBeforeMeasure = instance["removeDiagonalGatesBeforeMeasure"].get<bool>();
 	}
 
 	qc::QuantumComputation qc1;
@@ -67,7 +69,7 @@ nl::json verify(const py::object& instance) {
 	} catch (std::exception const& e) {
 		std::stringstream ss{};
 		ss << "Could not import input files: " << e.what();
-		return {"error", ss.str()};
+		return {{"error", ss.str()}};
 	}
 
 	std::unique_ptr<ec::EquivalenceChecker> ec;
@@ -82,7 +84,7 @@ nl::json verify(const py::object& instance) {
 	} catch (std::exception const& e) {
 		std::stringstream ss{};
 		ss << "Could not construct equivalence checker: " << e.what();
-		return {"error", ss.str()};
+		return {{"error", ss.str()}};
 	}
 	ec->expectNothing();
 	try {
@@ -90,7 +92,7 @@ nl::json verify(const py::object& instance) {
 	} catch (std::exception const& e) {
 		std::stringstream ss{};
 		ss << "Error during equivalence check: " << e.what();
-		return {"error", ss.str()};
+		return {{"error", ss.str()}};
 	}
 
 	auto result = ec->results.produceJSON(config.printStatistics);
@@ -103,7 +105,7 @@ nl::json verify(const py::object& instance) {
 PYBIND11_MODULE(pyqcec, m) {
 	m.doc() = "pybind11 for the JKQ QCEC quantum circuit equivalence checking tool";
 	m.attr("__name__") = "jkq.qcec";
-	m.def("verify", &verify, "verify the equivalence of two circuits");
+	m.def("_verify", &_verify, "verify the equivalence of two circuits");
 
 	py::enum_<ec::Method>(m, "Method")
 	        .value("reference", ec::Method::Reference)

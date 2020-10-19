@@ -11,7 +11,6 @@
 #include <utility>
 
 #include "ImprovedDDEquivalenceChecker.hpp"
-#include "CircuitOptimizer.hpp"
 
 namespace ec {
 	using CostFunction = std::function<unsigned short(const qc::OpType&, unsigned short)>;
@@ -25,11 +24,6 @@ namespace ec {
 	public:
 		CompilationFlowEquivalenceChecker(qc::QuantumComputation& qc1, qc::QuantumComputation& qc2, CostFunction  costFunction = IBMCostFunction): ImprovedDDEquivalenceChecker(qc1, qc2), costFunction(std::move(costFunction)) {
 			method = results.method = CompilationFlow;
-			qc::CircuitOptimizer::swapGateFusion(qc1);
-			qc::CircuitOptimizer::singleGateFusion(qc1);
-
-			qc::CircuitOptimizer::swapGateFusion(qc2);
-			qc::CircuitOptimizer::singleGateFusion(qc2);
 		}
 
 		void check(const Configuration& config) override;

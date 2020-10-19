@@ -11,6 +11,7 @@
 #include <chrono>
 
 #include "QuantumComputation.hpp"
+#include "CircuitOptimizer.hpp"
 #include "EquivalenceCheckingResults.hpp"
 
 #define DEBUG_MODE_EC 0
@@ -22,6 +23,11 @@ namespace ec {
 		bool printCSV = false;
 		bool printStatistics = false;
 		fp tolerance = CN::TOLERANCE;
+
+		// configuration options for optimizations
+		bool singleQubitGateFusion = false;
+		bool swapGateFusion = false;
+		bool removeDiagonalGatesBeforeMeasure = false;
 
 		// configuration options for PowerOfSimulation equivalence checker
 		double fidelity_limit = 0.999;

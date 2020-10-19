@@ -63,7 +63,7 @@ with open(README_PATH) as readme_file:
 
 setup(
     name='jkq.qcec',
-    version='1.5.0b1',
+    version='1.5.0',
     author='Lukas Burgholzer',
     author_email='lukas.burgholzer@jku.at',
     description='JKQ QCEC - A JKQ tool for Quantum Circuit Equivalence Checking',
@@ -74,9 +74,9 @@ setup(
     ext_modules=[CMakeExtension('pyqcec')],
     cmdclass=dict(build_ext=CMakeBuild),
     zip_safe=False,
-    packages=find_namespace_packages(),
+    packages=find_namespace_packages(include=['jkq.*']),
     classifiers=[
-        'Development Status :: 4 - Beta',
+        'Development Status :: 5 - Production/Stable',
         "Programming Language :: Python :: 3",
         "Programming Language :: C++",
         "License :: OSI Approved :: MIT License",
@@ -93,6 +93,6 @@ setup(
         'Tracker': 'https://github.com/iic-jku/qcec/issues',
         'Research': 'https://iic.jku.at/eda/research/quantum_verification',
     },
-    python_requires='>=3',
+    python_requires='>=3.6',
     setup_requires=['cmake>=3.10']
 )
