@@ -1,21 +1,23 @@
 path_classifiers:
   test:
     - test
-    - src/extern/qfr/test
-    - src/extern/qfr/extern/dd_package/test
-    - src/extern/qfr/extern/dd_package/extern/googletest
-    - src/scripts
+    - extern/qfr/test
+    - extern/qfr/extern/dd_package/test
+    - scripts
   library:
-    - src/extern/json
-    - src/extern/pybind11
-    - src/extern/pybind11_json
+    - extern/qfr/extern/dd_package/extern/googletest
+    - extern/json
+    - extern/pybind11
+    - extern/pybind11_json
 
 extraction:
   cpp:
     prepare:
       packages:
-        - "cmake"
+        - cmake
     configure:
-      command: "cmake -S . -B build -DGIT_SUBMODULE=OFF"
+      command:
+        - cmake -S . -B build -DGIT_SUBMODULE=OFF -DBUILD_QCEC_TESTS=ON -DBUILD_QFR_TESTS=ON -DBUILD_DD_PACKAGE_TESTS=ON
     index:
-      build_command: "cmake --build build --parallel 4"
+      build_command:
+        - cmake --build build --parallel 4
