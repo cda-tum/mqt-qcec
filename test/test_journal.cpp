@@ -24,7 +24,7 @@ protected:
 	std::string test_original_dir = "./circuits/original/";
 	std::string test_transpiled_dir = "./circuits/transpiled/";
 
-	unsigned short tries = 20;
+	unsigned short tries = 10;
 
 	double min_time = 0.;
 	double max_time = 0.;
@@ -110,22 +110,23 @@ INSTANTIATE_TEST_SUITE_P(Journal, JournalTestNonEQ,
 				                         "pcler8_248",
 				                         "5xp1_194",
 				                         "alu1_198",
-				                         "mlp4_245",
+//				                         "mlp4_245",
 				                         "dk17_224",
 //				                         "add6_196",
-				                         "C7552_205",
+//				                         "C7552_205",
 				                         "cu_219",
-				                         "example2_231",
+//				                         "example2_231",
 				                         "c2_181",
 				                         "rd73_312",
-				                         "cm150a_210",
+//				                         "cm150a_210",
 				                         "cm163a_213",
 				                         "c2_182",
 				                         "sym9_317",
 				                         "mod5adder_306",
-				                         "rd84_313",
-				                         "cm151a_211",
-				                         "apla_203"),
+				                         "rd84_313"
+//				                         "cm151a_211",
+//				                         "apla_203"
+				                         ),
 		                         testing::Range(static_cast<unsigned short>(1), static_cast<unsigned short>(4), 2)),
                          [](const testing::TestParamInfo<JournalTestNonEQ::ParamType>& info) {
 	                         std::string name = std::get<0>(info.param);
@@ -201,7 +202,7 @@ protected:
 
 	std::string transpiled_file{};
 
-	int timeout = 60;
+	int timeout = 50;
 
 	void SetUp() override {
 		std::stringstream ss{};
@@ -220,8 +221,8 @@ INSTANTIATE_TEST_SUITE_P(Journal, JournalTestEQ,
 				                         "dk27_225",
 				                         "pcler8_248",
 				                         "5xp1_194",
-				                         "alu1_198",
-				                         "mlp4_245"
+				                         "alu1_198"
+				                         //"mlp4_245"
 				                         //"dk17_224",
 				                         //"add6_196",
 				                         //"C7552_205",

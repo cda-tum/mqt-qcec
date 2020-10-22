@@ -195,7 +195,7 @@ namespace ec {
 			auto atEnd = opIt;
 			bool onlyMeasurementsRemaining = true;
 			while (atEnd != end) {
-				if (op->getType() != qc::Measure) {
+				if ((*atEnd)->getType() != qc::Measure) {
 					onlyMeasurementsRemaining = false;
 					break;
 				}
@@ -373,87 +373,6 @@ namespace ec {
 		}
 
 		return true;
-	}
-
-	void EquivalenceChecker::augmentQubits(qc::QuantumComputation& circuit_to_augment, qc::QuantumComputation& circuit_to_match) {
-		// handle the case when the circuits operate on different amounts of qubits (typically ancillaries or device qubits)
-		// it is assumed that these additional logical qubits are appended to the original list of qubits, i.e.
-		// if the smaller circuit has qubits
-		//      q0, q1, ..., qn,
-		// the larger circuit follows the structure
-		//      q0, q1, ..., qn, anc0, anc1, ..., ancm
-		// note this holds for LOGICAL qubits and not for the physical assignments.
-		if (circuit_to_augment.getNqubits() > circuit_to_match.getNqubits()) {
-			// switch circuits if wrong order was passed
-			augmentQubits(circuit_to_match, circuit_to_augment);
-			return;
-		} else if (circuit_to_augment.getNqubits() == circuit_to_match.getNqubits()) {
-			// if both circuits operate on the same number of qubits nothing has to be done
-			return;
-		}
-
-		#if DEBUG_MODE_EC
-		std::cout << "Add additional qubits to circuit that shall be augmented" << std::endl;
-		#endif
-		unsigned short nancillae_to_augment = circuit_to_match.getNqubits() - circuit_to_augment.getNqubits();
-		unsigned short physical_qubit_index = 0;
-		for (int i = 0; i < nancillae_to_augment; ++i) {
-			// find first unoccupied physical qubit
-			while (circuit_to_augment.initialLayout.count(physical_qubit_index)) {
-				physical_qubit_index++;
-			}
-			#if DEBUG_MODE_EC
-			std::cout << "Found unoccupied physical qubit: " << physical_qubit_index << std::endl;
-			#endif
-			circuit_to_augment.addAncillaryQubit(physical_qubit_index, -1);
-			// these added qubits are also garbage outputs
-			circuit_to_augment.setLogicalQubitGarbage(circuit_to_augment.getNqubits() - 1);
-			physical_qubit_index++;
-		}
-		#if DEBUG_MODE_EC
-		std::cout << "Circuit to augment: ";
-		circuit_to_augment->printRegisters();
-		circuit_to_augment->print();
-		std::cout << "Remove qubits from back of circuit that shall be matched" << std::endl;
-		std::cout << "Circuit to match: ";
-		circuit_to_match->printRegisters();
-		circuit_to_match->print();
-		#endif
-		unsigned short nqubits_to_remove = circuit_to_match.getNqubits() - circuit_to_augment.getNqubitsWithoutAncillae();
-		std::vector<std::pair<unsigned short, short>> removed{ };
-		std::bitset<qc::MAX_QUBITS> garbage{ };
-		for (unsigned short i = 0; i < nqubits_to_remove; ++i) {
-			auto logical_qubit_index = qc::QuantumComputation::getHighestLogicalQubitIndex(circuit_to_match.initialLayout);
-			if (circuit_to_match.logicalQubitIsAncillary(logical_qubit_index)) continue;
-
-			// store wether qubit was garbage
-			garbage[logical_qubit_index] = circuit_to_match.logicalQubitIsGarbage(logical_qubit_index);
-			removed.push_back(circuit_to_match.removeQubit(logical_qubit_index));
-		}
-		#if DEBUG_MODE_EC
-		std::cout << "Circuit to match: ";
-		circuit_to_match->printRegisters();
-		circuit_to_match->print();
-		std::cout << "Add the removed qubits ";
-		for(const auto& q:removed)
-			std::cout << q.first << " ";
-		std::cout << "back as ancillae" << std::endl;
-		#endif
-
-		for (auto it = removed.rbegin(); it != removed.rend(); ++it) {
-			circuit_to_match.addAncillaryQubit(it->first, it->second);
-			// restore garbage
-			if (garbage[circuit_to_match.getNqubits() - 1])
-				circuit_to_match.setLogicalQubitGarbage(circuit_to_match.getNqubits() - 1);
-		}
-
-		#if DEBUG_MODE_EC
-		std::cout << "Resulting in: " << std::endl;
-		std::cout << "Circuit to match: ";
-		circuit_to_match->printRegisters();
-		circuit_to_match->print();
-		#endif
-
 	}
 
 	Equivalence EquivalenceChecker::equals(dd::Edge e, dd::Edge f) {

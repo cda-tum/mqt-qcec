@@ -171,8 +171,6 @@ namespace ec {
 		void exportResultAsDot(const std::string& filename) const {
 			dd::export2Dot(results.result, filename);
 		}
-
-		static void augmentQubits(qc::QuantumComputation& circuit_to_augment, qc::QuantumComputation& circuit_to_match);
 	};
 
 

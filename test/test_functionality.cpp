@@ -91,6 +91,24 @@ TEST_P(FunctionalityTest, CompilationFlow) {
 	EXPECT_EQ(eq_flow.results.equivalence, ec::Equivalent);
 }
 
+TEST_P(FunctionalityTest, Optimizations) {
+	qc_alternative.import(test_alternative_dir + "test_" + GetParam() + ".qasm");
+	ec::EquivalenceChecker eq(qc_original, qc_alternative);
+	eq.expectEquivalent();
+	config.singleQubitGateFusion = true;
+	eq.check(config);
+	eq.printResult(std::cout);
+	EXPECT_TRUE(eq.results.consideredEquivalent());
+	config.swapGateFusion = true;
+	eq.check(config);
+	eq.printResult(std::cout);
+	EXPECT_TRUE(eq.results.consideredEquivalent());
+	config.removeDiagonalGatesBeforeMeasure = true;
+	eq.check(config);
+	eq.printResult(std::cout);
+	EXPECT_TRUE(eq.results.consideredEquivalent());
+}
+
 TEST_F(FunctionalityTest, test2) {
 	test_original = "./circuits/test/test2.real";
 	qc_original.import(test_original);
