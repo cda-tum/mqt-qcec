@@ -2,17 +2,20 @@
 [![Travis (.com) branch](https://img.shields.io/travis/com/iic-jku/qcec/master?logo=travis&style=plastic)](https://travis-ci.com/iic-jku/qcec)
 [![Codecov branch](https://img.shields.io/codecov/c/github/iic-jku/qcec/master?label=codecov&logo=codecov&style=plastic)](https://codecov.io/gh/iic-jku/qcec)
 ![GitHub](https://img.shields.io/github/license/iic-jku/qcec?style=plastic)
+[![toolset: JKQ](https://img.shields.io/badge/toolset-JKQ-blue?style=plastic)](https://github.com/iic-jku/jkq)
 [![arXiv](https://img.shields.io/static/v1?label=arXiv&message=2004.08420&color=inactive&style=plastic)](https://arxiv.org/abs/2004.08420)
 [![arXiv](https://img.shields.io/static/v1?label=arXiv&message=2009.02376&color=inactive&style=plastic)](https://arxiv.org/abs/2009.02376)
-[![toolset: JKQ](https://img.shields.io/badge/toolset-JKQ-blue?style=plastic)](https://github.com/iic-jku/jkq)
+[![arXiv](https://img.shields.io/static/v1?label=arXiv&message=2011.07288&color=inactive&style=plastic)](https://arxiv.org/abs/2011.07288)
 
 # JKQ QCEC - A JKQ tool for **Q**uantum **C**ircuit **E**quivalence **C**hecking
 
-A JKQ tool for Quantum Circuit Equivalence Checking by the [Institute for Integrated Circuits](http://iic.jku.at/eda/) at the [Johannes Kepler University Linz](https://jku.at) based on methods proposed in [[1]](https://arxiv.org/abs/2004.08420), [[2]](https://arxiv.org/abs/2009.02376). 
+A JKQ tool for Quantum Circuit Equivalence Checking by the [Institute for Integrated Circuits](http://iic.jku.at/eda/) at the [Johannes Kepler University Linz](https://jku.at) based on methods proposed in [[1]](https://arxiv.org/abs/2004.08420), [[2]](https://arxiv.org/abs/2009.02376), [[3]](https://arxiv.org/abs/2011.07288). 
 
 [[1]](https://arxiv.org/abs/2004.08420) L. Burgholzer and R. Wille. **"Advanced Equivalence Checking for Quantum Circuits"**. IEEE Transactions on Computer Aided Design of Integrated Circuits and Systems (TCAD), 2021 (pre-print [arXiv:2004.08420](https://arxiv.org/abs/2004.08420))
 
 [[2]](https://arxiv.org/abs/2009.02376) L. Burgholzer, R. Raymond, and R. Wille. **"Verifying Results of the IBM Qiskit Quantum Circuit Compilation Flow"**. In International Conference on Quantum Computing and Engineering (QCE), 2020 (pre-print [arXiv:2009.02376](https://arxiv.org/abs/2009.02376))
+
+[[3]](https://arxiv.org/abs/2011.07288) L. Burgholzer, R. Kueng, and R. Wille. **"Random Stimuli Generation for the Verification of Quantum Circuits"**. In Asia and South Pacific Design Automation Conference (ASP-DAC), 2021 (pre-print [arxiv:2011.07288](https://arxiv.org/abs/2011.07288)) 
 
 This tool can be used for checking the equivalence of two quantum circuits provided in any of the following formats:
  * `Real` (e.g. from [RevLib](http://revlib.org)),
@@ -22,12 +25,15 @@ This tool can be used for checking the equivalence of two quantum circuits provi
  
  with the following available methods:
 - **Reference** - Construct and compare the DD for both circuits [[1, Section III.B]](https://arxiv.org/pdf/2004.08420.pdf#page=5),
-- ![G \rightarrow \mathbb{I} \leftarrow G'](https://render.githubusercontent.com/render/math?math=G%20%5Crightarrow%20%5Cmathbb%7BI%7D%20%5Cleftarrow%20G') - Starting from the identity *I*, either apply gates from *G* or (inverted) gates from *G'* according to one of the following strategies [[1, Section IV.A]](https://arxiv.org/pdf/2004.08420.pdf#page=6)
+- ![G \rightarrow \mathbb{I} \leftarrow G'](https://render.githubusercontent.com/render/math?math=G%20%5Crightarrow%20%5Cmathbb%7BI%7D%20%5Cleftarrow%20G') - Starting from the identity *I*, either apply gates from *G* or (inverted) gates from *G'* according to one of the following strategies [[1, Section IV.A]](https://arxiv.org/pdf/2004.08420.pdf#page=6):
     - **Naive** - Alternate between applications of *G* and *G'* [[1, Section V.A]](https://arxiv.org/pdf/2004.08420.pdf#page=8),
     - **Proportional** - Proportionally apply gates according to the gate count ratio of *G* and *G'* [[1, Section V.B]](https://arxiv.org/pdf/2004.08420.pdf#page=8),
     - **Lookahead** - Always apply the gate yielding the smaller DD [[1, Section V.C]](https://arxiv.org/pdf/2004.08420.pdf#page=8),
-- **Simulation** - Conduct simulation runs to prove non-equivalence or give a strong indication of equivalence [[1, Section IV.B]](https://arxiv.org/pdf/2004.08420.pdf#page=7),
-- **Verification of compilation results** - A dedicated scheme for verifying results of the IBM Qiskit Compilation Flow explicitly exploiting certain knowledge about the compilation process. [[2]](https://arxiv.org/abs/2009.02376)
+- **Simulation** - Conduct simulation runs to prove non-equivalence or give a strong indication of equivalence [[1, Section IV.B]](https://arxiv.org/pdf/2004.08420.pdf#page=3) using: 
+  - **Classical Stimuli** - computational basis states [[1, Section IV.B]](https://arxiv.org/pdf/2004.08420.pdf#page=7), [[3, Section 3.1]](https://arxiv.org/pdf/2011.07288.pdf#page=3)
+  - **Local Quantum Stimuli** - each qubit value is independently chosen from any of the six basis states (|0>, |1>, |+>, |->, |L>, |R>) [[3, Section 3.2]](https://arxiv.org/pdf/2011.07288.pdf#page=4)
+  - **Global Quantum Stimuli** - random stabilizer states [[3, Section 3.3]](https://arxiv.org/pdf/2011.07288.pdf#page=4)
+- **Verification of compilation results** - A dedicated scheme for verifying results of the IBM Qiskit Compilation Flow explicitly exploiting certain knowledge about the compilation process. [[2]](https://arxiv.org/pdf/2009.02376.pdf)
 
 The tool builds upon [our decision diagram (DD) package](https://github.com/iic-jku/dd_package.git) as well as [our quantum functionality representation (QFR)](https://github.com/iic-jku/qfr.git). For more information, please visit [iic.jku.at/eda/research/quantum_verification](http://iic.jku.at/eda/research/quantum_verification). If you want to visually explore decision diagrams for quantum computing, check out our installation-free web-tool [JKQ DDVis](https://iic.jku.at/eda/research/quantum_dd/tool/).
 
@@ -56,8 +62,11 @@ Params:
     tolerance – Numerical tolerance used during computation
     nsims – Number of simulations to conduct (for simulation method)
     fidelity – Fidelity limit for comparison (for simulation method)
+    stimuliType - Type of stimuli to use (for simulation method: *classical* | localquantum | globalquantum)
     csv – Create CSV string for result
     statistics – Print statistics
+    storeCEXinput: Store counterexample input state vector (for simulation method)
+    storeCEXoutput: Store resulting counterexample state vectors (for simulation method)
     swapGateFusion – Optimization pass reconstructing SWAP operations
     singleQubitGateFusion – Optimization pass fusing consecutive single qubit gates
     removeDiagonalGatesBeforeMeasure – Optimization pass removing diagonal gates before measurements
@@ -70,8 +79,11 @@ def verify(file1: Union[str, bytes, PathLike],
             tolerance: float = 1e-13,
             nsims: int = 16,
             fidelity: float = 0.999,
+            stimuliType: StimuliType = StimuliType.classical,
             csv: bool = False,
             statistics: bool = False,
+            storeCEXinput: bool = False,
+            storeCEXoutput: bool = False,
             swapGateFusion: bool = False,
             singleQubitGateFusion: bool = False,
             removeDiagonalGatesBeforeMeasure: bool = False) -> object
@@ -150,6 +162,7 @@ In order to build the library execute the following in the project's main direct
    ```
     The following CMake targets are available
     - `qcec_app`: The commandline executable
+    - `qcec_sim_app`: Commandline tool dedicated for simulative verification
     - `qcec`: The standalone library
     - `qcec_example`: A small commandline demo example
     - `qcec_test`: Unit tests using GoogleTest
@@ -199,5 +212,18 @@ If you use our tool for your research, we will be thankful if you refer to it by
 
 </details>
 
+<details open>
+<summary>[3] L. Burgholzer, R. Kueng, and R. Wille. "Random Stimuli Generation for the Verification of Quantum Circuits". Asia and South Pacific Design Automation Conference (ASP-DAC), 2021</summary>
+
+```bibtex
+@inproceedings{burgholzer2021randomStimuliGenerationQuantum,
+  title = {Random stimuli generation for the verification of quantum circuits},
+  booktitle = {Asia and South Pacific Design Automation Conf.},
+  author = {Burgholzer, Lukas and Richard, Kueng and Wille, Robert},
+  year = {2021}
+}
+```
+
+</details>
 
 

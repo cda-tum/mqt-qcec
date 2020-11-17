@@ -14,26 +14,29 @@
 #include "PowerOfSimulationEquivalenceChecker.hpp"
 
 void show_usage(const std::string& name) {
-	std::cerr << "Usage: " << name << " <PATH_TO_FILE_1> <PATH_TO_FILE_2> (--method <method>)                       " << std::endl;
-	std::cerr << "Supported file formats:                                                                           " << std::endl;
-	std::cerr << "  .real                                                                                           " << std::endl;
-	std::cerr << "  .qasm                                                                                           " << std::endl;
-	std::cerr << "  .tfc                                                                                            " << std::endl;
-	std::cerr << "  .qc                                                                                             " << std::endl;
-	std::cerr << "Available methods:                                                                                " << std::endl;
-	std::cerr << "  reference                                                                                       " << std::endl;
-	std::cerr << "  naive                                                                                           " << std::endl;
-	std::cerr << "  proportional (default)                                                                          " << std::endl;
-	std::cerr << "  lookahead                                                                                       " << std::endl;
-	std::cerr << "  simulation                                                                                      " << std::endl;
-	std::cerr << "  compilationflow                                                                                 " << std::endl;
-	std::cerr << "Result Options:                                                                                   " << std::endl;
-	std::cerr << "  --ps:                                   Print statistics                                        " << std::endl;
-	std::cerr << "  --csv:                                  Print results as csv string                             " << std::endl;
+	std::cerr << "Usage: " << name << " <PATH_TO_FILE_1> <PATH_TO_FILE_2> (--method <method>)    " << std::endl;
+	std::cerr << "Supported file formats:                                                        " << std::endl;
+	std::cerr << "  .real                                                                        " << std::endl;
+	std::cerr << "  .qasm                                                                        " << std::endl;
+	std::cerr << "  .tfc                                                                         " << std::endl;
+	std::cerr << "  .qc                                                                          " << std::endl;
+	std::cerr << "Available methods:                                                             " << std::endl;
+	std::cerr << "  reference                                                                    " << std::endl;
+	std::cerr << "  naive                                                                        " << std::endl;
+	std::cerr << "  proportional (default)                                                       " << std::endl;
+	std::cerr << "  lookahead                                                                    " << std::endl;
+	std::cerr << "  simulation (using 'classical', 'localquantum', or 'globalquantum' stimuli)   " << std::endl;
+	std::cerr << "  compilationflow                                                              " << std::endl;
+	std::cerr << "Result Options:                                                                                               " << std::endl;
+	std::cerr << "  --ps:                                   Print statistics                                                    " << std::endl;
+	std::cerr << "  --csv:                                  Print results as csv string                                         " << std::endl;
+	std::cerr << "  --storeCEXinput:                        Store counterexample input state vector (for simulation method)     " << std::endl;
+	std::cerr << "  --storeCEXoutput:                       Store resulting counterexample state vectors (for simulation method)" << std::endl;
 	std::cerr << "Verification Parameters:                                                                          " << std::endl;
 	std::cerr << "  --tol e (default 1e-13):                Numerical tolerance used during computation             " << std::endl;
 	std::cerr << "  --nsims r (default 16):                 Number of simulations to conduct (for simulation method)" << std::endl;
 	std::cerr << "  --fid F (default 0.999):                Fidelity limit for comparison (for simulation method)   " << std::endl;
+	std::cerr << "  --stimuliType s (default 'classical'):  Type of stimuli to use (for simulation method)          " << std::endl;
 	std::cerr << "Optimization Options:                                                                             " << std::endl;
 	std::cerr << "  --swapGateFusion:                       reconstruct SWAP operations                             " << std::endl;
 	std::cerr << "  --singleQubitGateFusion:                fuse consecutive single qubit gates                     " << std::endl;
@@ -146,6 +149,29 @@ int main(int argc, char** argv){
 					show_usage(argv[0]);
 					return 1;
 				}
+			} else if(cmd == "--stimuliType") {
+				++i;
+				if (i >= argc) {
+					show_usage(argv[0]);
+					return 1;
+				}
+				cmd = argv[i];
+				std::transform(cmd.begin(), cmd.end(), cmd.begin(), [](unsigned char c) { return ::tolower(c); });
+
+				if (cmd == "classical") {
+					config.stimuliType = ec::Classical;
+				} else if (cmd == "localquantum") {
+					config.stimuliType = ec::LocalQuantum;
+				} else if (cmd == "globalquantum") {
+					config.stimuliType = ec::GlobalQuantum;
+				} else {
+					show_usage(argv[0]);
+					return 1;
+				}
+			} else if(cmd == "--storeCEXinput") {
+				config.storeCEXinput = true;
+			} else if(cmd == "--storeCEXoutput") {
+				config.storeCEXoutput = true;
 			} else if (cmd == "--swapGateFusion") {
 				config.swapGateFusion = true;
 			} else if (cmd == "--singleQubitGateFusion") {

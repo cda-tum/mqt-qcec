@@ -15,6 +15,7 @@ add_library(${PROJECT_NAME}
             ${${PROJECT_NAME}_SOURCE_DIR}/include/EquivalenceChecker.hpp
             ${CMAKE_CURRENT_SOURCE_DIR}/EquivalenceChecker.cpp
             ${${PROJECT_NAME}_SOURCE_DIR}/include/EquivalenceCheckingResults.hpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/EquivalenceCheckingResults.cpp
             ${${PROJECT_NAME}_SOURCE_DIR}/include/ImprovedDDEquivalenceChecker.hpp
             ${CMAKE_CURRENT_SOURCE_DIR}/ImprovedDDEquivalenceChecker.cpp
             ${${PROJECT_NAME}_SOURCE_DIR}/include/CompilationFlowEquivalenceChecker.hpp

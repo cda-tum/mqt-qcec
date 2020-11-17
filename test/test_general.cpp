@@ -1,5 +1,5 @@
 /*
- * This file is part of IIC-JKU QCEC library which is released under the MIT license.
+ * This file is part of JKQ QCEC library which is released under the MIT license.
  * See file README.md or go to http://iic.jku.at/eda/research/quantum_verification/ for more information.
  */
 
@@ -41,7 +41,7 @@ TEST_F(GeneralTest, CSVOutput) {
 	ss.clear();
 	ec.printCSVHeader(ss);
 	std::string csvHeader = ss.str();
-	std::string expectedHeader = "filename1;nqubits1;ngates1;filename2;nqubits2;ngates2;expectedEquivalent;equivalent;method;time;maxActive;nsims";
+	std::string expectedHeader = "filename1;nqubits1;ngates1;filename2;nqubits2;ngates2;expectedEquivalent;equivalent;method;time;maxActive;nsims;stimuliType";
 	EXPECT_THAT(csvHeader, HasSubstr(expectedHeader));
 }
 
@@ -131,33 +131,6 @@ TEST_F(GeneralTest, NonEquivalence) {
 	ec.expectNonEquivalent();
 	EXPECT_NO_THROW(ec.check(););
 	EXPECT_EQ(ec.results.equivalence, ec::NonEquivalent);
-}
-
-TEST_F(GeneralTest, PowerOfSimulationConsistency) {
-	qc_original.import("./circuits/test/test_original.real");
-	qc_alternative.import("./circuits/test/test_erroneous.real");
-
-	ec::PowerOfSimulationEquivalenceChecker ec(qc_original, qc_alternative, 12345);
-	ec.expectEquivalent();
-	EXPECT_NO_THROW(ec.check(););
-
-	ec::PowerOfSimulationEquivalenceChecker ec2(qc_original, qc_alternative, 12345);
-	ec2.expectEquivalent();
-	EXPECT_NO_THROW(ec2.check(););
-
-	EXPECT_EQ(ec.results.nsims, ec2.results.nsims);
-}
-
-TEST_F(GeneralTest, PowerOfSimulationProveEquivalence) {
-	qc_original.import("./circuits/test/test_original.real");
-	qc_alternative.import("./circuits/test/test_alternative.real");
-
-	ec::PowerOfSimulationEquivalenceChecker ec(qc_original, qc_alternative, 12345);
-	ec.expectEquivalent();
-	EXPECT_NO_THROW(ec.check(););
-	ec.printResult();
-
-	EXPECT_EQ(ec.results.equivalence,ec.results.consideredEquivalent());
 }
 
 TEST_F(GeneralTest, IntermediateMeasurementNotSupported) {

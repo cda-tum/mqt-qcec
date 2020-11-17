@@ -20,6 +20,12 @@ if (NOT TARGET gtest OR NOT TARGET gmock)
 	target_compile_features(gtest_main PUBLIC cxx_std_14)
 	target_compile_features(gmock PUBLIC cxx_std_14)
 	target_compile_features(gmock_main PUBLIC cxx_std_14)
+	if (BUILD_QCEC_BINDINGS)
+		target_compile_options(gtest PUBLIC -fvisibility=hidden)
+		target_compile_options(gtest_main PUBLIC -fvisibility=hidden)
+		target_compile_options(gmock PUBLIC -fvisibility=hidden)
+		target_compile_options(gmock_main PUBLIC -fvisibility=hidden)
+	endif ()
 endif()
 
 add_executable(${PROJECT_NAME}_example ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp)
@@ -46,7 +52,7 @@ macro(package_add_test TESTNAME)
 	add_executable(${TESTNAME} ${ARGN})
 	# link the Google test infrastructure, mocking library, and a default main fuction to
 	# the test executable.  Remove g_test_main if writing your own main function.
-	target_link_libraries(${TESTNAME} PRIVATE JKQ::${PROJECT_NAME} gmock gtest_main)
+	target_link_libraries(${TESTNAME} PUBLIC JKQ::${PROJECT_NAME} gmock gtest_main)
 	if (BUILD_QCEC_BINDINGS)
 		target_compile_options(${TESTNAME} PUBLIC -fvisibility=hidden)
 	endif ()
@@ -76,7 +82,8 @@ package_add_test(${PROJECT_NAME}_test
                  ${CMAKE_CURRENT_SOURCE_DIR}/test_general.cpp
                  ${CMAKE_CURRENT_SOURCE_DIR}/test_functionality.cpp
                  ${CMAKE_CURRENT_SOURCE_DIR}/test_journal.cpp
-                 ${CMAKE_CURRENT_SOURCE_DIR}/test_compilationflow.cpp)
+                 ${CMAKE_CURRENT_SOURCE_DIR}/test_compilationflow.cpp
+                 ${CMAKE_CURRENT_SOURCE_DIR}/test_simulation.cpp)
 
 add_custom_command(TARGET ${PROJECT_NAME}_test
                    POST_BUILD

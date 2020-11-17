@@ -36,6 +36,10 @@ nl::json _verify(const nl::json& instance) {
 		config.max_sims = instance["nsims"].get<unsigned long long>();
 	}
 
+	if (instance.contains("stimuliType")) {
+		nl::from_json(instance["stimuliType"].get<std::string>(), config.stimuliType);
+	}
+
 	if (instance.contains("fidelity")) {
 		config.fidelity_limit = instance["fidelity"].get<fp>();
 	}
@@ -46,6 +50,14 @@ nl::json _verify(const nl::json& instance) {
 
 	if (instance.contains("statistics")) {
 		config.printStatistics = instance["statistics"].get<bool>();
+	}
+
+	if (instance.contains("storeCEXinput")) {
+		config.storeCEXinput = instance["storeCEXinput"].get<bool>();
+	}
+
+	if (instance.contains("storeCEXoutput")) {
+		config.storeCEXoutput = instance["storeCEXoutput"].get<bool>();
 	}
 
 	if (instance.contains("swapGateFusion")) {
@@ -115,6 +127,12 @@ PYBIND11_MODULE(pyqcec, m) {
 	        .value("simulation", ec::Method::PowerOfSimulation)
 	        .value("compilationflow", ec::Method::CompilationFlow)
 	        .export_values();
+
+	py::enum_<ec::StimuliType>(m, "StimuliType")
+			.value("classical", ec::StimuliType::Classical)
+			.value("localquantum", ec::StimuliType::LocalQuantum)
+			.value("globalquantum", ec::StimuliType::GlobalQuantum)
+			.export_values();
 
 	#ifdef VERSION_INFO
 		m.attr("__version__") = VERSION_INFO;

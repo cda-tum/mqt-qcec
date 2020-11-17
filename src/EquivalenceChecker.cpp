@@ -1,5 +1,5 @@
 /*
- * This file is part of IIC-JKU QCEC library which is released under the MIT license.
+ * This file is part of JKQ QCEC library which is released under the MIT license.
  * See file README.md or go to http://iic.jku.at/eda/research/quantum_verification/ for more information.
  */
 
@@ -12,12 +12,12 @@ namespace ec {
 		dd = std::make_unique<dd::Package>();
 		dd->setMode(dd::Matrix);
 
-		filename1 = results.name1 = qc1.getName();
-		filename2 = results.name2 = qc2.getName();
-		results.name = filename1 + " and " + filename2;
+		results.name1 = qc1.getName();
+		results.name2 = qc2.getName();
+		results.name = results.name1 + " and " + results.name2;
 
-		nqubits1 = results.nqubits1 = qc1.getNqubits();
-		nqubits2 = results.nqubits2 = qc2.getNqubits();
+		results.nqubits1 = qc1.getNqubits();
+		results.nqubits2 = qc2.getNqubits();
 
 		results.ngates1 = qc1.getNops();
 		results.ngates2 = qc2.getNops();

@@ -20,3 +20,14 @@ install(TARGETS ${PROJECT_NAME}_app
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 
 set_target_properties(${PROJECT_NAME}_app PROPERTIES EXPORT_NAME ${PROJECT_NAME}_app)
+
+add_executable(${PROJECT_NAME}_sim_app ${CMAKE_CURRENT_SOURCE_DIR}/sim_app.cpp)
+target_compile_features(${PROJECT_NAME}_sim_app PUBLIC cxx_std_14)
+set_target_properties(${PROJECT_NAME}_sim_app PROPERTIES CXX_EXTENSIONS OFF)
+target_link_libraries(${PROJECT_NAME}_sim_app PRIVATE JKQ::${PROJECT_NAME})
+if(MSVC)
+	target_compile_options(${PROJECT_NAME}_sim_app PUBLIC "/W4" "$<$<CONFIG:RELEASE>:/O2 /GL>")
+	target_link_options(${PROJECT_NAME}_sim_app PUBLIC "$<$<CONFIG:Release>:/LTCG>")
+else()
+	target_compile_options(${PROJECT_NAME}_sim_app PUBLIC -Wall $<$<CONFIG:DEBUG>:-g3 -Og -Wextra -Wpedantic -pedantic> $<$<CONFIG:RELEASE>:-O3 -mtune=native -march=native -DNDEBUG -g0>)
+endif()

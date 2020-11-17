@@ -1,5 +1,5 @@
 /*
- * This file is part of IIC-JKU QCEC library which is released under the MIT license.
+ * This file is part of JKQ QCEC library which is released under the MIT license.
  * See file README.md or go to http://iic.jku.at/eda/research/quantum_verification/ for more information.
  */
 
@@ -33,6 +33,9 @@ namespace ec {
 		double fidelity_limit = 0.999;
 		unsigned long long max_sims = 16;
 		unsigned long long timeout = 60000;
+		StimuliType stimuliType = Classical;
+		bool storeCEXinput = false;
+		bool storeCEXoutput = false;
 	};
 
 	class QCECException : public std::invalid_argument {
@@ -47,16 +50,11 @@ namespace ec {
 
 	class EquivalenceChecker {
 	protected:
-		std::string filename1{};
-		std::string filename2{};
-
 		qc::QuantumComputation& qc1;
 		qc::QuantumComputation& qc2;
 
 		std::unique_ptr<dd::Package> dd;
 
-		unsigned short nqubits1 = 0;
-		unsigned short nqubits2 = 0;
 		unsigned short nqubits = 0;
 
 		std::bitset<qc::MAX_QUBITS> ancillary1{};
