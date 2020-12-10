@@ -14,8 +14,8 @@ namespace py = pybind11;
 namespace nl = nlohmann;
 using namespace pybind11::literals;
 
-// private c++ binding function (json) -> json
-nl::json _verify(const nl::json& instance) {
+// c++ binding function (json) -> json
+nl::json ver(const nl::json& instance) {
 	if (!instance.contains("file1") || !instance.contains("file2")) {
 		return {{"error", R"("file1" and "file2" need to be specified in config)"}};
 	}
@@ -116,8 +116,7 @@ nl::json _verify(const nl::json& instance) {
 
 PYBIND11_MODULE(pyqcec, m) {
 	m.doc() = "pybind11 for the JKQ QCEC quantum circuit equivalence checking tool";
-	m.attr("__name__") = "pyqcec";
-	m.def("_verify", &_verify, "verify the equivalence of two circuits");
+	m.def("ver", &ver, "verify the equivalence of two circuits");
 
 	py::enum_<ec::Method>(m, "Method")
 	        .value("reference", ec::Method::Reference)
