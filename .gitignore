@@ -1,3 +1,6 @@
-/build*
-/cmake-build-*
+build*
+cmake-build-*
 .idea
+venv
+dist
+*egg-info

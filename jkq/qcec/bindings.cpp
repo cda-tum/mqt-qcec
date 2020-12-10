@@ -116,7 +116,7 @@ nl::json _verify(const nl::json& instance) {
 
 PYBIND11_MODULE(pyqcec, m) {
 	m.doc() = "pybind11 for the JKQ QCEC quantum circuit equivalence checking tool";
-	m.attr("__name__") = "jkq.qcec";
+	m.attr("__name__") = "pyqcec";
 	m.def("_verify", &_verify, "verify the equivalence of two circuits");
 
 	py::enum_<ec::Method>(m, "Method")

@@ -32,8 +32,7 @@ class CMakeBuild(build_ext):
 
         cmake_args = ['-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=' + extdir,
                       '-DPYTHON_EXECUTABLE=' + sys.executable,
-                      '-DBUILD_QCEC_BINDINGS=ON',
-                      '-DGIT_SUBMODULE=OFF']
+                      '-DBUILD_QCEC_BINDINGS=ON']
 
         cfg = 'Debug' if self.debug else 'Release'
         build_args = ['--config', cfg]
@@ -63,7 +62,7 @@ with open(README_PATH) as readme_file:
 
 setup(
     name='jkq.qcec',
-    version='1.6.0',
+    version='1.6.1',
     author='Lukas Burgholzer',
     author_email='lukas.burgholzer@jku.at',
     description='JKQ QCEC - A JKQ tool for Quantum Circuit Equivalence Checking',
