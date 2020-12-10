@@ -1,5 +1,5 @@
 [![PyPI](https://img.shields.io/pypi/v/jkq.qcec?logo=pypi&style=plastic)](https://pypi.org/project/jkq.qcec/)
-[![Travis (.com) branch](https://img.shields.io/travis/com/iic-jku/qcec/master?logo=travis&style=plastic)](https://travis-ci.com/iic-jku/qcec)
+[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/iic-jku/qcec/CI?logo=github&style=plastic)](https://github.com/iic-jku/qcec/actions?query=workflow%3A%22CI%22)
 [![Codecov branch](https://img.shields.io/codecov/c/github/iic-jku/qcec/master?label=codecov&logo=codecov&style=plastic)](https://codecov.io/gh/iic-jku/qcec)
 ![GitHub](https://img.shields.io/github/license/iic-jku/qcec?style=plastic)
 [![toolset: JKQ](https://img.shields.io/badge/toolset-JKQ-blue?style=plastic)](https://github.com/iic-jku/jkq)
@@ -137,7 +137,7 @@ Internally the JKQ QCEC library works in the following way
   
 ### System requirements
 
-Building (and running) is continuously tested under Linux (Ubuntu 20.04) using gcc-9.3 and clang-11, MacOS (Catalina 10.15) using AppleClang and gcc-10, and Windows using Microsoft Visual Studio 2017. 
+Building (and running) is continuously tested under Linux, MacOS, and Windows using the [latest available system versions for GitHub Actions](https://github.com/actions/virtual-environments). 
 However, the implementation should be compatible with any current C++ compiler supporting C++14 and a minimum CMake version of 3.10.
 
 ### Configure, Build, and Install

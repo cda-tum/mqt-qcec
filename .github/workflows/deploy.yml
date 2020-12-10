@@ -1,8 +1,9 @@
-name: Build and upload to PyPI
+name: Deploy to PyPI
 
 on:
   release:
     types: [published]
+  workflow_dispatch:
     
 env:
   CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
