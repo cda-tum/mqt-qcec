@@ -2,6 +2,7 @@
 	path = extern/qfr
 	url = https://github.com/iic-jku/qfr.git
     branch = master
+    shallow = true
 [submodule "extern/json"]
 	path = extern/json
 	url = https://github.com/nlohmann/json.git
