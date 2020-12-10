@@ -1,0 +1,104 @@
+name: Build and Test
+
+on: 
+  push:
+    branches: master
+  pull_request:
+    branches: master
+  workflow_dispatch:
+
+env:
+  BUILD_TYPE: Release
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Configure CMake
+      shell: bash
+      run: |
+         if [ "$RUNNER_OS" == "Windows" ]; then
+           cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -T "ClangCl"
+         else
+           cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+         fi  
+        
+    - name: Build
+      shell: bash
+      run: |
+        if [ "$RUNNER_OS" == "Windows" ]; then
+          cmake --build "${{github.workspace}}/build" --config $BUILD_TYPE --target INSTALL --parallel 8      
+        else
+          cmake --build "${{github.workspace}}/build" --config $BUILD_TYPE --parallel 8
+          sudo cmake --build "${{github.workspace}}/build" --config $BUILD_TYPE --target install
+        fi 
+
+  test:
+    needs: build
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Configure CMake
+      shell: bash
+      run: |
+         if [ "$RUNNER_OS" == "Windows" ]; then
+           cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -T "ClangCl"
+         else
+           cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+         fi  
+
+    - name: Build
+      shell: bash
+      run: |
+        if [ "$RUNNER_OS" == "Windows" ]; then
+          cmake --build "${{github.workspace}}/build" --config $BUILD_TYPE --parallel 8      
+        else
+          cmake --build "${{github.workspace}}/build" --config $BUILD_TYPE --target qcec_test --parallel 8
+        fi  
+
+    - name: Test
+      working-directory: ${{github.workspace}}/build/test
+      shell: bash
+      run: |
+        if [ "$RUNNER_OS" == "Windows" ]; then
+          cd $BUILD_TYPE
+          ./qcec_test.exe
+        else
+          ./qcec_test
+        fi
+    
+  coverage:
+    needs: test
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Configure CMake
+      shell: bash
+      run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=Debug -DCOVERAGE=1
+
+    - name: Build
+      shell: bash
+      run: cmake --build "${{github.workspace}}/build" --config Debug --target qcec_test
+
+    - name: Test
+      working-directory: ${{github.workspace}}/build/test
+      shell: bash
+      run: ./qcec_test
+        
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v1
+      with:
+        fail_ci_if_error: true
