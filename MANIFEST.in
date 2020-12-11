@@ -1,0 +1,17 @@
+include README.md LICENSE CMakeLists.txt
+include src/*
+include include/*
+include cmake/*
+include apps/*
+graft jkq/*
+graft extern/json
+graft extern/pybind11
+graft extern/pybind11_json
+include extern/qfr/CMakeLists.txt
+graft extern/qfr/src
+graft extern/qfr/include
+graft extern/qfr/cmake
+include extern/qfr/extern/dd_package/CMakeLists.txt
+graft extern/qfr/extern/dd_package/src
+graft extern/qfr/extern/dd_package/include
+graft extern/qfr/extern/dd_package/cmake

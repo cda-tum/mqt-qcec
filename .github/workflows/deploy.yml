@@ -53,6 +53,9 @@ jobs:
       - name: Build sdist
         run: python setup.py sdist
 
+      - name: Test sdist
+        run: pip install --verbose dist/*.tar.gz
+
       - uses: actions/upload-artifact@v2
         with:
           path: dist/*.tar.gz
