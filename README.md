@@ -7,7 +7,7 @@
 [![arXiv](https://img.shields.io/static/v1?label=arXiv&message=2009.02376&color=inactive&style=plastic)](https://arxiv.org/abs/2009.02376)
 [![arXiv](https://img.shields.io/static/v1?label=arXiv&message=2011.07288&color=inactive&style=plastic)](https://arxiv.org/abs/2011.07288)
 
-# JKQ QCEC - A JKQ tool for **Q**uantum **C**ircuit **E**quivalence **C**hecking
+# QCEC - A JKQ tool for **Q**uantum **C**ircuit **E**quivalence **C**hecking
 
 A JKQ tool for Quantum Circuit Equivalence Checking by the [Institute for Integrated Circuits](http://iic.jku.at/eda/) at the [Johannes Kepler University Linz](https://jku.at) based on methods proposed in [[1]](https://arxiv.org/abs/2004.08420), [[2]](https://arxiv.org/abs/2009.02376), [[3]](https://arxiv.org/abs/2011.07288). 
 
