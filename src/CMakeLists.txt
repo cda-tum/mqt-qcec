@@ -44,16 +44,11 @@ else()
 	add_subdirectory("${PROJECT_SOURCE_DIR}/extern/qfr" "extern/qfr")
 endif ()
 
-# Typically you don't care so much for a third party library's tests to be
-# run from your own project's code.
-set(JSON_BuildTests OFF CACHE INTERNAL "")
-# add nlohmann::json library
-add_subdirectory("${PROJECT_SOURCE_DIR}/extern/json" "extern/json")
 if (BUILD_QCEC_BINDINGS)
 	target_compile_options(nlohmann_json INTERFACE -fvisibility=hidden)
 	target_compile_options(qfr PUBLIC -fvisibility=hidden)
 endif ()
-target_link_libraries(${PROJECT_NAME} PUBLIC JKQ::qfr PUBLIC nlohmann_json::nlohmann_json)
+target_link_libraries(${PROJECT_NAME} PUBLIC JKQ::qfr)
 
 # add coverage compiler and linker flag if COVERAGE is set
 if (COVERAGE)

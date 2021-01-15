@@ -41,7 +41,6 @@ macro(handle_submodule MODULENAME)
 endmacro()
 
 handle_submodule(qfr)
-handle_submodule(json)
 
 add_subdirectory(src)
 
@@ -59,8 +58,6 @@ endif()
 
 option(BUILD_QCEC_BINDINGS "Also build Python bindings for QCEC project" OFF)
 if(BUILD_QCEC_BINDINGS)
-	handle_submodule(pybind11)
-	handle_submodule(pybind11_json)
 	add_subdirectory(jkq/qcec)
 endif()
 

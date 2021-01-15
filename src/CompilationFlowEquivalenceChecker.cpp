@@ -168,7 +168,7 @@ namespace ec {
 			case qc::X:
 				if (nc <= 1) return 1;
 				else {
-					return 2 * (nc-2) * (2 * IBMCostFunction(qc::U1, 0) + 2 * IBMCostFunction(qc::U2, 0) + 3 * IBMCostFunction(qc::X, 1))
+					return 2 * (nc-2) * (2 * IBMCostFunction(qc::Phase, 0) + 2 * IBMCostFunction(qc::U2, 0) + 3 * IBMCostFunction(qc::X, 1))
 					+ 6 * IBMCostFunction(qc::X, 1) + 8 * IBMCostFunction(qc::U3, 0);
 				}
 				//if (nc == 3) return 2 * (4 * IBMCostFunction(qc::U1, 1) + 3 * IBMCostFunction(qc::X, 1)) + IBMCostFunction(qc::X, 2);
@@ -187,19 +187,21 @@ namespace ec {
 			case qc::RX:
 			case qc::RY:
 			case qc::H:
+			case qc::SX:
+			case qc::SXdag:
 				if (nc == 0) return 1;
 				if (nc == 1) return 2 * IBMCostFunction(qc::X, 1) + 4 * IBMCostFunction(qc::U3, 0);
 				else
 					return 2 * IBMCostFunction(qc::X, nc) + 4 * IBMCostFunction(qc::U3, 0); // heuristic
 
-			case qc::U1:
+			case qc::Phase:
 			case qc::S:
 			case qc::Sdag:
 			case qc::T:
 			case qc::Tdag:
 			case qc::RZ:
 				if (nc == 0) return 1;
-				if (nc == 1) return 2 * IBMCostFunction(qc::X, 1) + 3 * IBMCostFunction(qc::U1, 0);
+				if (nc == 1) return 2 * IBMCostFunction(qc::X, 1) + 3 * IBMCostFunction(qc::Phase, 0);
 				else
 					return 2 * IBMCostFunction(qc::X, nc) + 3 * IBMCostFunction(qc::U3, 0); // heuristic
 
@@ -214,8 +216,8 @@ namespace ec {
 			case qc::iSWAP:
 				return IBMCostFunction(qc::SWAP, nc) + 2 * IBMCostFunction(qc::S, nc-1) + IBMCostFunction(qc::Z, nc);
 
-			case qc::P:
-			case qc::Pdag:
+			case qc::Peres:
+			case qc::Peresdag:
 				return IBMCostFunction(qc::X, nc) + IBMCostFunction(qc::X, nc-1);
 
 			case qc::Compound: // this assumes that compound operations only arise from single qubit fusion
