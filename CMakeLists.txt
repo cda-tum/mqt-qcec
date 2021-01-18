@@ -42,12 +42,6 @@ endmacro()
 
 handle_submodule(qfr)
 
-if (${CMAKE_VERSION} VERSION_LESS "3.18")
-	SET(PYBIND11_FINDPYTHON ON CACHE BOOL "Allow pybind11 to find Python libraries")
-else()
-	# this fixes an issue with manylinux containers (see https://github.com/pypa/manylinux/issues/484)
-	find_package(Python COMPONENTS Interpreter Development.Module)
-endif ()
 add_subdirectory(src)
 
 option(BUILD_QCEC_TESTS "Also build tests for QCEC project" OFF)
