@@ -44,10 +44,6 @@ else()
 	add_subdirectory("${PROJECT_SOURCE_DIR}/extern/qfr" "extern/qfr")
 endif ()
 
-if (BUILD_QCEC_BINDINGS)
-	target_compile_options(nlohmann_json INTERFACE -fvisibility=hidden)
-	target_compile_options(qfr PUBLIC -fvisibility=hidden)
-endif ()
 target_link_libraries(${PROJECT_NAME} PUBLIC JKQ::qfr)
 
 # add coverage compiler and linker flag if COVERAGE is set

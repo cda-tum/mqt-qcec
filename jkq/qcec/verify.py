@@ -2,15 +2,13 @@
 # This file is part of JKQ QCEC library which is released under the MIT license.
 # See file README.md or go to http://iic.jku.at/eda/research/quantum_verification/ for more information.
 #
-
-import typing as _typing
-import os as _os
+import pickle
+from pathlib import Path
+from typing import Any, Dict
 from .pyqcec import Method, StimuliType, ver
 
-_Path = _typing.Union[str, bytes, _os.PathLike]
 
-
-def verify(file1: _Path, file2: _Path,
+def verify(circ1, circ2,
            method: Method = Method.proportional,
            tolerance: float = 1e-13,
            nsims: int = 16,
@@ -23,13 +21,11 @@ def verify(file1: _Path, file2: _Path,
            swapGateFusion: bool = False,
            singleQubitGateFusion: bool = False,
            removeDiagonalGatesBeforeMeasure = False
-           ) -> object:
+           ) -> Dict[str, Any]:
     """Interface to the JKQ QCEC tool for verifying quantum circuits
 
-    :param file1: Path to first file
-    :type file1: _Path
-    :param file2: Path to second file
-    :type file2: _Path
+    :param circ1: Path to first circuit file, path to Qiskit QuantumCircuit pickle, or Qiskit QuantumCircuit object
+    :param circ2: Path to second circuit file, path to Qiskit QuantumCircuit pickle, or Qiskit QuantumCircuit object
     :param method: Equivalence checking method to use (reference | naive | *proportional* | lookahead | simulation | compilation flow)
     :type method: Method
     :param tolerance: Numerical tolerance used during computation
@@ -55,24 +51,30 @@ def verify(file1: _Path, file2: _Path,
     :param removeDiagonalGatesBeforeMeasure: Optimization pass removing diagonal gates before measurements
     :type removeDiagonalGatesBeforeMeasure: bool
     :return: JSON object containing results
-    :rtype: _typing.Dict[str, _typing.Any]
+    :rtype: Dict[str, Any]
     """
-    result = ver({
-        "file1": file1,
-        "file2": file2,
-        "method": method.name,
-        "tolerance": tolerance,
-        "nsims": nsims,
-        "fidelity": fidelity,
-        "stimuliType": stimuliType.name,
-        "csv": csv,
-        "statistics": statistics,
-        "storeCEXinput": storeCEXinput,
-        "storeCEXoutput": storeCEXoutput,
-        "swapGateFusion": swapGateFusion,
-        "singleQubitGateFusion": singleQubitGateFusion,
-        "removeDiagonalGatesBeforeMeasure": removeDiagonalGatesBeforeMeasure
-    })
+
+    if type(circ1) == str and Path(circ1).suffix == '.pickle':
+        circ1 = pickle.load(open(circ1, "rb"))
+
+    if type(circ2) == str and Path(circ2).suffix == '.pickle':
+        circ2 = pickle.load(open(circ2, "rb"))
+
+    result = ver(circ1, circ2,
+                 {
+                    "method": method.name,
+                    "tolerance": tolerance,
+                    "nsims": nsims,
+                    "fidelity": fidelity,
+                    "stimuliType": stimuliType.name,
+                    "csv": csv,
+                    "statistics": statistics,
+                    "storeCEXinput": storeCEXinput,
+                    "storeCEXoutput": storeCEXoutput,
+                    "swapGateFusion": swapGateFusion,
+                    "singleQubitGateFusion": singleQubitGateFusion,
+                    "removeDiagonalGatesBeforeMeasure": removeDiagonalGatesBeforeMeasure
+                 })
 
     if "error" in result:
         print(result["error"])

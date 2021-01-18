@@ -4,8 +4,8 @@ if(${CMAKE_VERSION} VERSION_LESS 3.12)
 endif()
 
 project(qcec
-        VERSION 1.6.2
-        DESCRIPTION "A JKQ tool for quantum circuit equivalence checking (JKQ QCEC)"
+        VERSION 1.7.0
+        DESCRIPTION "QCEC - A JKQ tool for Quantum Circuit Equivalence Checking"
         LANGUAGES CXX)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)

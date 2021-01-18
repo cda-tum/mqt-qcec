@@ -18,8 +18,9 @@ A JKQ tool for Quantum Circuit Equivalence Checking by the [Institute for Integr
 [[3]](https://arxiv.org/abs/2011.07288) L. Burgholzer, R. Kueng, and R. Wille. **"Random Stimuli Generation for the Verification of Quantum Circuits"**. In Asia and South Pacific Design Automation Conference (ASP-DAC), 2021 (pre-print [arxiv:2011.07288](https://arxiv.org/abs/2011.07288)) 
 
 This tool can be used for checking the equivalence of two quantum circuits provided in any of the following formats:
- * `Real` (e.g. from [RevLib](http://revlib.org)),
+ * `QuantumCircuit` object from IBM's [Qiskit](https://github.com/Qiskit/qiskit) (only through the JKQ QCEC Python bindings)
  * `OpenQASM` (e.g. used by IBM's [Qiskit](https://github.com/Qiskit/qiskit)),
+ * `Real` (e.g. from [RevLib](http://revlib.org)),
  * `TFC` (e.g. from [Reversible Logic Synthesis Benchmarks Page](http://webhome.cs.uvic.ca/~dmaslov/mach-read.html))
  * `QC` (e.g. from [Feynman](https://github.com/meamy/feynman))
  
@@ -56,8 +57,8 @@ where the `verify` function is defined as follows:
 Interface to the JKQ QCEC tool for verifying quantum circuits
 
 Params:
-    file1 – Path to first file (required)
-    file2 – Path to second file (required)
+    circ1 – Path to first circuit file, path to Qiskit QuantumCircuit pickle, or Qiskit QuantumCircuit object (required)
+    circ2 – Path to second circuit file, path to Qiskit QuantumCircuit pickle, or Qiskit QuantumCircuit object (required)
     method – Equivalence checking method to use (reference | naive | *proportional* | lookahead | simulation | compilation flow)
     tolerance – Numerical tolerance used during computation
     nsims – Number of simulations to conduct (for simulation method)
@@ -73,20 +74,19 @@ Params:
 Returns:
     JSON object containing results
 """
-def verify(file1: Union[str, bytes, PathLike],
-            file2: Union[str, bytes, PathLike],
-            method: Method = Method.proportional,
-            tolerance: float = 1e-13,
-            nsims: int = 16,
-            fidelity: float = 0.999,
-            stimuliType: StimuliType = StimuliType.classical,
-            csv: bool = False,
-            statistics: bool = False,
-            storeCEXinput: bool = False,
-            storeCEXoutput: bool = False,
-            swapGateFusion: bool = False,
-            singleQubitGateFusion: bool = False,
-            removeDiagonalGatesBeforeMeasure: bool = False) -> object
+def verify(circ1, circ2,
+           method: Method = Method.proportional,
+           tolerance: float = 1e-13,
+           nsims: int = 16,
+           fidelity: float = 0.999,
+           stimuliType: StimuliType = StimuliType.classical,
+           csv: bool = False,
+           statistics: bool = False,
+           storeCEXinput: bool = False,
+           storeCEXoutput: bool = False,
+           swapGateFusion: bool = False,
+           singleQubitGateFusion: bool = False,
+           removeDiagonalGatesBeforeMeasure: bool = False) -> object
 ```
 ### Command-line Executable
 JKQ QCEC also provides a **standalone executable** with command-line interface called `qcec_app`.

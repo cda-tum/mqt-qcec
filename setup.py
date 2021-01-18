@@ -64,10 +64,10 @@ with open(README_PATH) as readme_file:
 
 setup(
     name='jkq.qcec',
-    version='1.6.2',
+    version='1.7.0',
     author='Lukas Burgholzer',
     author_email='lukas.burgholzer@jku.at',
-    description='JKQ QCEC - A JKQ tool for Quantum Circuit Equivalence Checking',
+    description='QCEC - A JKQ tool for Quantum Circuit Equivalence Checking',
     long_description=README,
     long_description_content_type="text/markdown",
     license="MIT",
