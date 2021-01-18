@@ -41,7 +41,7 @@ macro(handle_submodule MODULENAME)
 endmacro()
 
 handle_submodule(qfr)
-find_package (Python3 COMPONENTS Interpreter Development.Module)
+SET(PYBIND11_FINDPYTHON ON CACHE BOOL "Allow pybind11 to find Python libraries")
 add_subdirectory(src)
 
 option(BUILD_QCEC_TESTS "Also build tests for QCEC project" OFF)
