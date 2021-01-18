@@ -41,7 +41,7 @@ macro(handle_submodule MODULENAME)
 endmacro()
 
 handle_submodule(qfr)
-
+find_package (Python COMPONENTS Interpreter Development)
 add_subdirectory(src)
 
 option(BUILD_QCEC_TESTS "Also build tests for QCEC project" OFF)
