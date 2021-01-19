@@ -13,7 +13,6 @@
 #include "gtest/gtest.h"
 #include "PowerOfSimulationEquivalenceChecker.hpp"
 #include "ImprovedDDEquivalenceChecker.hpp"
-#include "CompilationFlowEquivalenceChecker.hpp"
 
 class JournalTestNonEQ: public testing::TestWithParam<std::tuple<std::string, unsigned short>> {
 protected:
@@ -202,16 +201,16 @@ protected:
 
 	std::string transpiled_file{};
 
-	int timeout = 50;
+	int timeout = 5;
 
 	void SetUp() override {
 		std::stringstream ss{};
 		ss << test_transpiled_dir << GetParam() << "_transpiled.";
-		if (GetParam() == "add6_196" || GetParam() == "cm150a_210") {
-			ss << "real";
-		} else {
+//		if (GetParam() == "add6_196" || GetParam() == "cm150a_210") {
+//			ss << "real";
+//		} else {
 			ss << "qasm";
-		}
+//		}
 		transpiled_file = ss.str();
 	}
 };
@@ -262,6 +261,7 @@ TEST_P(JournalTestEQ, EQReference) {
 	}
 
 	equivalenceChecker.printCSVEntry();
+	equivalenceChecker.printResult();
 	EXPECT_TRUE(equivalenceChecker.results.timeout || equivalenceChecker.results.consideredEquivalent());
 }
 
@@ -281,6 +281,7 @@ TEST_P(JournalTestEQ, EQNaive) {
 	}
 
 	equivalenceChecker.printCSVEntry();
+	equivalenceChecker.printResult();
 	EXPECT_TRUE(equivalenceChecker.results.timeout || equivalenceChecker.results.consideredEquivalent());
 }
 
@@ -300,6 +301,7 @@ TEST_P(JournalTestEQ, EQProportional) {
 	}
 
 	equivalenceChecker.printCSVEntry();
+	equivalenceChecker.printResult();
 	EXPECT_TRUE(equivalenceChecker.results.timeout || equivalenceChecker.results.consideredEquivalent());
 }
 
@@ -319,6 +321,7 @@ TEST_P(JournalTestEQ, EQLookahead) {
 	}
 
 	equivalenceChecker.printCSVEntry();
+	equivalenceChecker.printResult();
 	EXPECT_TRUE(equivalenceChecker.results.timeout || equivalenceChecker.results.consideredEquivalent());
 }
 
@@ -338,5 +341,6 @@ TEST_P(JournalTestEQ, EQPowerOfSimulation) {
 	}
 
 	equivalenceChecker.printCSVEntry();
+	equivalenceChecker.printResult();
 	EXPECT_TRUE(equivalenceChecker.results.timeout || equivalenceChecker.results.consideredEquivalent());
 }
