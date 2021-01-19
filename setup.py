@@ -1,5 +1,6 @@
 import os
 import sys
+import sysconfig
 import platform
 import subprocess
 
@@ -45,7 +46,8 @@ class CMakeBuild(build_ext):
                 cmake_args += ['-A', 'x64']
             build_args += ['--', '/m']
         else:
-            cmake_args += ['-DCMAKE_BUILD_TYPE=' + cfg]
+            cmake_args += ['-DCMAKE_BUILD_TYPE=' + cfg,
+                           '-DPython_ROOT_DIR=' + sysconfig.get_path('scripts')]
             build_args += ['--', '-j2']
 
         env = os.environ.copy()
