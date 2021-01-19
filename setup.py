@@ -50,7 +50,7 @@ class CMakeBuild(build_ext):
             build_args += ['--', '-j2']
 
         if platform.system() == "Linux":
-            cmake_args += ['-DPYBIND11_FINDPYTHON=OFF']
+            cmake_args += ['-DPYTHON_EXECUTABLE=' + sys.executable, '-DPYBIND11_FINDPYTHON=OFF']
 
         env = os.environ.copy()
         env['CXXFLAGS'] = '{} -DVERSION_INFO=\\"{}\\"'.format(env.get('CXXFLAGS', ''),
