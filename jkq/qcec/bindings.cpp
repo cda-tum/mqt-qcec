@@ -7,6 +7,8 @@
 #include "pybind11/pybind11.h"
 #include "pybind11_json/pybind11_json.hpp"
 
+#include "QiskitImport.hpp"
+
 #include "CompilationFlowEquivalenceChecker.hpp"
 #include "PowerOfSimulationEquivalenceChecker.hpp"
 
@@ -22,7 +24,7 @@ nl::json ver(const py::object& circ1, const py::object& circ2, const nl::json& j
 			auto&& file1 = circ1.cast<std::string>();
 			qc1.import(file1);
 		} else {
-			qc1.import(circ1);
+			import(qc1, circ1);
 		}
 	} catch (std::exception const& e) {
 		std::stringstream ss{};
@@ -36,7 +38,7 @@ nl::json ver(const py::object& circ1, const py::object& circ2, const nl::json& j
 			std::string file2 = circ2.cast<std::string>();
 			qc2.import(file2);
 		} else {
-			qc2.import(circ2);
+			import(qc2, circ2);
 		}
 	} catch (std::exception const& e) {
 		std::stringstream ss{};

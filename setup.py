@@ -33,7 +33,8 @@ class CMakeBuild(build_ext):
             extdir += os.path.sep
 
         cmake_args = ['-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=' + extdir,
-                      '-DPython_EXECUTABLE=' + sys.executable,
+                      '-DPYTHON_EXECUTABLE=' + sys.executable,
+                      '-DBUILD_QFR_BINDINGS=ON',
                       '-DBUILD_QCEC_BINDINGS=ON']
 
         cfg = 'Debug' if self.debug else 'Release'
@@ -48,9 +49,6 @@ class CMakeBuild(build_ext):
         else:
             cmake_args += ['-DCMAKE_BUILD_TYPE=' + cfg]
             build_args += ['--', '-j2']
-
-        if platform.system() == "Linux":
-            cmake_args += ['-DPYTHON_EXECUTABLE=' + sys.executable, '-DPYBIND11_FINDPYTHON=OFF']
 
         env = os.environ.copy()
         env['CXXFLAGS'] = '{} -DVERSION_INFO=\\"{}\\"'.format(env.get('CXXFLAGS', ''),
