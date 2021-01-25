@@ -187,42 +187,14 @@ namespace ec {
 	}
 
 	void EquivalenceChecker::applyGate(decltype(qc1.begin())& opIt, dd::Edge& to, std::map<unsigned short, unsigned short>& permutation, decltype(qc1.end())& end, Direction dir) {
-
-		auto&& op = *opIt;
-
-		// Measurements at the end of the circuit are considered NOPs. They may provide output permutation information
-		if (op->getType() == qc::Measure) {
-			auto atEnd = opIt;
-			bool onlyMeasurementsRemaining = true;
-			while (atEnd != end) {
-				if ((*atEnd)->getType() != qc::Measure) {
-					onlyMeasurementsRemaining = false;
-					break;
-				}
-				++atEnd;
-			}
-
-			if (!onlyMeasurementsRemaining) {
+		// Measurements at the end of the circuit are considered NOPs.
+		if ((*opIt)->getType() == qc::Measure) {
+			if (!qc::QuantumComputation::isLastOperationOnQubit(opIt, end)) {
 				throw QCECException("Intermediate measurements currently not supported. Defer your measurements to the end.");
 			}
-
-			for (size_t i=0; i<op->getNcontrols(); ++i) {
-				auto qubitidx = op->getControls().at(i).qubit;
-				auto bitidx = op->getTargets().at(i);
-				auto current = permutation.at(qubitidx);
-				if (qubitidx != bitidx && current != bitidx) {
-					for (auto& p: permutation) {
-						if (p.second == bitidx) {
-							p.second = current;
-							break;
-						}
-					}
-					permutation.at(qubitidx) = bitidx;
-				}
-			}
-		} else {
-			applyGate(op, to, permutation, dir);
+			return;
 		}
+		applyGate(*opIt, to, permutation, dir);
 	}
 
 	void EquivalenceChecker::check(const Configuration& config) {

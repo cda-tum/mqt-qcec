@@ -4,7 +4,7 @@ if(${CMAKE_VERSION} VERSION_LESS 3.12)
 endif()
 
 project(qcec
-        VERSION 1.7.0
+        VERSION 1.7.1
         DESCRIPTION "QCEC - A JKQ tool for Quantum Circuit Equivalence Checking"
         LANGUAGES CXX)
 
@@ -27,7 +27,7 @@ macro(handle_submodule MODULENAME)
 	find_package(Git QUIET)
 	if(GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git" AND GIT_SUBMODULE)
 		message(STATUS "${MODULENAME} update")
-		execute_process(COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive -- extern/${MODULENAME}
+		execute_process(COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive --remote -- extern/${MODULENAME}
 		                WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 		                RESULT_VARIABLE GIT_SUBMOD_RESULT)
 		if(NOT GIT_SUBMOD_RESULT EQUAL "0")
