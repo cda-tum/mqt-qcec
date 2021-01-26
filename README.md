@@ -57,9 +57,9 @@ where the `verify` function is defined as follows:
 Interface to the JKQ QCEC tool for verifying quantum circuits
 
 Params:
-    circ1 – Path to first circuit file, path to Qiskit QuantumCircuit pickle, or Qiskit QuantumCircuit object (required)
-    circ2 – Path to second circuit file, path to Qiskit QuantumCircuit pickle, or Qiskit QuantumCircuit object (required)
-    method – Equivalence checking method to use (reference | naive | *proportional* | lookahead | simulation | compilation flow)
+    circ1 – Qiskit QuantumCircuit object, path to circuit file or Qiskit QuantumCircuit pickle (required)
+    circ2 – Qiskit QuantumCircuit object, path to circuit file or Qiskit QuantumCircuit pickle (required)
+    method – Equivalence checking method to use (reference | naive | *proportional* | lookahead | simulation | compilationflow)
     tolerance – Numerical tolerance used during computation
     nsims – Number of simulations to conduct (for simulation method)
     fidelity – Fidelity limit for comparison (for simulation method)
@@ -88,6 +88,26 @@ def verify(circ1, circ2,
            singleQubitGateFusion: bool = False,
            removeDiagonalGatesBeforeMeasure: bool = False) -> object
 ```
+
+### Integration of IBM Qiskit
+The JKQ QCEC tool is designed to natively integrate with IBM Qiskit. In particular, using out tool to verify, e.g., the results of IBM Qiskit's quantum circuit compilation flow, is as easy as:
+```python
+from jkq import qcec
+from qiskit import QuantumCircuit, transpile
+
+# create your quantum circuit
+qc = <...> 
+
+# append measurements to save output mapping of physical to logical (qu)bits
+qc.measure_all() 
+
+# compile circuit to appropriate backend using some optimization level
+qc_comp = transpile(qc, backend=<...>, optimization_level=<0 | 1 | 2 | 3>) 
+
+# verify the compilation result
+qcec.verify(qc, qc_comp, method=qcec.Method.compilationflow, statistics=True)
+```
+
 ### Command-line Executable
 JKQ QCEC also provides a **standalone executable** with command-line interface called `qcec_app`.
 It provides the same options as the Python module as flags (e.g., `--ps` for printing statistics, or `--method <method>`for setting the method). Per default, this produces JSON formatted output.

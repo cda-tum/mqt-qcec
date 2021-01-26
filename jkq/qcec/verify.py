@@ -24,9 +24,9 @@ def verify(circ1, circ2,
            ) -> Dict[str, Any]:
     """Interface to the JKQ QCEC tool for verifying quantum circuits
 
-    :param circ1: Path to first circuit file, path to Qiskit QuantumCircuit pickle, or Qiskit QuantumCircuit object
-    :param circ2: Path to second circuit file, path to Qiskit QuantumCircuit pickle, or Qiskit QuantumCircuit object
-    :param method: Equivalence checking method to use (reference | naive | *proportional* | lookahead | simulation | compilation flow)
+    :param circ1: Qiskit QuantumCircuit object, path to circuit file or Qiskit QuantumCircuit pickle (required)
+    :param circ2: Qiskit QuantumCircuit object, path to circuit file or Qiskit QuantumCircuit pickle (required)
+    :param method: Equivalence checking method to use (reference | naive | *proportional* | lookahead | simulation | compilationflow)
     :type method: Method
     :param tolerance: Numerical tolerance used during computation
     :type tolerance: float
