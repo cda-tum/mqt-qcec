@@ -90,7 +90,7 @@ def verify(circ1, circ2,
 ```
 
 ### Integration of IBM Qiskit
-The JKQ QCEC tool is designed to natively integrate with IBM Qiskit. In particular, using out tool to verify, e.g., the results of IBM Qiskit's quantum circuit compilation flow, is as easy as:
+The JKQ QCEC tool is designed to natively integrate with IBM Qiskit. In particular, using our tool to verify, e.g., the results of IBM Qiskit's quantum circuit compilation flow, is as easy as:
 ```python
 from jkq import qcec
 from qiskit import QuantumCircuit, transpile
