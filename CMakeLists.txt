@@ -4,7 +4,7 @@ if(${CMAKE_VERSION} VERSION_LESS 3.12)
 endif()
 
 project(qcec
-        VERSION 1.7.1
+        VERSION 1.7.2
         DESCRIPTION "QCEC - A JKQ tool for Quantum Circuit Equivalence Checking"
         LANGUAGES CXX)
 
