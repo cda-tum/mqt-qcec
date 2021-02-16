@@ -49,7 +49,7 @@ pip install jkq.qcec
 and then in Python
 ```python
 from jkq import qcec
-qcec.verify(...)
+qcec.verify(circ1, circ2,  **kwargs)
 ```
 where the `verify` function is defined as follows:
 ```python
@@ -158,47 +158,35 @@ Internally the JKQ QCEC library works in the following way
 ### System requirements
 
 Building (and running) is continuously tested under Linux, MacOS, and Windows using the [latest available system versions for GitHub Actions](https://github.com/actions/virtual-environments). 
-However, the implementation should be compatible with any current C++ compiler supporting C++14 and a minimum CMake version of 3.10.
+However, the implementation should be compatible with any current C++ compiler supporting C++17 and a minimum CMake version of 3.13.
 
-### Configure, Build, and Install
+### Setup, Configure, and Build
 
-In order to build the library execute the following in the project's main directory
-1) Configure CMake
-    ```commandline
-    cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
-    ```
-   Windows users using Visual Studio and the MSVC compiler may try
-   ```commandline
-   cmake -S . -B build -G "Visual Studio 15 2017" -A x64 -DCMAKE_BUILD_TYPE=Release
-   ```
-   Older CMake versions not supporting the above syntax (< 3.13) may be used with
-   ```commandline
-   mkdir build && cd build
-   cmake .. -DCMAKE_BUILD_TYPE=Release
-   ```
-2) Build the respective target. 
-    ```commandline
-   cmake --build ./build --config Release --target <target>
-   ```
-    The following CMake targets are available
-    - `qcec_app`: The commandline executable
-    - `qcec_sim_app`: Commandline tool dedicated for simulative verification
-    - `qcec`: The standalone library
-    - `qcec_example`: A small commandline demo example
-    - `qcec_test`: Unit tests using GoogleTest
+To start off, clone this repository using
+```shell
+git clone --recurse-submodules -j8 https://github.com/iic-jku/qcec 
+```
+Note the `--recurse-submodules` flag. It is required to also clone all the required submodules. If you happen to forget passing the flag on your initial clone, you can initialize all the submodules by executing `git submodule update --init --recursive` in the main project directory.
 
-3) Optional: The QCEC library and tool may be installed on the system by executing
-   
-    ```commandline
-    cmake --build ./build --config Release --target install
-    ```
+Our projects use CMake as the main build configuration tool. Building a project using CMake is a two-stage process. First, CMake needs to be *configured* by calling
+```shell 
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+```
+This tells CMake to search the current directory `.` (passed via `-S`) for a *CMakeLists.txt* file and process it into a directory `build` (passed via `-B`).
+The flag `-DCMAKE_BUILD_TYPE=Release` tells CMake to configure a *Release* build (as opposed to, e.g., a *Debug* build).
 
-    It can then also be included in other projects using the following CMake snippet
-    
-    ```cmake
-    find_package(qcec)
-    target_link_libraries(${TARGET_NAME} PRIVATE JKQ::qcec)
-    ```
+After configuring with CMake, the project can be built by calling
+```shell
+ cmake --build build --config Release
+```
+This tries to build the project in the `build` directory (passed via `--build`).
+Some operating systems and developer environments explicitly require a configuration to be set, which is why the `--config` flag is also passed to the build command. The flag `--parallel <NUMBER_OF_THREADS>` may be added to trigger a parallel build.
+
+Building the project this way generates
+- the main library `libqcec.a` (Unix) / `qcec.lib` (Windows) in the `build/src` directory
+- the commandline executables `qcec_app` and `qcec_sim_app` (for simulation-based verification) in the `build/apps` directory
+- a test executable `qcec_test` containing a small set of unit tests in the `build/test` directory (only if `-DBUILD_QCEC_TESTS=ON` is passed to CMake during configuration)
+- a small demo example executable `qcec_example` in the `build/test` directory (only if `-DBUILD_QCEC_TESTS=ON` is passed to CMake during configuration)
 
 ## Reference
 
@@ -208,11 +196,11 @@ If you use our tool for your research, we will be thankful if you refer to it by
 <summary>[1] L. Burgholzer and R. Wille. "Advanced Equivalence Checking for Quantum Circuits". IEEE Trans. on CAD of Integrated Circuits and Systems (TCAD), 2021</summary>
 
 ```bibtex
-@article{burgholzer2020advanced,
+@article{burgholzer2021advanced,
     author = {Burgholzer, Lukas and Wille, Robert},
     title = {Advanced Equivalence Checking for Quantum Circuits},
-    year = 2021,
-    journaltitle = {{IEEE} Trans. on {CAD} of Integrated Circuits and Systems}
+    journaltitle = {{IEEE} Transactions on {CAD} of Integrated Circuits and Systems},
+    year = {2021}
 }
 ```
 
@@ -238,7 +226,7 @@ If you use our tool for your research, we will be thankful if you refer to it by
 ```bibtex
 @inproceedings{burgholzer2021randomStimuliGenerationQuantum,
   title = {Random stimuli generation for the verification of quantum circuits},
-  booktitle = {Asia and South Pacific Design Automation Conf.},
+  booktitle = {Asia and South Pacific Design Automation Conference},
   author = {Burgholzer, Lukas and Richard, Kueng and Wille, Robert},
   year = {2021}
 }

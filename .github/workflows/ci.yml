@@ -19,6 +19,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+      with:
+        submodules: recursive
 
     - name: Configure CMake
       shell: bash
@@ -31,13 +33,7 @@ jobs:
         
     - name: Build
       shell: bash
-      run: |
-        if [ "$RUNNER_OS" == "Windows" ]; then
-          cmake --build "${{github.workspace}}/build" --config $BUILD_TYPE --target INSTALL --parallel 8      
-        else
-          cmake --build "${{github.workspace}}/build" --config $BUILD_TYPE --parallel 8
-          sudo cmake --build "${{github.workspace}}/build" --config $BUILD_TYPE --target install
-        fi 
+      run: cmake --build "${{github.workspace}}/build" --config $BUILD_TYPE --parallel 8
 
   test:
     needs: build
@@ -48,6 +44,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+      with:
+        submodules: recursive
 
     - name: Configure CMake
       shell: bash
@@ -84,6 +82,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+      with:
+        submodules: recursive
 
     - name: Configure CMake
       shell: bash

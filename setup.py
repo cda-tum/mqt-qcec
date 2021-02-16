@@ -34,8 +34,8 @@ class CMakeBuild(build_ext):
 
         cmake_args = ['-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=' + extdir,
                       '-DPYTHON_EXECUTABLE=' + sys.executable,
-                      '-DBUILD_QFR_BINDINGS=ON',
-                      '-DBUILD_QCEC_BINDINGS=ON']
+                      '-DBINDINGS=ON',
+                      '-DDEPLOY=ON']
 
         cfg = 'Debug' if self.debug else 'Release'
         build_args = ['--config', cfg]
@@ -66,7 +66,7 @@ with open(README_PATH) as readme_file:
 
 setup(
     name='jkq.qcec',
-    version='1.7.2',
+    version='1.7.3',
     author='Lukas Burgholzer',
     author_email='lukas.burgholzer@jku.at',
     description='QCEC - A JKQ tool for Quantum Circuit Equivalence Checking',
@@ -97,5 +97,5 @@ setup(
         'Research': 'https://iic.jku.at/eda/research/quantum_verification',
     },
     python_requires='>=3.6',
-    setup_requires=['cmake>=3.10']
+    setup_requires=['cmake>=3.13']
 )

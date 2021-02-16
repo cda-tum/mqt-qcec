@@ -1,63 +1,53 @@
-cmake_minimum_required(VERSION 3.10...3.19)
-if(${CMAKE_VERSION} VERSION_LESS 3.12)
-	cmake_policy(VERSION ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION})
-endif()
+cmake_minimum_required(VERSION 3.13...3.19)
 
 project(qcec
-        VERSION 1.7.2
+        LANGUAGES CXX
+        VERSION 1.7.3
         DESCRIPTION "QCEC - A JKQ tool for Quantum Circuit Equivalence Checking"
-        LANGUAGES CXX)
+        )
 
+# enable organization of targets into folders
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
-SET(COVERAGE OFF CACHE BOOL "Coverage")
-option(BUILD_SHARED_LIBS "Build shared libraries (.dll/.so) instead of static ones (.lib/.a)" OFF)
 
+# configuration options
+option(DEPLOY "Configure for deployment")
+option(BINDINGS "Configure for building Python bindings")
+option(COVERAGE "Configure for coverage report generation")
+option(GENERATE_POSITION_INDEPENDENT_CODE "Generate position independent code")
+option(BUILD_QCEC_TESTS "Also build tests for QMAP project")
+
+# build type settings
 set(default_build_type "Release")
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
 	message(STATUS "Setting build type to '${default_build_type}' as none was specified.")
-	set(CMAKE_BUILD_TYPE "${default_build_type}" CACHE
-	    STRING "Choose the type of build." FORCE)
-	# Set the possible values of build type for cmake-gui
-	set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS
-	             "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
+	set(CMAKE_BUILD_TYPE "${default_build_type}" CACHE STRING "Choose the type of build." FORCE)
+	set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
 endif()
 
-option(GIT_SUBMODULE "Check submodules during build" ON)
-macro(handle_submodule MODULENAME)
-	find_package(Git QUIET)
-	if(GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git" AND GIT_SUBMODULE)
-		message(STATUS "${MODULENAME} update")
-		execute_process(COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive --remote -- extern/${MODULENAME}
-		                WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-		                RESULT_VARIABLE GIT_SUBMOD_RESULT)
-		if(NOT GIT_SUBMOD_RESULT EQUAL "0")
-			message(FATAL_ERROR "git submodule update --init --recursive -- extern/${MODULENAME} failed with ${GIT_SUBMOD_RESULT}.")
-		endif()
-	endif()
-
+macro(check_submodule_present MODULENAME)
 	if(NOT EXISTS "${PROJECT_SOURCE_DIR}/extern/${MODULENAME}/CMakeLists.txt")
-		message(FATAL_ERROR "${MODULENAME} failed to download! GIT_SUBMODULE was turned off or failed. Please update submodules and try again.")
+		message(FATAL_ERROR "${MODULENAME} submodule not cloned properly. Please run `git submodule update --init --recursive` from the main project directory")
 	endif()
 endmacro()
 
-handle_submodule(qfr)
+check_submodule_present(qfr)
 
+# add main library code
 add_subdirectory(src)
 
-option(BUILD_QCEC_TESTS "Also build tests for QCEC project" OFF)
+# add test code
 if (BUILD_QCEC_TESTS)
 	enable_testing()
 	include(GoogleTest)
 	add_subdirectory(test)
 endif ()
 
-# only build apps if this is the main project
+# add apps if this is the main project
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
 	add_subdirectory(apps)
 endif()
 
-option(BUILD_QCEC_BINDINGS "Also build Python bindings for QCEC project" OFF)
-if(BUILD_QCEC_BINDINGS)
+# add Python binding code
+if(BINDINGS)
 	add_subdirectory(jkq/qcec)
 endif()
-
