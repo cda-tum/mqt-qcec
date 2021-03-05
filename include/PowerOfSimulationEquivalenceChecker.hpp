@@ -29,7 +29,6 @@ namespace ec {
 		std::function<unsigned long long()> stimuliGenerator;
 		std::function<unsigned short()> basisStateGenerator;
 		std::unordered_set<unsigned long long> stimuli;
-		std::vector<dd::BasisStates> basisStates;
 
 		unsigned short nqubits_for_stimuli = 0;
 
@@ -38,6 +37,12 @@ namespace ec {
 		std::uniform_int_distribution<unsigned long long> distribution;
 		std::uniform_int_distribution<unsigned short> basisStateDistribution;
 
+		bool checkWithStimulus(const dd::Edge& stimulus, const Configuration& config = Configuration{});
+
+		bool checkWithClassicalStimulus(unsigned long long stimulus = 0U, const Configuration& config = Configuration{});
+		bool checkWithLocalQuantumStimulus(const std::vector<dd::BasisStates>& stimulus, const Configuration& config = Configuration{});
+		bool checkWithGlobalQuantumStimulus(const qc::RandomCliffordCircuit& rcs, const Configuration& config = Configuration{});
+
 		void checkWithClassicalStimuli(const Configuration& config = Configuration{});
 		void checkWithLocalQuantumStimuli(const Configuration& config = Configuration{});
 		void checkWithGlobalQuantumStimuli(const Configuration& config = Configuration{});
@@ -45,7 +50,6 @@ namespace ec {
 	public:
 		PowerOfSimulationEquivalenceChecker(qc::QuantumComputation& qc1, qc::QuantumComputation& qc2, unsigned long seed = 0): EquivalenceChecker(qc1, qc2), seed(seed) {
 			nqubits_for_stimuli = qc1.getNqubitsWithoutAncillae();
-			basisStates = std::vector<dd::BasisStates>(nqubits);
 
 			if(seed == 0) {
 				// this is probably overkill but better safe than sorry

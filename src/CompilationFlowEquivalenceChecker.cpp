@@ -13,7 +13,7 @@ namespace ec {
 
 		setTolerance(config.tolerance);
 
-		auto start = std::chrono::high_resolution_clock::now();
+		auto start = std::chrono::steady_clock::now();
 
 		qc::CircuitOptimizer::swapGateFusion(qc1);
 		qc::CircuitOptimizer::swapGateFusion(qc2);
@@ -89,10 +89,10 @@ namespace ec {
 
 		qc::QuantumComputation::changePermutation(results.result, perm1, output1, line, dd, LEFT);
 		qc::QuantumComputation::changePermutation(results.result, perm2, output2, line, dd, RIGHT);
-		results.result = reduceGarbage(results.result, garbage1, LEFT);
-		results.result = reduceGarbage(results.result, garbage2, RIGHT);
-		results.result = reduceAncillae(results.result, ancillary1, LEFT);
-		results.result = reduceAncillae(results.result, ancillary2, RIGHT);
+		results.result = dd->reduceGarbage(results.result, garbage1, LEFT);
+		results.result = dd->reduceGarbage(results.result, garbage2, RIGHT);
+		results.result = dd->reduceAncillae(results.result, ancillary1, LEFT);
+		results.result = dd->reduceAncillae(results.result, ancillary2, RIGHT);
 
 		auto goal_matrix = createGoalMatrix();
 		results.equivalence = equals(results.result, goal_matrix);
@@ -101,7 +101,6 @@ namespace ec {
 		std::chrono::duration<double> diff = end - start;
 		results.time = diff.count();
 		results.maxActive = dd->maxActive;
-
 	}
 
 	unsigned short IBMCostFunction(const qc::OpType& gate, unsigned short nc) {

@@ -24,17 +24,40 @@ namespace ec {
 
 		line.fill(qc::LINE_DEFAULT);
 
+		// currently this modifies the underlying quantum circuits
+		// in the future this might want to be avoided
 		qc1.stripIdleQubits();
 		qc2.stripIdleQubits();
+
 		auto& larger_circuit = qc1.getNqubits() > qc2.getNqubits() ? qc1 : qc2;
 		auto& smaller_circuit = qc1.getNqubits() > qc2.getNqubits() ? qc2 : qc1;
 
+		setupAncillariesAndGarbage(smaller_circuit, larger_circuit);
+
+		initial1 = qc1.initialLayout;
+		initial2 = qc2.initialLayout;
+		output1 = qc1.outputPermutation;
+		output2 = qc2.outputPermutation;
+		ancillary1 = qc1.ancillary;
+		ancillary2 = qc2.ancillary;
+		garbage1 = qc1.garbage;
+		garbage2 = qc2.garbage;
+		nqubits = qc1.getNqubitsWithoutAncillae() + std::max(qc1.getNancillae(), qc2.getNancillae());
+		results.nqubits = nqubits;
+
+		if (qc1.getNqubitsWithoutAncillae() != qc2.getNqubitsWithoutAncillae()) {
+			std::cerr << "[QCEC] Warning: circuits have different number of primary inputs! Proceed with caution!" << std::endl;
+		}
+
+		fixOutputPermutationMismatch(smaller_circuit);
+	}
+
+	void EquivalenceChecker::setupAncillariesAndGarbage(qc::QuantumComputation& smaller_circuit, qc::QuantumComputation& larger_circuit) {
 		if (std::max(qc1.getNqubits(), qc2.getNqubits()) <= qc::MAX_QUBITS) {
-			// setup of ancillaries and garbage outputs
 			unsigned short nqubits_to_remove = larger_circuit.getNqubits() - smaller_circuit.getNqubits();
 			std::vector<std::pair<unsigned short, short>> removed{ };
 			std::bitset<qc::MAX_QUBITS> garbage{ };
-			for (unsigned short i = 0; i < nqubits_to_remove; ++i) {
+			for (unsigned short i=0; i<nqubits_to_remove; ++i) {
 				auto logical_qubit_index = qc::QuantumComputation::getHighestLogicalQubitIndex(larger_circuit.initialLayout);
 				smaller_circuit.setLogicalQubitAncillary(logical_qubit_index);
 
@@ -47,37 +70,19 @@ namespace ec {
 				larger_circuit.addAncillaryQubit(it->first, it->second);
 				smaller_circuit.setLogicalQubitGarbage(larger_circuit.getNqubits() - 1);
 				// restore garbage
-				if (garbage[larger_circuit.getNqubits() - 1]) {
+				if (garbage[larger_circuit.getNqubits()-1]) {
 					larger_circuit.setLogicalQubitGarbage(larger_circuit.getNqubits() - 1);
 				}
 			}
 		}
+	}
 
-		initial1 = qc1.initialLayout;
-		initial2 = qc2.initialLayout;
-		output1 = qc1.outputPermutation;
-		output2 = qc2.outputPermutation;
-		ancillary1 = qc1.ancillary;
-		ancillary2 = qc2.ancillary;
-		garbage1 = qc1.garbage;
-		garbage2 = qc2.garbage;
-		nqubits = results.nqubits = qc1.getNqubitsWithoutAncillae() + std::max(qc1.getNancillae(), qc2.getNancillae());
-
-		if (qc1.getNqubitsWithoutAncillae() != qc2.getNqubitsWithoutAncillae()) {
-			std::cerr << "[QCEC] Warning: circuits have different number of primary inputs! Proceed with caution!" << std::endl;
-		}
-
-//		if (output1.size() != output2.size()) {
-//			std::cerr << "[QCEC] Warning: circuits have different number of primary outputs! Proceed with caution!" << std::endl;
-//		}
-
+	void EquivalenceChecker::fixOutputPermutationMismatch(qc::QuantumComputation& circuit) {
 		if (std::max(qc1.getNqubits(), qc2.getNqubits()) <= qc::MAX_QUBITS) {
 			// Try to fix potential mismatches in output permutations
-//			auto& larger_initial = qc1.getNqubits() > qc2.getNqubits() ? initial1 : initial2;
 			auto& smaller_initial = qc1.getNqubits() > qc2.getNqubits() ? initial2 : initial1;
 			auto& larger_output = qc1.getNqubits() > qc2.getNqubits() ? output1 : output2;
 			auto& smaller_output = qc1.getNqubits() > qc2.getNqubits() ? output2 : output1;
-//			auto& larger_ancillary = qc1.getNqubits() > qc2.getNqubits() ? ancillary1 : ancillary2;
 			auto& smaller_ancillary = qc1.getNqubits() > qc2.getNqubits() ? ancillary2 : ancillary1;
 			auto& larger_garbage = qc1.getNqubits() > qc2.getNqubits() ? garbage1 : garbage2;
 			auto& smaller_garbage = qc1.getNqubits() > qc2.getNqubits() ? garbage2 : garbage1;
@@ -96,7 +101,7 @@ namespace ec {
 				unsigned short outcount = nout;
 				unsigned short output_qubit_in_smaller_circuit = 0;
 				bool exists_in_smaller = false;
-				for (int i = 0; i < smaller_circuit.getNqubits(); ++i) {
+				for (int i = 0; i < circuit.getNqubits(); ++i) {
 					if (!smaller_garbage.test(i)) {
 						--outcount;
 					}
@@ -136,7 +141,7 @@ namespace ec {
 //						std::cout << "Found logical qubit " << output_qubit_in_larger_circuit << " in smaller circuit at physical qubit " << physical_index_of_larger_in_smaller << std::endl;
 //						std::cout << "This qubit is idle: " << smaller_circuit.isIdleQubit(physical_index_of_larger_in_smaller) << std::endl;
 //					}
-						if (!found || smaller_circuit.isIdleQubit(physical_index_of_larger_in_smaller)) {
+						if (!found || circuit.isIdleQubit(physical_index_of_larger_in_smaller)) {
 //						std::cout << "Logical qubit " << output_qubit_in_smaller_circuit << " can be moved to logical qubit " << output_qubit_in_larger_circuit << std::endl;
 							for (auto& in: smaller_initial) {
 								if (in.second == output_qubit_in_smaller_circuit) {
@@ -205,7 +210,7 @@ namespace ec {
 
 		setTolerance(config.tolerance);
 
-		auto start = std::chrono::high_resolution_clock::now();
+		auto start = std::chrono::steady_clock::now();
 
 		if (config.swapGateFusion) {
 			qc::CircuitOptimizer::swapGateFusion(qc1);
@@ -223,9 +228,9 @@ namespace ec {
 		}
 
 		qc::permutationMap perm1 = initial1;
-		dd::Edge e = dd->makeIdent(0, short(nqubits-1));
+		dd::Edge e = dd->makeIdent(nqubits);
 		dd->incRef(e);
-		e = reduceAncillae(e, ancillary1);
+		e = dd->reduceAncillae(e, ancillary1);
 		it1 = qc1.begin();
 		end1 = qc1.end();
 
@@ -234,20 +239,13 @@ namespace ec {
 			++it1;
 		}
 		qc::QuantumComputation::changePermutation(e, perm1, output1, line, dd);
-		e = reduceAncillae(e, ancillary1);
-		e = reduceGarbage(e, garbage1);
-
-		#if DEBUG_MODE_EC
-		std::cout << "-------" << std::endl << std::endl;
-		std::stringstream ess{};
-		ess << "e_" << filename2 << ".dot";
-		dd->export2Dot(e, ess.str().c_str());
-		#endif
+		e = dd->reduceAncillae(e, ancillary1);
+		e = dd->reduceGarbage(e, garbage1);
 
 		qc::permutationMap perm2 = initial2;
-		dd::Edge f = dd->makeIdent(0, short(nqubits-1));
+		dd::Edge f = dd->makeIdent(nqubits);
 		dd->incRef(f);
-		f = reduceAncillae(f, ancillary2);
+		f = dd->reduceAncillae(f, ancillary2);
 		it2 = qc2.begin();
 		end2 = qc2.end();
 
@@ -256,14 +254,8 @@ namespace ec {
 			++it2;
 		}
 		qc::QuantumComputation::changePermutation(f, perm2, output2, line, dd);
-		f = reduceAncillae(f, ancillary2);
-		f = reduceGarbage(f, garbage2);
-
-		#if DEBUG_MODE_EC
-		std::stringstream fss{};
-		fss << "f_" << filename2 << ".dot";
-		dd->export2Dot(f, fss.str().c_str());
-		#endif
+		f = dd->reduceAncillae(f, ancillary2);
+		f = dd->reduceGarbage(f, garbage2);
 
 		results.maxActive = dd->maxActive;
 
@@ -279,7 +271,7 @@ namespace ec {
 			dd->decRef(f);
 		}
 
-		auto end = std::chrono::high_resolution_clock::now();
+		auto end = std::chrono::steady_clock::now();
 		std::chrono::duration<double> diff = end - start;
 		results.time = diff.count();
 	}

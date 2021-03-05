@@ -14,8 +14,6 @@
 #include "CircuitOptimizer.hpp"
 #include "EquivalenceCheckingResults.hpp"
 
-#define DEBUG_MODE_EC 0
-
 namespace ec {
 	enum Direction: bool { LEFT = true, RIGHT = false };
 
@@ -74,16 +72,14 @@ namespace ec {
 
 		std::array<short, qc::MAX_QUBITS> line{};
 
-		unsigned long long maxSize = 0;
-		double average = 0.;
-		size_t count = 0;
-		std::unordered_set<dd::NodePtr> visited{};
-		unsigned long long counter = 0;
+		/// Given that one circuit has more qubits than the other, the difference is assumed to arise from ancillary qubits.
+		/// This function adjusts both circuits accordingly
+		void setupAncillariesAndGarbage(qc::QuantumComputation& smaller_circuit, qc::QuantumComputation& larger_circuit);
 
-		dd::Edge reduceAncillae(dd::Edge& e, std::bitset<qc::MAX_QUBITS>& ancillary, bool regular = true);
-		dd::Edge reduceAncillaeRecursion(dd::Edge& e, std::bitset<qc::MAX_QUBITS>& ancillary, unsigned short lowerbound, bool regular = true);
-		dd::Edge reduceGarbage(dd::Edge& e, std::bitset<qc::MAX_QUBITS>& garbage, bool regular = true);
-		dd::Edge reduceGarbageRecursion(dd::Edge& e, std::bitset<qc::MAX_QUBITS>& garbage, unsigned short lowerbound, bool regular = true);
+		/// In some cases both circuits calculate the same function, but on different qubits.
+		/// This function tries to correct such mismatches.
+		/// Note that this is still highly experimental!
+		void fixOutputPermutationMismatch(qc::QuantumComputation& circuit);
 
 		/// Take operation and apply it either from the left or (inverted) from the right
 		/// \param op operation to apply

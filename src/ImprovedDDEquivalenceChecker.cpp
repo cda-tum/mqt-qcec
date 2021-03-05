@@ -7,7 +7,7 @@
 
 namespace ec {
 	dd::Edge ImprovedDDEquivalenceChecker::createInitialMatrix() {
-		dd::Edge e = dd->makeIdent(0, short(nqubits-1));
+		dd::Edge e = dd->makeIdent(nqubits);
 		dd->incRef(e);
 
 		std::bitset<qc::MAX_QUBITS> ancillary{};
@@ -38,17 +38,17 @@ namespace ec {
 				}
 			}
 		}
-		e = reduceAncillae(e, ancillary);
+		e = dd->reduceAncillae(e, ancillary);
 		return e;
 	}
 
 	dd::Edge ImprovedDDEquivalenceChecker::createGoalMatrix() {
-		auto goalMatrix = dd->makeIdent(0, short(nqubits - 1));
+		auto goalMatrix = dd->makeIdent(nqubits);
 		dd->incRef(goalMatrix);
-		goalMatrix = reduceAncillae(goalMatrix, ancillary2, RIGHT);
-		goalMatrix = reduceGarbage(goalMatrix, garbage2, RIGHT);
-		goalMatrix = reduceAncillae(goalMatrix, ancillary1, LEFT);
-		goalMatrix = reduceGarbage(goalMatrix, garbage1, LEFT);
+		goalMatrix = dd->reduceAncillae(goalMatrix, ancillary2, RIGHT);
+		goalMatrix = dd->reduceGarbage(goalMatrix, garbage2, RIGHT);
+		goalMatrix = dd->reduceAncillae(goalMatrix, ancillary1, LEFT);
+		goalMatrix = dd->reduceGarbage(goalMatrix, garbage1, LEFT);
 		return goalMatrix;
 	}
 
@@ -64,7 +64,7 @@ namespace ec {
 
 		setTolerance(config.tolerance);
 
-		auto start = std::chrono::high_resolution_clock::now();
+		auto start = std::chrono::steady_clock::now();
 
 		if (config.swapGateFusion) {
 			qc::CircuitOptimizer::swapGateFusion(qc1);
@@ -98,8 +98,7 @@ namespace ec {
 			case Lookahead: checkLookahead(perm1, perm2);
 				break;
 			default:
-				std::cerr << "Method " << toString(method) << " not supported by ImprovedDDEquivalenceChecker" << std::endl;
-				exit(1);
+				throw QCECException("Method " + toString(method) + " not supported by ImprovedDDEquivalenceChecker");
 		}
 
 		// finish first circuit
@@ -116,22 +115,14 @@ namespace ec {
 
 		qc::QuantumComputation::changePermutation(results.result, perm1, output1, line, dd, LEFT);
 		qc::QuantumComputation::changePermutation(results.result, perm2, output2, line, dd, RIGHT);
-		results.result = reduceGarbage(results.result, garbage1, LEFT);
-		results.result = reduceGarbage(results.result, garbage2, RIGHT);
-		results.result = reduceAncillae(results.result, ancillary1, LEFT);
-		results.result = reduceAncillae(results.result, ancillary2, RIGHT);
+		results.result = dd->reduceGarbage(results.result, garbage1, LEFT);
+		results.result = dd->reduceGarbage(results.result, garbage2, RIGHT);
+		results.result = dd->reduceAncillae(results.result, ancillary1, LEFT);
+		results.result = dd->reduceAncillae(results.result, ancillary2, RIGHT);
 
 		results.equivalence = equals(results.result, createGoalMatrix());
 
-		#if DEBUG_MODE_EC
-		std::stringstream ss{};
-		ss << "result_improved_" << filename2 << ".dot";
-		dd->export2Dot(results.result, ss.str().c_str());
-		std::cout << "Avg size: " << average << std::endl;
-		std::cout << "Max size: " << maxSize << std::endl;
-		#endif
-
-		auto end = std::chrono::high_resolution_clock::now();
+		auto end = std::chrono::steady_clock::now();
 		std::chrono::duration<double> diff = end - start;
 		results.time = diff.count();
 		results.maxActive = dd->maxActive;
@@ -139,14 +130,12 @@ namespace ec {
 
 	/// Alternate between LEFT and RIGHT applications
 	void ImprovedDDEquivalenceChecker::checkNaive(qc::permutationMap& perm1, qc::permutationMap& perm2) {
-
 		while (it1 != end1 && it2 != end2) {
 			applyGate(it1, results.result, perm1, end1, LEFT);
 			++it1;
 			applyGate(it2, results.result, perm2, end2, RIGHT);
 			++it2;
 		}
-
 	}
 
 	/// Alternate according to the gate count ratio between LEFT and RIGHT applications

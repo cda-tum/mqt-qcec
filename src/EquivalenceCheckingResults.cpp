@@ -157,7 +157,7 @@ namespace ec {
 			if (!cexInput.empty() || !cexOutput1.empty() || !cexOutput2.empty()) {
 				resultJSON["verification_cex"] = {};
 				if (!cexInput.empty()) {
-					to_json(resultJSON["verification_cex"]["input"] ,cexInput);
+					to_json(resultJSON["verification_cex"]["input"] , cexInput);
 				}
 				if (!cexOutput1.empty()) {
 					to_json(resultJSON["verification_cex"]["output1"], cexOutput1);
