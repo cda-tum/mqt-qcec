@@ -35,7 +35,7 @@ nl::json ver(const py::object& circ1, const py::object& circ2, const nl::json& j
 	qc::QuantumComputation qc2{};
 	try {
 		if(py::isinstance<py::str>(circ2)) {
-			std::string file2 = circ2.cast<std::string>();
+			auto&& file2 = circ2.cast<std::string>();
 			qc2.import(file2);
 		} else {
 			import(qc2, circ2);

@@ -26,9 +26,9 @@ jobs:
       shell: bash
       run: |
          if [ "$RUNNER_OS" == "Windows" ]; then
-           cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -T "ClangCl"
+           cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DBINDINGS=ON -T "ClangCl"
          else
-           cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+           cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DBINDINGS=ON
          fi  
         
     - name: Build

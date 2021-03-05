@@ -42,7 +42,7 @@ TEST_P(FunctionalityTest, Reference) {
 	ec::EquivalenceChecker eq(qc_original, qc_alternative);
 	eq.expectEquivalent();
 	eq.check(config);
-	eq.printResult(std::cout);
+	eq.printResult();
 	EXPECT_EQ(eq.results.equivalence, ec::Equivalent);
 }
 
@@ -51,7 +51,7 @@ TEST_P(FunctionalityTest, ReferenceFromImproved) {
 	ec::ImprovedDDEquivalenceChecker eq_ref(qc_original, qc_alternative, ec::Reference);
 	eq_ref.expectEquivalent();
 	eq_ref.check(config);
-	eq_ref.printResult(std::cout);
+	eq_ref.printResult();
 	EXPECT_EQ(eq_ref.results.equivalence, ec::Equivalent);
 }
 
@@ -60,7 +60,7 @@ TEST_P(FunctionalityTest, Proportional) {
 	ec::ImprovedDDEquivalenceChecker eq_proportional(qc_original, qc_alternative, ec::Proportional);
 	eq_proportional.expectEquivalent();
 	eq_proportional.check(config);
-	eq_proportional.printResult(std::cout);
+	eq_proportional.printResult();
 	EXPECT_EQ(eq_proportional.results.equivalence, ec::Equivalent);
 }
 
@@ -69,7 +69,7 @@ TEST_P(FunctionalityTest, Lookahead) {
 	ec::ImprovedDDEquivalenceChecker eq_lookahead(qc_original, qc_alternative, ec::Lookahead);
 	eq_lookahead.expectEquivalent();
 	eq_lookahead.check(config);
-	eq_lookahead.printResult(std::cout);
+	eq_lookahead.printResult();
 	EXPECT_EQ(eq_lookahead.results.equivalence, ec::Equivalent);
 }
 
@@ -78,7 +78,7 @@ TEST_P(FunctionalityTest, Naive) {
 	ec::ImprovedDDEquivalenceChecker eq_naive(qc_original, qc_alternative, ec::Naive);
 	eq_naive.expectEquivalent();
 	eq_naive.check(config);
-	eq_naive.printResult(std::cout);
+	eq_naive.printResult();
 	EXPECT_EQ(eq_naive.results.equivalence, ec::Equivalent);
 }
 
@@ -87,7 +87,7 @@ TEST_P(FunctionalityTest, CompilationFlow) {
 	ec::CompilationFlowEquivalenceChecker eq_flow(qc_original, qc_alternative);
 	eq_flow.expectEquivalent();
 	eq_flow.check(config);
-	eq_flow.printResult(std::cout);
+	eq_flow.printResult();
 	EXPECT_EQ(eq_flow.results.equivalence, ec::Equivalent);
 }
 
@@ -97,15 +97,15 @@ TEST_P(FunctionalityTest, Optimizations) {
 	eq.expectEquivalent();
 	config.singleQubitGateFusion = true;
 	eq.check(config);
-	eq.printResult(std::cout);
+	eq.printResult();
 	EXPECT_TRUE(eq.results.consideredEquivalent());
 	config.swapGateFusion = true;
 	eq.check(config);
-	eq.printResult(std::cout);
+	eq.printResult();
 	EXPECT_TRUE(eq.results.consideredEquivalent());
 	config.removeDiagonalGatesBeforeMeasure = true;
 	eq.check(config);
-	eq.printResult(std::cout);
+	eq.printResult();
 	EXPECT_TRUE(eq.results.consideredEquivalent());
 }
 
@@ -117,7 +117,7 @@ TEST_F(FunctionalityTest, test2) {
 	ec::EquivalenceChecker eq(qc_original, qc_alternative);
 	eq.expectEquivalent();
 	eq.check(config);
-	eq.printResult(std::cout);
+	eq.printResult();
 	EXPECT_EQ(eq.results.equivalence, ec::Equivalent);
 
 	qc_original.import(test_original);
@@ -126,7 +126,7 @@ TEST_F(FunctionalityTest, test2) {
 	ec::ImprovedDDEquivalenceChecker eq_proportional(qc_original, qc_alternative, ec::Proportional);
 	eq_proportional.expectEquivalent();
 	eq_proportional.check(config);
-	eq_proportional.printResult(std::cout);
+	eq_proportional.printResult();
 	EXPECT_EQ(eq_proportional.results.equivalence, ec::Equivalent);
 
 	qc_original.import(test_original);
@@ -135,7 +135,7 @@ TEST_F(FunctionalityTest, test2) {
 	ec::ImprovedDDEquivalenceChecker eq_lookahead(qc_original, qc_alternative, ec::Lookahead);
 	eq_lookahead.expectEquivalent();
 	eq_lookahead.check(config);
-	eq_lookahead.printResult(std::cout);
+	eq_lookahead.printResult();
 	EXPECT_EQ(eq_lookahead.results.equivalence, ec::Equivalent);
 
 	qc_original.import(test_original);
@@ -144,7 +144,7 @@ TEST_F(FunctionalityTest, test2) {
 	ec::ImprovedDDEquivalenceChecker eq_naive(qc_original, qc_alternative, ec::Naive);
 	eq_naive.expectEquivalent();
 	eq_naive.check(config);
-	eq_naive.printResult(std::cout);
+	eq_naive.printResult();
 	EXPECT_EQ(eq_naive.results.equivalence, ec::Equivalent);
 
 	qc_original.import(test_original);
@@ -153,7 +153,7 @@ TEST_F(FunctionalityTest, test2) {
 	ec::CompilationFlowEquivalenceChecker eq_flow(qc_original, qc_alternative);
 	eq_flow.expectEquivalent();
 	eq_flow.check(config);
-	eq_flow.printResult(std::cout);
+	eq_flow.printResult();
 	EXPECT_EQ(eq_flow.results.equivalence, ec::Equivalent);
 }
 
