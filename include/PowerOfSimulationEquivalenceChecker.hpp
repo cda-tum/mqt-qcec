@@ -70,7 +70,7 @@ namespace ec {
 			} else {
 				mt.seed(seed);
 			}
-			distribution = std::uniform_int_distribution<unsigned long long>(0, (unsigned long long) (std::pow((long double) 2, nqubits_for_stimuli) - 1));
+			distribution = std::uniform_int_distribution<unsigned long long>(0, static_cast<unsigned long long>(std::pow(2.L, nqubits_for_stimuli) - 1));
 			stimuliGenerator = [&]() { return distribution(mt); };
 			dd->setMode(dd::Vector);
 

@@ -223,10 +223,11 @@ namespace ec {
 	/// Alternate according to the gate count ratio between LEFT and RIGHT applications
 	void ImprovedDDEquivalenceChecker::checkProportional(qc::permutationMap& perm1, qc::permutationMap& perm2) {
 
-		unsigned int ratio = (unsigned int)
-				std::round((double)std::max(qc1.getNops(), qc2.getNops()) / std::min(qc1.getNops(), qc2.getNops()));
-		unsigned int ratio1 = (qc1.getNops() > qc2.getNops())? ratio: 1;
-		unsigned int ratio2 = (qc1.getNops() > qc2.getNops())? 1: ratio;
+		auto ratio = static_cast<const unsigned int>(std::round(
+						static_cast<const double>(std::max(qc1.getNops(), qc2.getNops())) /
+						static_cast<const double>(std::min(qc1.getNops(), qc2.getNops()))));
+		auto ratio1 = (qc1.getNops() > qc2.getNops())? ratio: 1;
+		auto ratio2 = (qc1.getNops() > qc2.getNops())? 1: ratio;
 
 		while (it1 != end1 && it2 != end2) {
 			for (unsigned int i = 0; i < ratio1 && it1 != end1; ++i) {
