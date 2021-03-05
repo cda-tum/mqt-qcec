@@ -42,19 +42,6 @@ namespace ec {
 		void checkWithLocalQuantumStimuli(const Configuration& config = Configuration{});
 		void checkWithGlobalQuantumStimuli(const Configuration& config = Configuration{});
 
-		template<size_t N>
-		static void nextPath(std::bitset<N>& path) {
-			for (size_t i=0; i<N; ++i) {
-				if (path[i] == 0) {
-					path[i] = 1;
-					break;
-				}
-				path[i] = 0;
-			}
-		}
-		dd::ComplexValue getStateVectorAmplitude(dd::Edge e, const std::bitset<dd::MAXN>& path) const;
-		std::vector<dd::ComplexValue> getStateVector(dd::Edge e) const;
-
 	public:
 		PowerOfSimulationEquivalenceChecker(qc::QuantumComputation& qc1, qc::QuantumComputation& qc2, unsigned long seed = 0): EquivalenceChecker(qc1, qc2), seed(seed) {
 			nqubits_for_stimuli = qc1.getNqubitsWithoutAncillae();

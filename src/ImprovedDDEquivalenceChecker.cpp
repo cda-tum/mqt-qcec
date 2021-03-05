@@ -172,10 +172,8 @@ namespace ec {
 
 	/// Look-ahead LEFT and RIGHT and choose the more promising option
 	void ImprovedDDEquivalenceChecker::checkLookahead(qc::permutationMap& perm1, qc::permutationMap& perm2) {
-		dd::Edge lookLeft{}, lookRight{}, left{}, right{}, saved{};
+		dd::Edge left{}, right{}, saved{};
 		bool cachedLeft = false, cachedRight = false;
-		std::unordered_set<dd::NodePtr> visited1{};
-		std::unordered_set<dd::NodePtr> visited2{};
 
 		while (it1 != end1 && it2 != end2) {
 			if(!cachedLeft) {
@@ -207,17 +205,11 @@ namespace ec {
 			}
 
 			saved = results.result;
-			lookLeft = dd->multiply(left, saved);
-			lookRight = dd->multiply(saved, right);
+			auto lookLeft = dd->multiply(left, saved);
+			auto lookRight = dd->multiply(saved, right);
 
-			visited1.clear();
-			visited2.clear();
-			auto nc1 = nodecount(lookLeft, visited1);
-			auto nc2 = nodecount(lookRight, visited2);
-
-			#if DEBUG_MODE_EC
-			std::cout << "(" << nc1 << "/" << nc2 << ") ";
-			#endif
+			auto nc1 = dd->size(lookLeft);
+			auto nc2 = dd->size(lookRight);
 
 			if (nc1 <= nc2) {
 				results.result = lookLeft;

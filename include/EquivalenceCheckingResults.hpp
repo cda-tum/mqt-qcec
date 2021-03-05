@@ -80,9 +80,9 @@ namespace ec {
 		unsigned long maxActive = 0;
 		unsigned long long nsims = 0;
 		unsigned long long basisState = 0;
-		std::vector<dd::ComplexValue> cexInput{};
-		std::vector<dd::ComplexValue> cexOutput1{};
-		std::vector<dd::ComplexValue> cexOutput2{};
+		dd::Package::CVec cexInput{};
+		dd::Package::CVec cexOutput1{};
+		dd::Package::CVec cexOutput2{};
 		fp fidelity = 0.0;
 		dd::Edge result = dd::Package::DDzero;
 
@@ -99,16 +99,15 @@ namespace ec {
 		virtual std::ostream& print() { return print(std::cout); }
 		virtual std::ostream& print(std::ostream& out);
 
-		static void to_json(nlohmann::json& j, std::vector<dd::ComplexValue>& stateVector) {
+		static void to_json(nlohmann::json& j, dd::Package::CVec& stateVector) {
 			j = nlohmann::json::array();
-			for (const auto amplitude: stateVector)
-				j.emplace_back(std::array<fp, 2>{amplitude.r, amplitude.i});
+			for (const auto& amp: stateVector) {
+				j.emplace_back(amp);
+			}
 		}
-		static void from_json(const nlohmann::json& j, std::vector<dd::ComplexValue>& stateVector) {
+		static void from_json(const nlohmann::json& j, dd::Package::CVec& stateVector) {
 			for (unsigned long long i=0; i<j.size(); ++i) {
-				auto amplitude = j.at(i).get<std::pair<fp, fp>>();
-				stateVector[i].r = amplitude.first;
-				stateVector[i].i = amplitude.second;
+				stateVector[i] = j.at(i).get<std::pair<fp, fp>>();
 			}
 		}
 		virtual nlohmann::json produceJSON(bool statistics);

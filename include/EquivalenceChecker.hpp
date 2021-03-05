@@ -94,26 +94,6 @@ namespace ec {
 
 		bool validInstance();
 
-		static unsigned int nodecount(dd::Edge& e, std::unordered_set<dd::NodePtr>& v) {
-			unsigned int sum = 0;
-			std::queue<dd::Edge*> q{};
-			q.push(&e);
-			while (!q.empty()) {
-				auto node = q.front();
-				q.pop();
-				++sum;
-				if (dd::Package::isTerminal(*node))
-					continue;
-
-				for (auto& edge : node->p->e) {
-					if (edge.p != nullptr && v.insert(edge.p).second) {
-						q.push(&edge);
-					}
-				}
-			}
-			return sum;
-		}
-
 	public:
 		EquivalenceCheckingResults results{};
 
@@ -133,10 +113,6 @@ namespace ec {
 		void suggestEquivalent() { results.expected = ProbablyEquivalent; }
 
 		static void setTolerance(fp tol) { dd::Package::setComplexNumberTolerance(tol); }
-
-		unsigned int getResultingDDSize() {
-			return dd->size(results.result) - 1;
-		}
 
 		virtual std::ostream& printResult() { return printResult(std::cout); }
 		virtual std::ostream& printResult(std::ostream& out) {
