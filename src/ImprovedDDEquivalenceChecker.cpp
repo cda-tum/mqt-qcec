@@ -81,30 +81,9 @@ namespace ec {
 			qc::CircuitOptimizer::removeDiagonalGatesBeforeMeasure(qc2);
 		}
 
-		#if DEBUG_MODE_EC
-		std::cout << "QC1: ";
-		qc1->printRegisters();
-		qc1->print();
-		std::cout << "QC2: ";
-		qc2->printRegisters();
-		qc2->print();
-		#endif
-
 		qc::permutationMap perm1 = initial1;
 		qc::permutationMap perm2 = initial2;
 		results.result = createInitialMatrix();
-
-		#if DEBUG_MODE_EC
-		visited.clear();
-		auto nc = nodecount(results.result, visited);
-		maxSize = std::max(maxSize, nc);
-		addToAverage(nc-1);
-		std::cout << "Initial: " << nc-1 << std::endl;
-		std::stringstream ss{};
-		ss << toString(results.method) << "_Initial.dot";
-		dd->export2Dot(results.result, ss.str().c_str());
-		++counter;
-		#endif
 
 		it1 = qc1.begin();
 		it2 = qc2.begin();
@@ -127,36 +106,12 @@ namespace ec {
 		while (it1 != end1) {
 			applyGate(it1, results.result, perm1, end1, LEFT);
 			++it1;
-
-			#if DEBUG_MODE_EC
-				visited.clear();
-				nc = nodecount(results.result, visited);
-				maxSize = std::max(maxSize, nc);
-				addToAverage(nc-1);
-				std::cout << nc-1 << " L " << std::endl;
-				std::stringstream ss{};
-				ss << toString(results.method) << "_" << counter << "_L.dot";
-				dd->export2Dot(results.result, ss.str().c_str());
-				++counter;
-			#endif
 		}
 
 		//finish second circuit
 		while (it2 != end2) {
 			applyGate(it2, results.result, perm2, end2, RIGHT);
 			++it2;
-
-			#if DEBUG_MODE_EC
-				visited.clear();
-				nc = nodecount(results.result, visited);
-				maxSize = std::max(maxSize, nc);
-				addToAverage(nc-1);
-				std::cout << nc-1 << " R " << std::endl;
-				std::stringstream ss{};
-				ss << toString(results.method) << "_" << counter << "_R.dot";
-				dd->export2Dot(results.result, ss.str().c_str());
-				++counter;
-			#endif
 		}
 
 		qc::QuantumComputation::changePermutation(results.result, perm1, output1, line, dd, LEFT);
@@ -187,34 +142,8 @@ namespace ec {
 
 		while (it1 != end1 && it2 != end2) {
 			applyGate(it1, results.result, perm1, end1, LEFT);
-
-			#if DEBUG_MODE_EC
-			visited.clear();
-			auto nc = nodecount(results.result, visited);
-			maxSize = std::max(maxSize, nc);
-			addToAverage(nc-1);
-			std::cout << nc-1 << " L " << std::endl;
-			std::stringstream ss{};
-			ss << toString(results.method) << "_" << counter << "_L.dot";
-			dd->export2Dot(results.result, ss.str().c_str());
-			++counter;
-			#endif
-
-			applyGate(it2, results.result, perm2, end2, RIGHT);
-
-			#if DEBUG_MODE_EC
-			visited.clear();
-			nc = nodecount(results.result, visited);
-			maxSize = std::max(maxSize, nc);
-			addToAverage(nc-1);
-			std::cout << nc-1 << " R " << std::endl;
-			ss = std::stringstream("");
-			ss << toString(results.method) << "_" << counter << "_R.dot";
-			dd->export2Dot(results.result, ss.str().c_str());
-			++counter;
-			#endif
-
 			++it1;
+			applyGate(it2, results.result, perm2, end2, RIGHT);
 			++it2;
 		}
 
@@ -233,34 +162,10 @@ namespace ec {
 			for (unsigned int i = 0; i < ratio1 && it1 != end1; ++i) {
 				applyGate(it1, results.result, perm1, end1, LEFT);
 				++it1;
-
-				#if DEBUG_MODE_EC
-				visited.clear();
-				auto nc = nodecount(results.result, visited);
-				maxSize = std::max(maxSize, nc);
-				addToAverage(nc-1);
-				std::cout << nc-1 << " L " << std::endl;
-				std::stringstream ss{};
-				ss << toString(results.method) << "_" << counter << "_L.dot";
-				dd->export2Dot(results.result, ss.str().c_str());
-				++counter;
-				#endif
 			}
 			for (unsigned int i = 0; i < ratio2 && it2 != end2; ++i) {
 				applyGate(it2, results.result, perm2, end2, RIGHT);
 				++it2;
-
-				#if DEBUG_MODE_EC
-				visited.clear();
-				auto nc = nodecount(results.result, visited);
-				maxSize = std::max(maxSize, nc);
-				addToAverage(nc-1);
-				std::cout << nc-1 << " R " << std::endl;
-				std::stringstream ss{};
-				ss << toString(results.method) << "_" << counter << "_R.dot";
-				dd->export2Dot(results.result, ss.str().c_str());
-				++counter;
-				#endif
 			}
 		}
 	}
@@ -318,30 +223,10 @@ namespace ec {
 				results.result = lookLeft;
 				dd->decRef(left);
 				cachedLeft = false;
-
-				#if DEBUG_MODE_EC
-				maxSize = std::max(maxSize, nc1);
-				addToAverage(nc1-1);
-				std::cout << "L " << std::endl;
-				std::stringstream ss{};
-				ss << toString(results.method) << "_" << counter << "_L.dot";
-				dd->export2Dot(results.result, ss.str().c_str());
-				++counter;
-				#endif
 			} else {
 				results.result = lookRight;
 				dd->decRef(right);
 				cachedRight = false;
-
-				#if DEBUG_MODE_EC
-				maxSize = std::max(maxSize, nc2);
-				addToAverage(nc2-1);
-				std::cout << "R " << std::endl;
-				std::stringstream ss{};
-				ss << toString(results.method) << "_" << counter << "_R.dot";
-				dd->export2Dot(results.result, ss.str().c_str());
-				++counter;
-				#endif
 			}
 			dd->incRef(results.result);
 			dd->decRef(saved);
@@ -355,18 +240,6 @@ namespace ec {
 			dd->decRef(saved);
 			dd->decRef(left);
 			dd->garbageCollect();
-
-			#if DEBUG_MODE_EC
-			visited.clear();
-			auto nc = nodecount(results.result, visited);
-			maxSize = std::max(maxSize, nc);
-			addToAverage(nc-1);
-			std::cout << nc-1 << " L " << std::endl;
-			std::stringstream ss{};
-			ss << toString(results.method) << "_" << counter << "_L.dot";
-			dd->export2Dot(results.result, ss.str().c_str());
-			++counter;
-			#endif
 		}
 
 		if (cachedRight) {
@@ -376,18 +249,6 @@ namespace ec {
 			dd->decRef(saved);
 			dd->decRef(right);
 			dd->garbageCollect();
-
-			#if DEBUG_MODE_EC
-			visited.clear();
-			auto nc = nodecount(results.result, visited);
-			maxSize = std::max(maxSize, nc);
-			addToAverage(nc-1);
-			std::cout << nc-1 << " R " << std::endl;
-			std::stringstream ss{};
-			ss << toString(results.method) << "_" << counter << "_R.dot";
-			dd->export2Dot(results.result, ss.str().c_str());
-			++counter;
-			#endif
 		}
 
 	}

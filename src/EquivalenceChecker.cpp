@@ -222,36 +222,12 @@ namespace ec {
 			qc::CircuitOptimizer::removeDiagonalGatesBeforeMeasure(qc2);
 		}
 
-		#if DEBUG_MODE_EC
-		std::cout << "QC1: ";
-		qc1->printRegisters();
-		qc1->print();
-		std::cout << "QC2: ";
-		qc2->printRegisters();
-		qc2->print();
-		#endif
-
 		qc::permutationMap perm1 = initial1;
 		dd::Edge e = dd->makeIdent(0, short(nqubits-1));
 		dd->incRef(e);
 		e = reduceAncillae(e, ancillary1);
 		it1 = qc1.begin();
 		end1 = qc1.end();
-
-		#if DEBUG_MODE_EC
-		visited.clear();
-		auto nc = nodecount(e, visited);
-		addToAverage(nc-1);
-		std::cout << "Initial: " << nc-1 << std::endl;
-		std::stringstream ss{};
-		ss << toString(results.method) << "_initial_L.dot";
-		dd->export2Dot(e, ss.str().c_str());
-		++counter;
-
-		std::stringstream eiss{};
-		eiss << "e_initial_" << filename1 << ".dot";
-		dd->export2Dot(e, eiss.str().c_str());
-		#endif
 
 		while (it1 != end1) {
 			applyGate(it1, e, perm1, end1);
@@ -274,21 +250,6 @@ namespace ec {
 		f = reduceAncillae(f, ancillary2);
 		it2 = qc2.begin();
 		end2 = qc2.end();
-
-		#if DEBUG_MODE_EC
-		visited.clear();
-		nc = nodecount(f, visited);
-		addToAverage(nc-1);
-		std::cout << "Initial: " << nc-1 << std::endl;
-		ss = std::stringstream("");
-		ss << toString(results.method) << "_initial_R.dot";
-		dd->export2Dot(f, ss.str().c_str());
-		counter = 1;
-
-		std::stringstream fiss{};
-		fiss << "f_initial_" << filename2 << ".dot";
-		dd->export2Dot(f, fiss.str().c_str());
-		#endif
 
 		while (it2 != end2) {
 			applyGate(it2, f, perm2, end2);
@@ -313,24 +274,10 @@ namespace ec {
 			dd->decRef(e);
 			dd->decRef(f);
 			dd->incRef(results.result);
-			#if DEBUG_MODE_EC
-			visited.clear();
-			nc = nodecount(results.result, visited);
-			maxSize = std::max(maxSize, nc);
-			addToAverage(nc-1);
-			std::cout << nc-1 << " NEQ " << std::endl;
-			#endif
 		} else {
 			results.result = e;
 			dd->decRef(f);
 		}
-		#if DEBUG_MODE_EC
-		std::stringstream ss{};
-		ss << "result_" << filename2 << ".dot";
-		dd->export2Dot(results.result, ss.str().c_str());
-		std::cout << "Max size: " << maxSize << std::endl;
-		std::cout << "Avg size: " << average << std::endl;
-		#endif
 
 		auto end = std::chrono::high_resolution_clock::now();
 		std::chrono::duration<double> diff = end - start;

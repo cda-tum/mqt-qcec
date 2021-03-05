@@ -26,29 +26,9 @@ namespace ec {
 			qc::CircuitOptimizer::removeDiagonalGatesBeforeMeasure(qc2);
 		}
 
-		#if DEBUG_MODE_EC
-		std::cout << "QC1: ";
-		qc1->printRegisters();
-		qc1->print();
-		std::cout << "QC2: ";
-		qc2->printRegisters();
-		qc2->print();
-		#endif
-
 		qc::permutationMap perm1 = initial1;
 		qc::permutationMap perm2 = initial2;
 		results.result = createInitialMatrix();
-
-		#if DEBUG_MODE_EC
-		visited.clear();
-		auto nc = nodecount(results.result, visited);
-		maxSize = std::max(maxSize, nc-1);
-		addToAverage(nc-1);
-
-		std::stringstream eiss{};
-		eiss << "flow_initial_" << filename1 << ".dot";
-		dd->export2Dot(results.result, eiss.str().c_str());
-		#endif
 
 		it1 = qc1.begin();
 		it2 = qc2.begin();
@@ -81,13 +61,6 @@ namespace ec {
 						applyGate(*it1, results.result, perm1, LEFT);
 						++it1;
 					}
-
-					#if DEBUG_MODE_EC
-					visited.clear();
-					auto nc = nodecount(results.result, visited);
-					maxSize = std::max(maxSize, nc-1);
-					addToAverage(nc-1);
-					#endif
 				}
 
 				for (int i = 0; i < cost1 && it2 != end2; ++i) {
@@ -99,13 +72,6 @@ namespace ec {
 						applyGate(*it2, results.result, perm2, RIGHT);
 						++it2;
 					}
-
-					#if DEBUG_MODE_EC
-					visited.clear();
-					auto nc = nodecount(results.result, visited);
-					maxSize = std::max(maxSize, nc-1);
-					addToAverage(nc-1);
-					#endif
 				}
 			}
 		}
@@ -113,26 +79,12 @@ namespace ec {
 		while (it1 != end1) {
 			applyGate(it1, results.result, perm1, end1, LEFT);
 			++it1;
-
-			#if DEBUG_MODE_EC
-			visited.clear();
-			auto nc = nodecount(results.result, visited);
-			maxSize = std::max(maxSize, nc-1);
-			addToAverage(nc-1);
-			#endif
 		}
 
 		//finish second circuit
 		while (it2 != end2) {
 			applyGate(it2, results.result, perm2, end2, RIGHT);
 			++it2;
-
-			#if DEBUG_MODE_EC
-			visited.clear();
-			auto nc = nodecount(results.result, visited);
-			maxSize = std::max(maxSize, nc-1);
-			addToAverage(nc-1);
-			#endif
 		}
 
 		qc::QuantumComputation::changePermutation(results.result, perm1, output1, line, dd, LEFT);
@@ -145,15 +97,7 @@ namespace ec {
 		auto goal_matrix = createGoalMatrix();
 		results.equivalence = equals(results.result, goal_matrix);
 
-		#if DEBUG_MODE_EC
-		std::stringstream ss{};
-		ss << "result_flow_" << filename2 << ".dot";
-		dd->export2Dot(results.result, ss.str().c_str());
-		std::cout << "Max size: " << maxSize << std::endl;
-		std::cout << "Avg size: " << average << std::endl;
-		#endif
-
-		auto end = std::chrono::high_resolution_clock::now();
+		auto end = std::chrono::steady_clock::now();
 		std::chrono::duration<double> diff = end - start;
 		results.time = diff.count();
 		results.maxActive = dd->maxActive;

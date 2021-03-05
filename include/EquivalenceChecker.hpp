@@ -92,15 +92,6 @@ namespace ec {
 		void applyGate(std::unique_ptr<qc::Operation>& op, dd::Edge& to, std::map<unsigned short, unsigned short>& permutation, Direction dir = LEFT);
 		void applyGate(decltype(qc1.begin())& opIt, dd::Edge& to, std::map<unsigned short, unsigned short>& permutation, decltype(qc1.end())& end , Direction dir = LEFT);
 
-		void addToAverage(unsigned long long x) {
-			if (count == 0) {
-				average = static_cast<double>(x);
-			} else {
-				average = (average * count + double(x)) / double(count + 1);
-			}
-			++count;
-		}
-
 		bool validInstance();
 
 		static unsigned int nodecount(dd::Edge& e, std::unordered_set<dd::NodePtr>& v) {
