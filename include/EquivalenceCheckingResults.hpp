@@ -88,11 +88,11 @@ namespace ec {
 
 		virtual ~EquivalenceCheckingResults() = default;
 
-		bool error() const {
+		[[nodiscard]] bool error() const {
 			return tooManyQubits || differentNrQubits;
 		}
 
-		bool consideredEquivalent() const {
+		[[nodiscard]] bool consideredEquivalent() const {
 			return equivalence == Equivalent || equivalence == EquivalentUpToGlobalPhase || equivalence == ProbablyEquivalent;
 		}
 

@@ -43,7 +43,7 @@ namespace ec {
 	public:
 		explicit QCECException(std::string  msg) : std::invalid_argument("QCEC Exception"), msg(std::move(msg)) { }
 
-		const char *what() const noexcept override {
+		[[nodiscard]] const char *what() const noexcept override {
 			return msg.c_str();
 		}
 	};
