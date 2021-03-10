@@ -62,12 +62,7 @@ protected:
 
 	void SetUp() override {
 		std::stringstream ss{};
-		ss << test_transpiled_dir << std::get<0>(GetParam()) << "_transpiled.";
-		if (std::get<0>(GetParam()) == "add6_196" || std::get<0>(GetParam()) == "cm150a_210") {
-			ss << "real";
-		} else {
-			ss << "qasm";
-		}
+		ss << test_transpiled_dir << std::get<0>(GetParam()) << "_transpiled.qasm";
 		transpiled_file = ss.str();
 
 		std::array<std::mt19937_64::result_type , std::mt19937_64::state_size> random_data{};
@@ -162,24 +157,13 @@ TEST_P(JournalTestNonEQ, PowerOfSimulation) {
 		} while (setExists(already_removed, removed));
 		already_removed.insert(removed);
 
-		try {
-			ec::SimulationBasedEquivalenceChecker noneq_sim(qc_original, qc_transpiled);
-			auto results = noneq_sim.check(config);
-			std::cout << "[" << i << "] ";
-			results.printCSVEntry();
-			addToStatistics(i, results.verificationTime + results.preprocessingTime, results.nsims);
-			if(results.equivalence == ec::Equivalence::NotEquivalent) {
-				successes++;
-			}
-		} catch (std::exception& e) {
-			std::cout << e.what() << std::endl;
-			for (const auto& rem: already_removed) {
-				std::cout << "{ ";
-				for (const auto r : rem) {
-					std::cout << r << " ";
-				}
-				std::cout << "}" << std::endl;
-			}
+		ec::SimulationBasedEquivalenceChecker noneq_sim(qc_original, qc_transpiled);
+		auto results = noneq_sim.check(config);
+		std::cout << "[" << i << "] ";
+		results.printCSVEntry();
+		addToStatistics(i, results.verificationTime + results.preprocessingTime, results.nsims);
+		if(results.equivalence == ec::Equivalence::NotEquivalent) {
+			successes++;
 		}
 	}
 	std::cout  << qc_original.getName() << ";" << qc_original.getNqubits() << ";" << qc_original.getNops() << ";" << qc_transpiled.getNops()

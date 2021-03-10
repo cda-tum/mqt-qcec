@@ -146,7 +146,7 @@ TEST_F(GeneralTest, IntermediateMeasurementNotSupported) {
 	std::stringstream ss2{bell_circuit};
 	ASSERT_NO_THROW(qc_alternative.import(ss2, qc::OpenQASM));
 	ec::EquivalenceChecker ec(qc_original, qc_alternative);
-	EXPECT_THROW(ec.check(), ec::QCECException);
+	EXPECT_THROW(ec.check(), std::invalid_argument);
 }
 
 TEST_F(GeneralTest, RemoveDiagonalGatesBeforeMeasure) {
@@ -185,4 +185,37 @@ TEST_F(GeneralTest, RemoveDiagonalGatesBeforeMeasure) {
 	ec::CompilationFlowEquivalenceChecker ec3(qc1, qc2);
 	results = ec3.check(config);
 	EXPECT_TRUE(results.consideredEquivalent());
+}
+
+TEST_F(GeneralTest, EquivalenceUpToGlobalPhase) {
+	qc_original.addQubitRegister(1);
+	qc_original.emplace_back<qc::StandardOperation>(1, 0, qc::X);
+	qc_original.emplace_back<qc::StandardOperation>(1, 0, qc::Z);
+	qc_original.emplace_back<qc::StandardOperation>(1, 0, qc::X);
+	qc_original.emplace_back<qc::StandardOperation>(1, 0, qc::Z);
+	qc_original.emplace_back<qc::StandardOperation>(1, 0, qc::X);
+	std::cout << qc_original << std::endl;
+
+	qc_alternative.addQubitRegister(1);
+	qc_alternative.emplace_back<qc::StandardOperation>(1, 0, qc::X);
+	std::cout << qc_alternative << std::endl;
+
+	ec::EquivalenceChecker ec(qc_original, qc_alternative);
+	auto results = ec.check();
+	EXPECT_EQ(results.equivalence, ec::Equivalence::EquivalentUpToGlobalPhase);
+	results.print();
+
+	ec::ImprovedDDEquivalenceChecker ec2(qc_original, qc_alternative);
+	auto results2 = ec2.check();
+	EXPECT_EQ(results2.equivalence, ec::Equivalence::EquivalentUpToGlobalPhase);
+	results2.print();
+}
+
+TEST_F(GeneralTest, InvalidStrategy) {
+	qc_original.addQubitRegister(1);
+	qc_original.emplace_back<qc::StandardOperation>(1, 0, qc::X);
+
+	ec::ImprovedDDEquivalenceChecker ec2(qc_original, qc_original);
+	ec::Configuration config{.strategy=ec::Strategy::CompilationFlow};
+	EXPECT_THROW(ec2.check(config), std::invalid_argument);
 }

@@ -185,7 +185,7 @@ namespace ec {
 		// Measurements at the end of the circuit are considered NOPs.
 		if ((*opIt)->getType() == qc::Measure) {
 			if (!qc::QuantumComputation::isLastOperationOnQubit(opIt, end)) {
-				throw QCECException("Intermediate measurements currently not supported. Defer your measurements to the end.");
+				throw std::invalid_argument("Intermediate measurements currently not supported. Defer your measurements to the end.");
 			}
 			return;
 		}

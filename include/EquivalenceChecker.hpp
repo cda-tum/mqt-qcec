@@ -62,16 +62,6 @@ namespace ec {
 		}
 	};
 
-	class QCECException : public std::invalid_argument {
-		std::string msg;
-	public:
-		explicit QCECException(std::string  msg) : std::invalid_argument("QCEC Exception"), msg(std::move(msg)) { }
-
-		[[nodiscard]] const char *what() const noexcept override {
-			return msg.c_str();
-		}
-	};
-
 	class EquivalenceChecker {
 	protected:
 		qc::QuantumComputation& qc1;

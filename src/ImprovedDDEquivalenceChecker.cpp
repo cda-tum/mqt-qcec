@@ -78,7 +78,7 @@ namespace ec {
 			case ec::Strategy::Lookahead: checkLookahead(results.result, perm1, perm2);
 				break;
 			default:
-				throw QCECException("Strategy " + toString(config.strategy) + " not supported by ImprovedDDEquivalenceChecker");
+				throw std::invalid_argument("Strategy " + toString(config.strategy) + " not supported by ImprovedDDEquivalenceChecker");
 		}
 
 		// finish first circuit
