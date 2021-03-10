@@ -53,7 +53,7 @@ jobs:
          if [ "$RUNNER_OS" == "Windows" ]; then
            cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DBUILD_QCEC_TESTS=ON -T "ClangCl"
          else
-           cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DBUILD_QCEC_TESTS=ON
+           cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DBUILD_QCEC_TESTS=ON -DBINDINGS=ON
          fi  
 
     - name: Build
@@ -87,7 +87,7 @@ jobs:
 
     - name: Configure CMake
       shell: bash
-      run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=Debug -DBUILD_QCEC_TESTS=ON -DCOVERAGE=1
+      run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=Debug -DBUILD_QCEC_TESTS=ON -DBINDINGS=ON -DCOVERAGE=1
 
     - name: Build
       shell: bash

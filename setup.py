@@ -1,6 +1,5 @@
 import os
 import sys
-import sysconfig
 import platform
 import subprocess
 

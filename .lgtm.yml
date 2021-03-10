@@ -14,10 +14,15 @@ extraction:
   cpp:
     prepare:
       packages:
-        - cmake
+        - python-pip
+    after_prepare:
+      - pip3 install --local cmake
+      - ls ~/.local/bin
+      - export PATH=$Path:~/.local/bin
+      - cmake --version
     configure:
       command:
-        - cmake -S . -B build -DGIT_SUBMODULE=OFF -DBUILD_QCEC_TESTS=ON -DBUILD_QFR_TESTS=ON -DBUILD_DD_PACKAGE_TESTS=ON
+        - cmake -S . -B build -DGIT_SUBMODULE=OFF -DBUILD_QCEC_TESTS=ON -DBUILD_QFR_TESTS=ON -DBUILD_DD_PACKAGE_TESTS=ON -DBINDINGS=ON
     index:
       build_command:
         - cmake --build build --parallel 4
