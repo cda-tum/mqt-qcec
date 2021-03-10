@@ -55,7 +55,7 @@ ec::EquivalenceCheckingResults verify(const py::object& circ1,
 			if (config.strategy == ec::Strategy::CompilationFlow) {
 				ec = std::make_unique<ec::CompilationFlowEquivalenceChecker>(qc1, qc2);
 			} else {
-				ec = std::make_unique<ec::ImprovedDDEquivalenceChecker>(qc1, qc2, config.strategy);
+				ec = std::make_unique<ec::ImprovedDDEquivalenceChecker>(qc1, qc2);
 			}
 		} else if (config.method == ec::Method::Simulation) {
 			ec = std::make_unique<ec::SimulationBasedEquivalenceChecker>(qc1, qc2);

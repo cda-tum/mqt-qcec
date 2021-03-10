@@ -22,9 +22,7 @@ namespace ec {
 		CostFunction costFunction;
 
 	public:
-		CompilationFlowEquivalenceChecker(qc::QuantumComputation& qc1, qc::QuantumComputation& qc2, CostFunction  costFunction = IBMCostFunction): ImprovedDDEquivalenceChecker(qc1, qc2), costFunction(std::move(costFunction)) {
-			strategy = Strategy::CompilationFlow;
-		}
+		CompilationFlowEquivalenceChecker(qc::QuantumComputation& qc1, qc::QuantumComputation& qc2, CostFunction  costFunction = IBMCostFunction): ImprovedDDEquivalenceChecker(qc1, qc2), costFunction(std::move(costFunction)) { }
 
 		EquivalenceCheckingResults check(const Configuration& config) override;
 		EquivalenceCheckingResults check() override { return check(Configuration{}); }

@@ -47,7 +47,8 @@ TEST_P(FunctionalityTest, Reference) {
 
 TEST_P(FunctionalityTest, Proportional) {
 	qc_alternative.import(test_alternative_dir + "test_" + GetParam() + ".qasm");
-	ec::ImprovedDDEquivalenceChecker eq_proportional(qc_original, qc_alternative, ec::Strategy::Proportional);
+	ec::ImprovedDDEquivalenceChecker eq_proportional(qc_original, qc_alternative);
+	config.strategy = ec::Strategy::Proportional;
 	auto results = eq_proportional.check(config);
 	results.print();
 	EXPECT_EQ(results.equivalence, ec::Equivalence::Equivalent);
@@ -55,7 +56,8 @@ TEST_P(FunctionalityTest, Proportional) {
 
 TEST_P(FunctionalityTest, Lookahead) {
 	qc_alternative.import(test_alternative_dir + "test_" + GetParam() + ".qasm");
-	ec::ImprovedDDEquivalenceChecker eq_lookahead(qc_original, qc_alternative, ec::Strategy::Lookahead);
+	ec::ImprovedDDEquivalenceChecker eq_lookahead(qc_original, qc_alternative);
+	config.strategy = ec::Strategy::Lookahead;
 	auto results = eq_lookahead.check(config);
 	results.print();
 	EXPECT_EQ(results.equivalence, ec::Equivalence::Equivalent);
@@ -63,7 +65,8 @@ TEST_P(FunctionalityTest, Lookahead) {
 
 TEST_P(FunctionalityTest, Naive) {
 	qc_alternative.import(test_alternative_dir + "test_" + GetParam() + ".qasm");
-	ec::ImprovedDDEquivalenceChecker eq_naive(qc_original, qc_alternative, ec::Strategy::Naive);
+	ec::ImprovedDDEquivalenceChecker eq_naive(qc_original, qc_alternative);
+	config.strategy = ec::Strategy::Naive;
 	auto results = eq_naive.check(config);
 	results.print();
 	EXPECT_EQ(results.equivalence, ec::Equivalence::Equivalent);
@@ -107,7 +110,8 @@ TEST_F(FunctionalityTest, test2) {
 	qc_original.import(test_original);
 	qc_alternative.import(test_alternative_dir + "test2_optimized.qasm");
 
-	ec::ImprovedDDEquivalenceChecker eq_proportional(qc_original, qc_alternative, ec::Strategy::Proportional);
+	ec::ImprovedDDEquivalenceChecker eq_proportional(qc_original, qc_alternative);
+	config.strategy = ec::Strategy::Proportional;
 	results = eq_proportional.check(config);
 	results.print();
 	EXPECT_EQ(results.equivalence, ec::Equivalence::Equivalent);
@@ -115,7 +119,8 @@ TEST_F(FunctionalityTest, test2) {
 	qc_original.import(test_original);
 	qc_alternative.import(test_alternative_dir + "test2_optimized.qasm");
 
-	ec::ImprovedDDEquivalenceChecker eq_lookahead(qc_original, qc_alternative, ec::Strategy::Lookahead);
+	ec::ImprovedDDEquivalenceChecker eq_lookahead(qc_original, qc_alternative);
+	config.strategy = ec::Strategy::Lookahead;
 	results = eq_lookahead.check(config);
 	results.print();
 	EXPECT_EQ(results.equivalence, ec::Equivalence::Equivalent);
@@ -123,7 +128,8 @@ TEST_F(FunctionalityTest, test2) {
 	qc_original.import(test_original);
 	qc_alternative.import(test_alternative_dir + "test2_optimized.qasm");
 
-	ec::ImprovedDDEquivalenceChecker eq_naive(qc_original, qc_alternative, ec::Strategy::Naive);
+	ec::ImprovedDDEquivalenceChecker eq_naive(qc_original, qc_alternative);
+	config.strategy = ec::Strategy::Naive;
 	results = eq_naive.check(config);
 	results.print();
 	EXPECT_EQ(results.equivalence, ec::Equivalence::Equivalent);

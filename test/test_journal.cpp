@@ -193,14 +193,12 @@ class JournalTestEQ : public testing::TestWithParam<std::string> {
 protected:
 	qc::QuantumComputation qc_original;
 	qc::QuantumComputation qc_transpiled;
-	ec::Configuration config;
+	ec::Configuration config{};
 
 	std::string test_original_dir = "./circuits/original/";
 	std::string test_transpiled_dir = "./circuits/transpiled/";
 
 	std::string transpiled_file{};
-
-	int timeout = 5;
 
 	void SetUp() override {
 		std::stringstream ss{};
@@ -249,7 +247,7 @@ TEST_P(JournalTestEQ, EQReference) {
 	qc_transpiled.import(transpiled_file);
 
 	ec::EquivalenceChecker equivalenceChecker(qc_original, qc_transpiled);
-	auto results = equivalenceChecker.check();
+	auto results = equivalenceChecker.check(config);
 	results.printCSVEntry();
 	results.print();
 	EXPECT_TRUE(results.consideredEquivalent());
@@ -259,8 +257,9 @@ TEST_P(JournalTestEQ, EQNaive) {
 	qc_original.import(test_original_dir + GetParam() + ".real");
 	qc_transpiled.import(transpiled_file);
 
-	ec::ImprovedDDEquivalenceChecker equivalenceChecker(qc_original, qc_transpiled, ec::Strategy::Naive);
-	auto results = equivalenceChecker.check();
+	ec::ImprovedDDEquivalenceChecker equivalenceChecker(qc_original, qc_transpiled);
+	config.strategy = ec::Strategy::Naive;
+	auto results = equivalenceChecker.check(config);
 	results.printCSVEntry();
 	results.print();
 	EXPECT_TRUE(results.consideredEquivalent());
@@ -270,8 +269,9 @@ TEST_P(JournalTestEQ, EQProportional) {
 	qc_original.import(test_original_dir + GetParam() + ".real");
 	qc_transpiled.import(transpiled_file);
 
-	ec::ImprovedDDEquivalenceChecker equivalenceChecker(qc_original, qc_transpiled, ec::Strategy::Proportional);
-	auto results = equivalenceChecker.check();
+	ec::ImprovedDDEquivalenceChecker equivalenceChecker(qc_original, qc_transpiled);
+	config.strategy = ec::Strategy::Proportional;
+	auto results = equivalenceChecker.check(config);
 	results.printCSVEntry();
 	results.print();
 	EXPECT_TRUE(results.consideredEquivalent());
@@ -281,8 +281,9 @@ TEST_P(JournalTestEQ, EQLookahead) {
 	qc_original.import(test_original_dir + GetParam() + ".real");
 	qc_transpiled.import(transpiled_file);
 
-	ec::ImprovedDDEquivalenceChecker equivalenceChecker(qc_original, qc_transpiled, ec::Strategy::Lookahead);
-	auto results = equivalenceChecker.check();
+	ec::ImprovedDDEquivalenceChecker equivalenceChecker(qc_original, qc_transpiled);
+	config.strategy = ec::Strategy::Lookahead;
+	auto results = equivalenceChecker.check(config);
 	results.printCSVEntry();
 	results.print();
 	EXPECT_TRUE(results.consideredEquivalent());
@@ -293,7 +294,7 @@ TEST_P(JournalTestEQ, EQPowerOfSimulation) {
 	qc_transpiled.import(transpiled_file);
 
 	ec::SimulationBasedEquivalenceChecker equivalenceChecker(qc_original, qc_transpiled);
-	auto results = equivalenceChecker.check();
+	auto results = equivalenceChecker.check(config);
 	results.printCSVEntry();
 	results.print();
 	EXPECT_TRUE(results.consideredEquivalent());

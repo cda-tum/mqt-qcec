@@ -44,12 +44,10 @@ namespace ec {
 		dd::Edge createGoalMatrix();
 
 	public:
-		ImprovedDDEquivalenceChecker(qc::QuantumComputation& qc1, qc::QuantumComputation& qc2, Strategy strategy = Strategy::Proportional):
-				EquivalenceChecker(qc1, qc2), strategy(strategy) {
+		ImprovedDDEquivalenceChecker(qc::QuantumComputation& qc1, qc::QuantumComputation& qc2):
+				EquivalenceChecker(qc1, qc2) {
 			method = Method::G_I_Gp;
 		}
-
-		Strategy strategy = Strategy::Proportional;
 
 		/// Use dedicated method to check the equivalence of both provided circuits
 		EquivalenceCheckingResults check(const Configuration& config) override;

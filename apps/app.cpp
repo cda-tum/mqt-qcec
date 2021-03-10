@@ -197,7 +197,7 @@ int main(int argc, char** argv){
 		ec::SimulationBasedEquivalenceChecker ec(qc1, qc2);
 		results = ec.check(config);
 	} else {
-		ec::ImprovedDDEquivalenceChecker ec(qc1, qc2, config.strategy);
+		ec::ImprovedDDEquivalenceChecker ec(qc1, qc2);
 		results = ec.check(config);
 	}
 	results.printJSON();

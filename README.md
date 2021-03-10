@@ -135,8 +135,7 @@ Internally the JKQ QCEC library works in the following way
     ```
     or
     ```c++
-    ec::Strategy strategy = ec::Strategy::{ Naive | Proportional | Lookahead };
-    auto eq = ec::ImprovedDDEquivalenceChecker(qc1, qc2, strategy);
+    auto eq = ec::ImprovedDDEquivalenceChecker(qc1, qc2);
     ```
     or
     ```c++ 
@@ -150,6 +149,7 @@ Internally the JKQ QCEC library works in the following way
     ```c++
     ec::Configuration config{};
     config.tolerance = 1e-8;
+    config.strategy = ec::Strategy::Lookahead;
     ```
 - Perform the actual equivalence check
     ```c++
