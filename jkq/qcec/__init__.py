@@ -3,5 +3,4 @@
 # See file README.md or go to http://iic.jku.at/eda/research/quantum_verification/ for more information.
 #
 
-from .verify import verify
-from .pyqcec import Method, StimuliType
+from .pyqcec import Method, Strategy, StimuliType, Configuration, Results, Equivalence, verify

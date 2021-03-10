@@ -7,33 +7,23 @@
 
 namespace ec {
 
-	void CompilationFlowEquivalenceChecker::check(const ec::Configuration& config) {
-		if (!validInstance())
-			return;
+	EquivalenceCheckingResults CompilationFlowEquivalenceChecker::check(const ec::Configuration& config) {
 
-		setTolerance(config.tolerance);
+		EquivalenceCheckingResults results{};
+		setupResults(results);
+		results.strategy = Strategy::CompilationFlow;
 
-		auto start = std::chrono::steady_clock::now();
-
-		qc::CircuitOptimizer::swapGateFusion(qc1);
-		qc::CircuitOptimizer::swapGateFusion(qc2);
-
-		qc::CircuitOptimizer::singleQubitGateFusion(qc1);
-		qc::CircuitOptimizer::singleQubitGateFusion(qc2);
-
-		if (config.removeDiagonalGatesBeforeMeasure) {
-			qc::CircuitOptimizer::removeDiagonalGatesBeforeMeasure(qc1);
-			qc::CircuitOptimizer::removeDiagonalGatesBeforeMeasure(qc2);
+		if (!validInstance()) {
+			return results;
 		}
 
-		qc::permutationMap perm1 = initial1;
-		qc::permutationMap perm2 = initial2;
-		results.result = createInitialMatrix();
+		auto start = std::chrono::steady_clock::now();
+		runPreCheckPasses(config);
+		auto endPreprocessing = std::chrono::steady_clock::now();
 
-		it1 = qc1.begin();
-		it2 = qc2.begin();
-		end1 = qc1.end();
-		end2 = qc2.end();
+		auto perm1 = initial1;
+		auto perm2 = initial2;
+		results.result = createInitialMatrix();
 
 		while (it1 != end1 && it2 != end2) {
 
@@ -49,10 +39,10 @@ namespace ec {
 			}
 
 			if (it1 != end1 && it2 != end2) {
-				unsigned short cost1 = costFunction((*it1)->getType(), (*it1)->getControls().size());
-				unsigned short cost2 = costFunction((*it2)->getType(), (*it2)->getControls().size());
+				auto cost1 = costFunction((*it1)->getType(), (*it1)->getControls().size());
+				auto cost2 = costFunction((*it2)->getType(), (*it2)->getControls().size());
 
-				for (int i = 0; i < cost2 && it1 != end1; ++i) {
+				for (unsigned long long i = 0; i < cost2 && it1 != end1; ++i) {
 					applyGate(it1, results.result, perm1, end1, LEFT);
 					++it1;
 
@@ -63,7 +53,7 @@ namespace ec {
 					}
 				}
 
-				for (int i = 0; i < cost1 && it2 != end2; ++i) {
+				for (unsigned long long i = 0; i < cost1 && it2 != end2; ++i) {
 					applyGate(it2, results.result, perm2, end2, RIGHT);
 					++it2;
 
@@ -81,7 +71,7 @@ namespace ec {
 			++it1;
 		}
 
-		//finish second circuit
+		// finish second circuit
 		while (it2 != end2) {
 			applyGate(it2, results.result, perm2, end2, RIGHT);
 			++it2;
@@ -97,13 +87,17 @@ namespace ec {
 		auto goal_matrix = createGoalMatrix();
 		results.equivalence = equals(results.result, goal_matrix);
 
-		auto end = std::chrono::steady_clock::now();
-		std::chrono::duration<double> diff = end - start;
-		results.time = diff.count();
-		results.maxActive = dd->maxActive;
+		auto endVerification = std::chrono::steady_clock::now();
+		std::chrono::duration<double> preprocessingTime = endPreprocessing - start;
+		std::chrono::duration<double> verificationTime = endVerification - endPreprocessing;
+		results.preprocessingTime = preprocessingTime.count();
+		results.verificationTime = verificationTime.count();
+		results.maxActive = std::max(results.maxActive, dd->maxActive);
+
+		return results;
 	}
 
-	unsigned short IBMCostFunction(const qc::OpType& gate, unsigned short nc) {
+	unsigned long long IBMCostFunction(const qc::OpType& gate, unsigned short nc) {
 		switch (gate) {
 			case qc::I:
 				return 1;
@@ -171,7 +165,8 @@ namespace ec {
 				return 1; // these operations are assumed to incur no cost, but to advance the procedure 1 is used
 
 			default:
-				throw QCECException("No cost for gate " + std::to_string(gate));
+				std::cerr << "No cost for gate " << std::to_string(gate) << " -> assuming cost of 1!" << std::endl;
+				return 1;
 		}
 	}
 }

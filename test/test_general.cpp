@@ -6,12 +6,11 @@
 #include <iostream>
 #include <string>
 #include <sstream>
-#include <CompilationFlowEquivalenceChecker.hpp>
 
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
-#include "EquivalenceChecker.hpp"
-#include "PowerOfSimulationEquivalenceChecker.hpp"
+#include "SimulationBasedEquivalenceChecker.hpp"
+#include "CompilationFlowEquivalenceChecker.hpp"
 
 using ::testing::HasSubstr;
 
@@ -26,22 +25,19 @@ TEST_F(GeneralTest, CSVOutput) {
 	qc_alternative.import("./circuits/test/test_alternative.real");
 
 	ec::EquivalenceChecker ec(qc_original, qc_alternative);
-	ec.expectEquivalent();
-	ec.check();
-	EXPECT_NO_THROW(ec.exportResultAsDot("result.dot"));
-	EXPECT_FALSE(ec.error());
+	auto results = ec.check();
 
 	std::stringstream ss{};
-	ec.printCSVEntry(ss);
+	results.printCSVEntry(ss);
 	std::string csvEntry = ss.str();
-	std::string expectedEntry = "test_original;3;4;test_alternative;3;16;EQ  ;EQ  ;Reference;";
+	std::string expectedEntry = "test_original;3;4;test_alternative;3;16;equivalent;";
 	EXPECT_THAT(csvEntry, HasSubstr(expectedEntry));
 
 	ss.str("");
 	ss.clear();
-	ec.printCSVHeader(ss);
+	ec::EquivalenceCheckingResults::printCSVHeader(ss);
 	std::string csvHeader = ss.str();
-	std::string expectedHeader = "filename1;nqubits1;ngates1;filename2;nqubits2;ngates2;expectedEquivalent;equivalent;method;time;maxActive;nsims;stimuliType";
+	std::string expectedHeader = "filename1;nqubits1;ngates1;filename2;nqubits2;ngates2;equivalent;t_pre;t_ver;maxActive;method;strategy;nsims;stimuliType";
 	EXPECT_THAT(csvHeader, HasSubstr(expectedHeader));
 }
 
@@ -50,13 +46,12 @@ TEST_F(GeneralTest, Output) {
 	qc_alternative.import("./circuits/test/test_alternative.real");
 
 	ec::ImprovedDDEquivalenceChecker ec(qc_original, qc_alternative);
-	ec.expectEquivalent();
-	EXPECT_NO_THROW(ec.check(););
+	auto results = ec.check();
 
-	ec.printCSVHeader();
-	ec.printCSVEntry();
-	ec.printJSONResult(true);
-	ec.printResult();
+	ec::EquivalenceCheckingResults::printCSVHeader();
+	results.printCSVEntry();
+	results.printJSON();
+	results.print();
 }
 
 TEST_F(GeneralTest, InvalidInstance) {
@@ -64,14 +59,12 @@ TEST_F(GeneralTest, InvalidInstance) {
 	qc_alternative.import("./circuits/test/test_error.qasm");
 
 	ec::EquivalenceChecker ec(qc_original, qc_alternative);
-	ec.check();
-	EXPECT_EQ(ec.results.equivalence, ec::NoInformation);
-	EXPECT_TRUE(ec.error());
+	auto results = ec.check();
+	EXPECT_EQ(results.equivalence, ec::Equivalence::NoInformation);
 
 	ec::CompilationFlowEquivalenceChecker cfec(qc_original, qc_alternative);
-	cfec.check();
-	EXPECT_EQ(cfec.results.equivalence, ec::NoInformation);
-	EXPECT_TRUE(cfec.error());
+	results = cfec.check();
+	EXPECT_EQ(results.equivalence, ec::Equivalence::NoInformation);
 }
 
 TEST_F(GeneralTest, NonUnitary) {
@@ -93,9 +86,8 @@ TEST_F(GeneralTest, SwitchDifferentlySizedCircuits) {
 	qc_alternative.import("./circuits/transpiled/dk27_225_transpiled.qasm");
 
 	ec::CompilationFlowEquivalenceChecker ec(qc_alternative, qc_original);
-	ec.check();
-	EXPECT_TRUE(ec.results.equivalence == ec::Equivalent || ec.results.equivalence == ec::EquivalentUpToGlobalPhase);
-	EXPECT_FALSE(ec.error());
+	auto results = ec.check();
+	EXPECT_TRUE(results.consideredEquivalent());
 }
 
 TEST_F(GeneralTest, MeasurementPermutation) {
@@ -119,8 +111,8 @@ TEST_F(GeneralTest, MeasurementPermutation) {
 	std::stringstream ss2{bell_circuit};
 	ASSERT_NO_THROW(qc_alternative.import(ss2, qc::OpenQASM));
 	ec::EquivalenceChecker ec(qc_original, qc_alternative);
-	ASSERT_NO_THROW(ec.check());
-	EXPECT_TRUE(ec.results.consideredEquivalent());
+	auto results = ec.check();
+	EXPECT_TRUE(results.consideredEquivalent());
 }
 
 TEST_F(GeneralTest, NonEquivalence) {
@@ -128,9 +120,8 @@ TEST_F(GeneralTest, NonEquivalence) {
 	qc_alternative.import("./circuits/test/test_erroneous.real");
 
 	ec::EquivalenceChecker ec(qc_original, qc_alternative);
-	ec.expectNonEquivalent();
-	EXPECT_NO_THROW(ec.check(););
-	EXPECT_EQ(ec.results.equivalence, ec::NonEquivalent);
+	auto results = ec.check();
+	EXPECT_EQ(results.equivalence, ec::Equivalence::NotEquivalent);
 }
 
 TEST_F(GeneralTest, IntermediateMeasurementNotSupported) {
@@ -156,7 +147,6 @@ TEST_F(GeneralTest, IntermediateMeasurementNotSupported) {
 	ASSERT_NO_THROW(qc_alternative.import(ss2, qc::OpenQASM));
 	ec::EquivalenceChecker ec(qc_original, qc_alternative);
 	EXPECT_THROW(ec.check(), ec::QCECException);
-	ec.printResult();
 }
 
 TEST_F(GeneralTest, RemoveDiagonalGatesBeforeMeasure) {
@@ -175,25 +165,24 @@ TEST_F(GeneralTest, RemoveDiagonalGatesBeforeMeasure) {
 	std::cout << qc2 << std::endl;
 	std::cout << "-----------------------------" << std::endl;
 	ec::EquivalenceChecker ec(qc1, qc2);
-	ec.check();
-	EXPECT_FALSE(ec.results.consideredEquivalent());
+	auto results = ec.check();
+	EXPECT_FALSE(results.consideredEquivalent());
 
-	ec::PowerOfSimulationEquivalenceChecker ecpos(qc1, qc2);
-	ecpos.check();
-	EXPECT_TRUE(ecpos.results.consideredEquivalent());
+	ec::SimulationBasedEquivalenceChecker ecpos(qc1, qc2);
+	results = ecpos.check();
+	EXPECT_TRUE(results.consideredEquivalent());
 
 	ec::Configuration config{};
 	config.removeDiagonalGatesBeforeMeasure = true;
 	ec::EquivalenceChecker ec1(qc1, qc2);
-	ec1.check(config);
-	EXPECT_TRUE(ec1.results.consideredEquivalent());
+	results = ec1.check(config);
+	EXPECT_TRUE(results.consideredEquivalent());
 
 	ec::ImprovedDDEquivalenceChecker ec2(qc1, qc2);
-	ec2.check(config);
-	EXPECT_TRUE(ec2.results.consideredEquivalent());
+	results = ec2.check(config);
+	EXPECT_TRUE(results.consideredEquivalent());
 
 	ec::CompilationFlowEquivalenceChecker ec3(qc1, qc2);
-	ec3.check(config);
-	EXPECT_TRUE(ec3.results.consideredEquivalent());
-
+	results = ec3.check(config);
+	EXPECT_TRUE(results.consideredEquivalent());
 }

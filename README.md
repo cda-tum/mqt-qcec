@@ -42,57 +42,54 @@ If you have any questions, feel free to contact us via [iic-quantum@jku.at](mail
 
 ## Usage
 
-JKQ QCEC is mainly developed as a C++ library with a [commandline interface](#command-line-executable). However, using it in Python is as easy as
+JKQ QCEC is mainly developed as a C++ library with an easy-to-use Python interface. 
+- Get the Python package
 ```bash
 pip install jkq.qcec
 ```
-and then in Python
+- Start using it in Python:
 ```python
-from jkq import qcec
-qcec.verify(circ1, circ2,  **kwargs)
-```
-where the `verify` function is defined as follows:
-```python
-"""
-Interface to the JKQ QCEC tool for verifying quantum circuits
+from jkq.qcec import *
 
-Params:
-    circ1 – Qiskit QuantumCircuit object, path to circuit file or Qiskit QuantumCircuit pickle (required)
-    circ2 – Qiskit QuantumCircuit object, path to circuit file or Qiskit QuantumCircuit pickle (required)
-    method – Equivalence checking method to use (reference | naive | *proportional* | lookahead | simulation | compilationflow)
-    tolerance – Numerical tolerance used during computation
-    nsims – Number of simulations to conduct (for simulation method)
-    fidelity – Fidelity limit for comparison (for simulation method)
-    stimuliType - Type of stimuli to use (for simulation method: *classical* | localquantum | globalquantum)
-    csv – Create CSV string for result
-    statistics – Print statistics
-    storeCEXinput: Store counterexample input state vector (for simulation method)
-    storeCEXoutput: Store resulting counterexample state vectors (for simulation method)
-    swapGateFusion – Optimization pass reconstructing SWAP operations
-    singleQubitGateFusion – Optimization pass fusing consecutive single qubit gates
-    removeDiagonalGatesBeforeMeasure – Optimization pass removing diagonal gates before measurements
-Returns:
-    JSON object containing results
-"""
-def verify(circ1, circ2,
-           method: Method = Method.proportional,
-           tolerance: float = 1e-13,
-           nsims: int = 16,
-           fidelity: float = 0.999,
-           stimuliType: StimuliType = StimuliType.classical,
-           csv: bool = False,
-           statistics: bool = False,
-           storeCEXinput: bool = False,
-           storeCEXoutput: bool = False,
-           swapGateFusion: bool = False,
-           singleQubitGateFusion: bool = False,
-           removeDiagonalGatesBeforeMeasure: bool = False) -> object
+config = Configuration()
+<...>  # set configuration options
+results = verify(circ1, circ2, config)
 ```
+Both circuits can either be IBM Qiskit `QuantumCircuit` objects or paths to circuit files (in any of the formats listed above). 
+
+The verification procedure can be configured with the following settings and options:
+ - General settings:
+    - `method`: Equivalence checking method to use
+        - reference
+        - ![G \rightarrow \mathbb{I} \leftarrow G'](https://render.githubusercontent.com/render/math?math=G%20%5Crightarrow%20%5Cmathbb%7BI%7D%20%5Cleftarrow%20G') (*default*)
+        - simulation
+    - `tolerance`: Numerical tolerance used during computation (`1e-13` per default)
+- Settinggs for the ![G \rightarrow \mathbb{I} \leftarrow G'](https://render.githubusercontent.com/render/math?math=G%20%5Crightarrow%20%5Cmathbb%7BI%7D%20%5Cleftarrow%20G') method:
+    - `strategy`: strategy to use for the scheme
+        - naive
+        - proportional (*default*)
+        - lookahead
+        - compilationflow
+- Settings for the simulation-based method:
+    - `fidelity`: Fidelity limit for comparison (`0.999` per default)
+    - `max_sims`: Maximum number of simulations to conduct (`16` per default)
+    - `stimuli_type`: Type of stimuli to use
+        - classical (*default*)
+        - localquantum
+        - globalquantum
+    - `store_cex_input`: Store counterexample input state vector (*off* by default)
+    - `store_cex_output`: Store resulting counterexample state vectors (*off* by default)
+- optimizations:
+    - `reconstruct_swaps`: Reconstruct SWAP operations from consecutive CNOTs (*on* per default)
+    - `fuse_single_qubit_gates`: Fuse consecutive single qubit gates (*on* per default)
+    - `remove_diagonal_gates_before_measure`: Remove diagonal gates before measurements (*off* by default)
+    
+The `qcec.Results` class that is returned by the `verify` function provides `json()` and `csv()` methods to produce JSON or CSV formatted output.
 
 ### Integration of IBM Qiskit
 The JKQ QCEC tool is designed to natively integrate with IBM Qiskit. In particular, using our tool to verify, e.g., the results of IBM Qiskit's quantum circuit compilation flow, is as easy as:
 ```python
-from jkq import qcec
+from jkq.qcec import Configuration, Strategy, verify
 from qiskit import QuantumCircuit, transpile
 
 # create your quantum circuit
@@ -104,18 +101,23 @@ qc.measure_all()
 # compile circuit to appropriate backend using some optimization level
 qc_comp = transpile(qc, backend=<...>, optimization_level=<0 | 1 | 2 | 3>) 
 
+# set dedicated verification strategy
+config = Configuration()
+config.strategy = Strategy.compilationflow
+
 # verify the compilation result
-qcec.verify(qc, qc_comp, method=qcec.Method.compilationflow, statistics=True)
+result = verify(qc, qc_comp, config)
 ```
 
 ### Command-line Executable
 JKQ QCEC also provides a **standalone executable** with command-line interface called `qcec_app`.
-It provides the same options as the Python module as flags (e.g., `--ps` for printing statistics, or `--method <method>`for setting the method). Per default, this produces JSON formatted output.
-If the `--csv` flag is present, a CSV entry according to the following header is printed
-```csv
-filename1;nqubits1;ngates1;filename2;nqubits2;ngates2;expectedEquivalent;equivalent;method;time;maxActive;nsims
-```
+It provides the same options as the Python module as flags (e.g., `--method <method>` for setting the method) and produces JSON formatted output.
 For a full list of options, call `qcec_app --help`.
+
+### System requirements
+
+Building (and running) is continuously tested under Linux, MacOS, and Windows using the [latest available system versions for GitHub Actions](https://github.com/actions/virtual-environments).
+However, the implementation should be compatible with any current C++ compiler supporting C++17 and a minimum CMake version of 3.14.
 
 ### Library Organisation
 Internally the JKQ QCEC library works in the following way
@@ -129,12 +131,16 @@ Internally the JKQ QCEC library works in the following way
     ```
 - Instantiate an `ec::EquivalenceChecker` object with both circuits
     ```c++
-    ec::Method method = ec::{ Reference | Naive | Proportional | Lookahead };
-    auto eq = ec::ImprovedDDEquivalenceChecker(qc1, qc2, method);
+    auto eq = ec::EquivalenceChecker(qc1, qc2);
     ```
-    or 
+    or
+    ```c++
+    ec::Strategy strategy = ec::Strategy::{ Naive | Proportional | Lookahead };
+    auto eq = ec::ImprovedDDEquivalenceChecker(qc1, qc2, strategy);
+    ```
+    or
     ```c++ 
-    auto eq = ec::PowerOfSimulationEquivalenceChecker(qc1, qc2);
+    auto eq = ec::SimulationBasedEquivalenceChecker(qc1, qc2);
     ```
     or 
     ```c++ 
@@ -143,22 +149,16 @@ Internally the JKQ QCEC library works in the following way
 - Set configuration options, e.g.,
     ```c++
     ec::Configuration config{};
-    config.printStatistics = true;
+    config.tolerance = 1e-8;
     ```
 - Perform the actual equivalence check
     ```c++
-    eq.check(config);
+    auto results = eq.check(config);
     ```
 - Print the results
     ```c++
-    ec.printJSONResult(config.printStatistics);
+    results.printJSON();
     ```
-    or access them through the ```eq.results``` member.
-  
-### System requirements
-
-Building (and running) is continuously tested under Linux, MacOS, and Windows using the [latest available system versions for GitHub Actions](https://github.com/actions/virtual-environments). 
-However, the implementation should be compatible with any current C++ compiler supporting C++17 and a minimum CMake version of 3.14.
 
 ### Setup, Configure, and Build
 
@@ -186,7 +186,18 @@ Building the project this way generates
 - the main library `libqcec.a` (Unix) / `qcec.lib` (Windows) in the `build/src` directory
 - the commandline executables `qcec_app` and `qcec_sim_app` (for simulation-based verification) in the `build/apps` directory
 - a test executable `qcec_test` containing a small set of unit tests in the `build/test` directory (only if `-DBUILD_QCEC_TESTS=ON` is passed to CMake during configuration)
-- a small demo example executable `qcec_example` in the `build/test` directory (only if `-DBUILD_QCEC_TESTS=ON` is passed to CMake during configuration)
+
+### Extending the Python Bindings
+
+To extend the Python bindings you can locally install the package in edit mode, so that changes in the Python code are instantly available.
+The following example assumes you have a [virtual environment](https://docs.python.org/3/library/venv.html) set up and activated.
+
+```commandline
+(venv) $ pip install cmake
+(venv) $ pip install --editable .
+```
+
+If you change parts of the C++ code, you have to run the second line to make the changes visible in Python.
 
 ## Reference
 

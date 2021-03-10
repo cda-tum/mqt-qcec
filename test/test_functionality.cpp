@@ -40,73 +40,58 @@ INSTANTIATE_TEST_SUITE_P(TestCircuits, FunctionalityTest,
 TEST_P(FunctionalityTest, Reference) {
 	qc_alternative.import(test_alternative_dir + "test_" + GetParam() + ".qasm");
 	ec::EquivalenceChecker eq(qc_original, qc_alternative);
-	eq.expectEquivalent();
-	eq.check(config);
-	eq.printResult();
-	EXPECT_EQ(eq.results.equivalence, ec::Equivalent);
-}
-
-TEST_P(FunctionalityTest, ReferenceFromImproved) {
-	qc_alternative.import(test_alternative_dir + "test_" + GetParam() + ".qasm");
-	ec::ImprovedDDEquivalenceChecker eq_ref(qc_original, qc_alternative, ec::Reference);
-	eq_ref.expectEquivalent();
-	eq_ref.check(config);
-	eq_ref.printResult();
-	EXPECT_EQ(eq_ref.results.equivalence, ec::Equivalent);
+	auto results = eq.check(config);
+	results.print();
+	EXPECT_EQ(results.equivalence, ec::Equivalence::Equivalent);
 }
 
 TEST_P(FunctionalityTest, Proportional) {
 	qc_alternative.import(test_alternative_dir + "test_" + GetParam() + ".qasm");
-	ec::ImprovedDDEquivalenceChecker eq_proportional(qc_original, qc_alternative, ec::Proportional);
-	eq_proportional.expectEquivalent();
-	eq_proportional.check(config);
-	eq_proportional.printResult();
-	EXPECT_EQ(eq_proportional.results.equivalence, ec::Equivalent);
+	ec::ImprovedDDEquivalenceChecker eq_proportional(qc_original, qc_alternative, ec::Strategy::Proportional);
+	auto results = eq_proportional.check(config);
+	results.print();
+	EXPECT_EQ(results.equivalence, ec::Equivalence::Equivalent);
 }
 
 TEST_P(FunctionalityTest, Lookahead) {
 	qc_alternative.import(test_alternative_dir + "test_" + GetParam() + ".qasm");
-	ec::ImprovedDDEquivalenceChecker eq_lookahead(qc_original, qc_alternative, ec::Lookahead);
-	eq_lookahead.expectEquivalent();
-	eq_lookahead.check(config);
-	eq_lookahead.printResult();
-	EXPECT_EQ(eq_lookahead.results.equivalence, ec::Equivalent);
+	ec::ImprovedDDEquivalenceChecker eq_lookahead(qc_original, qc_alternative, ec::Strategy::Lookahead);
+	auto results = eq_lookahead.check(config);
+	results.print();
+	EXPECT_EQ(results.equivalence, ec::Equivalence::Equivalent);
 }
 
 TEST_P(FunctionalityTest, Naive) {
 	qc_alternative.import(test_alternative_dir + "test_" + GetParam() + ".qasm");
-	ec::ImprovedDDEquivalenceChecker eq_naive(qc_original, qc_alternative, ec::Naive);
-	eq_naive.expectEquivalent();
-	eq_naive.check(config);
-	eq_naive.printResult();
-	EXPECT_EQ(eq_naive.results.equivalence, ec::Equivalent);
+	ec::ImprovedDDEquivalenceChecker eq_naive(qc_original, qc_alternative, ec::Strategy::Naive);
+	auto results = eq_naive.check(config);
+	results.print();
+	EXPECT_EQ(results.equivalence, ec::Equivalence::Equivalent);
 }
 
 TEST_P(FunctionalityTest, CompilationFlow) {
 	qc_alternative.import(test_alternative_dir + "test_" + GetParam() + ".qasm");
 	ec::CompilationFlowEquivalenceChecker eq_flow(qc_original, qc_alternative);
-	eq_flow.expectEquivalent();
-	eq_flow.check(config);
-	eq_flow.printResult();
-	EXPECT_EQ(eq_flow.results.equivalence, ec::Equivalent);
+	auto results = eq_flow.check(config);
+	results.print();
+	EXPECT_EQ(results.equivalence, ec::Equivalence::Equivalent);
 }
 
 TEST_P(FunctionalityTest, Optimizations) {
 	qc_alternative.import(test_alternative_dir + "test_" + GetParam() + ".qasm");
 	ec::EquivalenceChecker eq(qc_original, qc_alternative);
-	eq.expectEquivalent();
-	config.singleQubitGateFusion = true;
-	eq.check(config);
-	eq.printResult();
-	EXPECT_TRUE(eq.results.consideredEquivalent());
-	config.swapGateFusion = true;
-	eq.check(config);
-	eq.printResult();
-	EXPECT_TRUE(eq.results.consideredEquivalent());
+	config.fuseSingleQubitGates = true;
+	auto results = eq.check(config);
+	results.print();
+	EXPECT_TRUE(results.consideredEquivalent());
+	config.reconstructSWAPs = true;
+	results = eq.check(config);
+	results.print();
+	EXPECT_TRUE(results.consideredEquivalent());
 	config.removeDiagonalGatesBeforeMeasure = true;
-	eq.check(config);
-	eq.printResult();
-	EXPECT_TRUE(eq.results.consideredEquivalent());
+	results = eq.check(config);
+	results.print();
+	EXPECT_TRUE(results.consideredEquivalent());
 }
 
 TEST_F(FunctionalityTest, test2) {
@@ -115,45 +100,40 @@ TEST_F(FunctionalityTest, test2) {
 	qc_alternative.import(test_alternative_dir + "test2_optimized.qasm");
 
 	ec::EquivalenceChecker eq(qc_original, qc_alternative);
-	eq.expectEquivalent();
-	eq.check(config);
-	eq.printResult();
-	EXPECT_EQ(eq.results.equivalence, ec::Equivalent);
+	auto results = eq.check(config);
+	results.print();
+	EXPECT_EQ(results.equivalence, ec::Equivalence::Equivalent);
 
 	qc_original.import(test_original);
 	qc_alternative.import(test_alternative_dir + "test2_optimized.qasm");
 
-	ec::ImprovedDDEquivalenceChecker eq_proportional(qc_original, qc_alternative, ec::Proportional);
-	eq_proportional.expectEquivalent();
-	eq_proportional.check(config);
-	eq_proportional.printResult();
-	EXPECT_EQ(eq_proportional.results.equivalence, ec::Equivalent);
+	ec::ImprovedDDEquivalenceChecker eq_proportional(qc_original, qc_alternative, ec::Strategy::Proportional);
+	results = eq_proportional.check(config);
+	results.print();
+	EXPECT_EQ(results.equivalence, ec::Equivalence::Equivalent);
 
 	qc_original.import(test_original);
 	qc_alternative.import(test_alternative_dir + "test2_optimized.qasm");
 
-	ec::ImprovedDDEquivalenceChecker eq_lookahead(qc_original, qc_alternative, ec::Lookahead);
-	eq_lookahead.expectEquivalent();
-	eq_lookahead.check(config);
-	eq_lookahead.printResult();
-	EXPECT_EQ(eq_lookahead.results.equivalence, ec::Equivalent);
+	ec::ImprovedDDEquivalenceChecker eq_lookahead(qc_original, qc_alternative, ec::Strategy::Lookahead);
+	results = eq_lookahead.check(config);
+	results.print();
+	EXPECT_EQ(results.equivalence, ec::Equivalence::Equivalent);
 
 	qc_original.import(test_original);
 	qc_alternative.import(test_alternative_dir + "test2_optimized.qasm");
 
-	ec::ImprovedDDEquivalenceChecker eq_naive(qc_original, qc_alternative, ec::Naive);
-	eq_naive.expectEquivalent();
-	eq_naive.check(config);
-	eq_naive.printResult();
-	EXPECT_EQ(eq_naive.results.equivalence, ec::Equivalent);
+	ec::ImprovedDDEquivalenceChecker eq_naive(qc_original, qc_alternative, ec::Strategy::Naive);
+	results = eq_naive.check(config);
+	results.print();
+	EXPECT_EQ(results.equivalence, ec::Equivalence::Equivalent);
 
 	qc_original.import(test_original);
 	qc_alternative.import(test_alternative_dir + "test2_optimized.qasm");
 
 	ec::CompilationFlowEquivalenceChecker eq_flow(qc_original, qc_alternative);
-	eq_flow.expectEquivalent();
-	eq_flow.check(config);
-	eq_flow.printResult();
-	EXPECT_EQ(eq_flow.results.equivalence, ec::Equivalent);
+	results = eq_flow.check(config);
+	results.print();
+	EXPECT_EQ(results.equivalence, ec::Equivalence::Equivalent);
 }
 

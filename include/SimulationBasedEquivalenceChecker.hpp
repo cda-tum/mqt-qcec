@@ -3,8 +3,8 @@
  * See file README.md or go to http://iic.jku.at/eda/research/quantum_verification/ for more information.
  */
 
-#ifndef QCEC_POWEROFSIMULATIONEQUIVALENCECHECKER_HPP
-#define QCEC_POWEROFSIMULATIONEQUIVALENCECHECKER_HPP
+#ifndef QCEC_SIMULATIONBASEDEQUIVALENCECHECKER_HPP
+#define QCEC_SIMULATIONBASEDEQUIVALENCECHECKER_HPP
 
 #include <bitset>
 #include <unordered_set>
@@ -24,7 +24,7 @@
 
 namespace ec {
 
-	class PowerOfSimulationEquivalenceChecker: public EquivalenceChecker {
+	class SimulationBasedEquivalenceChecker: public EquivalenceChecker {
 	protected:
 		std::function<unsigned long long()> stimuliGenerator;
 		std::function<unsigned short()> basisStateGenerator;
@@ -37,18 +37,17 @@ namespace ec {
 		std::uniform_int_distribution<unsigned long long> distribution;
 		std::uniform_int_distribution<unsigned short> basisStateDistribution;
 
-		bool checkWithStimulus(const dd::Edge& stimulus, const Configuration& config = Configuration{});
 
-		bool checkWithClassicalStimulus(unsigned long long stimulus = 0U, const Configuration& config = Configuration{});
-		bool checkWithLocalQuantumStimulus(const std::vector<dd::BasisStates>& stimulus, const Configuration& config = Configuration{});
-		bool checkWithGlobalQuantumStimulus(const qc::RandomCliffordCircuit& rcs, const Configuration& config = Configuration{});
-
-		void checkWithClassicalStimuli(const Configuration& config = Configuration{});
-		void checkWithLocalQuantumStimuli(const Configuration& config = Configuration{});
-		void checkWithGlobalQuantumStimuli(const Configuration& config = Configuration{});
+		dd::Edge generateRandomStimulus(StimuliType type = StimuliType::Classical);
+		dd::Edge generateRandomClassicalStimulus();
+		dd::Edge generateRandomLocalQuantumStimulus();
+		dd::Edge generateRandomGlobalQuantumStimulus();
+		bool simulateWithStimulus(const dd::Edge& stimulus, EquivalenceCheckingResults& results, const Configuration& config = Configuration{});
+		void checkWithStimulus(const dd::Edge& stimulus, EquivalenceCheckingResults& results, const Configuration& config = Configuration{});
 
 	public:
-		PowerOfSimulationEquivalenceChecker(qc::QuantumComputation& qc1, qc::QuantumComputation& qc2, unsigned long seed = 0): EquivalenceChecker(qc1, qc2), seed(seed) {
+		SimulationBasedEquivalenceChecker(qc::QuantumComputation& qc1, qc::QuantumComputation& qc2, unsigned long seed = 0): EquivalenceChecker(qc1, qc2), seed(seed) {
+			method = ec::Method::Simulation;
 			nqubits_for_stimuli = qc1.getNqubitsWithoutAncillae();
 
 			if(seed == 0) {
@@ -69,10 +68,12 @@ namespace ec {
 			basisStateGenerator = [&]() { return basisStateDistribution(mt); };
 		};
 
-		void check(const Configuration& config) override;
-		void check() override { return check(Configuration{}); }
+		EquivalenceCheckingResults check(const Configuration& config) override;
+		EquivalenceCheckingResults check() override { return check(ec::Configuration{}); }
+		EquivalenceCheckingResults checkZeroState(const Configuration& config = Configuration{});
+		EquivalenceCheckingResults checkPlusState(const Configuration& config = Configuration{});
 	};
 
 }
 
-#endif //QCEC_POWEROFSIMULATIONEQUIVALENCECHECKER_HPP
+#endif //QCEC_SIMULATIONBASEDEQUIVALENCECHECKER_HPP

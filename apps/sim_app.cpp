@@ -8,7 +8,7 @@
 #include <locale>
 #include <algorithm>
 
-#include "PowerOfSimulationEquivalenceChecker.hpp"
+#include "SimulationBasedEquivalenceChecker.hpp"
 
 void show_usage(const std::string& name) {
 	std::cerr << "Usage: " << name << " <PATH_TO_FILE_1> <PATH_TO_FILE_2>                                                           " << std::endl;
@@ -45,7 +45,7 @@ int main(int argc, char** argv){
 	qc2.import(file2);
 
 	ec::Configuration config{};
-	config.stimuliType = ec::Classical;
+	config.stimuliType = ec::StimuliType::Classical;
 
 	unsigned long long modify_seed = 0;
 	unsigned long long gates_to_modify = 0;
@@ -104,12 +104,12 @@ int main(int argc, char** argv){
 				cmd = argv[i];
 				std::transform(cmd.begin(), cmd.end(), cmd.begin(), [](unsigned char c) { return ::tolower(c); });
 				if (cmd == "classical") {
-					config.stimuliType = ec::Classical;
+					config.stimuliType = ec::StimuliType::Classical;
 				} else if (cmd == "localquantum") {
-					config.stimuliType = ec::LocalQuantum;
+					config.stimuliType = ec::StimuliType::LocalQuantum;
 					resoss << "_" << "localquantum";
 				} else if (cmd == "globalquantum" ) {
-					config.stimuliType = ec::GlobalQuantum;
+					config.stimuliType = ec::StimuliType::GlobalQuantum;
 					resoss << "_" << "globalquantum";
 				} else {
 					show_usage(argv[0]);
@@ -234,14 +234,13 @@ int main(int argc, char** argv){
 	resoss << ".csv";
 
 	try {
-		ec::PowerOfSimulationEquivalenceChecker ec(qc1, qc2, simulation_seed);
-		ec.expectNothing();
-		ec.check(config);
+		ec::SimulationBasedEquivalenceChecker ec(qc1, qc2, simulation_seed);
+		auto results = ec.check(config);
 
 		std::ostringstream oss{};
 		oss << qc1.getName() << ";" << modify_seed << ";" << simulation_seed
-			<< ";" << ec.results.nsims << ";" << ec.results.time << ";"
-			<< (ec.results.equivalence == ec::NonEquivalent) << std::endl;
+		    << ";" << results.nsims << ";" << results.preprocessingTime << ";" << results.verificationTime << ";"
+		    << (results.equivalence == ec::Equivalence::NotEquivalent) << std::endl;
 		std::cout << oss.str();
 
 		std::ofstream ofs{};

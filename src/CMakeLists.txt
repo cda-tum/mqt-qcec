@@ -7,8 +7,8 @@ add_library(${PROJECT_NAME}
             ${CMAKE_CURRENT_SOURCE_DIR}/ImprovedDDEquivalenceChecker.cpp
             ${${PROJECT_NAME}_SOURCE_DIR}/include/CompilationFlowEquivalenceChecker.hpp
             ${CMAKE_CURRENT_SOURCE_DIR}/CompilationFlowEquivalenceChecker.cpp
-            ${${PROJECT_NAME}_SOURCE_DIR}/include/PowerOfSimulationEquivalenceChecker.hpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/PowerOfSimulationEquivalenceChecker.cpp
+            ${${PROJECT_NAME}_SOURCE_DIR}/include/SimulationBasedEquivalenceChecker.hpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/SimulationBasedEquivalenceChecker.cpp
             )
 # set include directories
 target_include_directories(${PROJECT_NAME} PUBLIC $<BUILD_INTERFACE:${${PROJECT_NAME}_SOURCE_DIR}/include>)

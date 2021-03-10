@@ -13,93 +13,72 @@
 #include "nlohmann/json.hpp"
 
 namespace ec {
-	enum Equivalence {
-		NonEquivalent, Equivalent, NoInformation, ProbablyEquivalent, EquivalentUpToGlobalPhase
+	enum class Equivalence {
+		NotEquivalent, Equivalent, NoInformation, ProbablyEquivalent, EquivalentUpToGlobalPhase
 	};
 
-	// map ec::Equivalence values to JSON as strings
-	NLOHMANN_JSON_SERIALIZE_ENUM( Equivalence, {
-		{NonEquivalent, "not equivalent"},
-		{Equivalent, "equivalent"},
-		{EquivalentUpToGlobalPhase, "equivalent up to global phase"},
-		{ProbablyEquivalent, "probably equivalent"},
-		{NoInformation, "no information"},
-	})
-
-	enum Method {
-		Reference, Naive, Proportional, Lookahead, CompilationFlow, PowerOfSimulation
+	enum class Method {
+		Reference, G_I_Gp, Simulation
 	};
 
-	// map ec::Method values to JSON as strings
-	NLOHMANN_JSON_SERIALIZE_ENUM( ec::Method, {
-		{ec::Reference, "reference"},
-		{ec::Naive, "naive"},
-		{ec::Proportional, "proportional"},
-		{ec::Lookahead, "lookahead"},
-		{ec::PowerOfSimulation, "simulation"},
-		{ec::CompilationFlow, "compilationflow"}
-	})
-
-	enum StimuliType {
-		Classical, LocalQuantum, GlobalQuantum\
+	enum class Strategy {
+		Naive, Proportional, Lookahead, CompilationFlow
 	};
 
-	// map ec::StimuliType values to JSON as strings
-	NLOHMANN_JSON_SERIALIZE_ENUM( ec::StimuliType, {
-		{ec::Classical, "classical"},
-		{ec::LocalQuantum, "localquantum"},
-		{ec::GlobalQuantum, "globalquantum"}
-	})
+	enum class StimuliType {
+		Classical, LocalQuantum, GlobalQuantum
+	};
 
 	std::string toString(const Method& method);
 	std::string toString(const Equivalence& equivalence);
+	std::string toString(const Strategy& method);
 	std::string toString(const StimuliType& stimuliType);
 
 	struct EquivalenceCheckingResults {
-		std::string name1;
-		std::string name2;
+
+		struct CircuitInfo {
+			std::string name;
+			unsigned short nqubits = 0;
+			unsigned long long ngates = 0;
+			dd::Package::CVec cexOutput{};
+
+			[[nodiscard]] std::string toString() const {
+				std::stringstream ss{};
+				if (!name.empty()) {
+					ss << name << " ";
+				}
+				ss << nqubits << " qubits, ";
+				ss << ngates << " gates";
+				return ss.str();
+			}
+		};
+
+		CircuitInfo circuit1{};
+		CircuitInfo circuit2{};
 		std::string name;
-		unsigned long ngates1 = 0;
-		unsigned long ngates2 = 0;
-		unsigned short nqubits1 = 0;
-		unsigned short nqubits2 = 0;
 		unsigned short nqubits = 0;
 
 		Method method;
-		StimuliType stimuliType = Classical;
-
-		// error flags
-		bool timeout = false;
-		bool tooManyQubits = false;
-		bool differentNrQubits = false;
-		Equivalence expected = NoInformation;
+		Strategy strategy = Strategy::Proportional;
+		StimuliType stimuliType = StimuliType::Classical;
 
 		// results
-		Equivalence equivalence = NoInformation;
-		double time = 0.0;
+		Equivalence equivalence = Equivalence::NoInformation;
+		double preprocessingTime = 0.0;
+		double verificationTime = 0.0;
 		unsigned long maxActive = 0;
 		unsigned long long nsims = 0;
-		unsigned long long basisState = 0;
 		dd::Package::CVec cexInput{};
-		dd::Package::CVec cexOutput1{};
-		dd::Package::CVec cexOutput2{};
 		fp fidelity = 0.0;
 		dd::Edge result = dd::Package::DDzero;
 
-		virtual ~EquivalenceCheckingResults() = default;
-
-		[[nodiscard]] bool error() const {
-			return tooManyQubits || differentNrQubits;
-		}
-
 		[[nodiscard]] bool consideredEquivalent() const {
-			return equivalence == Equivalent || equivalence == EquivalentUpToGlobalPhase || equivalence == ProbablyEquivalent;
+			return equivalence == Equivalence::Equivalent || equivalence == Equivalence::EquivalentUpToGlobalPhase || equivalence == Equivalence::ProbablyEquivalent;
 		}
 
-		virtual std::ostream& print() { return print(std::cout); }
-		virtual std::ostream& print(std::ostream& out);
+		std::ostream& print(std::ostream& out = std::cout) const;
 
-		static void to_json(nlohmann::json& j, dd::Package::CVec& stateVector) {
+		static void to_json(nlohmann::json& j, const dd::Package::CVec& stateVector) {
 			j = nlohmann::json::array();
 			for (const auto& amp: stateVector) {
 				j.emplace_back(amp);
@@ -110,24 +89,24 @@ namespace ec {
 				stateVector[i] = j.at(i).get<std::pair<fp, fp>>();
 			}
 		}
-		virtual nlohmann::json produceJSON(bool statistics);
-		virtual std::ostream& printJSON(bool printStatistics) { return printJSON(std::cout, printStatistics); }
-		virtual std::ostream& printJSON(std::ostream& out, bool printStatistics) {
-			if (error())
-				return out;
-			out << produceJSON(printStatistics).dump(2) << std::endl;
+		[[nodiscard]] nlohmann::json produceJSON() const;
+		[[nodiscard]] std::string toString() const {
+			return produceJSON().dump(2);
+		}
+		std::ostream& printJSON(std::ostream& out = std::cout) const {
+			out << toString() << std::endl;
 			return out;
 		}
 
+		static std::string getCSVHeader() {
+			return "filename1;nqubits1;ngates1;filename2;nqubits2;ngates2;equivalent;t_pre;t_ver;maxActive;method;strategy;nsims;stimuliType";
+		}
 		static std::ostream& printCSVHeader(std::ostream& out = std::cout) {
-			out << "filename1;nqubits1;ngates1;filename2;nqubits2;ngates2;expectedEquivalent;equivalent;method;time;maxActive;nsims;stimuliType";
+			out << getCSVHeader();
 			return out;
 		}
-		virtual std::string produceCSVEntry();
-		virtual std::ostream& printCSVEntry() { return printCSVEntry(std::cout ); }
-		virtual std::ostream& printCSVEntry(std::ostream& out) {
-			if (error())
-				return out;
+		[[nodiscard]] std::string produceCSVEntry() const;
+		std::ostream& printCSVEntry(std::ostream& out = std::cout) const {
 			out << produceCSVEntry() << std::endl;
 			return out;
 		}

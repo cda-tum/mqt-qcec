@@ -13,9 +13,9 @@
 #include "ImprovedDDEquivalenceChecker.hpp"
 
 namespace ec {
-	using CostFunction = std::function<unsigned short(const qc::OpType&, unsigned short)>;
+	using CostFunction = std::function<unsigned long long(const qc::OpType&, unsigned short)>;
 
-	unsigned short IBMCostFunction(const qc::OpType& gate, unsigned short nc);
+	unsigned long long IBMCostFunction(const qc::OpType& gate, unsigned short nc);
 
 	class CompilationFlowEquivalenceChecker: public ImprovedDDEquivalenceChecker {
 
@@ -23,11 +23,11 @@ namespace ec {
 
 	public:
 		CompilationFlowEquivalenceChecker(qc::QuantumComputation& qc1, qc::QuantumComputation& qc2, CostFunction  costFunction = IBMCostFunction): ImprovedDDEquivalenceChecker(qc1, qc2), costFunction(std::move(costFunction)) {
-			method = results.method = CompilationFlow;
+			strategy = Strategy::CompilationFlow;
 		}
 
-		void check(const Configuration& config) override;
-		void check() override { return check(Configuration{}); }
+		EquivalenceCheckingResults check(const Configuration& config) override;
+		EquivalenceCheckingResults check() override { return check(Configuration{}); }
 	};
 }
 

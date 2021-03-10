@@ -11,7 +11,7 @@
 #include <future>
 
 #include "gtest/gtest.h"
-#include "PowerOfSimulationEquivalenceChecker.hpp"
+#include "SimulationBasedEquivalenceChecker.hpp"
 #include "ImprovedDDEquivalenceChecker.hpp"
 
 class JournalTestNonEQ: public testing::TestWithParam<std::tuple<std::string, unsigned short>> {
@@ -163,13 +163,12 @@ TEST_P(JournalTestNonEQ, PowerOfSimulation) {
 		already_removed.insert(removed);
 
 		try {
-			ec::PowerOfSimulationEquivalenceChecker noneq_sim(qc_original, qc_transpiled);
-			noneq_sim.expectNonEquivalent();
-			noneq_sim.check(config);
+			ec::SimulationBasedEquivalenceChecker noneq_sim(qc_original, qc_transpiled);
+			auto results = noneq_sim.check(config);
 			std::cout << "[" << i << "] ";
-			noneq_sim.printCSVEntry();
-			addToStatistics(i, noneq_sim.results.time, noneq_sim.results.nsims);
-			if(noneq_sim.results.equivalence == ec::NonEquivalent) {
+			results.printCSVEntry();
+			addToStatistics(i, results.verificationTime + results.preprocessingTime, results.nsims);
+			if(results.equivalence == ec::Equivalence::NotEquivalent) {
 				successes++;
 			}
 		} catch (std::exception& e) {
@@ -250,97 +249,52 @@ TEST_P(JournalTestEQ, EQReference) {
 	qc_transpiled.import(transpiled_file);
 
 	ec::EquivalenceChecker equivalenceChecker(qc_original, qc_transpiled);
-
-	equivalenceChecker.expectEquivalent();
-	auto future = std::async(std::launch::async, [&equivalenceChecker]() {
-				equivalenceChecker.check(ec::Configuration{true});
-			});
-
-	if(future.wait_for(std::chrono::seconds(timeout)) == std::future_status::timeout) {
-		equivalenceChecker.results.timeout = true;
-	}
-
-	equivalenceChecker.printCSVEntry();
-	equivalenceChecker.printResult();
-	EXPECT_TRUE(equivalenceChecker.results.timeout || equivalenceChecker.results.consideredEquivalent());
+	auto results = equivalenceChecker.check();
+	results.printCSVEntry();
+	results.print();
+	EXPECT_TRUE(results.consideredEquivalent());
 }
 
 TEST_P(JournalTestEQ, EQNaive) {
 	qc_original.import(test_original_dir + GetParam() + ".real");
 	qc_transpiled.import(transpiled_file);
 
-	ec::ImprovedDDEquivalenceChecker equivalenceChecker(qc_original, qc_transpiled, ec::Naive);
-
-	equivalenceChecker.expectEquivalent();
-	auto future = std::async(std::launch::async, [&equivalenceChecker]() {
-		equivalenceChecker.check(ec::Configuration{true});
-	});
-
-	if(future.wait_for(std::chrono::seconds(timeout)) == std::future_status::timeout) {
-		equivalenceChecker.results.timeout = true;
-	}
-
-	equivalenceChecker.printCSVEntry();
-	equivalenceChecker.printResult();
-	EXPECT_TRUE(equivalenceChecker.results.timeout || equivalenceChecker.results.consideredEquivalent());
+	ec::ImprovedDDEquivalenceChecker equivalenceChecker(qc_original, qc_transpiled, ec::Strategy::Naive);
+	auto results = equivalenceChecker.check();
+	results.printCSVEntry();
+	results.print();
+	EXPECT_TRUE(results.consideredEquivalent());
 }
 
 TEST_P(JournalTestEQ, EQProportional) {
 	qc_original.import(test_original_dir + GetParam() + ".real");
 	qc_transpiled.import(transpiled_file);
 
-	ec::ImprovedDDEquivalenceChecker equivalenceChecker(qc_original, qc_transpiled, ec::Proportional);
-
-	equivalenceChecker.expectEquivalent();
-	auto future = std::async(std::launch::async, [&equivalenceChecker]() {
-		equivalenceChecker.check(ec::Configuration{true});
-	});
-
-	if(future.wait_for(std::chrono::seconds(timeout)) == std::future_status::timeout) {
-		equivalenceChecker.results.timeout = true;
-	}
-
-	equivalenceChecker.printCSVEntry();
-	equivalenceChecker.printResult();
-	EXPECT_TRUE(equivalenceChecker.results.timeout || equivalenceChecker.results.consideredEquivalent());
+	ec::ImprovedDDEquivalenceChecker equivalenceChecker(qc_original, qc_transpiled, ec::Strategy::Proportional);
+	auto results = equivalenceChecker.check();
+	results.printCSVEntry();
+	results.print();
+	EXPECT_TRUE(results.consideredEquivalent());
 }
 
 TEST_P(JournalTestEQ, EQLookahead) {
 	qc_original.import(test_original_dir + GetParam() + ".real");
 	qc_transpiled.import(transpiled_file);
 
-	ec::ImprovedDDEquivalenceChecker equivalenceChecker(qc_original, qc_transpiled, ec::Lookahead);
-
-	equivalenceChecker.expectEquivalent();
-	auto future = std::async(std::launch::async, [&equivalenceChecker]() {
-		equivalenceChecker.check(ec::Configuration{true});
-	});
-
-	if(future.wait_for(std::chrono::seconds(timeout)) == std::future_status::timeout) {
-		equivalenceChecker.results.timeout = true;
-	}
-
-	equivalenceChecker.printCSVEntry();
-	equivalenceChecker.printResult();
-	EXPECT_TRUE(equivalenceChecker.results.timeout || equivalenceChecker.results.consideredEquivalent());
+	ec::ImprovedDDEquivalenceChecker equivalenceChecker(qc_original, qc_transpiled, ec::Strategy::Lookahead);
+	auto results = equivalenceChecker.check();
+	results.printCSVEntry();
+	results.print();
+	EXPECT_TRUE(results.consideredEquivalent());
 }
 
 TEST_P(JournalTestEQ, EQPowerOfSimulation) {
 	qc_original.import(test_original_dir + GetParam() + ".real");
 	qc_transpiled.import(transpiled_file);
 
-	ec::PowerOfSimulationEquivalenceChecker equivalenceChecker(qc_original, qc_transpiled);
-
-	equivalenceChecker.expectEquivalent();
-	auto future = std::async(std::launch::async, [&equivalenceChecker]() {
-		equivalenceChecker.check(ec::Configuration{true});
-	});
-
-	if(future.wait_for(std::chrono::seconds(timeout)) == std::future_status::timeout) {
-		equivalenceChecker.results.timeout = true;
-	}
-
-	equivalenceChecker.printCSVEntry();
-	equivalenceChecker.printResult();
-	EXPECT_TRUE(equivalenceChecker.results.timeout || equivalenceChecker.results.consideredEquivalent());
+	ec::SimulationBasedEquivalenceChecker equivalenceChecker(qc_original, qc_transpiled);
+	auto results = equivalenceChecker.check();
+	results.printCSVEntry();
+	results.print();
+	EXPECT_TRUE(results.consideredEquivalent());
 }

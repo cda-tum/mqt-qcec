@@ -12,16 +12,6 @@ namespace ec {
 		dd = std::make_unique<dd::Package>();
 		dd->setMode(dd::Matrix);
 
-		results.name1 = qc1.getName();
-		results.name2 = qc2.getName();
-		results.name = results.name1 + " and " + results.name2;
-
-		results.nqubits1 = qc1.getNqubits();
-		results.nqubits2 = qc2.getNqubits();
-
-		results.ngates1 = qc1.getNops();
-		results.ngates2 = qc2.getNops();
-
 		line.fill(qc::LINE_DEFAULT);
 
 		// currently this modifies the underlying quantum circuits
@@ -42,14 +32,14 @@ namespace ec {
 		ancillary2 = qc2.ancillary;
 		garbage1 = qc1.garbage;
 		garbage2 = qc2.garbage;
-		nqubits = qc1.getNqubitsWithoutAncillae() + std::max(qc1.getNancillae(), qc2.getNancillae());
-		results.nqubits = nqubits;
 
 		if (qc1.getNqubitsWithoutAncillae() != qc2.getNqubitsWithoutAncillae()) {
 			std::cerr << "[QCEC] Warning: circuits have different number of primary inputs! Proceed with caution!" << std::endl;
 		}
+		nqubits = qc1.getNqubitsWithoutAncillae() + std::max(qc1.getNancillae(), qc2.getNancillae());
 
 		fixOutputPermutationMismatch(smaller_circuit);
+		method = Method::Reference;
 	}
 
 	void EquivalenceChecker::setupAncillariesAndGarbage(qc::QuantumComputation& smaller_circuit, qc::QuantumComputation& larger_circuit) {
@@ -191,7 +181,7 @@ namespace ec {
 		op->setNqubits(nq);
 	}
 
-	void EquivalenceChecker::applyGate(decltype(qc1.begin())& opIt, dd::Edge& to, std::map<unsigned short, unsigned short>& permutation, decltype(qc1.end())& end, Direction dir) {
+	void EquivalenceChecker::applyGate(decltype(qc1.begin())& opIt, dd::Edge& to, std::map<unsigned short, unsigned short>& permutation, const decltype(qc1.cend())& end, Direction dir) {
 		// Measurements at the end of the circuit are considered NOPs.
 		if ((*opIt)->getType() == qc::Measure) {
 			if (!qc::QuantumComputation::isLastOperationOnQubit(opIt, end)) {
@@ -202,37 +192,37 @@ namespace ec {
 		applyGate(*opIt, to, permutation, dir);
 	}
 
-	void EquivalenceChecker::check(const Configuration& config) {
-		results.method = Reference;
+	void EquivalenceChecker::setupResults(EquivalenceCheckingResults& results) {
+		results.circuit1.name = qc1.getName();
+		results.circuit2.name = qc2.getName();
+		results.name = results.circuit1.name + " and " + results.circuit2.name;
 
-		if (!validInstance())
-			return;
+		results.nqubits = nqubits;
+		results.circuit1.nqubits = qc1.getNqubits();
+		results.circuit2.nqubits = qc2.getNqubits();
 
-		setTolerance(config.tolerance);
+		results.circuit1.ngates = qc1.getNops();
+		results.circuit2.ngates = qc2.getNops();
+
+		results.method = method;
+	}
+
+	EquivalenceCheckingResults EquivalenceChecker::check(const Configuration& config) {
+		EquivalenceCheckingResults results{};
+		setupResults(results);
+
+		if (!validInstance()) {
+			return results;
+		}
 
 		auto start = std::chrono::steady_clock::now();
-
-		if (config.swapGateFusion) {
-			qc::CircuitOptimizer::swapGateFusion(qc1);
-			qc::CircuitOptimizer::swapGateFusion(qc2);
-		}
-
-		if (config.singleQubitGateFusion) {
-			qc::CircuitOptimizer::singleQubitGateFusion(qc1);
-			qc::CircuitOptimizer::singleQubitGateFusion(qc2);
-		}
-
-		if (config.removeDiagonalGatesBeforeMeasure) {
-			qc::CircuitOptimizer::removeDiagonalGatesBeforeMeasure(qc1);
-			qc::CircuitOptimizer::removeDiagonalGatesBeforeMeasure(qc2);
-		}
+		runPreCheckPasses(config);
+		auto endPreprocessing = std::chrono::steady_clock::now();
 
 		qc::permutationMap perm1 = initial1;
 		dd::Edge e = dd->makeIdent(nqubits);
 		dd->incRef(e);
 		e = dd->reduceAncillae(e, ancillary1);
-		it1 = qc1.begin();
-		end1 = qc1.end();
 
 		while (it1 != end1) {
 			applyGate(it1, e, perm1, end1);
@@ -246,8 +236,6 @@ namespace ec {
 		dd::Edge f = dd->makeIdent(nqubits);
 		dd->incRef(f);
 		f = dd->reduceAncillae(f, ancillary2);
-		it2 = qc2.begin();
-		end2 = qc2.end();
 
 		while (it2 != end2) {
 			applyGate(it2, f, perm2, end2);
@@ -260,7 +248,7 @@ namespace ec {
 		results.maxActive = dd->maxActive;
 
 		results.equivalence = equals(e, f);
-		if (results.equivalence == NonEquivalent) {
+		if (results.equivalence == Equivalence::NotEquivalent) {
 
 			results.result = dd->multiply(e, dd->conjugateTranspose(f));
 			dd->decRef(e);
@@ -271,26 +259,52 @@ namespace ec {
 			dd->decRef(f);
 		}
 
-		auto end = std::chrono::steady_clock::now();
-		std::chrono::duration<double> diff = end - start;
-		results.time = diff.count();
+		auto endVerification = std::chrono::steady_clock::now();
+		std::chrono::duration<double> preprocessingTime = endPreprocessing - start;
+		std::chrono::duration<double> verificationTime = endVerification - endPreprocessing;
+		results.preprocessingTime = preprocessingTime.count();
+		results.verificationTime = verificationTime.count();
+
+		return results;
 	}
 
 	bool EquivalenceChecker::validInstance() {
 		if (qc1.getNqubits() > qc::MAX_QUBITS || qc2.getNqubits() > qc::MAX_QUBITS) {
-			results.tooManyQubits = true;
 			std::cerr << "Circuit contains too many qubits to be manageable by QFR library" << std::endl;
 			return false;
 		}
-
 		return true;
 	}
 
-	Equivalence EquivalenceChecker::equals(dd::Edge e, dd::Edge f) {
-		if (e.p != f.p) return NonEquivalent;
+	Equivalence EquivalenceChecker::equals(const dd::Edge& e, const dd::Edge& f) {
+		if (e.p != f.p) return Equivalence::NotEquivalent;
 
-		if (!dd::ComplexNumbers::equals(e.w, f.w)) return EquivalentUpToGlobalPhase;
+		if (!dd::ComplexNumbers::equals(e.w, f.w)) return Equivalence::EquivalentUpToGlobalPhase;
 
-		return Equivalent;
+		return Equivalence::Equivalent;
+	}
+
+	void EquivalenceChecker::runPreCheckPasses(const Configuration& config) {
+		setTolerance(config.tolerance);
+
+		if (config.removeDiagonalGatesBeforeMeasure) {
+			qc::CircuitOptimizer::removeDiagonalGatesBeforeMeasure(qc1);
+			qc::CircuitOptimizer::removeDiagonalGatesBeforeMeasure(qc2);
+		}
+
+		if (config.reconstructSWAPs) {
+			qc::CircuitOptimizer::swapReconstruction(qc1);
+			qc::CircuitOptimizer::swapReconstruction(qc2);
+		}
+
+		if (config.fuseSingleQubitGates) {
+			qc::CircuitOptimizer::singleQubitGateFusion(qc1);
+			qc::CircuitOptimizer::singleQubitGateFusion(qc2);
+		}
+
+		it1 = qc1.begin();
+		it2 = qc2.begin();
+		end1 = qc1.cend();
+		end2 = qc2.cend();
 	}
 }

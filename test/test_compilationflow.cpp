@@ -3,14 +3,12 @@
  * See file README.md or go to http://iic.jku.at/eda/research/quantum_verification/ for more information.
  */
 
-#include <iostream>
 #include <string>
 #include <algorithm>
 #include <functional>
-#include <future>
 
 #include "gtest/gtest.h"
-#include "PowerOfSimulationEquivalenceChecker.hpp"
+#include "SimulationBasedEquivalenceChecker.hpp"
 #include "CompilationFlowEquivalenceChecker.hpp"
 
 class CompilationFlowTest : public testing::TestWithParam<std::string> {
@@ -21,8 +19,6 @@ protected:
 
 	std::string test_original_dir = "./circuits/original/";
 	std::string test_transpiled_dir = "./circuits/transpiled/";
-
-	int timeout = 60;
 
 	void SetUp() override {
 		qc_original.import(test_original_dir + GetParam() + ".real");
@@ -59,15 +55,7 @@ INSTANTIATE_TEST_SUITE_P(CompilationFlowTest, CompilationFlowTest,
 
 TEST_P(CompilationFlowTest, EquivalenceCompilationFlow) {
 	ec::CompilationFlowEquivalenceChecker ec_flow(qc_original, qc_transpiled);
-	ec_flow.expectEquivalent();
-	auto future = std::async(std::launch::async, [&ec_flow]() {
-		ec_flow.check(ec::Configuration{true});
-	});
-
-	if(future.wait_for(std::chrono::seconds(timeout)) == std::future_status::timeout) {
-		ec_flow.results.timeout = true;
-	}
-
-	ec_flow.printCSVEntry();
-	EXPECT_TRUE(ec_flow.results.timeout || ec_flow.results.consideredEquivalent());
+	auto results = ec_flow.check();
+	results.printCSVEntry();
+	EXPECT_TRUE(results.consideredEquivalent());
 }

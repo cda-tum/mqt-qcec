@@ -11,7 +11,7 @@
 #include "EquivalenceChecker.hpp"
 #include "ImprovedDDEquivalenceChecker.hpp"
 #include "CompilationFlowEquivalenceChecker.hpp"
-#include "PowerOfSimulationEquivalenceChecker.hpp"
+#include "SimulationBasedEquivalenceChecker.hpp"
 
 void show_usage(const std::string& name) {
 	std::cerr << "Usage: " << name << " <PATH_TO_FILE_1> <PATH_TO_FILE_2> (--method <method>)    " << std::endl;
@@ -38,7 +38,7 @@ void show_usage(const std::string& name) {
 	std::cerr << "  --fid F (default 0.999):                Fidelity limit for comparison (for simulation method)   " << std::endl;
 	std::cerr << "  --stimuliType s (default 'classical'):  Type of stimuli to use (for simulation method)          " << std::endl;
 	std::cerr << "Optimization Options:                                                                             " << std::endl;
-	std::cerr << "  --swapGateFusion:                       reconstruct SWAP operations                             " << std::endl;
+	std::cerr << "  --swapReconstruction:                   reconstruct SWAP operations                             " << std::endl;
 	std::cerr << "  --singleQubitGateFusion:                fuse consecutive single qubit gates                     " << std::endl;
 	std::cerr << "  --removeDiagonalGatesBeforeMeasure:     remove diagonal gates before measurements               " << std::endl;
 }
@@ -61,7 +61,6 @@ int main(int argc, char** argv){
 	std::string file2 = argv[2];
 
 	ec::Configuration config{};
-	ec::Method method = ec::Proportional;
 
 	// parse configuration options
 	if (argc >= 4) {
@@ -69,9 +68,7 @@ int main(int argc, char** argv){
 			std::string cmd = argv[i];
 			std::transform(cmd.begin(), cmd.end(), cmd.begin(), [](unsigned char c) { return ::tolower(c); });
 
-			if (cmd == "--csv") {
-				config.printCSV = true;
-			} else if (cmd == "--tol") {
+			if (cmd == "--tol") {
 				++i;
 				if (i >= argc) {
 					show_usage(argv[0]);
@@ -121,8 +118,6 @@ int main(int argc, char** argv){
 					show_usage(argv[0]);
 					return 1;
 				}
-			} else if (cmd == "--ps") {
-				config.printStatistics = true;
 			} else if (cmd == "--method"){
 				++i;
 				if (i >= argc) {
@@ -134,17 +129,21 @@ int main(int argc, char** argv){
 
 				// try to extract method
 				if (cmd == "reference") {
-					method = ec::Reference;
+					config.method = ec::Method::Reference;
 				} else if (cmd == "naive") {
-					method = ec::Naive;
+					config.method = ec::Method::G_I_Gp;
+					config.strategy = ec::Strategy::Naive;
 				} else if (cmd == "proportional") {
-					method = ec::Proportional;
+					config.method = ec::Method::G_I_Gp;
+					config.strategy = ec::Strategy::Proportional;
 				} else if (cmd == "lookahead") {
-					method = ec::Lookahead;
+					config.method = ec::Method::G_I_Gp;
+					config.strategy = ec::Strategy::Lookahead;
 				} else if (cmd == "compilationflow") {
-					method = ec::CompilationFlow;
+					config.method = ec::Method::G_I_Gp;
+					config.strategy = ec::Strategy::CompilationFlow;
 				} else if (cmd == "simulation") {
-					method = ec::PowerOfSimulation;
+					config.method = ec::Method::Simulation;
 				} else {
 					show_usage(argv[0]);
 					return 1;
@@ -159,11 +158,11 @@ int main(int argc, char** argv){
 				std::transform(cmd.begin(), cmd.end(), cmd.begin(), [](unsigned char c) { return ::tolower(c); });
 
 				if (cmd == "classical") {
-					config.stimuliType = ec::Classical;
+					config.stimuliType = ec::StimuliType::Classical;
 				} else if (cmd == "localquantum") {
-					config.stimuliType = ec::LocalQuantum;
+					config.stimuliType = ec::StimuliType::LocalQuantum;
 				} else if (cmd == "globalquantum") {
-					config.stimuliType = ec::GlobalQuantum;
+					config.stimuliType = ec::StimuliType::GlobalQuantum;
 				} else {
 					show_usage(argv[0]);
 					return 1;
@@ -172,10 +171,10 @@ int main(int argc, char** argv){
 				config.storeCEXinput = true;
 			} else if(cmd == "--storeCEXoutput") {
 				config.storeCEXoutput = true;
-			} else if (cmd == "--swapGateFusion") {
-				config.swapGateFusion = true;
+			} else if (cmd == "--swapReconstruction") {
+				config.reconstructSWAPs = true;
 			} else if (cmd == "--singleQubitGateFusion") {
-				config.singleQubitGateFusion = true;
+				config.fuseSingleQubitGates = true;
 			} else if (cmd == "--removeDiagonalGatesBeforeMeasure") {
 				config.removeDiagonalGatesBeforeMeasure = true;
 			} else {
@@ -190,34 +189,18 @@ int main(int argc, char** argv){
 	qc::QuantumComputation qc2(file2);
 
 	// perform equivalence check
-	if (method == ec::CompilationFlow) {
+	ec::EquivalenceCheckingResults results{};
+	if (config.strategy == ec::Strategy::CompilationFlow) {
 		ec::CompilationFlowEquivalenceChecker ec(qc1, qc2);
-		ec.expectNothing();
-		ec.check(config);
-		if (config.printCSV) {
-			ec.printCSVEntry();
-		} else {
-			ec.printJSONResult(config.printStatistics);
-		}
-	} else if (method == ec::PowerOfSimulation) {
-		ec::PowerOfSimulationEquivalenceChecker ec(qc1, qc2);
-		ec.expectNothing();
-		ec.check(config);
-		if (config.printCSV) {
-			ec.printCSVEntry();
-		} else {
-			ec.printJSONResult(config.printStatistics);
-		}
+		results = ec.check(config);
+	} else if (config.method == ec::Method::Simulation) {
+		ec::SimulationBasedEquivalenceChecker ec(qc1, qc2);
+		results = ec.check(config);
 	} else {
-		ec::ImprovedDDEquivalenceChecker ec(qc1, qc2, method);
-		ec.expectNothing();
-		ec.check(config);
-		if (config.printCSV) {
-			ec.printCSVEntry();
-		} else {
-			ec.printJSONResult(config.printStatistics);
-		}
+		ec::ImprovedDDEquivalenceChecker ec(qc1, qc2, config.strategy);
+		results = ec.check(config);
 	}
+	results.printJSON();
 
 	return 0;
 }

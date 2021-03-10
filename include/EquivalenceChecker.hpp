@@ -18,22 +18,48 @@ namespace ec {
 	enum Direction: bool { LEFT = true, RIGHT = false };
 
 	struct Configuration {
-		bool printCSV = false;
-		bool printStatistics = false;
+		ec::Method method = ec::Method::G_I_Gp;
+		ec::Strategy strategy = ec::Strategy::Proportional;
 		fp tolerance = CN::TOLERANCE;
 
 		// configuration options for optimizations
-		bool singleQubitGateFusion = false;
-		bool swapGateFusion = false;
+		bool fuseSingleQubitGates = true;
+		bool reconstructSWAPs = true;
 		bool removeDiagonalGatesBeforeMeasure = false;
 
 		// configuration options for PowerOfSimulation equivalence checker
 		double fidelity_limit = 0.999;
 		unsigned long long max_sims = 16;
-		unsigned long long timeout = 60000;
-		StimuliType stimuliType = Classical;
+		StimuliType stimuliType = ec::StimuliType::Classical;
 		bool storeCEXinput = false;
 		bool storeCEXoutput = false;
+
+		[[nodiscard]] nlohmann::json json() const {
+			nlohmann::json config{};
+			config["method"] = ec::toString(method);
+			if (method == ec::Method::G_I_Gp) {
+				config["strategy"] = ec::toString(strategy);
+			}
+			config["tolerance"] = tolerance;
+			config["optimizations"] = {};
+			auto& optimizations = config["optimizations"];
+			optimizations["fuse consecutive single qubit gates"] = fuseSingleQubitGates;
+			optimizations["reconstruct swaps"] = reconstructSWAPs;
+			optimizations["remove diagonal gates before measure"] = removeDiagonalGatesBeforeMeasure;
+			if (method == ec::Method::Simulation) {
+				config["simulation config"] = {};
+				auto& simulation = config["simulation config"];
+				simulation["fidelity limit"] = fidelity_limit;
+				simulation["max sims"] = max_sims;
+				simulation["stimuli type"] = ec::toString(stimuliType);
+				simulation["store counterexample input"] = storeCEXinput;
+				simulation["store counterexample output"] = storeCEXoutput;
+			}
+			return config;
+		}
+		[[nodiscard]] std::string toString() const{
+			return json().dump(2);
+		}
 	};
 
 	class QCECException : public std::invalid_argument {
@@ -67,8 +93,8 @@ namespace ec {
 
 		decltype(qc1.begin()) it1;
 		decltype(qc2.begin()) it2;
-		decltype(qc1.end()) end1;
-		decltype(qc1.end()) end2;
+		decltype(qc1.cend()) end1;
+		decltype(qc1.cend()) end2;
 
 		std::array<short, qc::MAX_QUBITS> line{};
 
@@ -81,59 +107,33 @@ namespace ec {
 		/// Note that this is still highly experimental!
 		void fixOutputPermutationMismatch(qc::QuantumComputation& circuit);
 
+		/// Run any configured optimization passes
+		virtual void runPreCheckPasses(const Configuration& config);
+
 		/// Take operation and apply it either from the left or (inverted) from the right
 		/// \param op operation to apply
 		/// \param to DD to apply the operation to
 		/// \param dir LEFT or RIGHT
 		void applyGate(std::unique_ptr<qc::Operation>& op, dd::Edge& to, std::map<unsigned short, unsigned short>& permutation, Direction dir = LEFT);
-		void applyGate(decltype(qc1.begin())& opIt, dd::Edge& to, std::map<unsigned short, unsigned short>& permutation, decltype(qc1.end())& end , Direction dir = LEFT);
+		void applyGate(decltype(qc1.begin())& opIt, dd::Edge& to, std::map<unsigned short, unsigned short>& permutation, const decltype(qc1.cend())& end , Direction dir = LEFT);
 
+		void setupResults(EquivalenceCheckingResults& results);
 		bool validInstance();
 
 	public:
-		EquivalenceCheckingResults results{};
-
 		EquivalenceChecker(qc::QuantumComputation& qc1, qc::QuantumComputation& qc2);
 
 		virtual ~EquivalenceChecker() = default;
 
 		// TODO: also allow equivalence by relative phase or up to a permutation of the outputs
-		static Equivalence equals(dd::Edge e, dd::Edge f);
+		static Equivalence equals(const dd::Edge& e, const dd::Edge& f);
 
-		virtual void check() { check(Configuration{}); };
-		virtual void check(const Configuration& config);
-
-		void expectEquivalent() { results.expected = Equivalent; }
-		void expectNonEquivalent() { results.expected = NonEquivalent; }
-		void expectNothing() { results.expected = NoInformation; }
-		void suggestEquivalent() { results.expected = ProbablyEquivalent; }
+		virtual EquivalenceCheckingResults check() { return check(Configuration{}); };
+		virtual EquivalenceCheckingResults check(const Configuration& config);
 
 		static void setTolerance(fp tol) { dd::Package::setComplexNumberTolerance(tol); }
-
-		virtual std::ostream& printResult() { return printResult(std::cout); }
-		virtual std::ostream& printResult(std::ostream& out) {
-			return results.print(out);
-		}
-
-		virtual std::ostream& printJSONResult(bool printStatistics) { return printJSONResult(std::cout, printStatistics); }
-		virtual std::ostream& printJSONResult(std::ostream& out, bool printStatistics) {
-			return results.printJSON(out, printStatistics);
-		}
-
-		virtual std::ostream & printCSVEntry() { return printCSVEntry(std::cout); }
-		virtual std::ostream & printCSVEntry(std::ostream& out) { return results.printCSVEntry(out); }
-		virtual std::ostream & printCSVHeader() { return printCSVHeader(std::cout); }
-		virtual std::ostream & printCSVHeader(std::ostream& out) { return ec::EquivalenceCheckingResults::printCSVHeader(out); }
-
-		virtual bool error() {
-			return results.error();
-		}
-
-		void exportResultAsDot(const std::string& filename) const {
-			dd::export2Dot(results.result, filename);
-		}
+		Method method = ec::Method::Reference;
 	};
-
 
 }
 

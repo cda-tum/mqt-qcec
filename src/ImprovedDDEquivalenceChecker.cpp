@@ -7,7 +7,7 @@
 
 namespace ec {
 	dd::Edge ImprovedDDEquivalenceChecker::createInitialMatrix() {
-		dd::Edge e = dd->makeIdent(nqubits);
+		auto e = dd->makeIdent(nqubits);
 		dd->incRef(e);
 
 		std::bitset<qc::MAX_QUBITS> ancillary{};
@@ -53,52 +53,32 @@ namespace ec {
 	}
 
 	/// Use dedicated method to check the equivalence of both provided circuits
-	void ImprovedDDEquivalenceChecker::check(const Configuration& config) {
-		if (method == Reference) {
-			EquivalenceChecker::check(config);
-			return;
+	EquivalenceCheckingResults ImprovedDDEquivalenceChecker::check(const Configuration& config) {
+		EquivalenceCheckingResults results{};
+		setupResults(results);
+		results.strategy = config.strategy;
+
+		if (!validInstance()) {
+			return results;
 		}
-
-		if (!validInstance())
-			return;
-
-		setTolerance(config.tolerance);
 
 		auto start = std::chrono::steady_clock::now();
+		runPreCheckPasses(config);
+		auto endPreprocessing = std::chrono::steady_clock::now();
 
-		if (config.swapGateFusion) {
-			qc::CircuitOptimizer::swapGateFusion(qc1);
-			qc::CircuitOptimizer::swapGateFusion(qc2);
-		}
-
-		if (config.singleQubitGateFusion) {
-			qc::CircuitOptimizer::singleQubitGateFusion(qc1);
-			qc::CircuitOptimizer::singleQubitGateFusion(qc2);
-		}
-
-		if (config.removeDiagonalGatesBeforeMeasure) {
-			qc::CircuitOptimizer::removeDiagonalGatesBeforeMeasure(qc1);
-			qc::CircuitOptimizer::removeDiagonalGatesBeforeMeasure(qc2);
-		}
-
-		qc::permutationMap perm1 = initial1;
-		qc::permutationMap perm2 = initial2;
+		auto perm1 = initial1;
+		auto perm2 = initial2;
 		results.result = createInitialMatrix();
 
-		it1 = qc1.begin();
-		it2 = qc2.begin();
-		end1 = qc1.end();
-		end2 = qc2.end();
-
-		switch (method) {
-			case Naive: checkNaive(perm1, perm2);
+		switch (config.strategy) {
+			case ec::Strategy::Naive: checkNaive(results.result, perm1, perm2);
 				break;
-			case Proportional: checkProportional(perm1, perm2);
+			case ec::Strategy::Proportional: checkProportional(results.result, perm1, perm2);
 				break;
-			case Lookahead: checkLookahead(perm1, perm2);
+			case ec::Strategy::Lookahead: checkLookahead(results.result, perm1, perm2);
 				break;
 			default:
-				throw QCECException("Method " + toString(method) + " not supported by ImprovedDDEquivalenceChecker");
+				throw QCECException("Strategy " + toString(config.strategy) + " not supported by ImprovedDDEquivalenceChecker");
 		}
 
 		// finish first circuit
@@ -121,46 +101,50 @@ namespace ec {
 		results.result = dd->reduceAncillae(results.result, ancillary2, RIGHT);
 
 		results.equivalence = equals(results.result, createGoalMatrix());
+		results.maxActive = std::max(results.maxActive, dd->maxActive);
 
-		auto end = std::chrono::steady_clock::now();
-		std::chrono::duration<double> diff = end - start;
-		results.time = diff.count();
-		results.maxActive = dd->maxActive;
+		auto endVerification = std::chrono::steady_clock::now();
+		std::chrono::duration<double> preprocessingTime = endPreprocessing - start;
+		std::chrono::duration<double> verificationTime = endVerification - endPreprocessing;
+		results.preprocessingTime = preprocessingTime.count();
+		results.verificationTime = verificationTime.count();
+
+		return results;
 	}
 
 	/// Alternate between LEFT and RIGHT applications
-	void ImprovedDDEquivalenceChecker::checkNaive(qc::permutationMap& perm1, qc::permutationMap& perm2) {
+	void ImprovedDDEquivalenceChecker::checkNaive(dd::Edge& result, qc::permutationMap& perm1, qc::permutationMap& perm2) {
 		while (it1 != end1 && it2 != end2) {
-			applyGate(it1, results.result, perm1, end1, LEFT);
+			applyGate(it1, result, perm1, end1, LEFT);
 			++it1;
-			applyGate(it2, results.result, perm2, end2, RIGHT);
+			applyGate(it2, result, perm2, end2, RIGHT);
 			++it2;
 		}
 	}
 
 	/// Alternate according to the gate count ratio between LEFT and RIGHT applications
-	void ImprovedDDEquivalenceChecker::checkProportional(qc::permutationMap& perm1, qc::permutationMap& perm2) {
+	void ImprovedDDEquivalenceChecker::checkProportional(dd::Edge& result, qc::permutationMap& perm1, qc::permutationMap& perm2) {
 
-		auto ratio = static_cast<const unsigned int>(std::round(
-						static_cast<const double>(std::max(qc1.getNops(), qc2.getNops())) /
-						static_cast<const double>(std::min(qc1.getNops(), qc2.getNops()))));
+		auto ratio = static_cast<unsigned int>(std::round(
+						static_cast<double>(std::max(qc1.getNops(), qc2.getNops())) /
+						static_cast<double>(std::min(qc1.getNops(), qc2.getNops()))));
 		auto ratio1 = (qc1.getNops() > qc2.getNops())? ratio: 1;
 		auto ratio2 = (qc1.getNops() > qc2.getNops())? 1: ratio;
 
 		while (it1 != end1 && it2 != end2) {
 			for (unsigned int i = 0; i < ratio1 && it1 != end1; ++i) {
-				applyGate(it1, results.result, perm1, end1, LEFT);
+				applyGate(it1, result, perm1, end1, LEFT);
 				++it1;
 			}
 			for (unsigned int i = 0; i < ratio2 && it2 != end2; ++i) {
-				applyGate(it2, results.result, perm2, end2, RIGHT);
+				applyGate(it2, result, perm2, end2, RIGHT);
 				++it2;
 			}
 		}
 	}
 
 	/// Look-ahead LEFT and RIGHT and choose the more promising option
-	void ImprovedDDEquivalenceChecker::checkLookahead(qc::permutationMap& perm1, qc::permutationMap& perm2) {
+	void ImprovedDDEquivalenceChecker::checkLookahead(dd::Edge& result, qc::permutationMap& perm1, qc::permutationMap& perm2) {
 		dd::Edge left{}, right{}, saved{};
 		bool cachedLeft = false, cachedRight = false;
 
@@ -193,7 +177,7 @@ namespace ec {
 				cachedRight = true;
 			}
 
-			saved = results.result;
+			saved = result;
 			auto lookLeft = dd->multiply(left, saved);
 			auto lookRight = dd->multiply(saved, right);
 
@@ -201,37 +185,35 @@ namespace ec {
 			auto nc2 = dd->size(lookRight);
 
 			if (nc1 <= nc2) {
-				results.result = lookLeft;
+				result = lookLeft;
 				dd->decRef(left);
 				cachedLeft = false;
 			} else {
-				results.result = lookRight;
+				result = lookRight;
 				dd->decRef(right);
 				cachedRight = false;
 			}
-			dd->incRef(results.result);
+			dd->incRef(result);
 			dd->decRef(saved);
 			dd->garbageCollect();
 		}
 
 		if (cachedLeft) {
-			saved = results.result;
-			results.result = dd->multiply(left, saved);
-			dd->incRef(results.result);
+			saved = result;
+			result = dd->multiply(left, saved);
+			dd->incRef(result);
 			dd->decRef(saved);
 			dd->decRef(left);
 			dd->garbageCollect();
 		}
 
 		if (cachedRight) {
-			saved = results.result;
-			results.result = dd->multiply(saved, right);
-			dd->incRef(results.result);
+			saved = result;
+			result = dd->multiply(saved, right);
+			dd->incRef(result);
 			dd->decRef(saved);
 			dd->decRef(right);
 			dd->garbageCollect();
 		}
-
 	}
-
 }
