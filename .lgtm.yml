@@ -16,7 +16,7 @@ extraction:
       packages:
         - python-pip
     after_prepare:
-      - pip3 install --local cmake
+      - pip3 install cmake --user
       - ls ~/.local/bin
       - export PATH=$Path:~/.local/bin
       - cmake --version
