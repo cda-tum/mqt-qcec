@@ -102,3 +102,15 @@ jobs:
       uses: codecov/codecov-action@v1
       with:
         fail_ci_if_error: true
+
+  codestyle:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+      - uses: DoozyX/clang-format-lint-action@v0.12
+        with:
+          source: 'include src test jkq/qcec'
+          extensions: 'h,hpp,c,cpp'
+          clangFormatVersion: 12
