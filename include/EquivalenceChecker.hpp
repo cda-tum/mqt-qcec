@@ -70,7 +70,7 @@ namespace ec {
 
         std::unique_ptr<dd::Package> dd;
 
-        unsigned short nqubits = 0;
+        dd::QubitCount nqubits = 0;
 
         std::vector<bool> ancillary1{};
         std::vector<bool> ancillary2{};

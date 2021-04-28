@@ -124,7 +124,7 @@ namespace ec {
         edges[1] = qc::VectorDD::zero;
 
         auto initial = stabilizer;
-        for (dd::Qubit p = 0; p < static_cast<dd::Qubit>(nqubits - nqubits_for_stimuli); p++) {
+        for (std::size_t p = 0; p < static_cast<std::size_t>(nqubits - nqubits_for_stimuli); p++) {
             edges[0] = initial;
             initial  = dd->makeDDNode(static_cast<dd::Qubit>(p + nqubits_for_stimuli), edges);
         }
