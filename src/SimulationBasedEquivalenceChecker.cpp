@@ -7,21 +7,19 @@
 
 namespace ec {
 
-    bool SimulationBasedEquivalenceChecker::simulateWithStimulus(const dd::Edge& stimulus, EquivalenceCheckingResults& results, const Configuration& config) {
-        line.fill(qc::LINE_DEFAULT);
+    bool SimulationBasedEquivalenceChecker::simulateWithStimulus(const qc::VectorDD& stimulus, EquivalenceCheckingResults& results, const Configuration& config) {
         auto map = initial1;
         auto e   = stimulus;
         dd->incRef(e);
         it1 = qc1.begin();
 
         while (it1 != end1) {
-            applyGate(it1, e, map, end1);
+            applyGate(qc1, it1, e, map);
             ++it1;
         }
         // correct permutation if necessary
-        qc::QuantumComputation::changePermutation(e, map, output1, line, dd);
+        qc::QuantumComputation::changePermutation(e, map, output1, dd);
         e = dd->reduceGarbage(e, garbage1);
-        e = dd->reduceAncillae(e, ancillary1);
 
         map    = initial2;
         auto f = stimulus;
@@ -29,14 +27,13 @@ namespace ec {
         it2 = qc2.begin();
 
         while (it2 != end2) {
-            applyGate(it2, f, map, end2);
+            applyGate(qc2, it2, f, map);
             ++it2;
         }
 
         // correct permutation if necessary
-        qc::QuantumComputation::changePermutation(f, map, output2, line, dd);
+        qc::QuantumComputation::changePermutation(f, map, output2, dd);
         f = dd->reduceGarbage(f, garbage2);
-        f = dd->reduceAncillae(f, ancillary2);
 
         results.fidelity = dd->fidelity(e, f);
 
@@ -55,36 +52,40 @@ namespace ec {
                 results.circuit2.cexOutput = dd->getVector(f);
             }
 
-            dd->garbageCollect(true);
+            dd->garbageCollect();
             return true;
-        } else if (results.nsims == static_cast<unsigned long long>(std::pow(2.L, nqubits_for_stimuli))) {
+        } else if (results.nsims == static_cast<std::size_t>(std::pow(2.L, nqubits_for_stimuli))) {
             results.equivalence = ec::Equivalence::Equivalent;
             dd->decRef(e);
             dd->decRef(f);
-            dd->garbageCollect(true);
+            dd->garbageCollect();
             return true;
         } else {
             results.equivalence = ec::Equivalence::ProbablyEquivalent;
             dd->decRef(e);
             dd->decRef(f);
-            dd->garbageCollect(true);
+            dd->garbageCollect();
             return false;
         }
     }
 
-    dd::Edge SimulationBasedEquivalenceChecker::generateRandomClassicalStimulus() {
+    qc::VectorDD SimulationBasedEquivalenceChecker::generateRandomClassicalStimulus() {
         // generate distinct stimulus
-        auto new_stimulus = stimuli.insert(stimuliGenerator());
-        while (!new_stimulus.second) {
-            new_stimulus = stimuli.insert(stimuliGenerator());
+        auto [new_stimulus, success] = stimuli.insert(stimuliGenerator());
+        while (!success) {
+            std::tie(new_stimulus, success) = stimuli.insert(stimuliGenerator());
         }
-        std::bitset<dd::MAXN> stimulusBits(*new_stimulus.first);
-
+        std::vector<bool> stimulusBits(nqubits_for_stimuli);
+        for (int i = 0; i < nqubits_for_stimuli; ++i) {
+            if (*new_stimulus & (1 << i)) {
+                stimulusBits[i] = true;
+            }
+        }
         auto in = dd->makeBasisState(nqubits, stimulusBits);
         return in;
     }
 
-    dd::Edge SimulationBasedEquivalenceChecker::generateRandomLocalQuantumStimulus() {
+    qc::VectorDD SimulationBasedEquivalenceChecker::generateRandomLocalQuantumStimulus() {
         auto stimulus = std::vector<dd::BasisStates>(nqubits, dd::BasisStates::zero);
         for (int i = 0; i < nqubits_for_stimuli; ++i) {
             switch (basisStateGenerator()) {
@@ -114,23 +115,23 @@ namespace ec {
         return in;
     }
 
-    dd::Edge SimulationBasedEquivalenceChecker::generateRandomGlobalQuantumStimulus() {
+    qc::VectorDD SimulationBasedEquivalenceChecker::generateRandomGlobalQuantumStimulus() {
         auto rcs        = qc::RandomCliffordCircuit(nqubits_for_stimuli, static_cast<unsigned int>(std::round(std::log2(nqubits_for_stimuli))), stimuliGenerator());
         auto stabilizer = rcs.simulate(dd->makeZeroState(nqubits_for_stimuli), dd);
         dd->decRef(stabilizer); // decrease right after so the reference count stays correct later on
 
-        dd::Edge edges[4];
-        edges[1] = edges[2] = edges[3] = dd->DDzero;
+        std::array<qc::VectorDD, 2> edges{};
+        edges[1] = qc::VectorDD::zero;
 
         auto initial = stabilizer;
-        for (short p = 0; p < static_cast<short>(nqubits - nqubits_for_stimuli); p++) {
+        for (dd::Qubit p = 0; p < static_cast<dd::Qubit>(nqubits - nqubits_for_stimuli); p++) {
             edges[0] = initial;
-            initial  = dd->makeNonterminal(static_cast<short>(p + nqubits_for_stimuli), edges);
+            initial  = dd->makeDDNode(static_cast<dd::Qubit>(p + nqubits_for_stimuli), edges);
         }
         return initial;
     }
 
-    dd::Edge SimulationBasedEquivalenceChecker::generateRandomStimulus(StimuliType type) {
+    qc::VectorDD SimulationBasedEquivalenceChecker::generateRandomStimulus(StimuliType type) {
         switch (type) {
             case ec::StimuliType::Classical:
                 return generateRandomClassicalStimulus();
@@ -139,17 +140,13 @@ namespace ec {
             case ec::StimuliType::GlobalQuantum:
                 return generateRandomGlobalQuantumStimulus();
         }
-        return dd::Package::DDzero;
+        return qc::VectorDD::zero;
     }
 
     EquivalenceCheckingResults SimulationBasedEquivalenceChecker::check(const Configuration& config) {
         EquivalenceCheckingResults results{};
         setupResults(results);
         results.stimuliType = config.stimuliType;
-
-        if (!validInstance()) {
-            return results;
-        }
 
         auto start = std::chrono::steady_clock::now();
         runPreCheckPasses(config);
@@ -168,16 +165,12 @@ namespace ec {
         std::chrono::duration<double> verificationTime  = endVerification - endPreprocessing;
         results.preprocessingTime                       = preprocessingTime.count();
         results.verificationTime                        = verificationTime.count();
-        results.maxActive                               = std::max(results.maxActive, dd->maxActive);
+        results.maxActive                               = std::max(results.maxActive, dd->vUniqueTable.getMaxActiveNodes());
 
         return results;
     }
 
-    void SimulationBasedEquivalenceChecker::checkWithStimulus(const dd::Edge& stimulus, EquivalenceCheckingResults& results, const Configuration& config) {
-        if (!validInstance()) {
-            return;
-        }
-
+    void SimulationBasedEquivalenceChecker::checkWithStimulus(const qc::VectorDD& stimulus, EquivalenceCheckingResults& results, const Configuration& config) {
         auto start = std::chrono::steady_clock::now();
         runPreCheckPasses(config);
         auto endPreprocessing = std::chrono::steady_clock::now();
@@ -191,7 +184,7 @@ namespace ec {
         std::chrono::duration<double> verificationTime  = endVerification - endPreprocessing;
         results.preprocessingTime += preprocessingTime.count();
         results.verificationTime += verificationTime.count();
-        results.maxActive = std::max(results.maxActive, dd->maxActive);
+        results.maxActive = std::max(results.maxActive, dd->vUniqueTable.getMaxActiveNodes());
     }
 
     EquivalenceCheckingResults SimulationBasedEquivalenceChecker::checkZeroState(const Configuration& config) {
@@ -199,8 +192,7 @@ namespace ec {
         setupResults(results);
         results.stimuliType = ec::StimuliType::Classical;
 
-        std::bitset<qc::MAX_QUBITS> stimulusBits(0ULL);
-        auto                        stimulus = dd->makeBasisState(nqubits, stimulusBits);
+        auto stimulus = dd->makeZeroState(nqubits);
         checkWithStimulus(stimulus, results, config);
         return results;
     }

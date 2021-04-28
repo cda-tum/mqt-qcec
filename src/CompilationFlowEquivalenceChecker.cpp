@@ -12,10 +12,6 @@ namespace ec {
         setupResults(results);
         results.strategy = Strategy::CompilationFlow;
 
-        if (!validInstance()) {
-            return results;
-        }
-
         auto start = std::chrono::steady_clock::now();
         runPreCheckPasses(config);
         auto endPreprocessing = std::chrono::steady_clock::now();
@@ -41,7 +37,7 @@ namespace ec {
                 auto cost2 = costFunction((*it2)->getType(), (*it2)->getControls().size());
 
                 for (unsigned long long i = 0; i < cost2 && it1 != end1; ++i) {
-                    applyGate(it1, results.result, perm1, end1, LEFT);
+                    applyGate(qc1, it1, results.result, perm1, LEFT);
                     ++it1;
 
                     // apply possible swaps
@@ -52,7 +48,7 @@ namespace ec {
                 }
 
                 for (unsigned long long i = 0; i < cost1 && it2 != end2; ++i) {
-                    applyGate(it2, results.result, perm2, end2, RIGHT);
+                    applyGate(qc2, it2, results.result, perm2, RIGHT);
                     ++it2;
 
                     // apply possible swaps
@@ -65,18 +61,18 @@ namespace ec {
         }
         // finish first circuit
         while (it1 != end1) {
-            applyGate(it1, results.result, perm1, end1, LEFT);
+            applyGate(qc1, it1, results.result, perm1, LEFT);
             ++it1;
         }
 
         // finish second circuit
         while (it2 != end2) {
-            applyGate(it2, results.result, perm2, end2, RIGHT);
+            applyGate(qc2, it2, results.result, perm2, RIGHT);
             ++it2;
         }
 
-        qc::QuantumComputation::changePermutation(results.result, perm1, output1, line, dd, LEFT);
-        qc::QuantumComputation::changePermutation(results.result, perm2, output2, line, dd, RIGHT);
+        qc::QuantumComputation::changePermutation(results.result, perm1, output1, dd, LEFT);
+        qc::QuantumComputation::changePermutation(results.result, perm2, output2, dd, RIGHT);
         results.result = dd->reduceGarbage(results.result, garbage1, LEFT);
         results.result = dd->reduceGarbage(results.result, garbage2, RIGHT);
         results.result = dd->reduceAncillae(results.result, ancillary1, LEFT);
@@ -90,7 +86,7 @@ namespace ec {
         std::chrono::duration<double> verificationTime  = endVerification - endPreprocessing;
         results.preprocessingTime                       = preprocessingTime.count();
         results.verificationTime                        = verificationTime.count();
-        results.maxActive                               = std::max(results.maxActive, dd->maxActive);
+        results.maxActive                               = std::max(results.maxActive, dd->mUniqueTable.getMaxActiveNodes());
 
         return results;
     }

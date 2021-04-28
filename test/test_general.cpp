@@ -56,15 +56,7 @@ TEST_F(GeneralTest, Output) {
 
 TEST_F(GeneralTest, InvalidInstance) {
     qc_original.import("./circuits/test/test_original.real");
-    qc_alternative.import("./circuits/test/test_error.qasm");
-
-    ec::EquivalenceChecker ec(qc_original, qc_alternative);
-    auto                   results = ec.check();
-    EXPECT_EQ(results.equivalence, ec::Equivalence::NoInformation);
-
-    ec::CompilationFlowEquivalenceChecker cfec(qc_original, qc_alternative);
-    results = cfec.check();
-    EXPECT_EQ(results.equivalence, ec::Equivalence::NoInformation);
+    EXPECT_THROW(qc_alternative.import("./circuits/test/test_error.qasm"), qc::QFRException);
 }
 
 TEST_F(GeneralTest, NonUnitary) {
@@ -154,14 +146,14 @@ TEST_F(GeneralTest, RemoveDiagonalGatesBeforeMeasure) {
     unsigned short         nqubits = 1;
     qc::QuantumComputation qc1(nqubits);
     qc1.emplace_back<StandardOperation>(nqubits, 0, X);
-    qc1.emplace_back<NonUnitaryOperation>(nqubits, std::vector<unsigned short>{0}, std::vector<unsigned short>{0});
+    qc1.emplace_back<NonUnitaryOperation>(nqubits, std::vector<dd::Qubit>{0}, std::vector<std::size_t>{0});
     std::cout << qc1 << std::endl;
     std::cout << "-----------------------------" << std::endl;
 
     qc::QuantumComputation qc2(nqubits);
     qc2.emplace_back<StandardOperation>(nqubits, 0, X);
     qc2.emplace_back<StandardOperation>(nqubits, 0, Z);
-    qc2.emplace_back<NonUnitaryOperation>(nqubits, std::vector<unsigned short>{0}, std::vector<unsigned short>{0});
+    qc2.emplace_back<NonUnitaryOperation>(nqubits, std::vector<dd::Qubit>{0}, std::vector<std::size_t>{0});
     std::cout << qc2 << std::endl;
     std::cout << "-----------------------------" << std::endl;
     ec::EquivalenceChecker ec(qc1, qc2);

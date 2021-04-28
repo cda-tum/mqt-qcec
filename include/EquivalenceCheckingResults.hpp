@@ -6,7 +6,8 @@
 #ifndef QUANTUMCIRCUITEQUIVALENCECHECKING_BASERESULTS_HPP
 #define QUANTUMCIRCUITEQUIVALENCECHECKING_BASERESULTS_HPP
 
-#include "DDpackage.h"
+#include "Definitions.hpp"
+#include "dd/Package.hpp"
 #include "nlohmann/json.hpp"
 
 #include <iostream>
@@ -50,7 +51,7 @@ namespace ec {
             std::string        name;
             unsigned short     nqubits = 0;
             unsigned long long ngates  = 0;
-            dd::Package::CVec  cexOutput{};
+            dd::CVec           cexOutput{};
 
             [[nodiscard]] std::string toString() const {
                 std::stringstream ss{};
@@ -68,7 +69,7 @@ namespace ec {
         std::string    name;
         unsigned short nqubits = 0;
 
-        Method      method;
+        Method      method{};
         Strategy    strategy    = Strategy::Proportional;
         StimuliType stimuliType = StimuliType::Classical;
 
@@ -78,9 +79,9 @@ namespace ec {
         double             verificationTime  = 0.0;
         unsigned long      maxActive         = 0;
         unsigned long long nsims             = 0;
-        dd::Package::CVec  cexInput{};
-        fp                 fidelity = 0.0;
-        dd::Edge           result   = dd::Package::DDzero;
+        dd::CVec           cexInput{};
+        dd::fp             fidelity = 0.0;
+        qc::MatrixDD       result   = qc::MatrixDD::zero;
 
         [[nodiscard]] bool consideredEquivalent() const {
             return equivalence == Equivalence::Equivalent || equivalence == Equivalence::EquivalentUpToGlobalPhase || equivalence == Equivalence::ProbablyEquivalent;
@@ -88,19 +89,19 @@ namespace ec {
 
         std::ostream& print(std::ostream& out = std::cout) const;
 
-        static void to_json(nlohmann::json& j, const dd::Package::CVec& stateVector) {
+        static void to_json(nlohmann::json& j, const dd::CVec& stateVector) {
             j = nlohmann::json::array();
             for (const auto& amp: stateVector) {
                 j.emplace_back(amp);
             }
         }
-        static void from_json(const nlohmann::json& j, dd::Package::CVec& stateVector) {
+        static void from_json(const nlohmann::json& j, dd::CVec& stateVector) {
             for (unsigned long long i = 0; i < j.size(); ++i) {
-                stateVector[i] = j.at(i).get<std::pair<fp, fp>>();
+                stateVector[i] = j.at(i).get<std::pair<dd::fp, dd::fp>>();
             }
         }
         [[nodiscard]] nlohmann::json produceJSON() const;
-        [[nodiscard]] std::string    toString() const {
+        [[nodiscard]] std::string toString() const {
             return produceJSON().dump(2);
         }
         std::ostream& printJSON(std::ostream& out = std::cout) const {
@@ -116,7 +117,7 @@ namespace ec {
             return out;
         }
         [[nodiscard]] std::string produceCSVEntry() const;
-        std::ostream&             printCSVEntry(std::ostream& out = std::cout) const {
+        std::ostream& printCSVEntry(std::ostream& out = std::cout) const {
             out << produceCSVEntry() << std::endl;
             return out;
         }

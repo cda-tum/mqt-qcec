@@ -21,7 +21,7 @@ namespace ec {
     struct Configuration {
         ec::Method   method    = ec::Method::G_I_Gp;
         ec::Strategy strategy  = ec::Strategy::Proportional;
-        fp           tolerance = CN::TOLERANCE;
+        dd::fp       tolerance = dd::ComplexTable<>::tolerance();
 
         // configuration options for optimizations
         bool fuseSingleQubitGates             = true;
@@ -29,11 +29,11 @@ namespace ec {
         bool removeDiagonalGatesBeforeMeasure = false;
 
         // configuration options for PowerOfSimulation equivalence checker
-        double             fidelity_limit = 0.999;
-        unsigned long long max_sims       = 16;
-        StimuliType        stimuliType    = ec::StimuliType::Classical;
-        bool               storeCEXinput  = false;
-        bool               storeCEXoutput = false;
+        double      fidelity_limit = 0.999;
+        std::size_t max_sims       = 16;
+        StimuliType stimuliType    = ec::StimuliType::Classical;
+        bool        storeCEXinput  = false;
+        bool        storeCEXoutput = false;
 
         [[nodiscard]] nlohmann::json json() const {
             nlohmann::json config{};
@@ -72,26 +72,24 @@ namespace ec {
 
         unsigned short nqubits = 0;
 
-        std::bitset<qc::MAX_QUBITS> ancillary1{};
-        std::bitset<qc::MAX_QUBITS> ancillary2{};
-        std::bitset<qc::MAX_QUBITS> garbage1{};
-        std::bitset<qc::MAX_QUBITS> garbage2{};
+        std::vector<bool> ancillary1{};
+        std::vector<bool> ancillary2{};
+        std::vector<bool> garbage1{};
+        std::vector<bool> garbage2{};
 
-        qc::permutationMap initial1;
-        qc::permutationMap initial2;
-        qc::permutationMap output1;
-        qc::permutationMap output2;
+        qc::Permutation initial1;
+        qc::Permutation initial2;
+        qc::Permutation output1;
+        qc::Permutation output2;
 
         decltype(qc1.begin()) it1;
         decltype(qc2.begin()) it2;
         decltype(qc1.cend())  end1;
         decltype(qc1.cend())  end2;
 
-        std::array<short, qc::MAX_QUBITS> line{};
-
         /// Given that one circuit has more qubits than the other, the difference is assumed to arise from ancillary qubits.
         /// This function adjusts both circuits accordingly
-        void setupAncillariesAndGarbage(qc::QuantumComputation& smaller_circuit, qc::QuantumComputation& larger_circuit);
+        static void setupAncillariesAndGarbage(qc::QuantumComputation& smaller_circuit, qc::QuantumComputation& larger_circuit);
 
         /// In some cases both circuits calculate the same function, but on different qubits.
         /// This function tries to correct such mismatches.
@@ -105,11 +103,43 @@ namespace ec {
         /// \param op operation to apply
         /// \param to DD to apply the operation to
         /// \param dir LEFT or RIGHT
-        void applyGate(std::unique_ptr<qc::Operation>& op, dd::Edge& to, std::map<unsigned short, unsigned short>& permutation, Direction dir = LEFT);
-        void applyGate(decltype(qc1.begin())& opIt, dd::Edge& to, std::map<unsigned short, unsigned short>& permutation, const decltype(qc1.cend())& end, Direction dir = LEFT);
+        template<class DDType>
+        void applyGate(std::unique_ptr<qc::Operation>& op, DDType& to, qc::Permutation& permutation, Direction dir = LEFT) {
+            // set appropriate qubit count to generate correct DD
+            auto nq = op->getNqubits();
+            op->setNqubits(nqubits);
+
+            auto saved = to;
+            if constexpr (std::is_same_v<DDType, qc::VectorDD>) {
+                // direction has no effect on state vector DDs
+                to = dd->multiply(op->getDD(dd, permutation), to);
+            } else {
+                if (dir == LEFT) {
+                    to = dd->multiply(op->getDD(dd, permutation), to);
+                } else {
+                    to = dd->multiply(to, op->getInverseDD(dd, permutation));
+                }
+            }
+            dd->incRef(to);
+            dd->decRef(saved);
+            dd->garbageCollect();
+
+            // reset qubit count
+            op->setNqubits(nq);
+        }
+        template<class DDType>
+        void applyGate(qc::QuantumComputation& qc, decltype(qc1.begin())& opIt, DDType& to, qc::Permutation& permutation, Direction dir = LEFT) {
+            // Measurements at the end of the circuit are considered NOPs.
+            if ((*opIt)->getType() == qc::Measure) {
+                if (!qc.isLastOperationOnQubit(opIt, qc.cend())) {
+                    throw std::invalid_argument("Intermediate measurements currently not supported. Defer your measurements to the end.");
+                }
+                return;
+            }
+            applyGate(*opIt, to, permutation, dir);
+        }
 
         void setupResults(EquivalenceCheckingResults& results);
-        bool validInstance();
 
     public:
         EquivalenceChecker(qc::QuantumComputation& qc1, qc::QuantumComputation& qc2);
@@ -117,12 +147,19 @@ namespace ec {
         virtual ~EquivalenceChecker() = default;
 
         // TODO: also allow equivalence by relative phase or up to a permutation of the outputs
-        static Equivalence equals(const dd::Edge& e, const dd::Edge& f);
+        template<class DDType>
+        static Equivalence equals(const DDType& e, const DDType& f) {
+            if (e.p != f.p) return Equivalence::NotEquivalent;
+
+            if (!e.w.approximatelyEquals(f.w)) return Equivalence::EquivalentUpToGlobalPhase;
+
+            return Equivalence::Equivalent;
+        }
 
         virtual EquivalenceCheckingResults check() { return check(Configuration{}); };
         virtual EquivalenceCheckingResults check(const Configuration& config);
 
-        static void setTolerance(fp tol) { dd::Package::setComplexNumberTolerance(tol); }
+        static void setTolerance(dd::fp tol) { decltype(dd->cn.complexTable)::setTolerance(tol); }
         Method      method = ec::Method::Reference;
     };
 

@@ -26,26 +26,26 @@ namespace ec {
 
     class SimulationBasedEquivalenceChecker: public EquivalenceChecker {
     protected:
-        std::function<unsigned long long()>    stimuliGenerator;
+        std::function<std::size_t()>    stimuliGenerator;
         std::function<unsigned short()>        basisStateGenerator;
-        std::unordered_set<unsigned long long> stimuli;
+        std::unordered_set<std::size_t> stimuli;
 
-        unsigned short nqubits_for_stimuli = 0;
+        dd::QubitCount nqubits_for_stimuli = 0;
 
-        unsigned long long                                seed = 0;
+        std::size_t                                seed = 0;
         std::mt19937_64                                   mt;
-        std::uniform_int_distribution<unsigned long long> distribution;
+        std::uniform_int_distribution<std::size_t> distribution;
         std::uniform_int_distribution<unsigned short>     basisStateDistribution;
 
-        dd::Edge generateRandomStimulus(StimuliType type = StimuliType::Classical);
-        dd::Edge generateRandomClassicalStimulus();
-        dd::Edge generateRandomLocalQuantumStimulus();
-        dd::Edge generateRandomGlobalQuantumStimulus();
-        bool     simulateWithStimulus(const dd::Edge& stimulus, EquivalenceCheckingResults& results, const Configuration& config = Configuration{});
-        void     checkWithStimulus(const dd::Edge& stimulus, EquivalenceCheckingResults& results, const Configuration& config = Configuration{});
+        qc::VectorDD generateRandomStimulus(StimuliType type = StimuliType::Classical);
+        qc::VectorDD generateRandomClassicalStimulus();
+        qc::VectorDD generateRandomLocalQuantumStimulus();
+        qc::VectorDD generateRandomGlobalQuantumStimulus();
+        bool     simulateWithStimulus(const qc::VectorDD& stimulus, EquivalenceCheckingResults& results, const Configuration& config = Configuration{});
+        void     checkWithStimulus(const qc::VectorDD& stimulus, EquivalenceCheckingResults& results, const Configuration& config = Configuration{});
 
     public:
-        SimulationBasedEquivalenceChecker(qc::QuantumComputation& qc1, qc::QuantumComputation& qc2, unsigned long seed = 0):
+        SimulationBasedEquivalenceChecker(qc::QuantumComputation& qc1, qc::QuantumComputation& qc2, std::size_t seed = 0):
             EquivalenceChecker(qc1, qc2), seed(seed) {
             method              = ec::Method::Simulation;
             nqubits_for_stimuli = qc1.getNqubitsWithoutAncillae();
@@ -60,9 +60,8 @@ namespace ec {
             } else {
                 mt.seed(seed);
             }
-            distribution     = std::uniform_int_distribution<unsigned long long>(0, static_cast<unsigned long long>(std::pow(2.L, nqubits_for_stimuli) - 1));
+            distribution     = std::uniform_int_distribution<std::size_t>(0, static_cast<std::size_t>(std::pow(2.L, nqubits_for_stimuli) - 1));
             stimuliGenerator = [&]() { return distribution(mt); };
-            dd->setMode(dd::Vector);
 
             basisStateDistribution = std::uniform_int_distribution<unsigned short>(0, 5);
             basisStateGenerator    = [&]() { return basisStateDistribution(mt); };

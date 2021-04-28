@@ -183,16 +183,16 @@ int main(int argc, char** argv) {
                     gates_to_modify = std::stoull(cmd);
 
                     for (auto k = 0u; k < gates_to_modify; ++k) {
-                        auto target   = rng() % qc2.getNqubits();
-                        auto control0 = qc::Control(rng() % qc2.getNqubits());
+                        auto target   = static_cast<dd::Qubit>(rng() % qc2.getNqubits());
+                        auto control0 = dd::Control{static_cast<dd::Qubit>(rng() % qc2.getNqubits())};
                         while (control0.qubit == target) {
-                            control0 = qc::Control(rng() % qc2.getNqubits());
+                            control0 = dd::Control{static_cast<dd::Qubit>(rng() % qc2.getNqubits())};
                         }
-                        auto control1 = qc::Control(rng() % qc2.getNqubits());
+                        auto control1 = dd::Control{static_cast<dd::Qubit>(rng() % qc2.getNqubits())};
                         while (control1.qubit == target || control1.qubit == control0.qubit) {
-                            control1 = qc::Control(rng() % qc2.getNqubits());
+                            control1 = dd::Control{static_cast<dd::Qubit>(rng() % qc2.getNqubits())};
                         }
-                        qc2.insert<std::unique_ptr<qc::StandardOperation>>(qc2.begin(), std::make_unique<qc::StandardOperation>(qc2.getNqubits(), std::vector<qc::Control>{control0, control1}, target));
+                        qc2.insert<std::unique_ptr<qc::StandardOperation>>(qc2.begin(), std::make_unique<qc::StandardOperation>(qc2.getNqubits(), dd::Controls{control0, control1}, target));
                     }
                     resoss << "_"
                            << "toffFront" << gates_to_modify;
@@ -213,16 +213,16 @@ int main(int argc, char** argv) {
                     gates_to_modify = std::stoull(cmd);
 
                     for (auto k = 0u; k < gates_to_modify; ++k) {
-                        auto target   = rng() % qc2.getNqubits();
-                        auto control0 = qc::Control(rng() % qc2.getNqubits());
+                        auto target   = static_cast<dd::Qubit>(rng() % qc2.getNqubits());
+                        auto control0 = dd::Control{static_cast<dd::Qubit>(rng() % qc2.getNqubits())};
                         while (control0.qubit == target) {
-                            control0 = qc::Control(rng() % qc2.getNqubits());
+                            control0 = dd::Control{static_cast<dd::Qubit>(rng() % qc2.getNqubits())};
                         }
-                        auto control1 = qc::Control(rng() % qc2.getNqubits());
+                        auto control1 = dd::Control{static_cast<dd::Qubit>(rng() % qc2.getNqubits())};
                         while (control1.qubit == target || control1.qubit == control0.qubit) {
-                            control1 = qc::Control(rng() % qc2.getNqubits());
+                            control1 = dd::Control{static_cast<dd::Qubit>(rng() % qc2.getNqubits())};
                         }
-                        qc2.emplace_back<qc::StandardOperation>(qc2.getNqubits(), std::vector<qc::Control>{control0, control1}, target);
+                        qc2.emplace_back<qc::StandardOperation>(qc2.getNqubits(), dd::Controls{control0, control1}, target);
                     }
                     resoss << "_"
                            << "toffRear" << gates_to_modify;
