@@ -42,7 +42,7 @@ namespace ec {
     void EquivalenceChecker::setupAncillariesAndGarbage(qc::QuantumComputation& smaller_circuit, qc::QuantumComputation& larger_circuit) {
         dd::QubitCount                               nqubits_to_remove = larger_circuit.getNqubits() - smaller_circuit.getNqubits();
         std::vector<std::pair<dd::Qubit, dd::Qubit>> removed{};
-        std::vector<bool> garbage(larger_circuit.getNqubits());
+        std::vector<bool>                            garbage(larger_circuit.getNqubits());
         smaller_circuit.ancillary.resize(larger_circuit.getNqubits());
         smaller_circuit.garbage.resize(larger_circuit.getNqubits());
         for (dd::QubitCount i = 0; i < nqubits_to_remove; ++i) {

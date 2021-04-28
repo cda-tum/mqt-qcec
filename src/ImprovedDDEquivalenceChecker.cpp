@@ -144,7 +144,7 @@ namespace ec {
     /// Look-ahead LEFT and RIGHT and choose the more promising option
     void ImprovedDDEquivalenceChecker::checkLookahead(qc::MatrixDD& result, qc::Permutation& perm1, qc::Permutation& perm2) {
         qc::MatrixDD left{}, right{}, saved{};
-        bool     cachedLeft = false, cachedRight = false;
+        bool         cachedLeft = false, cachedRight = false;
 
         while (it1 != end1 && it2 != end2) {
             if (!cachedLeft) {

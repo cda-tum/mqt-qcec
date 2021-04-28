@@ -67,21 +67,21 @@ namespace ec {
         CircuitInfo    circuit1{};
         CircuitInfo    circuit2{};
         std::string    name;
-        unsigned short nqubits = 0;
+        dd::QubitCount nqubits = 0;
 
         Method      method{};
         Strategy    strategy    = Strategy::Proportional;
         StimuliType stimuliType = StimuliType::Classical;
 
         // results
-        Equivalence        equivalence       = Equivalence::NoInformation;
-        double             preprocessingTime = 0.0;
-        double             verificationTime  = 0.0;
-        unsigned long      maxActive         = 0;
-        unsigned long long nsims             = 0;
-        dd::CVec           cexInput{};
-        dd::fp             fidelity = 0.0;
-        qc::MatrixDD       result   = qc::MatrixDD::zero;
+        Equivalence  equivalence       = Equivalence::NoInformation;
+        double       preprocessingTime = 0.0;
+        double       verificationTime  = 0.0;
+        std::size_t  maxActive         = 0;
+        std::size_t  nsims             = 0;
+        dd::CVec     cexInput{};
+        dd::fp       fidelity = 0.0;
+        qc::MatrixDD result   = qc::MatrixDD::zero;
 
         [[nodiscard]] bool consideredEquivalent() const {
             return equivalence == Equivalence::Equivalent || equivalence == Equivalence::EquivalentUpToGlobalPhase || equivalence == Equivalence::ProbablyEquivalent;
@@ -96,12 +96,12 @@ namespace ec {
             }
         }
         static void from_json(const nlohmann::json& j, dd::CVec& stateVector) {
-            for (unsigned long long i = 0; i < j.size(); ++i) {
+            for (std::size_t i = 0; i < j.size(); ++i) {
                 stateVector[i] = j.at(i).get<std::pair<dd::fp, dd::fp>>();
             }
         }
         [[nodiscard]] nlohmann::json produceJSON() const;
-        [[nodiscard]] std::string toString() const {
+        [[nodiscard]] std::string    toString() const {
             return produceJSON().dump(2);
         }
         std::ostream& printJSON(std::ostream& out = std::cout) const {
@@ -117,7 +117,7 @@ namespace ec {
             return out;
         }
         [[nodiscard]] std::string produceCSVEntry() const;
-        std::ostream& printCSVEntry(std::ostream& out = std::cout) const {
+        std::ostream&             printCSVEntry(std::ostream& out = std::cout) const {
             out << produceCSVEntry() << std::endl;
             return out;
         }
