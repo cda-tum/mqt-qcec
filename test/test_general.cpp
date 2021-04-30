@@ -211,3 +211,36 @@ TEST_F(GeneralTest, InvalidStrategy) {
     ec::Configuration                config{.strategy = ec::Strategy::CompilationFlow};
     EXPECT_THROW(ec2.check(config), std::invalid_argument);
 }
+
+TEST_F(GeneralTest, FinishFirstCircuit) {
+    qc_original.addQubitRegister(1);
+    qc_original.emplace_back<qc::StandardOperation>(1, 0, qc::X);
+    qc_original.emplace_back<qc::StandardOperation>(1, 0, qc::X);
+    qc_original.emplace_back<qc::StandardOperation>(1, 0, qc::X);
+
+    qc_alternative.addQubitRegister(1);
+    qc_alternative.emplace_back<qc::StandardOperation>(1, 0, qc::X);
+
+    ec::Configuration config{};
+    config.strategy = ec::Strategy::Naive;
+    config.fuseSingleQubitGates = false;
+    ec::ImprovedDDEquivalenceChecker ec(qc_original, qc_alternative);
+    auto results = ec.check(config);
+    EXPECT_TRUE(results.consideredEquivalent());
+}
+
+TEST_F(GeneralTest, CompilationFlowFinishSecondCircuit) {
+    qc_original.addQubitRegister(2);
+    qc_original.emplace_back<qc::StandardOperation>(2, dd::Control{0}, 1, qc::X);
+
+    qc_alternative.addQubitRegister(2);
+    qc_alternative.emplace_back<qc::StandardOperation>(2, 0, qc::H);
+    qc_alternative.emplace_back<qc::StandardOperation>(2, 1, qc::H);
+    qc_alternative.emplace_back<qc::StandardOperation>(2, dd::Control{1}, 0, qc::X);
+    qc_alternative.emplace_back<qc::StandardOperation>(2, 1, qc::H);
+    qc_alternative.emplace_back<qc::StandardOperation>(2, 0, qc::H);
+
+    ec::CompilationFlowEquivalenceChecker ec(qc_original, qc_alternative);
+    auto results = ec.check();
+    EXPECT_TRUE(results.consideredEquivalent());
+}
