@@ -244,3 +244,25 @@ TEST_F(GeneralTest, CompilationFlowFinishSecondCircuit) {
     auto                                  results = ec.check();
     EXPECT_TRUE(results.consideredEquivalent());
 }
+
+TEST_F(GeneralTest, FixOutputPermutationMismatch) {
+    qc_original.addQubitRegister(2);
+    qc_original.emplace_back<qc::StandardOperation>(2, 0, qc::X);
+    qc_original.emplace_back<qc::StandardOperation>(2, 1, qc::X);
+    qc_original.setLogicalQubitAncillary(1);
+    std::cout << qc_original << std::endl;
+
+    qc_alternative.addQubitRegister(3);
+    qc_alternative.emplace_back<qc::StandardOperation>(3, 0, qc::X);
+    qc_alternative.emplace_back<qc::StandardOperation>(3, 1, qc::I);
+    qc_alternative.emplace_back<qc::StandardOperation>(3, 2, qc::X);
+    qc_alternative.outputPermutation.erase(1);
+    qc_alternative.setLogicalQubitAncillary(1);
+    qc_alternative.setLogicalQubitGarbage(1);
+    std::cout << qc_alternative << std::endl;
+
+    ec::EquivalenceChecker ec(qc_original, qc_alternative);
+    auto                   results = ec.check();
+
+    EXPECT_TRUE(results.consideredEquivalent());
+}

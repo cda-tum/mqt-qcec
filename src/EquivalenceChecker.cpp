@@ -75,14 +75,14 @@ namespace ec {
 
         for (const auto& o: larger_output) {
             dd::Qubit output_qubit_in_larger_circuit = o.second;
-            //		    dd::Qubit physical_qubit_in_larger_circuit = o.first;
-            //			std::cout << "Output logical qubit " << static_cast<std::size_t>(output_qubit_in_larger_circuit) << " at physical qubit " << static_cast<std::size_t>(physical_qubit_in_larger_circuit);
+            // dd::Qubit physical_qubit_in_larger_circuit = o.first;
+            // std::cout << "Output logical qubit " << static_cast<std::size_t>(output_qubit_in_larger_circuit) << " at physical qubit " << static_cast<std::size_t>(physical_qubit_in_larger_circuit);
             dd::Qubit nout = 1;
             for (dd::Qubit i = 0; i < output_qubit_in_larger_circuit; ++i) {
                 if (!larger_garbage[i])
                     ++nout;
             }
-            //			std::cout << " which is logical output qubit number " << static_cast<std::size_t>(nout) << std::endl;
+            // std::cout << " which is logical output qubit number " << static_cast<std::size_t>(nout) << std::endl;
 
             dd::QubitCount outcount                        = nout;
             dd::Qubit      output_qubit_in_smaller_circuit = 0;
@@ -101,7 +101,7 @@ namespace ec {
             if (!exists_in_smaller)
                 continue;
 
-            //			std::cout << "This is logical qubit " << static_cast<std::size_t>(output_qubit_in_smaller_circuit) << " in the smaller circuit";
+            // std::cout << "This is logical qubit " << static_cast<std::size_t>(output_qubit_in_smaller_circuit) << " in the smaller circuit";
             dd::Qubit physical_qubit_in_smaller_circuit = 0;
             for (const auto& out: smaller_output) {
                 if (out.second == output_qubit_in_smaller_circuit) {
@@ -109,10 +109,10 @@ namespace ec {
                     break;
                 }
             }
-            //			std::cout << " which is assigned to physical qubit " << static_cast<std::size_t>(physical_qubit_in_smaller_circuit) << " at the end of the circuit" << std::endl;
+            // std::cout << " which is assigned to physical qubit " << static_cast<std::size_t>(physical_qubit_in_smaller_circuit) << " at the end of the circuit" << std::endl;
 
             if (output_qubit_in_larger_circuit != output_qubit_in_smaller_circuit) {
-                //				std::cout << "Mismatch in the logical output qubits" << std::endl;
+                // std::cout << "Mismatch in the logical output qubits" << std::endl;
                 if (smaller_ancillary[output_qubit_in_larger_circuit] && smaller_garbage[output_qubit_in_larger_circuit]) {
                     bool      found                               = false;
                     dd::Qubit physical_index_of_larger_in_smaller = 0;
@@ -123,27 +123,27 @@ namespace ec {
                             break;
                         }
                     }
-                    //					if (found) {
-                    //						std::cout << "Found logical qubit " << static_cast<std::size_t>(output_qubit_in_larger_circuit) << " in smaller circuit at physical qubit " << static_cast<std::size_t>(physical_index_of_larger_in_smaller) << std::endl;
-                    //						std::cout << "This qubit is idle: " << smaller_circuit.isIdleQubit(physical_index_of_larger_in_smaller) << std::endl;
-                    //					}
+                    if (found) {
+                        // std::cout << "Found logical qubit " << static_cast<std::size_t>(output_qubit_in_larger_circuit) << " in smaller circuit at physical qubit " << static_cast<std::size_t>(physical_index_of_larger_in_smaller) << std::endl;
+                        // std::cout << "This qubit is idle: " << circuit.isIdleQubit(physical_index_of_larger_in_smaller) << std::endl;
+                    }
                     if (!found || circuit.isIdleQubit(physical_index_of_larger_in_smaller)) {
-                        //						std::cout << "Logical qubit " << static_cast<std::size_t>(output_qubit_in_smaller_circuit) << " can be moved to logical qubit " << static_cast<std::size_t>(output_qubit_in_larger_circuit) << std::endl;
+                        // std::cout << "Logical qubit " << static_cast<std::size_t>(output_qubit_in_smaller_circuit) << " can be moved to logical qubit " << static_cast<std::size_t>(output_qubit_in_larger_circuit) << std::endl;
                         for (auto& in: smaller_initial) {
                             if (in.second == output_qubit_in_smaller_circuit) {
                                 in.second = output_qubit_in_larger_circuit;
-                                //								std::cout << "Physical qubit " << static_cast<std::size_t>(in.first) << " has been assigned logical qubit " << static_cast<std::size_t>(in.second) << " as input" << std::endl;
+                                // std::cout << "Physical qubit " << static_cast<std::size_t>(in.first) << " has been assigned logical qubit " << static_cast<std::size_t>(in.second) << " as input" << std::endl;
                                 break;
                             }
                         }
                         smaller_output[physical_qubit_in_smaller_circuit] = output_qubit_in_larger_circuit;
-                        //						std::cout << "Physical qubit " << static_cast<std::size_t>(physical_qubit_in_smaller_circuit) << " has been assigned logical qubit " << static_cast<std::size_t>(output_qubit_in_larger_circuit) << " as output" << std::endl;
+                        // std::cout << "Physical qubit " << static_cast<std::size_t>(physical_qubit_in_smaller_circuit) << " has been assigned logical qubit " << static_cast<std::size_t>(output_qubit_in_larger_circuit) << " as output" << std::endl;
                         smaller_ancillary[output_qubit_in_larger_circuit]  = smaller_ancillary[output_qubit_in_smaller_circuit];
                         smaller_ancillary[output_qubit_in_smaller_circuit] = true;
-                        //						std::cout << "Logical qubit " << static_cast<std::size_t>(output_qubit_in_larger_circuit) << " was assigned the ancillary status of qubit " << static_cast<std::size_t>(output_qubit_in_smaller_circuit) << " (i.e., " << smaller_ancillary.test(output_qubit_in_larger_circuit) << ")" << std::endl;
+                        // std::cout << "Logical qubit " << static_cast<std::size_t>(output_qubit_in_larger_circuit) << " was assigned the ancillary status of qubit " << static_cast<std::size_t>(output_qubit_in_smaller_circuit) << " (i.e., " << smaller_ancillary[output_qubit_in_larger_circuit] << ")" << std::endl;
                         smaller_garbage[output_qubit_in_larger_circuit]  = false;
                         smaller_garbage[output_qubit_in_smaller_circuit] = true;
-                        //						std::cout << "Logical qubit " << static_cast<std::size_t>(output_qubit_in_larger_circuit) << " has been removed from the garbage outputs" << std::endl;
+                        // std::cout << "Logical qubit " << static_cast<std::size_t>(output_qubit_in_larger_circuit) << " has been removed from the garbage outputs" << std::endl;
                     }
                 } else {
                     std::cerr << "Uncorrected mismatch in output qubits!" << std::endl;
