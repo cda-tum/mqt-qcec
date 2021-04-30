@@ -222,10 +222,10 @@ TEST_F(GeneralTest, FinishFirstCircuit) {
     qc_alternative.emplace_back<qc::StandardOperation>(1, 0, qc::X);
 
     ec::Configuration config{};
-    config.strategy = ec::Strategy::Naive;
+    config.strategy             = ec::Strategy::Naive;
     config.fuseSingleQubitGates = false;
     ec::ImprovedDDEquivalenceChecker ec(qc_original, qc_alternative);
-    auto results = ec.check(config);
+    auto                             results = ec.check(config);
     EXPECT_TRUE(results.consideredEquivalent());
 }
 
@@ -241,6 +241,6 @@ TEST_F(GeneralTest, CompilationFlowFinishSecondCircuit) {
     qc_alternative.emplace_back<qc::StandardOperation>(2, 0, qc::H);
 
     ec::CompilationFlowEquivalenceChecker ec(qc_original, qc_alternative);
-    auto results = ec.check();
+    auto                                  results = ec.check();
     EXPECT_TRUE(results.consideredEquivalent());
 }
