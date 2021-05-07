@@ -6,7 +6,8 @@
 #ifndef QUANTUMCIRCUITEQUIVALENCECHECKING_BASERESULTS_HPP
 #define QUANTUMCIRCUITEQUIVALENCECHECKING_BASERESULTS_HPP
 
-#include "DDpackage.h"
+#include "Definitions.hpp"
+#include "dd/Package.hpp"
 #include "nlohmann/json.hpp"
 
 #include <iostream>
@@ -50,7 +51,7 @@ namespace ec {
             std::string        name;
             unsigned short     nqubits = 0;
             unsigned long long ngates  = 0;
-            dd::Package::CVec  cexOutput{};
+            dd::CVec           cexOutput{};
 
             [[nodiscard]] std::string toString() const {
                 std::stringstream ss{};
@@ -66,21 +67,21 @@ namespace ec {
         CircuitInfo    circuit1{};
         CircuitInfo    circuit2{};
         std::string    name;
-        unsigned short nqubits = 0;
+        dd::QubitCount nqubits = 0;
 
-        Method      method;
+        Method      method{};
         Strategy    strategy    = Strategy::Proportional;
         StimuliType stimuliType = StimuliType::Classical;
 
         // results
-        Equivalence        equivalence       = Equivalence::NoInformation;
-        double             preprocessingTime = 0.0;
-        double             verificationTime  = 0.0;
-        unsigned long      maxActive         = 0;
-        unsigned long long nsims             = 0;
-        dd::Package::CVec  cexInput{};
-        fp                 fidelity = 0.0;
-        dd::Edge           result   = dd::Package::DDzero;
+        Equivalence  equivalence       = Equivalence::NoInformation;
+        double       preprocessingTime = 0.0;
+        double       verificationTime  = 0.0;
+        std::size_t  maxActive         = 0;
+        std::size_t  nsims             = 0;
+        dd::CVec     cexInput{};
+        dd::fp       fidelity = 0.0;
+        qc::MatrixDD result   = qc::MatrixDD::zero;
 
         [[nodiscard]] bool consideredEquivalent() const {
             return equivalence == Equivalence::Equivalent || equivalence == Equivalence::EquivalentUpToGlobalPhase || equivalence == Equivalence::ProbablyEquivalent;
@@ -88,15 +89,15 @@ namespace ec {
 
         std::ostream& print(std::ostream& out = std::cout) const;
 
-        static void to_json(nlohmann::json& j, const dd::Package::CVec& stateVector) {
+        static void to_json(nlohmann::json& j, const dd::CVec& stateVector) {
             j = nlohmann::json::array();
             for (const auto& amp: stateVector) {
                 j.emplace_back(amp);
             }
         }
-        static void from_json(const nlohmann::json& j, dd::Package::CVec& stateVector) {
-            for (unsigned long long i = 0; i < j.size(); ++i) {
-                stateVector[i] = j.at(i).get<std::pair<fp, fp>>();
+        static void from_json(const nlohmann::json& j, dd::CVec& stateVector) {
+            for (std::size_t i = 0; i < j.size(); ++i) {
+                stateVector[i] = j.at(i).get<std::pair<dd::fp, dd::fp>>();
             }
         }
         [[nodiscard]] nlohmann::json produceJSON() const;

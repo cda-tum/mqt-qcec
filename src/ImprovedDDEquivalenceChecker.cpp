@@ -6,12 +6,12 @@
 #include <ImprovedDDEquivalenceChecker.hpp>
 
 namespace ec {
-    dd::Edge ImprovedDDEquivalenceChecker::createInitialMatrix() {
+    qc::MatrixDD ImprovedDDEquivalenceChecker::createInitialMatrix() {
         auto e = dd->makeIdent(nqubits);
         dd->incRef(e);
 
-        std::bitset<qc::MAX_QUBITS> ancillary{};
-        for (int q = nqubits - 1; q >= 0; --q) {
+        std::vector<bool> ancillary(nqubits);
+        for (auto q = static_cast<dd::Qubit>(nqubits - 1); q >= 0; --q) {
             if (qc1.logicalQubitIsAncillary(q) && qc2.logicalQubitIsAncillary(q)) {
                 bool found1  = false;
                 bool isidle1 = false;
@@ -34,7 +34,7 @@ namespace ec {
 
                 // qubit only really exists or is acted on in one of the circuits
                 if ((found1 ^ found2) || (isidle1 ^ isidle2)) {
-                    ancillary.set(q);
+                    ancillary[q] = true;
                 }
             }
         }
@@ -42,7 +42,7 @@ namespace ec {
         return e;
     }
 
-    dd::Edge ImprovedDDEquivalenceChecker::createGoalMatrix() {
+    qc::MatrixDD ImprovedDDEquivalenceChecker::createGoalMatrix() {
         auto goalMatrix = dd->makeIdent(nqubits);
         dd->incRef(goalMatrix);
         goalMatrix = dd->reduceAncillae(goalMatrix, ancillary2, RIGHT);
@@ -57,10 +57,6 @@ namespace ec {
         EquivalenceCheckingResults results{};
         setupResults(results);
         results.strategy = config.strategy;
-
-        if (!validInstance()) {
-            return results;
-        }
 
         auto start = std::chrono::steady_clock::now();
         runPreCheckPasses(config);
@@ -86,25 +82,25 @@ namespace ec {
 
         // finish first circuit
         while (it1 != end1) {
-            applyGate(it1, results.result, perm1, end1, LEFT);
+            applyGate(qc1, it1, results.result, perm1, LEFT);
             ++it1;
         }
 
         //finish second circuit
         while (it2 != end2) {
-            applyGate(it2, results.result, perm2, end2, RIGHT);
+            applyGate(qc2, it2, results.result, perm2, RIGHT);
             ++it2;
         }
 
-        qc::QuantumComputation::changePermutation(results.result, perm1, output1, line, dd, LEFT);
-        qc::QuantumComputation::changePermutation(results.result, perm2, output2, line, dd, RIGHT);
+        qc::QuantumComputation::changePermutation(results.result, perm1, output1, dd, LEFT);
+        qc::QuantumComputation::changePermutation(results.result, perm2, output2, dd, RIGHT);
         results.result = dd->reduceGarbage(results.result, garbage1, LEFT);
         results.result = dd->reduceGarbage(results.result, garbage2, RIGHT);
         results.result = dd->reduceAncillae(results.result, ancillary1, LEFT);
         results.result = dd->reduceAncillae(results.result, ancillary2, RIGHT);
 
         results.equivalence = equals(results.result, createGoalMatrix());
-        results.maxActive   = std::max(results.maxActive, dd->maxActive);
+        results.maxActive   = std::max(results.maxActive, dd->mUniqueTable.getMaxActiveNodes());
 
         auto                          endVerification   = std::chrono::steady_clock::now();
         std::chrono::duration<double> preprocessingTime = endPreprocessing - start;
@@ -116,17 +112,17 @@ namespace ec {
     }
 
     /// Alternate between LEFT and RIGHT applications
-    void ImprovedDDEquivalenceChecker::checkNaive(dd::Edge& result, qc::permutationMap& perm1, qc::permutationMap& perm2) {
+    void ImprovedDDEquivalenceChecker::checkNaive(qc::MatrixDD& result, qc::Permutation& perm1, qc::Permutation& perm2) {
         while (it1 != end1 && it2 != end2) {
-            applyGate(it1, result, perm1, end1, LEFT);
+            applyGate(qc1, it1, result, perm1, LEFT);
             ++it1;
-            applyGate(it2, result, perm2, end2, RIGHT);
+            applyGate(qc2, it2, result, perm2, RIGHT);
             ++it2;
         }
     }
 
     /// Alternate according to the gate count ratio between LEFT and RIGHT applications
-    void ImprovedDDEquivalenceChecker::checkProportional(dd::Edge& result, qc::permutationMap& perm1, qc::permutationMap& perm2) {
+    void ImprovedDDEquivalenceChecker::checkProportional(qc::MatrixDD& result, qc::Permutation& perm1, qc::Permutation& perm2) {
         auto ratio  = static_cast<unsigned int>(std::round(
                 static_cast<double>(std::max(qc1.getNops(), qc2.getNops())) /
                 static_cast<double>(std::min(qc1.getNops(), qc2.getNops()))));
@@ -135,20 +131,20 @@ namespace ec {
 
         while (it1 != end1 && it2 != end2) {
             for (unsigned int i = 0; i < ratio1 && it1 != end1; ++i) {
-                applyGate(it1, result, perm1, end1, LEFT);
+                applyGate(qc1, it1, result, perm1, LEFT);
                 ++it1;
             }
             for (unsigned int i = 0; i < ratio2 && it2 != end2; ++i) {
-                applyGate(it2, result, perm2, end2, RIGHT);
+                applyGate(qc2, it2, result, perm2, RIGHT);
                 ++it2;
             }
         }
     }
 
     /// Look-ahead LEFT and RIGHT and choose the more promising option
-    void ImprovedDDEquivalenceChecker::checkLookahead(dd::Edge& result, qc::permutationMap& perm1, qc::permutationMap& perm2) {
-        dd::Edge left{}, right{}, saved{};
-        bool     cachedLeft = false, cachedRight = false;
+    void ImprovedDDEquivalenceChecker::checkLookahead(qc::MatrixDD& result, qc::Permutation& perm1, qc::Permutation& perm2) {
+        qc::MatrixDD left{}, right{}, saved{};
+        bool         cachedLeft = false, cachedRight = false;
 
         while (it1 != end1 && it2 != end2) {
             if (!cachedLeft) {
@@ -158,7 +154,7 @@ namespace ec {
 
                 auto nq = (*it1)->getNqubits();
                 (*it1)->setNqubits(nqubits);
-                left = (*it1)->getDD(dd, line, perm1);
+                left = (*it1)->getDD(dd, perm1);
                 dd->incRef(left);
                 (*it1)->setNqubits(nq);
                 ++it1;
@@ -172,7 +168,7 @@ namespace ec {
 
                 auto nq = (*it2)->getNqubits();
                 (*it2)->setNqubits(nqubits);
-                right = (*it2)->getInverseDD(dd, line, perm2);
+                right = (*it2)->getInverseDD(dd, perm2);
                 dd->incRef(right);
                 (*it2)->setNqubits(nq);
                 ++it2;

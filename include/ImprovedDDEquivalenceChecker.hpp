@@ -17,11 +17,11 @@ namespace ec {
 
     class ImprovedDDEquivalenceChecker: public EquivalenceChecker {
         /// Alternate between LEFT and RIGHT applications
-        void checkNaive(dd::Edge& result, qc::permutationMap& perm1, qc::permutationMap& perm2);
+        void checkNaive(qc::MatrixDD& result, qc::Permutation& perm1, qc::Permutation& perm2);
         /// Alternate according to the gate count ratio between LEFT and RIGHT applications
-        void checkProportional(dd::Edge& result, qc::permutationMap& perm1, qc::permutationMap& perm2);
+        void checkProportional(qc::MatrixDD& result, qc::Permutation& perm1, qc::Permutation& perm2);
         /// Look-ahead LEFT and RIGHT and choose the more promising option
-        void checkLookahead(dd::Edge& result, qc::permutationMap& perm1, qc::permutationMap& perm2);
+        void checkLookahead(qc::MatrixDD& result, qc::Permutation& perm1, qc::Permutation& perm2);
 
     protected:
         /// Create the initial matrix used for the G->I<-G' scheme.
@@ -31,7 +31,7 @@ namespace ec {
         /// [1 0] for an ancillary that is present in one circuit and not acted upon in the other
         /// [0 0]
         /// \return initial matrix
-        dd::Edge createInitialMatrix();
+        qc::MatrixDD createInitialMatrix();
 
         /// Create the goal matrix used for the G->I<-G' scheme.
         /// [1 0] if the qubit is no ancillary
@@ -40,7 +40,7 @@ namespace ec {
         /// [1 0] for an ancillary that is present in either circuit
         /// [0 0]
         /// \return goal matrix
-        dd::Edge createGoalMatrix();
+        qc::MatrixDD createGoalMatrix();
 
     public:
         ImprovedDDEquivalenceChecker(qc::QuantumComputation& qc1, qc::QuantumComputation& qc2):

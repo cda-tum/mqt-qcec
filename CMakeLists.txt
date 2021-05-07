@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.14...3.19)
 
 project(qcec
         LANGUAGES CXX
-        VERSION 1.8.1
+        VERSION 1.9.0
         DESCRIPTION "QCEC - A JKQ tool for Quantum Circuit Equivalence Checking"
         )
 

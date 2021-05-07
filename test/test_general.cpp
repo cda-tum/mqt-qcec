@@ -56,15 +56,7 @@ TEST_F(GeneralTest, Output) {
 
 TEST_F(GeneralTest, InvalidInstance) {
     qc_original.import("./circuits/test/test_original.real");
-    qc_alternative.import("./circuits/test/test_error.qasm");
-
-    ec::EquivalenceChecker ec(qc_original, qc_alternative);
-    auto                   results = ec.check();
-    EXPECT_EQ(results.equivalence, ec::Equivalence::NoInformation);
-
-    ec::CompilationFlowEquivalenceChecker cfec(qc_original, qc_alternative);
-    results = cfec.check();
-    EXPECT_EQ(results.equivalence, ec::Equivalence::NoInformation);
+    EXPECT_THROW(qc_alternative.import("./circuits/test/test_error.qasm"), qc::QFRException);
 }
 
 TEST_F(GeneralTest, NonUnitary) {
@@ -154,14 +146,14 @@ TEST_F(GeneralTest, RemoveDiagonalGatesBeforeMeasure) {
     unsigned short         nqubits = 1;
     qc::QuantumComputation qc1(nqubits);
     qc1.emplace_back<StandardOperation>(nqubits, 0, X);
-    qc1.emplace_back<NonUnitaryOperation>(nqubits, std::vector<unsigned short>{0}, std::vector<unsigned short>{0});
+    qc1.emplace_back<NonUnitaryOperation>(nqubits, std::vector<dd::Qubit>{0}, std::vector<std::size_t>{0});
     std::cout << qc1 << std::endl;
     std::cout << "-----------------------------" << std::endl;
 
     qc::QuantumComputation qc2(nqubits);
     qc2.emplace_back<StandardOperation>(nqubits, 0, X);
     qc2.emplace_back<StandardOperation>(nqubits, 0, Z);
-    qc2.emplace_back<NonUnitaryOperation>(nqubits, std::vector<unsigned short>{0}, std::vector<unsigned short>{0});
+    qc2.emplace_back<NonUnitaryOperation>(nqubits, std::vector<dd::Qubit>{0}, std::vector<std::size_t>{0});
     std::cout << qc2 << std::endl;
     std::cout << "-----------------------------" << std::endl;
     ec::EquivalenceChecker ec(qc1, qc2);
@@ -218,4 +210,59 @@ TEST_F(GeneralTest, InvalidStrategy) {
     ec::ImprovedDDEquivalenceChecker ec2(qc_original, qc_original);
     ec::Configuration                config{.strategy = ec::Strategy::CompilationFlow};
     EXPECT_THROW(ec2.check(config), std::invalid_argument);
+}
+
+TEST_F(GeneralTest, FinishFirstCircuit) {
+    qc_original.addQubitRegister(1);
+    qc_original.emplace_back<qc::StandardOperation>(1, 0, qc::X);
+    qc_original.emplace_back<qc::StandardOperation>(1, 0, qc::X);
+    qc_original.emplace_back<qc::StandardOperation>(1, 0, qc::X);
+
+    qc_alternative.addQubitRegister(1);
+    qc_alternative.emplace_back<qc::StandardOperation>(1, 0, qc::X);
+
+    ec::Configuration config{};
+    config.strategy             = ec::Strategy::Naive;
+    config.fuseSingleQubitGates = false;
+    ec::ImprovedDDEquivalenceChecker ec(qc_original, qc_alternative);
+    auto                             results = ec.check(config);
+    EXPECT_TRUE(results.consideredEquivalent());
+}
+
+TEST_F(GeneralTest, CompilationFlowFinishSecondCircuit) {
+    qc_original.addQubitRegister(2);
+    qc_original.emplace_back<qc::StandardOperation>(2, dd::Control{0}, 1, qc::X);
+
+    qc_alternative.addQubitRegister(2);
+    qc_alternative.emplace_back<qc::StandardOperation>(2, 0, qc::H);
+    qc_alternative.emplace_back<qc::StandardOperation>(2, 1, qc::H);
+    qc_alternative.emplace_back<qc::StandardOperation>(2, dd::Control{1}, 0, qc::X);
+    qc_alternative.emplace_back<qc::StandardOperation>(2, 1, qc::H);
+    qc_alternative.emplace_back<qc::StandardOperation>(2, 0, qc::H);
+
+    ec::CompilationFlowEquivalenceChecker ec(qc_original, qc_alternative);
+    auto                                  results = ec.check();
+    EXPECT_TRUE(results.consideredEquivalent());
+}
+
+TEST_F(GeneralTest, FixOutputPermutationMismatch) {
+    qc_original.addQubitRegister(2);
+    qc_original.emplace_back<qc::StandardOperation>(2, 0, qc::X);
+    qc_original.emplace_back<qc::StandardOperation>(2, 1, qc::X);
+    qc_original.setLogicalQubitAncillary(1);
+    std::cout << qc_original << std::endl;
+
+    qc_alternative.addQubitRegister(3);
+    qc_alternative.emplace_back<qc::StandardOperation>(3, 0, qc::X);
+    qc_alternative.emplace_back<qc::StandardOperation>(3, 1, qc::I);
+    qc_alternative.emplace_back<qc::StandardOperation>(3, 2, qc::X);
+    qc_alternative.outputPermutation.erase(1);
+    qc_alternative.setLogicalQubitAncillary(1);
+    qc_alternative.setLogicalQubitGarbage(1);
+    std::cout << qc_alternative << std::endl;
+
+    ec::EquivalenceChecker ec(qc_original, qc_alternative);
+    auto                   results = ec.check();
+
+    EXPECT_TRUE(results.consideredEquivalent());
 }
