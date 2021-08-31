@@ -1,6 +1,7 @@
 ignore:
   - "extern/**/*"
   - "jkq/**/*"
+  - "test/**/*"
 
 coverage:
   range: 60..90
