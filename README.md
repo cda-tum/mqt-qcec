@@ -44,17 +44,23 @@ If you have any questions, feel free to contact us via [iic-quantum@jku.at](mail
 
 JKQ QCEC is mainly developed as a C++ library with an easy-to-use Python interface. 
 - Get the Python package
-```bash
-pip install jkq.qcec
-```
+    ```bash
+    pip install jkq.qcec
+    ```
+  In order to make the library as easy to use as possible (without compilation), we provide wheels for most common platforms (64-bit Linux, MacOS, Windows). However, in order to get the best performance out of QCEC, it is recommended to
+  build it locally from the source distribution via
+    ```bash
+    pip install --no-binary jkq.qcec
+    ```
+  This enables platform specific compiler optimizations that cannot be enabled on portable wheels.
 - Start using it in Python:
-```python
-from jkq.qcec import *
-
-config = Configuration()
-<...>  # set configuration options
-results = verify(circ1, circ2, config)
-```
+    ```python
+    from jkq.qcec import *
+    
+    config = Configuration()
+    <...>  # set configuration options
+    results = verify(circ1, circ2, config)
+    ```
 Both circuits can either be IBM Qiskit `QuantumCircuit` objects or paths to circuit files (in any of the formats listed above). 
 
 The verification procedure can be configured with the following settings and options:
@@ -244,5 +250,3 @@ If you use our tool for your research, we will be thankful if you refer to it by
 ```
 
 </details>
-
-

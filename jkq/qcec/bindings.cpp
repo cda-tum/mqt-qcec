@@ -4,11 +4,11 @@
  */
 
 #include "CompilationFlowEquivalenceChecker.hpp"
-#include "QiskitImport.hpp"
 #include "SimulationBasedEquivalenceChecker.hpp"
 #include "pybind11/pybind11.h"
 #include "pybind11/stl.h"
 #include "pybind11_json/pybind11_json.hpp"
+#include "qiskit/QuantumCircuit.hpp"
 
 namespace py = pybind11;
 namespace nl = nlohmann;
@@ -25,7 +25,7 @@ ec::EquivalenceCheckingResults verify(const py::object&        circ1,
             auto&& file1 = circ1.cast<std::string>();
             qc1.import(file1);
         } else {
-            import(qc1, circ1);
+            qc::qiskit::QuantumCircuit::import(qc1, circ1);
         }
     } catch (std::exception const& e) {
         py::print("Could not import first circuit: ", e.what());
@@ -38,7 +38,7 @@ ec::EquivalenceCheckingResults verify(const py::object&        circ1,
             auto&& file2 = circ2.cast<std::string>();
             qc2.import(file2);
         } else {
-            import(qc2, circ2);
+            qc::qiskit::QuantumCircuit::import(qc2, circ2);
         }
     } catch (std::exception const& e) {
         py::print("Could not import second circuit: ", e.what());

@@ -92,12 +92,13 @@ namespace ec {
         static void to_json(nlohmann::json& j, const dd::CVec& stateVector) {
             j = nlohmann::json::array();
             for (const auto& amp: stateVector) {
-                j.emplace_back(amp);
+                j.emplace_back(std::pair{amp.real(), amp.imag()});
             }
         }
         static void from_json(const nlohmann::json& j, dd::CVec& stateVector) {
             for (std::size_t i = 0; i < j.size(); ++i) {
-                stateVector[i] = j.at(i).get<std::pair<dd::fp, dd::fp>>();
+                const auto& c  = j.at(i).get<std::pair<dd::fp, dd::fp>>();
+                stateVector[i] = std::complex<dd::fp>(c.first, c.second);
             }
         }
         [[nodiscard]] nlohmann::json produceJSON() const;

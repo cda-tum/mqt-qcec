@@ -1,14 +1,19 @@
 name: CI
 
-on: 
+on:
   push:
-    branches: [master]
+    branches: [ master ]
   pull_request:
-    branches: [master]
+    branches: [ master ]
   workflow_dispatch:
 
 env:
   BUILD_TYPE: Release
+  MAKEFLAGS:  "-j2"
+
+defaults:
+  run:
+    shell: bash
 
 jobs:
   build:
@@ -16,7 +21,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        os: [ ubuntu-latest, macos-latest, windows-latest ]
 
     steps:
     - uses: actions/checkout@v2
@@ -24,7 +29,6 @@ jobs:
         submodules: recursive
 
     - name: Configure CMake
-      shell: bash
       run: |
          if [ "$RUNNER_OS" == "Windows" ]; then
            cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DBINDINGS=ON -T "ClangCl"
@@ -33,8 +37,7 @@ jobs:
          fi  
         
     - name: Build
-      shell: bash
-      run: cmake --build "${{github.workspace}}/build" --config $BUILD_TYPE --parallel 8
+      run: cmake --build "${{github.workspace}}/build" --config $BUILD_TYPE
 
   test:
     needs: build
@@ -50,7 +53,6 @@ jobs:
         submodules: recursive
 
     - name: Configure CMake
-      shell: bash
       run: |
          if [ "$RUNNER_OS" == "Windows" ]; then
            cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DBUILD_QCEC_TESTS=ON -T "ClangCl"
@@ -59,17 +61,15 @@ jobs:
          fi  
 
     - name: Build
-      shell: bash
       run: |
         if [ "$RUNNER_OS" == "Windows" ]; then
-          cmake --build "${{github.workspace}}/build" --config $BUILD_TYPE --parallel 8      
+          cmake --build "${{github.workspace}}/build" --config $BUILD_TYPE
         else
-          cmake --build "${{github.workspace}}/build" --config $BUILD_TYPE --target qcec_test --parallel 8
+          cmake --build "${{github.workspace}}/build" --config $BUILD_TYPE --target qcec_test
         fi  
 
     - name: Test
       working-directory: ${{github.workspace}}/build/test
-      shell: bash
       run: |
         if [ "$RUNNER_OS" == "Windows" ]; then
           cd $BUILD_TYPE
@@ -88,16 +88,13 @@ jobs:
         submodules: recursive
 
     - name: Configure CMake
-      shell: bash
       run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=Debug -DBUILD_QCEC_TESTS=ON -DBINDINGS=ON -DCOVERAGE=1
 
     - name: Build
-      shell: bash
       run: cmake --build "${{github.workspace}}/build" --config Debug --target qcec_test
 
     - name: Test
       working-directory: ${{github.workspace}}/build/test
-      shell: bash
       run: ./qcec_test
         
     - name: Upload coverage to Codecov
@@ -113,6 +110,6 @@ jobs:
           submodules: recursive
       - uses: DoozyX/clang-format-lint-action@v0.12
         with:
-          source: 'include src test jkq/qcec'
+          source: 'apps include src test jkq/qcec'
           extensions: 'h,hpp,c,cpp'
           clangFormatVersion: 12
