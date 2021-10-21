@@ -158,11 +158,11 @@ int main(int argc, char** argv) {
                 std::transform(cmd.begin(), cmd.end(), cmd.begin(), [](unsigned char c) { return ::tolower(c); });
 
                 if (cmd == "classical") {
-                    config.stimuliType = ec::StimuliType::Classical;
+                    config.stimuliType = ec::StateType::ComputationalBasis;
                 } else if (cmd == "localquantum") {
-                    config.stimuliType = ec::StimuliType::LocalQuantum;
+                    config.stimuliType = ec::StateType::Random1QBasis;
                 } else if (cmd == "globalquantum") {
-                    config.stimuliType = ec::StimuliType::GlobalQuantum;
+                    config.stimuliType = ec::StateType::Stabilizer;
                 } else {
                     show_usage(argv[0]);
                     return 1;

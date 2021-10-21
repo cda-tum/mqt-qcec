@@ -1,5 +1,16 @@
 add_library(${PROJECT_NAME}
+            ${${PROJECT_NAME}_SOURCE_DIR}/include/alternating
+            ${${PROJECT_NAME}_SOURCE_DIR}/include/construction
+            ${${PROJECT_NAME}_SOURCE_DIR}/include/simulation
+            ${${PROJECT_NAME}_SOURCE_DIR}/include/Configuration.hpp
+            ${${PROJECT_NAME}_SOURCE_DIR}/include/EquivalenceCriterion.hpp
+            ${${PROJECT_NAME}_SOURCE_DIR}/include/EquivalenceCheckingManager.hpp
             ${${PROJECT_NAME}_SOURCE_DIR}/include/EquivalenceChecker.hpp
+
+            ${CMAKE_CURRENT_SOURCE_DIR}/construction/DDConstructionChecker.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/simulation/DDSimulationChecker.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/simulation/StateGenerator.cpp
+
             ${CMAKE_CURRENT_SOURCE_DIR}/EquivalenceChecker.cpp
             ${${PROJECT_NAME}_SOURCE_DIR}/include/EquivalenceCheckingResults.hpp
             ${CMAKE_CURRENT_SOURCE_DIR}/EquivalenceCheckingResults.cpp
@@ -7,8 +18,6 @@ add_library(${PROJECT_NAME}
             ${CMAKE_CURRENT_SOURCE_DIR}/ImprovedDDEquivalenceChecker.cpp
             ${${PROJECT_NAME}_SOURCE_DIR}/include/CompilationFlowEquivalenceChecker.hpp
             ${CMAKE_CURRENT_SOURCE_DIR}/CompilationFlowEquivalenceChecker.cpp
-            ${${PROJECT_NAME}_SOURCE_DIR}/include/SimulationBasedEquivalenceChecker.hpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/SimulationBasedEquivalenceChecker.cpp
             )
 # set include directories
 target_include_directories(${PROJECT_NAME} PUBLIC $<BUILD_INTERFACE:${${PROJECT_NAME}_SOURCE_DIR}/include>)

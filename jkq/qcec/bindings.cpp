@@ -89,10 +89,10 @@ PYBIND11_MODULE(pyqcec, m) {
             .value("compilationflow", ec::Strategy::CompilationFlow)
             .export_values();
 
-    py::enum_<ec::StimuliType>(m, "StimuliType")
-            .value("classical", ec::StimuliType::Classical)
-            .value("localquantum", ec::StimuliType::LocalQuantum)
-            .value("globalquantum", ec::StimuliType::GlobalQuantum)
+    py::enum_<ec::StateType>(m, "StateType")
+            .value("classical", ec::StateType::ComputationalBasis)
+            .value("localquantum", ec::StateType::Random1QBasis)
+            .value("globalquantum", ec::StateType::Stabilizer)
             .export_values();
 
     py::enum_<ec::Equivalence>(m, "Equivalence")

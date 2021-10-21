@@ -37,7 +37,7 @@ TEST_F(GeneralTest, CSVOutput) {
     ss.clear();
     ec::EquivalenceCheckingResults::printCSVHeader(ss);
     std::string csvHeader      = ss.str();
-    std::string expectedHeader = "filename1;nqubits1;ngates1;filename2;nqubits2;ngates2;equivalent;t_pre;t_ver;maxActive;method;strategy;nsims;stimuliType";
+    std::string expectedHeader = "filename1;nqubits1;ngates1;filename2;nqubits2;ngates2;equivalent;t_pre;t_ver;maxActive;method;strategy;nsims;stateType";
     EXPECT_THAT(csvHeader, HasSubstr(expectedHeader));
 }
 

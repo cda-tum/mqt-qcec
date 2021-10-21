@@ -14,37 +14,6 @@
 #include <string>
 
 namespace ec {
-    enum class Equivalence {
-        NotEquivalent,
-        Equivalent,
-        NoInformation,
-        ProbablyEquivalent,
-        EquivalentUpToGlobalPhase
-    };
-
-    enum class Method {
-        Reference,
-        G_I_Gp,
-        Simulation
-    };
-
-    enum class Strategy {
-        Naive,
-        Proportional,
-        Lookahead,
-        CompilationFlow
-    };
-
-    enum class StimuliType {
-        Classical,
-        LocalQuantum,
-        GlobalQuantum
-    };
-
-    std::string toString(const Method& method);
-    std::string toString(const Equivalence& equivalence);
-    std::string toString(const Strategy& method);
-    std::string toString(const StimuliType& stimuliType);
 
     struct EquivalenceCheckingResults {
         struct CircuitInfo {
@@ -71,7 +40,7 @@ namespace ec {
 
         Method      method{};
         Strategy    strategy    = Strategy::Proportional;
-        StimuliType stimuliType = StimuliType::Classical;
+        StateType   stimuliType = StateType::ComputationalBasis;
 
         // results
         Equivalence  equivalence       = Equivalence::NoInformation;
@@ -111,7 +80,7 @@ namespace ec {
         }
 
         static std::string getCSVHeader() {
-            return "filename1;nqubits1;ngates1;filename2;nqubits2;ngates2;equivalent;t_pre;t_ver;maxActive;method;strategy;nsims;stimuliType";
+            return "filename1;nqubits1;ngates1;filename2;nqubits2;ngates2;equivalent;t_pre;t_ver;maxActive;method;strategy;nsims;stateType";
         }
         static std::ostream& printCSVHeader(std::ostream& out = std::cout) {
             out << getCSVHeader();

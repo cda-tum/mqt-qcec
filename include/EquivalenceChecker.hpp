@@ -7,108 +7,111 @@
 #define QUANTUMCIRCUITEQUIVALENCECHECKING_EQUIVALENCECHECKER_HPP
 
 #include "CircuitOptimizer.hpp"
+#include "Configuration.hpp"
 #include "EquivalenceCheckingResults.hpp"
+#include "EquivalenceCriterion.hpp"
 #include "QuantumComputation.hpp"
 
 #include <chrono>
 #include <memory>
 #include <string>
+#include <utility>
 
 namespace ec {
     enum Direction : bool { LEFT  = true,
                             RIGHT = false };
 
-    struct Configuration {
-        ec::Method   method    = ec::Method::G_I_Gp;
-        ec::Strategy strategy  = ec::Strategy::Proportional;
-        dd::fp       tolerance = dd::ComplexTable<>::tolerance();
-
-        // configuration options for optimizations
-        bool fuseSingleQubitGates             = true;
-        bool reconstructSWAPs                 = true;
-        bool removeDiagonalGatesBeforeMeasure = false;
-
-        // configuration options for PowerOfSimulation equivalence checker
-        double      fidelity_limit = 0.999;
-        std::size_t max_sims       = 16;
-        StimuliType stimuliType    = ec::StimuliType::Classical;
-        bool        storeCEXinput  = false;
-        bool        storeCEXoutput = false;
-
-        [[nodiscard]] nlohmann::json json() const {
-            nlohmann::json config{};
-            config["method"] = ec::toString(method);
-            if (method == ec::Method::G_I_Gp) {
-                config["strategy"] = ec::toString(strategy);
-            }
-            config["tolerance"]                                   = tolerance;
-            config["optimizations"]                               = {};
-            auto& optimizations                                   = config["optimizations"];
-            optimizations["fuse consecutive single qubit gates"]  = fuseSingleQubitGates;
-            optimizations["reconstruct swaps"]                    = reconstructSWAPs;
-            optimizations["remove diagonal gates before measure"] = removeDiagonalGatesBeforeMeasure;
-            if (method == ec::Method::Simulation) {
-                config["simulation config"]               = {};
-                auto& simulation                          = config["simulation config"];
-                simulation["fidelity limit"]              = fidelity_limit;
-                simulation["max sims"]                    = max_sims;
-                simulation["stimuli type"]                = ec::toString(stimuliType);
-                simulation["store counterexample input"]  = storeCEXinput;
-                simulation["store counterexample output"] = storeCEXoutput;
-            }
-            return config;
-        }
-        [[nodiscard]] std::string toString() const {
-            return json().dump(2);
-        }
-    };
-
     class EquivalenceChecker {
+    public:
+        EquivalenceChecker(const qc::QuantumComputation& qc1, const qc::QuantumComputation& qc2, const ec::Configuration& configuration):
+            qc1(qc1), qc2(qc2), configuration(configuration) {
+            dd           = std::make_unique<dd::Package>(qc1.getNqubits());
+            costFunction = [&](const qc::QuantumComputation&, const qc::QuantumComputation&, const std::unique_ptr<qc::Operation>&) { return 1U; };
+        };
+
+        EquivalenceChecker(const qc::QuantumComputation& qc1, const qc::QuantumComputation& qc2, const ec::Configuration& configuration, CostFunction costFunction):
+            EquivalenceChecker(qc1, qc2, configuration) {
+            this->costFunction = std::move(costFunction);
+        };
+        virtual ~EquivalenceChecker() = default;
+
+        template<class DDType>
+        EquivalenceCriterion equals(const DDType& e, const DDType& f) {
+            // both node pointers being equivalent is the strongest indication that the two decision diagrams are equivalent
+            if (e.p == f.p) {
+                // whenever the top edge weights differ, both decision diagrams are only equivalent up to a global phase
+                if (!e.w.approximatelyEquals(f.w)) {
+                    return EquivalenceCriterion::EquivalentUpToGlobalPhase;
+                }
+                return EquivalenceCriterion::Equivalent;
+            }
+
+            // in general, decision diagrams are canonic. This implies that if their top nodes differ, they are not
+            // equivalent. However, numerical instabilities might create a scenario where two nodes differ besides
+            // their underlying decision diagrams being extremely close (for some definition of `close`).
+            if constexpr (std::is_same_v<DDType, qc::MatrixDD>) {
+                // for matrices this is resolved by calculating their Frobenius inner product tr(U V^-1)
+                // and comparing it to some threshold.
+                dd::ComplexValue trace{};
+                if (e.p->ident) {
+                    trace = dd->trace(f);
+                } else if (f.p->ident) {
+                    trace = dd->trace(e);
+                } else {
+                    trace = dd->trace(dd->multiply(e, dd->conjugateTranspose(f)));
+                }
+
+                // whenever tr(U V^-1) ≃ 2^n, both decision diagrams should be considered equivalent
+                const auto normalizedRealPart = trace.r / std::exp2(e.p->v);
+                if (std::abs(normalizedRealPart - 1.0) < configuration.execution.traceThreshold) {
+                    return EquivalenceCriterion::Equivalent;
+                } else {
+                    // whenever |tr(U V^-1)|^2 ≃ 2^n, both decision diagrams should be considered equivalent up to global phase
+                    const auto normalizedSquaredMagnitude = (trace.r * trace.r + trace.i * trace.i) / std::exp2(e.p->v);
+                    if (std::abs(normalizedSquaredMagnitude - 1.0) < configuration.execution.traceThreshold) {
+                        return EquivalenceCriterion::EquivalentUpToGlobalPhase;
+                    }
+                }
+            } else {
+                // for vectors this is resolved by computing the inner product (or fidelity) between both decision
+                // diagrams and comparing it to some threshold
+                const auto innerProduct = dd->innerProduct(e, f);
+
+                // whenever <e,f> ≃ 1, both decision diagrams should be considered equivalent
+                if (std::abs(innerProduct.r - 1.) < configuration.simulation.fidelityLimit) {
+                    return EquivalenceCriterion::Equivalent;
+                }
+
+                // whenever |<e,f>|^2 ≃ 1, both decision diagrams should be considered equivalent up to a phase
+                const auto fidelity = innerProduct.r * innerProduct.r + innerProduct.i * innerProduct.i;
+                if (std::abs(fidelity - 1.0) < configuration.simulation.fidelityLimit) {
+                    return EquivalenceCriterion::EquivalentUpToPhase;
+                }
+            }
+
+            return EquivalenceCriterion::NotEquivalent;
+        }
+
+        virtual EquivalenceCriterion run() = 0;
+
     protected:
-        qc::QuantumComputation& qc1;
-        qc::QuantumComputation& qc2;
+        const qc::QuantumComputation& qc1;
+        const qc::QuantumComputation& qc2;
 
         std::unique_ptr<dd::Package> dd;
 
-        dd::QubitCount nqubits = 0;
+        Configuration configuration;
+        CostFunction  costFunction;
 
-        std::vector<bool> ancillary1{};
-        std::vector<bool> ancillary2{};
-        std::vector<bool> garbage1{};
-        std::vector<bool> garbage2{};
-
-        qc::Permutation initial1;
-        qc::Permutation initial2;
-        qc::Permutation output1;
-        qc::Permutation output2;
-
-        decltype(qc1.begin()) it1;
-        decltype(qc2.begin()) it2;
-        decltype(qc1.cend())  end1;
-        decltype(qc1.cend())  end2;
-
-        /// Given that one circuit has more qubits than the other, the difference is assumed to arise from ancillary qubits.
-        /// This function adjusts both circuits accordingly
-        static void setupAncillariesAndGarbage(qc::QuantumComputation& smaller_circuit, qc::QuantumComputation& larger_circuit);
-
-        /// In some cases both circuits calculate the same function, but on different qubits.
-        /// This function tries to correct such mismatches.
-        /// Note that this is still highly experimental!
-        void fixOutputPermutationMismatch(qc::QuantumComputation& circuit);
-
-        /// Run any configured optimization passes
-        virtual void runPreCheckPasses(const Configuration& config);
+        double      runtime{};
+        std::size_t maxActiveNodes{};
 
         /// Take operation and apply it either from the left or (inverted) from the right
         /// \param op operation to apply
         /// \param to DD to apply the operation to
         /// \param dir LEFT or RIGHT
         template<class DDType>
-        void applyGate(std::unique_ptr<qc::Operation>& op, DDType& to, qc::Permutation& permutation, Direction dir = LEFT) {
-            // set appropriate qubit count to generate correct DD
-            auto nq = op->getNqubits();
-            op->setNqubits(nqubits);
-
+        void applyGate(const std::unique_ptr<qc::Operation>& op, DDType& to, qc::Permutation& permutation, Direction dir = LEFT) {
             auto saved = to;
             if constexpr (std::is_same_v<DDType, qc::VectorDD>) {
                 // direction has no effect on state vector DDs
@@ -123,44 +126,7 @@ namespace ec {
             dd->incRef(to);
             dd->decRef(saved);
             dd->garbageCollect();
-
-            // reset qubit count
-            op->setNqubits(nq);
         }
-        template<class DDType>
-        void applyGate(qc::QuantumComputation& qc, decltype(qc1.begin())& opIt, DDType& to, qc::Permutation& permutation, Direction dir = LEFT) {
-            // Measurements at the end of the circuit are considered NOPs.
-            if ((*opIt)->getType() == qc::Measure) {
-                if (!qc.isLastOperationOnQubit(opIt, qc.cend())) {
-                    throw std::invalid_argument("Intermediate measurements currently not supported. Defer your measurements to the end.");
-                }
-                return;
-            }
-            applyGate(*opIt, to, permutation, dir);
-        }
-
-        void setupResults(EquivalenceCheckingResults& results);
-
-    public:
-        EquivalenceChecker(qc::QuantumComputation& qc1, qc::QuantumComputation& qc2);
-
-        virtual ~EquivalenceChecker() = default;
-
-        // TODO: also allow equivalence by relative phase or up to a permutation of the outputs
-        template<class DDType>
-        static Equivalence equals(const DDType& e, const DDType& f) {
-            if (e.p != f.p) return Equivalence::NotEquivalent;
-
-            if (!e.w.approximatelyEquals(f.w)) return Equivalence::EquivalentUpToGlobalPhase;
-
-            return Equivalence::Equivalent;
-        }
-
-        virtual EquivalenceCheckingResults check() { return check(Configuration{}); };
-        virtual EquivalenceCheckingResults check(const Configuration& config);
-
-        static void setTolerance(dd::fp tol) { decltype(dd->cn.complexTable)::setTolerance(tol); }
-        Method      method = ec::Method::Reference;
     };
 
 } // namespace ec

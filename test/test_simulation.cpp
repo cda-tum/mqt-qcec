@@ -52,7 +52,7 @@ TEST_F(SimulationTest, ClassicalStimuli) {
 TEST_F(SimulationTest, LocalStimuli) {
     qc_original.import("./circuits/test/test_original.real");
     qc_alternative.import("./circuits/test/test_alternative.real");
-    config.stimuliType = ec::StimuliType::LocalQuantum;
+    config.stimuliType = ec::StateType::Random1QBasis;
     ec::SimulationBasedEquivalenceChecker ec(qc_original, qc_alternative);
     auto                                  results = ec.check(config);
     results.print();
@@ -74,7 +74,7 @@ TEST_F(SimulationTest, LocalStimuli) {
 TEST_F(SimulationTest, GlobalStimuli) {
     qc_original.import("./circuits/test/test_original.real");
     qc_alternative.import("./circuits/test/test_alternative.real");
-    config.stimuliType = ec::StimuliType::GlobalQuantum;
+    config.stimuliType = ec::StateType::Stabilizer;
     ec::SimulationBasedEquivalenceChecker ec(qc_original, qc_alternative);
     auto                                  results = ec.check(config);
     results.print();

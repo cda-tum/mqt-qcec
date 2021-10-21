@@ -22,7 +22,7 @@ void show_usage(const std::string& name) {
     std::cerr << "  --toffFront X                                               add X random Toffolis to front of 2nd circuit       " << std::endl;
     std::cerr << "  --toffRear X                                                add X random Toffolis to rear of 2nd circuit        " << std::endl;
     std::cerr << "  --simulation_seed sim_seed                                  seed for simulation inputs                          " << std::endl;
-    std::cerr << "  --stimuliType classical | localquantum | globalquantum      type of stimuli to use                              " << std::endl;
+    std::cerr << "  --stateType classical | localquantum | globalquantum      type of stimuli to use                              " << std::endl;
 }
 
 int main(int argc, char** argv) {
@@ -45,7 +45,7 @@ int main(int argc, char** argv) {
     qc2.import(file2);
 
     ec::Configuration config{};
-    config.stimuliType = ec::StimuliType::Classical;
+    config.stimuliType = ec::StateType::ComputationalBasis;
 
     unsigned long long modify_seed     = 0;
     unsigned long long gates_to_modify = 0;
@@ -95,7 +95,7 @@ int main(int argc, char** argv) {
                     show_usage(argv[0]);
                     return 1;
                 }
-            } else if (cmd == "--stimuliType") {
+            } else if (cmd == "--stateType") {
                 ++i;
                 if (i >= argc) {
                     show_usage(argv[0]);
@@ -104,13 +104,13 @@ int main(int argc, char** argv) {
                 cmd = argv[i];
                 std::transform(cmd.begin(), cmd.end(), cmd.begin(), [](unsigned char c) { return ::tolower(c); });
                 if (cmd == "classical") {
-                    config.stimuliType = ec::StimuliType::Classical;
+                    config.stimuliType = ec::StateType::ComputationalBasis;
                 } else if (cmd == "localquantum") {
-                    config.stimuliType = ec::StimuliType::LocalQuantum;
+                    config.stimuliType = ec::StateType::Random1QBasis;
                     resoss << "_"
                            << "localquantum";
                 } else if (cmd == "globalquantum") {
-                    config.stimuliType = ec::StimuliType::GlobalQuantum;
+                    config.stimuliType = ec::StateType::Stabilizer;
                     resoss << "_"
                            << "globalquantum";
                 } else {
