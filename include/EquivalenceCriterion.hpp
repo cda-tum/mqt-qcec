@@ -51,7 +51,7 @@ namespace ec {
         } else if (criterion == "equivalent_up_to_phase" || criterion == "4") {
             return EquivalenceCriterion::EquivalentUpToPhase;
         } else {
-            throw std::runtime_error("Unknown equivalence criterion: " + criterion)
+            throw std::runtime_error("Unknown equivalence criterion: " + criterion);
         }
     }
 

@@ -11,6 +11,7 @@
 #include "EquivalenceCheckingResults.hpp"
 #include "EquivalenceCriterion.hpp"
 #include "QuantumComputation.hpp"
+#include "costfunction/CostFunction.hpp"
 
 #include <chrono>
 #include <memory>
@@ -23,16 +24,9 @@ namespace ec {
 
     class EquivalenceChecker {
     public:
-        EquivalenceChecker(const qc::QuantumComputation& qc1, const qc::QuantumComputation& qc2, const ec::Configuration& configuration):
-            qc1(qc1), qc2(qc2), configuration(configuration) {
-            dd           = std::make_unique<dd::Package>(qc1.getNqubits());
-            costFunction = [&](const qc::QuantumComputation&, const qc::QuantumComputation&, const std::unique_ptr<qc::Operation>&) { return 1U; };
-        };
+        EquivalenceChecker(const qc::QuantumComputation& qc1, const qc::QuantumComputation& qc2, const ec::Configuration& configuration, const CostFunction::Type& costFunctionType = CostFunction::Type::Naive):
+            qc1(qc1), qc2(qc2), configuration(configuration), costFunction(qc1, qc2, costFunctionType){};
 
-        EquivalenceChecker(const qc::QuantumComputation& qc1, const qc::QuantumComputation& qc2, const ec::Configuration& configuration, CostFunction costFunction):
-            EquivalenceChecker(qc1, qc2, configuration) {
-            this->costFunction = std::move(costFunction);
-        };
         virtual ~EquivalenceChecker() = default;
 
         template<class DDType>

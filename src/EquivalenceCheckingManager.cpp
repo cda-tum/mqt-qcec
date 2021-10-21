@@ -210,9 +210,6 @@ namespace ec {
         // run all configured optimization passes
         runOptimizationPasses();
 
-        // compute ratio of gates between both circuits
-        gateRatio = std::max((this->qc2.size() + this->qc1.size() / 2) / this->qc1.size(), 1U);
-
         // initialize the stimuli generator
         stimuliGenerator = StateGenerator(configuration.simulation.seed);
 

@@ -11,35 +11,25 @@
 
 namespace ec {
     enum class AlternatingScheme {
-        Naive,
-        Proportional,
-        Lookahead,
-        CompilationFlow
+        CostFunction,
+        Lookahead
     };
 
     inline std::string toString(const AlternatingScheme& scheme) {
         switch (scheme) {
-            case AlternatingScheme::Naive:
-                return "naive";
-            case AlternatingScheme::Proportional:
-                return "proportional";
+            case AlternatingScheme::CostFunction:
+                return "cost_function";
             case AlternatingScheme::Lookahead:
                 return "lookahead";
-            case AlternatingScheme::CompilationFlow:
-                return "compilation flow";
         }
         return " ";
     }
 
     inline AlternatingScheme alternatingSchemeFromString(const std::string& scheme) {
-        if (scheme == "naive" || scheme == "0") {
-            return AlternatingScheme::Naive;
-        } else if (scheme == "proportional" || scheme == "1") {
-            return AlternatingScheme::Proportional;
-        } else if (scheme == "lookahead" || scheme == "2") {
+        if (scheme == "cost_function" || scheme == "0") {
+            return AlternatingScheme::CostFunction;
+        } else if (scheme == "lookahead" || scheme == "1") {
             return AlternatingScheme::Lookahead;
-        } else if (scheme == "compilation flow" || scheme == "3") {
-            return AlternatingScheme::CompilationFlow;
         } else {
             throw std::runtime_error("Unknown alternating multiplication scheme: " + scheme);
         }

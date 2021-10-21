@@ -96,7 +96,7 @@ namespace ec {
         }
 
         // return the appropriate decision diagram
-        auto in = dd->makeBasisState(totalQubits, randomBasisState);
+        return dd->makeBasisState(totalQubits, randomBasisState);
     }
 
     qc::VectorDD StateGenerator::generateRandomStabilizerState(std::unique_ptr<dd::Package>& dd, dd::QubitCount totalQubits, dd::QubitCount ancillaryQubits) {

@@ -11,6 +11,9 @@
 namespace ec {
     class DDConstructionChecker: public EquivalenceChecker {
     public:
+        // in order to enable better operation caching in the decision diagram package the decision diagrams for both
+        // circuits are not built in sequence but rather in parallel. To this end, a cost function is used to specify
+        // how many gates of either circuit are to be applied for any gate of the other circuit
         EquivalenceCriterion run() override;
 
     protected:
@@ -37,6 +40,8 @@ namespace ec {
         void setupConstructionTask(const qc::QuantumComputation& qc, ConstructionTask& task);
 
         void advanceConstruction(ConstructionTask& task);
+
+        void applyPotentialSwaps(ConstructionTask& task);
 
         void postprocess(ConstructionTask& task);
     };

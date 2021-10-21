@@ -10,6 +10,7 @@
 #include "Configuration.hpp"
 #include "EquivalenceCriterion.hpp"
 #include "QuantumComputation.hpp"
+#include "alternating/DDAlternatingChecker.hpp"
 #include "construction/DDConstructionChecker.hpp"
 #include "simulation/DDSimulationChecker.hpp"
 #include "simulation/StateGenerator.hpp"
@@ -32,9 +33,6 @@ namespace ec {
         qc::QuantumComputation qc2{};
 
         Configuration configuration{};
-
-        std::size_t  gateRatio           = 1U;
-        CostFunction defaultCostFunction = [&](const qc::QuantumComputation&, const qc::QuantumComputation&, const std::unique_ptr<qc::Operation>&) { return gateRatio; };
 
         StateGenerator stimuliGenerator;
 

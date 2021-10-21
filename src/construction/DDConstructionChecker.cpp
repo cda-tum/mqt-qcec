@@ -16,16 +16,22 @@ namespace ec {
         setupConstructionTask(qc2, task2);
 
         while (!task1.finished() && !task2.finished()) {
-            // in order to enable better operation caching in the decision diagram package the decision diagrams for both
-            // circuits are not built in sequence but rather in parallel. To this end, a cost function is used to specify
-            // how many gates to apply from the second circuit given every gate from the first circuit.
-            const auto cost = costFunction(qc1, qc2, *task1.iterator);
+            applyPotentialSwaps(task1);
+            applyPotentialSwaps(task2);
 
-            advanceConstruction(task1);
+            if (!task1.finished() && !task2.finished()) {
+                const auto cost1 = costFunction(*task1.iterator, LEFT);
+                const auto cost2 = costFunction(*task2.iterator, RIGHT);
 
-            // TODO: it might make sense to explore whether gate fusion improves performance
-            for (std::size_t i = 0; i < cost && !task2.finished(); ++i) {
-                advanceConstruction(task2);
+                // TODO: it might make sense to explore whether gate fusion improves performance
+
+                for (std::size_t i = 0; i < cost2 && !task1.finished(); ++i) {
+                    advanceConstruction(task1);
+                }
+
+                for (std::size_t i = 0; i < cost1 && !task2.finished(); ++i) {
+                    advanceConstruction(task2);
+                }
             }
         }
 
@@ -61,6 +67,16 @@ namespace ec {
     void DDConstructionChecker::advanceConstruction(DDConstructionChecker::ConstructionTask& task) {
         applyGate(*task.iterator, task.functionality, task.permutation);
         ++task.iterator;
+
+        applyPotentialSwaps(task);
+    }
+
+    void DDConstructionChecker::applyPotentialSwaps(DDConstructionChecker::ConstructionTask& task) {
+        // swiftly apply any SWAP operation as these merely modify the underlying permutation
+        while (!task.finished() && (*task.iterator)->getType() == qc::SWAP) {
+            applyGate(*task.iterator, task.functionality, task.permutation);
+            ++task.iterator;
+        }
     }
 
     void DDConstructionChecker::postprocess(DDConstructionChecker::ConstructionTask& task) {

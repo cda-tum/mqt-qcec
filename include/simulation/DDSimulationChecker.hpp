@@ -11,15 +11,13 @@
 namespace ec {
     class DDSimulationChecker: public EquivalenceChecker {
     public:
-        template<class... Args>
-        DDSimulationChecker(const qc::QuantumComputation& qc1, const qc::QuantumComputation& qc2, const ec::Configuration& configuration, Args... args):
-            EquivalenceChecker(qc1, qc2, configuration, args...) {
+        DDSimulationChecker(const qc::QuantumComputation& qc1, const qc::QuantumComputation& qc2, const ec::Configuration& configuration, const CostFunction::Type& costFunctionType = CostFunction::Type::Naive):
+            EquivalenceChecker(qc1, qc2, configuration, costFunctionType) {
             initialState = dd->makeZeroState(this->qc1.getNqubits());
         }
 
-        template<class... Args>
-        DDSimulationChecker(const qc::QuantumComputation& qc1, const qc::QuantumComputation& qc2, const qc::VectorDD& initialState, const ec::Configuration& configuration, Args... args):
-            EquivalenceChecker(qc1, qc2, configuration, args...), initialState(initialState) {}
+        DDSimulationChecker(const qc::QuantumComputation& qc1, const qc::QuantumComputation& qc2, const qc::VectorDD& initialState, const ec::Configuration& configuration, const CostFunction::Type& costFunctionType = CostFunction::Type::Naive):
+            EquivalenceChecker(qc1, qc2, configuration, costFunctionType), initialState(initialState) {}
 
         EquivalenceCriterion run() override;
 
@@ -28,11 +26,13 @@ namespace ec {
         qc::VectorDD initialState{};
 
         struct SimulationTask {
-            const qc::QuantumComputation* qc;
+            const qc::QuantumComputation* qc = nullptr;
             qc::Permutation               permutation{};
             decltype(qc->begin())         iterator;
             decltype(qc->end())           end;
             qc::VectorDD                  state{};
+
+            SimulationTask() = default;
 
             SimulationTask(const qc::QuantumComputation& qc, const qc::VectorDD& initialState):
                 qc(&qc) {
@@ -51,6 +51,8 @@ namespace ec {
         void setupSimulationTask(const qc::QuantumComputation& qc, SimulationTask& task);
 
         void advanceSimulation(SimulationTask& task);
+
+        void applyPotentialSwaps(SimulationTask& task);
 
         void postprocess(SimulationTask& task);
     };

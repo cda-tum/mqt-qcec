@@ -15,9 +15,6 @@
 #include <thread>
 
 namespace ec {
-    // a generic cost function that has access to both circuits and returns the cost of a specific operation
-    using CostFunction = std::function<std::size_t(const qc::QuantumComputation&, const qc::QuantumComputation&, const std::unique_ptr<qc::Operation>&)>;
-
     struct Configuration {
         // configuration options for execution
         struct Execution {
@@ -42,7 +39,7 @@ namespace ec {
 
         // configuration options for the alternating multiplication scheme
         struct Alternating {
-            AlternatingScheme scheme = AlternatingScheme::Proportional;
+            AlternatingScheme scheme = AlternatingScheme::CostFunction;
         };
 
         // configuration options for the simulation scheme

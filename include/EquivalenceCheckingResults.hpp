@@ -38,12 +38,12 @@ namespace ec {
         std::string    name;
         dd::QubitCount nqubits = 0;
 
-        Method      method{};
-        Strategy    strategy    = Strategy::Proportional;
-        StateType   stimuliType = StateType::ComputationalBasis;
-
-        // results
-        Equivalence  equivalence       = Equivalence::NoInformation;
+        //        Method      method{};
+        //        Strategy    strategy    = Strategy::Proportional;
+        //        StateType   stimuliType = StateType::ComputationalBasis;
+        //
+        //        // results
+        //        Equivalence  equivalence       = Equivalence::NoInformation;
         double       preprocessingTime = 0.0;
         double       verificationTime  = 0.0;
         std::size_t  maxActive         = 0;
@@ -52,11 +52,11 @@ namespace ec {
         dd::fp       fidelity = 0.0;
         qc::MatrixDD result   = qc::MatrixDD::zero;
 
-        [[nodiscard]] bool consideredEquivalent() const {
-            return equivalence == Equivalence::Equivalent || equivalence == Equivalence::EquivalentUpToGlobalPhase || equivalence == Equivalence::ProbablyEquivalent;
-        }
+        //        [[nodiscard]] bool consideredEquivalent() const {
+        //            return equivalence == Equivalence::Equivalent || equivalence == Equivalence::EquivalentUpToGlobalPhase || equivalence == Equivalence::ProbablyEquivalent;
+        //        }
 
-        std::ostream& print(std::ostream& out = std::cout) const;
+        //        std::ostream& print(std::ostream& out = std::cout) const;
 
         static void to_json(nlohmann::json& j, const dd::CVec& stateVector) {
             j = nlohmann::json::array();
@@ -70,14 +70,14 @@ namespace ec {
                 stateVector[i] = std::complex<dd::fp>(c.first, c.second);
             }
         }
-        [[nodiscard]] nlohmann::json produceJSON() const;
-        [[nodiscard]] std::string    toString() const {
-            return produceJSON().dump(2);
-        }
-        std::ostream& printJSON(std::ostream& out = std::cout) const {
-            out << toString() << std::endl;
-            return out;
-        }
+        //        [[nodiscard]] nlohmann::json produceJSON() const;
+        //        [[nodiscard]] std::string    toString() const {
+        //            return produceJSON().dump(2);
+        //        }
+        //        std::ostream& printJSON(std::ostream& out = std::cout) const {
+        //            out << toString() << std::endl;
+        //            return out;
+        //        }
 
         static std::string getCSVHeader() {
             return "filename1;nqubits1;ngates1;filename2;nqubits2;ngates2;equivalent;t_pre;t_ver;maxActive;method;strategy;nsims;stateType";
@@ -86,11 +86,11 @@ namespace ec {
             out << getCSVHeader();
             return out;
         }
-        [[nodiscard]] std::string produceCSVEntry() const;
-        std::ostream&             printCSVEntry(std::ostream& out = std::cout) const {
-            out << produceCSVEntry() << std::endl;
-            return out;
-        }
+        //        [[nodiscard]] std::string produceCSVEntry() const;
+        //        std::ostream&             printCSVEntry(std::ostream& out = std::cout) const {
+        //            out << produceCSVEntry() << std::endl;
+        //            return out;
+        //        }
     };
 } // namespace ec
 
