@@ -12,8 +12,8 @@
 namespace ec {
     class DDAlternatingChecker: public EquivalenceChecker {
     public:
-        DDAlternatingChecker(const qc::QuantumComputation& qc1, const qc::QuantumComputation& qc2, const ec::Configuration& configuration, const CostFunction::Type& costFunctionType = CostFunction::Type::Naive, const AlternatingScheme& scheme = AlternatingScheme::CostFunction):
-            EquivalenceChecker(qc1, qc2, configuration, costFunctionType), scheme(scheme) {}
+        DDAlternatingChecker(const qc::QuantumComputation& qc1, const qc::QuantumComputation& qc2, const ec::Configuration& configuration, const AlternatingScheme& scheme = AlternatingScheme::CostFunction):
+            EquivalenceChecker(qc1, qc2, configuration), scheme(scheme) {}
 
         EquivalenceCriterion run() override;
 

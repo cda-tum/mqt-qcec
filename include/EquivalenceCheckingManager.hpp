@@ -39,6 +39,8 @@ namespace ec {
         double preprocessingTime{};
         double checkTime{};
 
+        std::size_t performedSimulations = 0U;
+
         /// Given that one circuit has more qubits than the other, the difference is assumed to arise from ancillary qubits.
         /// This function changes the additional qubits in the larger circuit to ancillary qubits.
         /// Furthermore it adds corresponding ancillaries in the smaller circuit

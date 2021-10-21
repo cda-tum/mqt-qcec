@@ -24,8 +24,8 @@ namespace ec {
 
     class EquivalenceChecker {
     public:
-        EquivalenceChecker(const qc::QuantumComputation& qc1, const qc::QuantumComputation& qc2, const ec::Configuration& configuration, const CostFunction::Type& costFunctionType = CostFunction::Type::Naive):
-            qc1(qc1), qc2(qc2), configuration(configuration), costFunction(qc1, qc2, costFunctionType){};
+        EquivalenceChecker(const qc::QuantumComputation& qc1, const qc::QuantumComputation& qc2, const ec::Configuration& configuration):
+            qc1(qc1), qc2(qc2), configuration(configuration), costFunction(qc1, qc2, configuration.execution.costFunctionType){};
 
         virtual ~EquivalenceChecker() = default;
 

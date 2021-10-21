@@ -7,6 +7,7 @@
 #define QCEC_CONFIGURATION_HPP
 
 #include "alternating/AlternatingScheme.hpp"
+#include "costfunction/CostFunction.hpp"
 #include "dd/Package.hpp"
 #include "nlohmann/json.hpp"
 #include "simulation/StateType.hpp"
@@ -26,6 +27,8 @@ namespace ec {
 
             bool runAlternatingScheme = true;
             bool runSimulationScheme  = true;
+
+            CostFunction::Type costFunctionType = CostFunction::Type::Proportional;
         };
 
         // configuration options for pre-check optimizations
@@ -67,6 +70,7 @@ namespace ec {
             exe["nthreads"]               = execution.parallel ? execution.nthreads : 1U;
             exe["run_alternating_scheme"] = execution.runAlternatingScheme;
             exe["run_simulation_scheme"]  = execution.runSimulationScheme;
+            exe["cost_function_type"]     = CostFunction::toString(execution.costFunctionType);
 
             config["optimizations"]                     = {};
             auto& opt                                   = config["optimizations"];

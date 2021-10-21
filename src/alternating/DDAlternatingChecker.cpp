@@ -136,6 +136,7 @@ namespace ec {
                 const auto cost2 = costFunction(*task2.iterator, RIGHT);
 
                 // TODO: it might make sense to explore whether gate fusion improves performance
+
                 for (std::size_t i = 0; i < cost2 && !task1.finished(); ++i) {
                     advanceAlternatingScheme(task1);
                 }

@@ -11,11 +11,35 @@
 // Abstract base class for describing a cost function
 class CostFunction {
 public:
-    enum Type {
+    enum class Type {
         Naive,
         Proportional,
         Compilationflow
     };
+
+    static std::string toString(const Type& type) {
+        switch (type) {
+            case Type::Naive:
+                return "naive";
+            case Type::Proportional:
+                return "proportional";
+            case Type::Compilationflow:
+                return "compilationflow";
+        }
+        return " ";
+    }
+
+    static Type fromString(const std::string type) {
+        if (type == "naive" || type == "0") {
+            return Type::Naive;
+        } else if (type == "proportional" || type == "1") {
+            return Type::Proportional;
+        } else if (type == "compilationflow" || type == "2") {
+            return Type::Compilationflow;
+        } else {
+            throw std::runtime_error("Unknown cost function type: " + type);
+        }
+    }
 
     CostFunction(const qc::QuantumComputation& qc1, const qc::QuantumComputation& qc2, const Type& type):
         qc1(qc1), qc2(qc2), type(type) {
@@ -31,12 +55,12 @@ public:
 
     std::size_t operator()(const std::unique_ptr<qc::Operation>& op, const bool firstCircuit = true) {
         switch (type) {
-            case Proportional:
+            case Type::Proportional:
                 // return 1 for the smaller circuit and the gate ratio otherwise
                 return (firstCircuit ^ firstIsLarger) ? 1U : gateRatio;
-            case Compilationflow:
+            case Type::Compilationflow:
                 return IBMCostFunction(op->getType(), op->getNcontrols());
-            case Naive:
+            case Type::Naive:
             default:
                 // just return 1 in any case
                 return 1U;

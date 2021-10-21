@@ -11,13 +11,13 @@
 namespace ec {
     class DDSimulationChecker: public EquivalenceChecker {
     public:
-        DDSimulationChecker(const qc::QuantumComputation& qc1, const qc::QuantumComputation& qc2, const ec::Configuration& configuration, const CostFunction::Type& costFunctionType = CostFunction::Type::Naive):
-            EquivalenceChecker(qc1, qc2, configuration, costFunctionType) {
+        DDSimulationChecker(const qc::QuantumComputation& qc1, const qc::QuantumComputation& qc2, const ec::Configuration& configuration):
+            EquivalenceChecker(qc1, qc2, configuration) {
             initialState = dd->makeZeroState(this->qc1.getNqubits());
         }
 
-        DDSimulationChecker(const qc::QuantumComputation& qc1, const qc::QuantumComputation& qc2, const qc::VectorDD& initialState, const ec::Configuration& configuration, const CostFunction::Type& costFunctionType = CostFunction::Type::Naive):
-            EquivalenceChecker(qc1, qc2, configuration, costFunctionType), initialState(initialState) {}
+        DDSimulationChecker(const qc::QuantumComputation& qc1, const qc::QuantumComputation& qc2, const ec::Configuration& configuration, const qc::VectorDD& initialState):
+            EquivalenceChecker(qc1, qc2, configuration), initialState(initialState) {}
 
         EquivalenceCriterion run() override;
 
