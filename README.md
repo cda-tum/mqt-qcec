@@ -43,17 +43,16 @@ If you have any questions, feel free to contact us via [iic-quantum@jku.at](mail
 ## Usage
 
 JKQ QCEC is mainly developed as a C++ library with an easy-to-use Python interface. 
-- Get the Python package
+- In order to make the library as easy to use as possible (without compilation), we provide pre-built wheels for most common platforms (64-bit Linux, MacOS, Windows). These can be installed using
     ```bash
     pip install jkq.qcec
     ```
-  In order to make the library as easy to use as possible (without compilation), we provide wheels for most common platforms (64-bit Linux, MacOS, Windows). However, in order to get the best performance out of QCEC, it is recommended to
-  build it locally from the source distribution via
+  However, in order to get the best performance out of QCEC, it is recommended to build it locally from the source distribution (see [system requirements](#system-requirements)) via
     ```bash
     pip install --no-binary jkq.qcec
     ```
   This enables platform specific compiler optimizations that cannot be enabled on portable wheels.
-- Start using it in Python:
+- Once installed, start using it in Python:
     ```python
     from jkq.qcec import *
     
@@ -116,17 +115,22 @@ result = verify(qc, qc_comp, config)
 ```
 
 ### Command-line Executable
-JKQ QCEC also provides a **standalone executable** with command-line interface called `qcec_app`.
-It provides the same options as the Python module as flags (e.g., `--method <method>` for setting the method) and produces JSON formatted output.
-For a full list of options, call `qcec_app --help`.
+
+JKQ QCEC also provides a **standalone executable** with command-line interface called `qcec_app`. It provides the same options as the Python module as flags (e.g., `--method <method>` for setting the method) and produces JSON formatted
+output. For a full list of options, call `qcec_app --help`.
 
 ### System requirements
 
-Building (and running) is continuously tested under Linux, MacOS, and Windows using the [latest available system versions for GitHub Actions](https://github.com/actions/virtual-environments).
-However, the implementation should be compatible with any current C++ compiler supporting C++17 and a minimum CMake version of 3.14.
+Building (and running) is continuously tested under Linux, MacOS, and Windows using the [latest available system versions for GitHub Actions](https://github.com/actions/virtual-environments). However, the implementation should be compatible
+with any current C++ compiler supporting C++17 and a minimum CMake version of 3.14.
+
+*Disclaimer*: We noticed some issues when compiling with Microsoft's `MSCV` compiler toolchain. If you are developing under Windows, consider using the `clang` compiler toolchain. A detailed description of how to set this up can be
+found [here](https://docs.microsoft.com/en-us/cpp/build/clang-support-msbuild?view=msvc-160).
 
 ### Library Organisation
+
 Internally the JKQ QCEC library works in the following way
+
 - Import both input files into a `qc::QuantumComputation` object
     ```c++
     std::string file1 = "<PATH_TO_FILE_1>";
