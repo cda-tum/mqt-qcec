@@ -6,62 +6,15 @@
 #include "alternating/DDAlternatingChecker.hpp"
 
 namespace ec {
-
-    EquivalenceCriterion DDAlternatingChecker::run() {
-        const auto start = std::chrono::steady_clock::now();
-
-        // prepare first task
-        task1 = AlternatingTask(qc1, LEFT);
-
-        // prepare second task
-        task2 = AlternatingTask(qc2, RIGHT);
-
-        // initialize functionality
-        functionality = createInitialMatrix();
-
-        // run specific scheme
-        if (scheme == AlternatingScheme::CostFunction) {
-            runCostFunctionCheck();
-        } else if (scheme == AlternatingScheme::Lookahead) {
-            runLookaheadCheck();
-        }
-
-        // finish first circuit
-        while (!task1.finished()) {
-            advanceAlternatingScheme(task1);
-        }
-
-        // finish second circuit
-        while (!task2.finished()) {
-            advanceAlternatingScheme(task2);
-        }
-
-        // postprocess the result
-        postprocess();
-
-        // generate goal matrix
-        auto goalMatrix = createGoalMatrix();
-
-        // compare the result to the goal matrix
-        auto equivalence = equals(functionality, goalMatrix);
-
-        maxActiveNodes = dd->mUniqueTable.getMaxActiveNodes();
-
-        const auto end = std::chrono::steady_clock::now();
-        runtime        = std::chrono::duration<double>(end - start).count();
-        return equivalence;
-    }
-
-    qc::MatrixDD DDAlternatingChecker::createInitialMatrix() {
-        const auto nqubits = qc1.getNqubits();
-
+    void DDAlternatingChecker::initialize() {
         // create the full identity matrix
-        auto e = dd->makeIdent(nqubits);
-        dd->incRef(e);
+        functionality = dd->makeIdent(nqubits);
+        dd->incRef(functionality);
 
-        // check whether any qubit acts as ancillary and is actually acted upon in both of the circuits
+        // only count ancillaries that are present in but not acted upon in both of the circuits
         // at the moment this is just to be on the safe side. It might be fine to also start with the
         // reduced matrix for every ancillary without any restriction
+        // TODO: check whether the way ancillaries are handled here is theoretically sound
         std::vector<bool> ancillary(nqubits);
         for (auto q = static_cast<dd::Qubit>(nqubits - 1); q >= 0; --q) {
             if (qc1.logicalQubitIsAncillary(q) && qc2.logicalQubitIsAncillary(q)) {
@@ -92,78 +45,72 @@ namespace ec {
         }
 
         // reduce the ancillary qubit contributions
-        e = dd->reduceAncillae(e, ancillary);
-        return e;
+        // [1 0] if the qubit is no ancillary or it is acted upon by both circuits
+        // [0 1]
+        //
+        // [1 0] for an ancillary that is present in one circuit and not acted upon in the other
+        // [0 0]
+        functionality = dd->reduceAncillae(functionality, ancillary);
     }
 
-    qc::MatrixDD DDAlternatingChecker::createGoalMatrix() {
-        const auto nqubits = qc1.getNqubits();
-
-        // create the full identity matrix
-        auto goalMatrix = dd->makeIdent(nqubits);
-        dd->incRef(goalMatrix);
-
-        goalMatrix = dd->reduceGarbage(goalMatrix, qc1.garbage, LEFT);
-        goalMatrix = dd->reduceGarbage(goalMatrix, qc2.garbage, RIGHT);
-        goalMatrix = dd->reduceAncillae(goalMatrix, qc1.ancillary, LEFT);
-        goalMatrix = dd->reduceAncillae(goalMatrix, qc2.ancillary, RIGHT);
-
-        return goalMatrix;
-    }
-
-    void DDAlternatingChecker::advanceAlternatingScheme(DDAlternatingChecker::AlternatingTask& task) {
-        applyGate(*task.iterator, functionality, task.permutation, task.direction);
-        ++task.iterator;
-
-        applyPotentialSwaps(task);
-    }
-
-    void DDAlternatingChecker::applyPotentialSwaps(DDAlternatingChecker::AlternatingTask& task) {
-        // swiftly apply any SWAP operation as these merely modify the underlying permutation
-        while (!task.finished() && (*task.iterator)->getType() == qc::SWAP) {
-            applyGate(*task.iterator, functionality, task.permutation, task.direction);
-            ++task.iterator;
+    void DDAlternatingChecker::execute() {
+        if (scheme == AlternatingScheme::CostFunction) {
+            executeCostFunction();
+        } else if (scheme == AlternatingScheme::Lookahead) {
+            executeLookahead();
         }
     }
 
-    void DDAlternatingChecker::runCostFunctionCheck() {
-        while (!task1.finished() && !task2.finished()) {
-            applyPotentialSwaps(task1);
-            applyPotentialSwaps(task2);
+    void DDAlternatingChecker::executeCostFunction() {
+        while (!taskManager1.finished() && !taskManager2.finished()) {
+            // skip over any SWAP operations
+            taskManager1.applySwapOperations(functionality);
+            taskManager2.applySwapOperations(functionality);
 
-            if (!task1.finished() && !task2.finished()) {
-                const auto cost1 = costFunction(*task1.iterator, LEFT);
-                const auto cost2 = costFunction(*task2.iterator, RIGHT);
+            if (!taskManager1.finished() && !taskManager2.finished()) {
+                // determine cost of either gate
+                const auto cost1 = costFunction(taskManager1(), LEFT);
+                const auto cost2 = costFunction(taskManager2(), RIGHT);
 
-                // TODO: it might make sense to explore whether gate fusion improves performance
-
-                for (std::size_t i = 0; i < cost2 && !task1.finished(); ++i) {
-                    advanceAlternatingScheme(task1);
-                }
-
-                for (std::size_t i = 0; i < cost1 && !task2.finished(); ++i) {
-                    advanceAlternatingScheme(task2);
-                }
+                // advance both tasks correspondingly
+                taskManager1.advance(functionality, cost2);
+                taskManager2.advance(functionality, cost1);
             }
         }
     }
 
-    void DDAlternatingChecker::runLookaheadCheck() {
+    void DDAlternatingChecker::executeLookahead() {
         qc::MatrixDD left{}, right{}, saved{};
         bool         cachedLeft = false, cachedRight = false;
 
-        while (!task1.finished() && !task2.finished()) {
+        while (!taskManager1.finished() && !taskManager2.finished()) {
             if (!cachedLeft) {
-                left = (*task1.iterator)->getDD(dd, task1.permutation);
+                // skip over any SWAP operations
+                taskManager1.applySwapOperations(functionality);
+
+                // break if the job is finished
+                if (taskManager1.finished())
+                    break;
+
+                // cache the current left DD
+                left = taskManager1.getDD();
                 dd->incRef(left);
-                ++task1.iterator;
+                taskManager1.advanceIterator();
                 cachedLeft = true;
             }
 
             if (!cachedRight) {
-                right = (*task2.iterator)->getInverseDD(dd, task2.permutation);
+                // skip over any SWAP operations
+                taskManager2.applySwapOperations(functionality);
+
+                // break if the job is finished
+                if (taskManager2.finished())
+                    break;
+
+                // cache the current right DD
+                right = taskManager2.getInverseDD();
                 dd->incRef(right);
-                ++task2.iterator;
+                taskManager2.advanceIterator();
                 cachedRight = true;
             }
 
@@ -207,13 +154,47 @@ namespace ec {
         }
     }
 
+    void DDAlternatingChecker::finish() {
+        taskManager1.finish(functionality);
+        taskManager2.finish(functionality);
+    }
+
     void DDAlternatingChecker::postprocess() {
-        qc::QuantumComputation::changePermutation(functionality, task1.permutation, qc1.outputPermutation, dd, LEFT);
-        qc::QuantumComputation::changePermutation(functionality, task2.permutation, qc2.outputPermutation, dd, RIGHT);
-        functionality = dd->reduceGarbage(functionality, qc1.garbage, LEFT);
-        functionality = dd->reduceGarbage(functionality, qc2.garbage, RIGHT);
-        functionality = dd->reduceAncillae(functionality, qc1.ancillary, LEFT);
-        functionality = dd->reduceAncillae(functionality, qc2.ancillary, RIGHT);
+        // ensure that the permutations that were tracked throughout the circuit match the expected output permutations
+        taskManager1.changePermutation(functionality);
+        taskManager2.changePermutation(functionality);
+
+        // sum up the contributions of garbage qubits
+        taskManager1.reduceGarbage(functionality);
+        taskManager2.reduceGarbage(functionality);
+
+        // TODO: check whether reducing ancillaries here is theoretically sound
+        taskManager1.reduceAncillae(functionality);
+        taskManager2.reduceAncillae(functionality);
+    }
+
+    EquivalenceCriterion DDAlternatingChecker::checkEquivalence() {
+        // create the full identity matrix
+        auto goalMatrix = dd->makeIdent(nqubits);
+        dd->incRef(goalMatrix);
+
+        // account for any garbage
+        taskManager1.reduceGarbage(goalMatrix);
+        taskManager2.reduceGarbage(goalMatrix);
+
+        // TODO: check whether reducing ancillaries here is theoretically sound
+        taskManager1.reduceAncillae(goalMatrix);
+        taskManager2.reduceAncillae(goalMatrix);
+
+        // the resulting goal matrix is
+        // [1 0] if the qubit is no ancillary
+        // [0 1]
+        //
+        // [1 0] for an ancillary that is present in either circuit
+        // [0 0]
+
+        // compare the obtained functionality to the goal matrix
+        return equals(functionality, goalMatrix);
     }
 
 } // namespace ec

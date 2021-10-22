@@ -31,7 +31,7 @@ namespace ec {
         } else if (scheme == "lookahead" || scheme == "1") {
             return AlternatingScheme::Lookahead;
         } else {
-            throw std::runtime_error("Unknown alternating multiplication scheme: " + scheme);
+            throw std::runtime_error("Unknown alternating scheme: " + scheme);
         }
     }
 

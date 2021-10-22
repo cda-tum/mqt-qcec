@@ -41,15 +41,16 @@ namespace ec {
     qc::VectorDD StateGenerator::generateRandomComputationalBasisState(std::unique_ptr<dd::Package>& dd, dd::QubitCount totalQubits, dd::QubitCount ancillaryQubits) {
         // determine how many qubits truly are random
         const auto randomQubits = totalQubits - ancillaryQubits;
-        if (randomQubits > static_cast<dd::QubitCount>(std::mt19937_64::word_size)) {
-            throw std::runtime_error("Generation of computational basis states currently only supports up to 64 qubits.");
+        if (randomQubits > static_cast<dd::QubitCount>(std::mt19937_64::word_size) - 1) {
+            throw std::runtime_error("Generation of computational basis states currently only supports up to 63 qubits.");
         }
 
         // generate a unique computational basis state
         // TODO: stop generation when no more unique states exist
-        auto [randomState, success] = generatedComputationalBasisStates.insert(computationalBasisStateGenerator() & (1U << randomQubits));
+        const std::uint_least64_t MASK = (static_cast<std::uint_least64_t>(1U) << randomQubits) - 1;
+        auto [randomState, success]    = generatedComputationalBasisStates.insert(computationalBasisStateGenerator() & MASK);
         while (!success) {
-            std::tie(randomState, success) = generatedComputationalBasisStates.insert(computationalBasisStateGenerator() & (1U << randomQubits));
+            std::tie(randomState, success) = generatedComputationalBasisStates.insert(computationalBasisStateGenerator() & MASK);
         }
 
         // generate the bitvector corresponding to the random state

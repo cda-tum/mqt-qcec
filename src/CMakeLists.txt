@@ -8,9 +8,6 @@ add_library(${PROJECT_NAME}
             ${${PROJECT_NAME}_SOURCE_DIR}/include/EquivalenceCheckingManager.hpp
             ${${PROJECT_NAME}_SOURCE_DIR}/include/EquivalenceChecker.hpp
 
-            ${CMAKE_CURRENT_SOURCE_DIR}/EquivalenceChecker.cpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/construction/DDConstructionChecker.cpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/simulation/DDSimulationChecker.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/simulation/StateGenerator.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/alternating/DDAlternatingChecker.cpp
 

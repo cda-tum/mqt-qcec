@@ -9,41 +9,14 @@
 #include "EquivalenceChecker.hpp"
 
 namespace ec {
-    class DDConstructionChecker: public EquivalenceChecker {
-    public:
-        // in order to enable better operation caching in the decision diagram package the decision diagrams for both
-        // circuits are not built in sequence but rather in parallel. To this end, a cost function is used to specify
-        // how many gates of either circuit are to be applied for any gate of the other circuit
-        EquivalenceCriterion run() override;
-
+    class DDConstructionChecker: public EquivalenceChecker<qc::MatrixDD> {
     protected:
-        struct ConstructionTask {
-            const qc::QuantumComputation* qc;
-            qc::Permutation               permutation{};
-            decltype(qc->begin())         iterator;
-            decltype(qc->end())           end;
-            qc::MatrixDD                  functionality{};
-
-            explicit ConstructionTask(const qc::QuantumComputation& qc):
-                qc(&qc) {
-                permutation = qc.initialLayout;
-                iterator    = qc.begin();
-                end         = qc.end();
-            }
-
-            [[nodiscard]] bool finished() const { return iterator == end; }
-        };
-
-        ConstructionTask task1;
-        ConstructionTask task2;
-
-        void setupConstructionTask(const qc::QuantumComputation& qc, ConstructionTask& task);
-
-        void advanceConstruction(ConstructionTask& task);
-
-        void applyPotentialSwaps(ConstructionTask& task);
-
-        void postprocess(ConstructionTask& task);
+        void initializeTask(TaskManager<qc::MatrixDD>& task) override {
+            auto initial = dd->makeIdent(nqubits);
+            dd->incRef(initial);
+            task.setInternalState(initial);
+            task.reduceAncillae();
+        }
     };
 } // namespace ec
 

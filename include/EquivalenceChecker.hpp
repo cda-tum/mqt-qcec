@@ -11,6 +11,7 @@
 #include "EquivalenceCheckingResults.hpp"
 #include "EquivalenceCriterion.hpp"
 #include "QuantumComputation.hpp"
+#include "TaskManager.hpp"
 #include "costfunction/CostFunction.hpp"
 
 #include <chrono>
@@ -19,17 +20,20 @@
 #include <utility>
 
 namespace ec {
-    enum Direction : bool { LEFT  = true,
-                            RIGHT = false };
-
+    template<class DDType>
     class EquivalenceChecker {
     public:
         EquivalenceChecker(const qc::QuantumComputation& qc1, const qc::QuantumComputation& qc2, const ec::Configuration& configuration):
-            qc1(qc1), qc2(qc2), configuration(configuration), costFunction(qc1, qc2, configuration.execution.costFunctionType){};
+            qc1(qc1), qc2(qc2),
+            nqubits(std::max(qc1.getNqubits(), qc2.getNqubits())),
+            dd(std::make_unique<dd::Package>(nqubits)),
+            taskManager1(TaskManager<DDType>(qc1, dd)),
+            taskManager2(TaskManager<DDType>(qc1, dd)),
+            configuration(configuration),
+            costFunction(qc1, qc2, configuration.execution.costFunctionType){};
 
         virtual ~EquivalenceChecker() = default;
 
-        template<class DDType>
         EquivalenceCriterion equals(const DDType& e, const DDType& f) {
             // both node pointers being equivalent is the strongest indication that the two decision diagrams are equivalent
             if (e.p == f.p) {
@@ -86,13 +90,47 @@ namespace ec {
             return EquivalenceCriterion::NotEquivalent;
         }
 
-        virtual EquivalenceCriterion run() = 0;
+        virtual EquivalenceCriterion run() {
+            const auto start = std::chrono::steady_clock::now();
+
+            // initialize the internal representation (initial state, initial matrix, etc.)
+            initialize();
+
+            // execute the equivalence checking scheme
+            execute();
+
+            // finish off both circuits
+            finish();
+
+            // postprocess the result
+            postprocess();
+
+            // check the equivalence
+            const auto equivalence = checkEquivalence();
+
+            // determine maximum number of nodes used
+            if constexpr (std::is_same_v<DDType, qc::MatrixDD>) {
+                maxActiveNodes = dd->mUniqueTable.getMaxActiveNodes();
+            } else if constexpr (std::is_same_v<DDType, qc::VectorDD>) {
+                maxActiveNodes = dd->vUniqueTable.getMaxActiveNodes();
+            }
+
+            const auto end = std::chrono::steady_clock::now();
+            runtime        = std::chrono::duration<double>(end - start).count();
+
+            return equivalence;
+        }
 
     protected:
         const qc::QuantumComputation& qc1;
         const qc::QuantumComputation& qc2;
 
+        dd::QubitCount nqubits{};
+
         std::unique_ptr<dd::Package> dd;
+
+        TaskManager<DDType> taskManager1;
+        TaskManager<DDType> taskManager2;
 
         Configuration configuration;
         CostFunction  costFunction;
@@ -100,26 +138,48 @@ namespace ec {
         double      runtime{};
         std::size_t maxActiveNodes{};
 
-        /// Take operation and apply it either from the left or (inverted) from the right
-        /// \param op operation to apply
-        /// \param to DD to apply the operation to
-        /// \param dir LEFT or RIGHT
-        template<class DDType>
-        void applyGate(const std::unique_ptr<qc::Operation>& op, DDType& to, qc::Permutation& permutation, Direction dir = LEFT) {
-            auto saved = to;
-            if constexpr (std::is_same_v<DDType, qc::VectorDD>) {
-                // direction has no effect on state vector DDs
-                to = dd->multiply(op->getDD(dd, permutation), to);
-            } else {
-                if (dir == LEFT) {
-                    to = dd->multiply(op->getDD(dd, permutation), to);
-                } else {
-                    to = dd->multiply(to, op->getInverseDD(dd, permutation));
+        virtual void initializeTask(TaskManager<DDType>&){};
+        virtual void initialize() {
+            initializeTask(taskManager1);
+            initializeTask(taskManager2);
+        }
+        virtual void execute() {
+            while (!taskManager1.finished() && !taskManager2.finished()) {
+                // skip over any SWAP operations
+                taskManager1.applySwapOperations();
+                taskManager2.applySwapOperations();
+
+                if (!taskManager1.finished() && !taskManager2.finished()) {
+                    // determine cost of either gate
+                    const auto cost1 = costFunction(taskManager1(), LEFT);
+                    const auto cost2 = costFunction(taskManager2(), RIGHT);
+
+                    // advance both tasks correspondingly
+                    taskManager1.advance(cost2);
+                    taskManager2.advance(cost1);
                 }
             }
-            dd->incRef(to);
-            dd->decRef(saved);
-            dd->garbageCollect();
+        }
+        virtual void finish() {
+            taskManager1.finish();
+            taskManager2.finish();
+        }
+        virtual void postprocessTask(TaskManager<DDType>& task) {
+            // ensure that the permutation that was tracked throughout the circuit matches the expected output permutation
+            task.changePermutation();
+
+            // eliminate the superfluous contributions of ancillary qubits (this only has an effect on matrices)
+            task.reduceAncillae();
+
+            // sum up the contributions of garbage qubits
+            task.reduceGarbage();
+        }
+        virtual void postprocess() {
+            postprocessTask(taskManager1);
+            postprocessTask(taskManager2);
+        }
+        virtual EquivalenceCriterion checkEquivalence() {
+            return equals(taskManager1.getInternalState(), taskManager2.getInternalState());
         }
     };
 
