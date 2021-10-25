@@ -47,6 +47,8 @@ namespace ec {
         inline DDType getDD() { return (*iterator)->getDD(package, permutation); }
         inline DDType getInverseDD() { return (*iterator)->getInverseDD(package, permutation); }
 
+        [[nodiscard]] const qc::QuantumComputation* getCircuit() const { return qc; }
+
         void advanceIterator() { ++iterator; }
 
         void applyGate(DDType& to) {

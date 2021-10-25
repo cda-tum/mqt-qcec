@@ -12,9 +12,10 @@
 #include "EquivalenceCriterion.hpp"
 #include "QuantumComputation.hpp"
 #include "TaskManager.hpp"
-#include "costfunction/CostFunction.hpp"
+#include "applicationscheme/ApplicationScheme.hpp"
 
 #include <chrono>
+#include <map>
 #include <memory>
 #include <string>
 #include <utility>
@@ -29,8 +30,7 @@ namespace ec {
             dd(std::make_unique<dd::Package>(nqubits)),
             taskManager1(TaskManager<DDType>(qc1, dd)),
             taskManager2(TaskManager<DDType>(qc1, dd)),
-            configuration(configuration),
-            costFunction(qc1, qc2, configuration.execution.costFunctionType){};
+            configuration(configuration){};
 
         virtual ~EquivalenceChecker() = default;
 
@@ -133,7 +133,9 @@ namespace ec {
         TaskManager<DDType> taskManager2;
 
         Configuration configuration;
-        CostFunction  costFunction;
+
+        // TODO: this has to be set from somewhere
+        std::unique_ptr<ApplicationScheme<DDType>> applicationScheme;
 
         double      runtime{};
         std::size_t maxActiveNodes{};
@@ -150,13 +152,12 @@ namespace ec {
                 taskManager2.applySwapOperations();
 
                 if (!taskManager1.finished() && !taskManager2.finished()) {
-                    // determine cost of either gate
-                    const auto cost1 = costFunction(taskManager1(), LEFT);
-                    const auto cost2 = costFunction(taskManager2(), RIGHT);
+                    // query application scheme on how to proceed
+                    const auto [apply1, apply2] = (*applicationScheme)();
 
                     // advance both tasks correspondingly
-                    taskManager1.advance(cost2);
-                    taskManager2.advance(cost1);
+                    taskManager1.advance(apply1);
+                    taskManager2.advance(apply2);
                 }
             }
         }

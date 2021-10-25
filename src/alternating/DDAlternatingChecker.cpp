@@ -68,13 +68,12 @@ namespace ec {
             taskManager2.applySwapOperations(functionality);
 
             if (!taskManager1.finished() && !taskManager2.finished()) {
-                // determine cost of either gate
-                const auto cost1 = costFunction(taskManager1(), LEFT);
-                const auto cost2 = costFunction(taskManager2(), RIGHT);
+                // query application scheme on how to proceed
+                const auto [apply1, apply2] = (*applicationScheme)();
 
                 // advance both tasks correspondingly
-                taskManager1.advance(functionality, cost2);
-                taskManager2.advance(functionality, cost1);
+                taskManager1.advance(functionality, apply1);
+                taskManager2.advance(functionality, apply2);
             }
         }
     }
