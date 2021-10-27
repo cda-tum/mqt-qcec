@@ -54,14 +54,6 @@ namespace ec {
     }
 
     void DDAlternatingChecker::execute() {
-        if (scheme == AlternatingScheme::CostFunction) {
-            executeCostFunction();
-        } else if (scheme == AlternatingScheme::Lookahead) {
-            executeLookahead();
-        }
-    }
-
-    void DDAlternatingChecker::executeCostFunction() {
         while (!taskManager1.finished() && !taskManager2.finished()) {
             // skip over any SWAP operations
             taskManager1.applySwapOperations(functionality);
@@ -75,81 +67,6 @@ namespace ec {
                 taskManager1.advance(functionality, apply1);
                 taskManager2.advance(functionality, apply2);
             }
-        }
-    }
-
-    void DDAlternatingChecker::executeLookahead() {
-        qc::MatrixDD left{}, right{}, saved{};
-        bool         cachedLeft = false, cachedRight = false;
-
-        while (!taskManager1.finished() && !taskManager2.finished()) {
-            if (!cachedLeft) {
-                // skip over any SWAP operations
-                taskManager1.applySwapOperations(functionality);
-
-                // break if the job is finished
-                if (taskManager1.finished())
-                    break;
-
-                // cache the current left DD
-                left = taskManager1.getDD();
-                dd->incRef(left);
-                taskManager1.advanceIterator();
-                cachedLeft = true;
-            }
-
-            if (!cachedRight) {
-                // skip over any SWAP operations
-                taskManager2.applySwapOperations(functionality);
-
-                // break if the job is finished
-                if (taskManager2.finished())
-                    break;
-
-                // cache the current right DD
-                right = taskManager2.getInverseDD();
-                dd->incRef(right);
-                taskManager2.advanceIterator();
-                cachedRight = true;
-            }
-
-            saved          = functionality;
-            auto lookLeft  = dd->multiply(left, saved);
-            auto lookRight = dd->multiply(saved, right);
-
-            auto nc1 = dd->size(lookLeft);
-            auto nc2 = dd->size(lookRight);
-
-            if (nc1 <= nc2) {
-                functionality = lookLeft;
-                dd->decRef(left);
-                cachedLeft = false;
-            } else {
-                functionality = lookRight;
-                dd->decRef(right);
-                cachedRight = false;
-            }
-            dd->incRef(functionality);
-            dd->decRef(saved);
-            dd->garbageCollect();
-        }
-
-        if (cachedLeft) {
-            saved         = functionality;
-            functionality = dd->multiply(left, saved);
-            dd->incRef(functionality);
-            dd->decRef(saved);
-            dd->decRef(left);
-            dd->garbageCollect();
-        }
-
-        if (cachedRight) {
-            saved         = functionality;
-            functionality = dd->multiply(saved, right);
-            dd->incRef(functionality);
-            dd->decRef(saved);
-            dd->decRef(right);
-            dd->garbageCollect();
         }
     }
 

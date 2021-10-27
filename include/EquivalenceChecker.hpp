@@ -13,6 +13,10 @@
 #include "QuantumComputation.hpp"
 #include "TaskManager.hpp"
 #include "applicationscheme/ApplicationScheme.hpp"
+#include "applicationscheme/GateCostApplicationScheme.hpp"
+#include "applicationscheme/LookaheadApplicationScheme.hpp"
+#include "applicationscheme/OneToOneApplicationScheme.hpp"
+#include "applicationscheme/ProportionalApplicationScheme.hpp"
 
 #include <chrono>
 #include <map>

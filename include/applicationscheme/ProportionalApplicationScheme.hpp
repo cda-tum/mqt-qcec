@@ -12,7 +12,7 @@ namespace ec {
     template<class DDType>
     class ProportionalApplicationScheme: public ApplicationScheme<DDType> {
     public:
-        ProportionalApplicationScheme(const TaskManager<DDType>& taskManager1, const TaskManager<DDType>& taskManager2):
+        ProportionalApplicationScheme(TaskManager<DDType>& taskManager1, TaskManager<DDType>& taskManager2):
             ApplicationScheme<DDType>(taskManager1, taskManager2) {
             const auto size1 = taskManager1.getCircuit()->size();
             const auto size2 = taskManager2.getCircuit()->size();

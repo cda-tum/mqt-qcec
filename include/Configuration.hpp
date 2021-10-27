@@ -6,7 +6,6 @@
 #ifndef QCEC_CONFIGURATION_HPP
 #define QCEC_CONFIGURATION_HPP
 
-#include "alternating/AlternatingScheme.hpp"
 #include "dd/Package.hpp"
 #include "nlohmann/json.hpp"
 #include "simulation/StateType.hpp"
@@ -37,11 +36,6 @@ namespace ec {
             bool transformDynamicCircuit          = false;
         };
 
-        // configuration options for the alternating multiplication scheme
-        struct Alternating {
-            AlternatingScheme scheme = AlternatingScheme::CostFunction;
-        };
-
         // configuration options for the simulation scheme
         struct Simulation {
             double      fidelityLimit  = 0.999;
@@ -54,7 +48,6 @@ namespace ec {
 
         Execution     execution{};
         Optimizations optimizations{};
-        Alternating   alternating{};
         Simulation    simulation{};
 
         [[nodiscard]] nlohmann::json json() const {
@@ -75,10 +68,6 @@ namespace ec {
             opt["reconstruct_swaps"]                    = optimizations.reconstructSWAPs;
             opt["remove_diagonal_gates_before_measure"] = optimizations.removeDiagonalGatesBeforeMeasure;
             opt["transform_dynamic_circuit"]            = optimizations.transformDynamicCircuit;
-
-            config["alternating_scheme_config"] = {};
-            auto& alt                           = config["alternating_scheme_config"];
-            alt["scheme"]                       = ec::toString(alternating.scheme);
 
             config["simulation_scheme_config"] = {};
             auto& sim                          = config["simulation config"];
