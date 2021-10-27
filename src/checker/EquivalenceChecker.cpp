@@ -44,12 +44,12 @@ namespace ec {
 
             // whenever tr(U V^-1) ≃ 2^n, both decision diagrams should be considered equivalent
             const auto normalizedRealPart = trace.r / std::exp2(e.p->v);
-            if (std::abs(normalizedRealPart - 1.0) < configuration.execution.traceThreshold) {
+            if (std::abs(normalizedRealPart - 1.0) < configuration.functionality.traceThreshold) {
                 return EquivalenceCriterion::Equivalent;
             } else {
                 // whenever |tr(U V^-1)|^2 ≃ 2^n, both decision diagrams should be considered equivalent up to global phase
                 const auto normalizedSquaredMagnitude = (trace.r * trace.r + trace.i * trace.i) / std::exp2(e.p->v);
-                if (std::abs(normalizedSquaredMagnitude - 1.0) < configuration.execution.traceThreshold) {
+                if (std::abs(normalizedSquaredMagnitude - 1.0) < configuration.functionality.traceThreshold) {
                     return EquivalenceCriterion::EquivalentUpToGlobalPhase;
                 }
             }

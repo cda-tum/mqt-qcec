@@ -20,7 +20,6 @@ namespace ec {
         // configuration options for execution
         struct Execution {
             dd::fp numericalTolerance = dd::ComplexTable<>::tolerance();
-            double traceThreshold     = 1e-8;
 
             bool        parallel = true;
             std::size_t nthreads = std::max(1U, std::thread::hardware_concurrency());
@@ -49,19 +48,24 @@ namespace ec {
             std::function<std::size_t(GateCostLUTKeyType)> costFunction = [](GateCostLUTKeyType) { return 1U; };
         };
 
+        struct Functionality {
+            double traceThreshold = 1e-8;
+        };
+
         // configuration options for the simulation scheme
         struct Simulation {
             double      fidelityThreshold = 1e-8;
             std::size_t maxSims           = 16;
-            StateType   stateType      = StateType::ComputationalBasis;
-            std::size_t seed           = 0U;
-            bool        storeCEXinput  = false;
-            bool        storeCEXoutput = false;
+            StateType   stateType         = StateType::ComputationalBasis;
+            std::size_t seed              = 0U;
+            bool        storeCEXinput     = false;
+            bool        storeCEXoutput    = false;
         };
 
         Execution     execution{};
         Optimizations optimizations{};
         Application   application{};
+        Functionality functionality{};
         Simulation    simulation{};
 
         [[nodiscard]] nlohmann::json json() const {
@@ -69,7 +73,6 @@ namespace ec {
             config["execution"]            = {};
             auto& exe                      = config["execution"];
             exe["tolerance"]               = execution.numericalTolerance;
-            exe["trace_threshold"]         = execution.traceThreshold;
             exe["parallel"]                = execution.parallel;
             exe["nthreads"]                = execution.parallel ? execution.nthreads : 1U;
             exe["run_construction_scheme"] = execution.runConstructionScheme;
@@ -95,9 +98,15 @@ namespace ec {
                 }
             }
 
+            if (execution.runConstructionScheme || execution.runAlternatingScheme) {
+                config["functionality"] = {};
+                auto& fun               = config["functionality"];
+                fun["trace_threshold"]  = functionality.traceThreshold;
+            }
+
             if (execution.runSimulationScheme) {
-                config["simulation_scheme"]        = {};
-                auto& sim                          = config["simulation_scheme"];
+                config["simulation"]               = {};
+                auto& sim                          = config["simulation"];
                 sim["fidelity_threshold"]          = simulation.fidelityThreshold;
                 sim["max_sims"]                    = simulation.maxSims;
                 sim["state_type"]                  = ec::toString(simulation.stateType);
