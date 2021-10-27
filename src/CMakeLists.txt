@@ -1,15 +1,23 @@
 add_library(${PROJECT_NAME}
-            ${${PROJECT_NAME}_SOURCE_DIR}/include/alternating
-            ${${PROJECT_NAME}_SOURCE_DIR}/include/construction
             ${${PROJECT_NAME}_SOURCE_DIR}/include/simulation
             ${${PROJECT_NAME}_SOURCE_DIR}/include/applicationscheme
+            ${${PROJECT_NAME}_SOURCE_DIR}/include/checker
             ${${PROJECT_NAME}_SOURCE_DIR}/include/Configuration.hpp
             ${${PROJECT_NAME}_SOURCE_DIR}/include/EquivalenceCriterion.hpp
             ${${PROJECT_NAME}_SOURCE_DIR}/include/EquivalenceCheckingManager.hpp
-            ${${PROJECT_NAME}_SOURCE_DIR}/include/EquivalenceChecker.hpp
+
+            ${CMAKE_CURRENT_SOURCE_DIR}/EquivalenceCheckingManager.cpp
+
+            ${CMAKE_CURRENT_SOURCE_DIR}/checker/EquivalenceChecker.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/checker/DDConstructionChecker.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/checker/DDSimulationChecker.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/checker/DDAlternatingChecker.cpp
 
             ${CMAKE_CURRENT_SOURCE_DIR}/simulation/StateGenerator.cpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/alternating/DDAlternatingChecker.cpp
+
+            ${CMAKE_CURRENT_SOURCE_DIR}/applicationscheme/ProportionalApplicationScheme.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/applicationscheme/GateCostApplicationScheme.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/applicationscheme/LookaheadApplicationScheme.cpp
 
             ${${PROJECT_NAME}_SOURCE_DIR}/include/EquivalenceCheckingResults.hpp
             ${CMAKE_CURRENT_SOURCE_DIR}/EquivalenceCheckingResults.cpp

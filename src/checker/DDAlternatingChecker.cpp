@@ -3,7 +3,7 @@
 * See file README.md or go to http://iic.jku.at/eda/research/quantum_verification/ for more information.
 */
 
-#include "alternating/DDAlternatingChecker.hpp"
+#include "checker/DDAlternatingChecker.hpp"
 
 namespace ec {
     void DDAlternatingChecker::initialize() {

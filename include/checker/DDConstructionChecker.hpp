@@ -6,17 +6,12 @@
 #ifndef QCEC_DDCONSTRUCTIONCHECKER_HPP
 #define QCEC_DDCONSTRUCTIONCHECKER_HPP
 
-#include "EquivalenceChecker.hpp"
+#include "checker/EquivalenceChecker.hpp"
 
 namespace ec {
     class DDConstructionChecker: public EquivalenceChecker<qc::MatrixDD> {
     protected:
-        void initializeTask(TaskManager<qc::MatrixDD>& task) override {
-            auto initial = dd->makeIdent(nqubits);
-            dd->incRef(initial);
-            task.setInternalState(initial);
-            task.reduceAncillae();
-        }
+        void initializeTask(TaskManager<qc::MatrixDD>& task) override;
     };
 } // namespace ec
 

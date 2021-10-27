@@ -12,26 +12,7 @@
 #include <iostream>
 
 namespace ec {
-    // Interface for describing an application scheme
-    // Given the current state of the check (tracked by two task managers), an application scheme describes how to
-    // proceed with the check, i.e., how many operations to apply from either circuit.
-    template<class DDType>
-    class ApplicationScheme {
-    public:
-        ApplicationScheme(TaskManager<DDType>& taskManager1, TaskManager<DDType>& taskManager2):
-            taskManager1(taskManager1), taskManager2(taskManager2){};
-
-        virtual ~ApplicationScheme() = default;
-
-        // get how many gates from either circuit shall be applied next
-        virtual std::pair<std::size_t, std::size_t> operator()() = 0;
-
-    protected:
-        TaskManager<DDType>& taskManager1;
-        TaskManager<DDType>& taskManager2;
-    };
-
-    // A list of application schemes that implement the above interface
+    // A list of application schemes that implement the below interface
     enum class ApplicationSchemeType {
         OneToOne,
         Proportional,
@@ -78,6 +59,25 @@ namespace ec {
         out << toString(applicationScheme);
         return out;
     }
+
+    // Interface for describing an application scheme
+    // Given the current state of the check (tracked by two task managers), an application scheme describes how to
+    // proceed with the check, i.e., how many operations to apply from either circuit.
+    template<class DDType>
+    class ApplicationScheme {
+    public:
+        ApplicationScheme(TaskManager<DDType>& taskManager1, TaskManager<DDType>& taskManager2):
+            taskManager1(taskManager1), taskManager2(taskManager2){};
+
+        virtual ~ApplicationScheme() = default;
+
+        // get how many gates from either circuit shall be applied next
+        virtual std::pair<std::size_t, std::size_t> operator()() = 0;
+
+    protected:
+        TaskManager<DDType>& taskManager1;
+        TaskManager<DDType>& taskManager2;
+    };
 
 } // namespace ec
 #endif //QCEC_APPLICATIONSCHEME_HPP

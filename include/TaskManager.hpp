@@ -44,8 +44,8 @@ namespace ec {
         }
         void flipDirection() { direction = (direction == LEFT) ? RIGHT : LEFT; }
 
-        inline DDType getDD() { return (*iterator)->getDD(package, permutation); }
-        inline DDType getInverseDD() { return (*iterator)->getInverseDD(package, permutation); }
+        inline qc::MatrixDD getDD() { return (*iterator)->getDD(package, permutation); }
+        inline qc::MatrixDD getInverseDD() { return (*iterator)->getInverseDD(package, permutation); }
 
         [[nodiscard]] const qc::QuantumComputation* getCircuit() const { return qc; }
 
@@ -105,7 +105,11 @@ namespace ec {
         void reduceAncillae() { reduceAncillae(internalState); }
 
         void reduceGarbage(DDType& state) {
-            state = package->reduceGarbage(state, qc->garbage, direction);
+            if constexpr (std::is_same_v<DDType, qc::VectorDD>) {
+                state = package->reduceGarbage(state, qc->garbage);
+            } else if constexpr (std::is_same_v<DDType, qc::MatrixDD>) {
+                state = package->reduceGarbage(state, qc->garbage, direction);
+            }
         }
         void reduceGarbage() { reduceGarbage(internalState); }
     };

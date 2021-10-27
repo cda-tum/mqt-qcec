@@ -38,39 +38,16 @@ namespace ec {
         GateCostApplicationScheme(TaskManager<DDType>& taskManager1, TaskManager<DDType>& taskManager2, GateCostLUT& gateCostLUT):
             ApplicationScheme<DDType>(taskManager1, taskManager2), gateCostLUT(gateCostLUT) {}
 
-        GateCostApplicationScheme(TaskManager<DDType>& taskManager1, TaskManager<DDType>& taskManager2, const std::function<std::size_t(GateCostLUTKeyType)>& costFunction):
-            ApplicationScheme<DDType>(taskManager1, taskManager2) {
-            generateLUT(costFunction, taskManager1.getCircuit());
-            generateLUT(costFunction, taskManager2.getCircuit());
-        }
+        GateCostApplicationScheme(TaskManager<DDType>& taskManager1, TaskManager<DDType>& taskManager2, const std::function<std::size_t(GateCostLUTKeyType)>& costFunction);
 
-        GateCostApplicationScheme(TaskManager<DDType>& taskManager1, TaskManager<DDType>& taskManager2, const std::string& filename):
-            ApplicationScheme<DDType>(taskManager1, taskManager2) {
-            // TODO: Provide a constructor that allows to read in a LUT from a file
-        }
+        GateCostApplicationScheme(TaskManager<DDType>& taskManager1, TaskManager<DDType>& taskManager2, const std::string& filename);
 
-        std::pair<size_t, size_t> operator()() override {
-            const auto  op   = this->taskManager1();
-            auto        key  = GateCostLUTKeyType{op->getType(), op->getNcontrols()};
-            std::size_t cost = 1U;
-            if (auto it = gateCostLUT.find(key); it != gateCostLUT.end()) {
-                cost = it->second;
-            }
-            return std::pair{1U, cost};
-        }
+        std::pair<size_t, size_t> operator()() override;
 
     protected:
         GateCostLUT gateCostLUT{};
 
-        void generateLUT(const std::function<std::size_t(GateCostLUTKeyType)>& costFunction, qc::QuantumComputation* qc) {
-            for (const auto& op: *qc) {
-                const auto               type      = op->getType();
-                const auto               nControls = op->getNcontrols();
-                const GateCostLUTKeyType key       = {type, nControls};
-                const auto               cost      = costFunction(key);
-                gateCostLUT.emplace(key, cost);
-            }
-        }
+        void populateLUT(const std::function<std::size_t(GateCostLUTKeyType)>& costFunction, const qc::QuantumComputation* qc);
     };
 } // namespace ec
 

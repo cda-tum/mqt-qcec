@@ -6,8 +6,8 @@
 #ifndef QCEC_DDALTERNATINGCHECKER_HPP
 #define QCEC_DDALTERNATINGCHECKER_HPP
 
-#include "EquivalenceChecker.hpp"
 #include "applicationscheme/LookaheadApplicationScheme.hpp"
+#include "checker/EquivalenceChecker.hpp"
 
 namespace ec {
     class DDAlternatingChecker: public EquivalenceChecker<qc::MatrixDD> {

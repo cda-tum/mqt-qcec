@@ -8,7 +8,7 @@
 
 #include "dd/Package.hpp"
 #include "nlohmann/json.hpp"
-#include "simulation/StateType.hpp"
+#include "simulation/StateGenerator.hpp"
 
 #include <functional>
 #include <thread>

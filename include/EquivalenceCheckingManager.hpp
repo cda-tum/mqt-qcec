@@ -10,9 +10,9 @@
 #include "Configuration.hpp"
 #include "EquivalenceCriterion.hpp"
 #include "QuantumComputation.hpp"
-#include "alternating/DDAlternatingChecker.hpp"
-#include "construction/DDConstructionChecker.hpp"
-#include "simulation/DDSimulationChecker.hpp"
+#include "checker/DDAlternatingChecker.hpp"
+#include "checker/DDConstructionChecker.hpp"
+#include "checker/DDSimulationChecker.hpp"
 #include "simulation/StateGenerator.hpp"
 
 #include <chrono>
@@ -34,7 +34,7 @@ namespace ec {
 
         Configuration configuration{};
 
-        StateGenerator stimuliGenerator;
+        StateGenerator stateGenerator;
 
         double preprocessingTime{};
         double checkTime{};
