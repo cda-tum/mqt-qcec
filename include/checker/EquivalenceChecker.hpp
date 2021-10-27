@@ -28,7 +28,7 @@ namespace ec {
     template<class DDType>
     class EquivalenceChecker {
     public:
-        EquivalenceChecker(const qc::QuantumComputation& qc1, const qc::QuantumComputation& qc2, const ec::Configuration& configuration);
+        EquivalenceChecker(const qc::QuantumComputation& qc1, const qc::QuantumComputation& qc2, ec::Configuration configuration);
 
         virtual ~EquivalenceChecker() = default;
 

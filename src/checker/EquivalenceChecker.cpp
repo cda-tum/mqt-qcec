@@ -5,16 +5,41 @@
 
 #include "checker/EquivalenceChecker.hpp"
 
+#include <utility>
+
 namespace ec {
 
     template<class DDType>
-    EquivalenceChecker<DDType>::EquivalenceChecker(const qc::QuantumComputation& qc1, const qc::QuantumComputation& qc2, const Configuration& configuration):
+    EquivalenceChecker<DDType>::EquivalenceChecker(const qc::QuantumComputation& qc1, const qc::QuantumComputation& qc2, Configuration configuration):
         qc1(qc1), qc2(qc2),
         nqubits(std::max(qc1.getNqubits(), qc2.getNqubits())),
         dd(std::make_unique<dd::Package>(nqubits)),
         taskManager1(TaskManager<DDType>(qc1, dd)),
         taskManager2(TaskManager<DDType>(qc1, dd)),
-        configuration(configuration) {}
+        configuration(std::move(configuration)) {
+        switch (this->configuration.application.scheme) {
+            case ApplicationSchemeType::OneToOne:
+                applicationScheme = std::make_unique<OneToOneApplicationScheme<DDType>>(taskManager1, taskManager2);
+                break;
+            case ApplicationSchemeType::Proportional:
+                applicationScheme = std::make_unique<ProportionalApplicationScheme<DDType>>(taskManager1, taskManager2);
+                break;
+            case ApplicationSchemeType::Lookahead:
+                if constexpr (std::is_same_v<DDType, qc::MatrixDD>) {
+                    applicationScheme = std::make_unique<LookaheadApplicationScheme>(taskManager1, taskManager2);
+                } else {
+                    throw std::runtime_error("Lookahead application scheme can only be used for matrices.");
+                }
+                break;
+            case ApplicationSchemeType::GateCost:
+                if (configuration.application.useProfile) {
+                    applicationScheme = std::make_unique<GateCostApplicationScheme<DDType>>(taskManager1, taskManager2, configuration.application.profileLocation);
+                } else {
+                    applicationScheme = std::make_unique<GateCostApplicationScheme<DDType>>(taskManager1, taskManager2, configuration.application.costFunction);
+                }
+                break;
+        }
+    }
 
     template<class DDType>
     EquivalenceCriterion EquivalenceChecker<DDType>::equals(const DDType& e, const DDType& f) {
