@@ -59,13 +59,13 @@ namespace ec {
             const auto innerProduct = dd->innerProduct(e, f);
 
             // whenever <e,f> ≃ 1, both decision diagrams should be considered equivalent
-            if (std::abs(innerProduct.r - 1.) < configuration.simulation.fidelityLimit) {
+            if (std::abs(innerProduct.r - 1.) < configuration.simulation.fidelityThreshold) {
                 return EquivalenceCriterion::Equivalent;
             }
 
             // whenever |<e,f>|^2 ≃ 1, both decision diagrams should be considered equivalent up to a phase
             const auto fidelity = innerProduct.r * innerProduct.r + innerProduct.i * innerProduct.i;
-            if (std::abs(fidelity - 1.0) < configuration.simulation.fidelityLimit) {
+            if (std::abs(fidelity - 1.0) < configuration.simulation.fidelityThreshold) {
                 return EquivalenceCriterion::EquivalentUpToPhase;
             }
         }

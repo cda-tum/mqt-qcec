@@ -19,10 +19,10 @@ namespace ec {
     struct Configuration {
         // configuration options for execution
         struct Execution {
-            dd::fp tolerance      = dd::ComplexTable<>::tolerance();
-            double traceThreshold = 1e-8;
+            dd::fp numericalTolerance = dd::ComplexTable<>::tolerance();
+            double traceThreshold     = 1e-8;
 
-            bool        parallel = false;
+            bool        parallel = true;
             std::size_t nthreads = std::max(1U, std::thread::hardware_concurrency());
 
             bool runConstructionScheme = false;
@@ -51,8 +51,8 @@ namespace ec {
 
         // configuration options for the simulation scheme
         struct Simulation {
-            double      fidelityLimit  = 0.999;
-            std::size_t maxSims        = 16;
+            double      fidelityThreshold = 1e-8;
+            std::size_t maxSims           = 16;
             StateType   stateType      = StateType::ComputationalBasis;
             std::size_t seed           = 0U;
             bool        storeCEXinput  = false;
@@ -68,7 +68,7 @@ namespace ec {
             nlohmann::json config{};
             config["execution"]            = {};
             auto& exe                      = config["execution"];
-            exe["tolerance"]               = execution.tolerance;
+            exe["tolerance"]               = execution.numericalTolerance;
             exe["trace_threshold"]         = execution.traceThreshold;
             exe["parallel"]                = execution.parallel;
             exe["nthreads"]                = execution.parallel ? execution.nthreads : 1U;
@@ -98,7 +98,7 @@ namespace ec {
             if (execution.runSimulationScheme) {
                 config["simulation_scheme"]        = {};
                 auto& sim                          = config["simulation_scheme"];
-                sim["fidelity_limit"]              = simulation.fidelityLimit;
+                sim["fidelity_threshold"]          = simulation.fidelityThreshold;
                 sim["max_sims"]                    = simulation.maxSims;
                 sim["state_type"]                  = ec::toString(simulation.stateType);
                 sim["seed"]                        = simulation.seed;

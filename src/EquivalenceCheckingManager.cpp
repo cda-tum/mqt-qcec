@@ -188,7 +188,7 @@ namespace ec {
         this->qc2 = qc1.size() > qc2.size() ? qc1.clone() : qc2.clone();
 
         // set numeric tolerance used throughout the check
-        setTolerance(configuration.execution.tolerance);
+        setTolerance(configuration.execution.numericalTolerance);
 
         // strip away qubits that are not acted upon
         this->qc1.stripIdleQubits();
