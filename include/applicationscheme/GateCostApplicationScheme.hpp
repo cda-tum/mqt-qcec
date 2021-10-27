@@ -35,9 +35,6 @@ namespace ec {
         GateCostApplicationScheme(TaskManager<DDType>& taskManager1, TaskManager<DDType>& taskManager2):
             ApplicationScheme<DDType>(taskManager1, taskManager2) {}
 
-        GateCostApplicationScheme(TaskManager<DDType>& taskManager1, TaskManager<DDType>& taskManager2, GateCostLUT& gateCostLUT):
-            ApplicationScheme<DDType>(taskManager1, taskManager2), gateCostLUT(gateCostLUT) {}
-
         GateCostApplicationScheme(TaskManager<DDType>& taskManager1, TaskManager<DDType>& taskManager2, const std::function<std::size_t(GateCostLUTKeyType)>& costFunction);
 
         GateCostApplicationScheme(TaskManager<DDType>& taskManager1, TaskManager<DDType>& taskManager2, const std::string& filename);
