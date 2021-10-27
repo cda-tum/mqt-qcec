@@ -19,6 +19,9 @@ namespace ec {
 
     template<class DDType>
     std::pair<size_t, size_t> GateCostApplicationScheme<DDType>::operator()() {
+        if (gateCostLUT.empty())
+            return {1U, 1U};
+
         const auto& op   = this->taskManager1();
         auto        key  = GateCostLUTKeyType{op->getType(), op->getNcontrols()};
         std::size_t cost = 1U;
