@@ -2,7 +2,7 @@ add_library(${PROJECT_NAME}
             ${${PROJECT_NAME}_SOURCE_DIR}/include/alternating
             ${${PROJECT_NAME}_SOURCE_DIR}/include/construction
             ${${PROJECT_NAME}_SOURCE_DIR}/include/simulation
-            ${${PROJECT_NAME}_SOURCE_DIR}/include/costfunction
+            ${${PROJECT_NAME}_SOURCE_DIR}/include/applicationscheme
             ${${PROJECT_NAME}_SOURCE_DIR}/include/Configuration.hpp
             ${${PROJECT_NAME}_SOURCE_DIR}/include/EquivalenceCriterion.hpp
             ${${PROJECT_NAME}_SOURCE_DIR}/include/EquivalenceCheckingManager.hpp
