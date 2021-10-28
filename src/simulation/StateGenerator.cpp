@@ -45,9 +45,14 @@ namespace ec {
             throw std::runtime_error("Generation of computational basis states currently only supports up to 63 qubits.");
         }
 
+        // check if there still is a unique computational basis state
+        const std::uint_least64_t maxStates = (static_cast<std::uint_least64_t>(1U) << randomQubits);
+        if (generatedComputationalBasisStates.size() == maxStates) {
+            throw std::runtime_error("No more unique basis states available.");
+        }
+
         // generate a unique computational basis state
-        // TODO: stop generation when no more unique states exist
-        const std::uint_least64_t MASK = (static_cast<std::uint_least64_t>(1U) << randomQubits) - 1;
+        const std::uint_least64_t MASK = maxStates - 1;
         auto [randomState, success]    = generatedComputationalBasisStates.insert(computationalBasisStateGenerator() & MASK);
         while (!success) {
             std::tie(randomState, success) = generatedComputationalBasisStates.insert(computationalBasisStateGenerator() & MASK);
@@ -56,7 +61,7 @@ namespace ec {
         // generate the bitvector corresponding to the random state
         std::vector<bool> stimulusBits(totalQubits, false);
         for (dd::QubitCount i = 0; i < randomQubits; ++i) {
-            if (*randomState & (1U << i)) {
+            if (*randomState & (static_cast<std::uint_least64_t>(1U) << i)) {
                 stimulusBits[i] = true;
             }
         }
