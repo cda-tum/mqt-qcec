@@ -49,7 +49,6 @@ namespace ec {
 
         Configuration configuration;
 
-        // TODO: this has to be set from somewhere
         std::unique_ptr<ApplicationScheme<DDType>> applicationScheme;
 
         double      runtime{};

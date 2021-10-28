@@ -45,6 +45,13 @@ namespace ec {
         GateCostLUT gateCostLUT{};
 
         void populateLUT(const std::function<std::size_t(GateCostLUTKeyType)>& costFunction, const qc::QuantumComputation* qc);
+
+        // read gate cost LUT from file
+        // very simple file format:
+        // each line consists of
+        // <identifier> <controls> <cost>
+        void populateLUT(const std::string& filename);
+        void populateLUT(std::istream& is);
     };
 } // namespace ec
 

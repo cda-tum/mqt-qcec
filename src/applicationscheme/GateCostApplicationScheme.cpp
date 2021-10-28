@@ -41,7 +41,24 @@ namespace ec {
     template<class DDType>
     GateCostApplicationScheme<DDType>::GateCostApplicationScheme(TaskManager<DDType>& taskManager1, TaskManager<DDType>& taskManager2, [[maybe_unused]] const std::string& filename):
         ApplicationScheme<DDType>(taskManager1, taskManager2) {
-        // TODO: Provide a constructor that allows to read in a LUT from a file
+        populateLUT(filename);
+    }
+    template<class DDType>
+    void GateCostApplicationScheme<DDType>::populateLUT(const std::string& filename) {
+        std::ifstream ifs(filename);
+        if (!ifs.good()) {
+            throw std::runtime_error("Error opening LUT file: " + filename);
+        }
+        populateLUT(ifs);
+    }
+    template<class DDType>
+    void GateCostApplicationScheme<DDType>::populateLUT(std::istream& is) {
+        qc::OpType     opType    = qc::OpType::None;
+        dd::QubitCount nControls = 0U;
+        std::size_t    cost      = 1U;
+        while (is >> opType >> nControls >> cost) {
+            gateCostLUT.emplace(std::pair{opType, nControls}, cost);
+        }
     }
 
     template class GateCostApplicationScheme<qc::VectorDD>;
