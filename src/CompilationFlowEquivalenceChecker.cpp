@@ -78,8 +78,15 @@ namespace ec {
         results.result = dd->reduceAncillae(results.result, ancillary1, LEFT);
         results.result = dd->reduceAncillae(results.result, ancillary2, RIGHT);
 
-        auto goal_matrix    = createGoalMatrix();
-        results.equivalence = equals(results.result, goal_matrix);
+        if (dd->isCloseToIdentity(results.result, config.identityThreshold)) {
+            if (!results.result.w.approximatelyOne()) {
+                results.equivalence = Equivalence::EquivalentUpToGlobalPhase;
+            } else {
+                results.equivalence = Equivalence::Equivalent;
+            }
+        } else {
+            results.equivalence = Equivalence::NotEquivalent;
+        }
 
         auto                          endVerification   = std::chrono::steady_clock::now();
         std::chrono::duration<double> preprocessingTime = endPreprocessing - start;

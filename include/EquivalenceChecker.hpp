@@ -19,9 +19,10 @@ namespace ec {
                             RIGHT = false };
 
     struct Configuration {
-        ec::Method   method    = ec::Method::G_I_Gp;
-        ec::Strategy strategy  = ec::Strategy::Proportional;
-        dd::fp       tolerance = dd::ComplexTable<>::tolerance();
+        ec::Method   method            = ec::Method::G_I_Gp;
+        ec::Strategy strategy          = ec::Strategy::Proportional;
+        dd::fp       tolerance         = dd::ComplexTable<>::tolerance();
+        dd::fp       identityThreshold = 1e-10;
 
         // configuration options for optimizations
         bool fuseSingleQubitGates             = true;
@@ -39,7 +40,8 @@ namespace ec {
             nlohmann::json config{};
             config["method"] = ec::toString(method);
             if (method == ec::Method::G_I_Gp) {
-                config["strategy"] = ec::toString(strategy);
+                config["strategy"]           = ec::toString(strategy);
+                config["identity threshold"] = identityThreshold;
             }
             config["tolerance"]                                   = tolerance;
             config["optimizations"]                               = {};

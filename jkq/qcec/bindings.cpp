@@ -126,6 +126,10 @@ PYBIND11_MODULE(pyqcec, m) {
                            R"pbdoc(
 					Numerical tolerance used during computation
 				)pbdoc")
+            .def_readwrite("identity_threshold", &ec::Configuration::identityThreshold,
+                           R"pbdoc(
+					Numerical threshold used for checking the similarity to the identity matrix
+				)pbdoc")
             .def_readwrite("reconstruct_swaps", &ec::Configuration::reconstructSWAPs,
                            R"pbdoc(
 					Optimization pass reconstructing SWAP operations

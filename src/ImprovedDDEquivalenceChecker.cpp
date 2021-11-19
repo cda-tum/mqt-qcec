@@ -99,8 +99,16 @@ namespace ec {
         results.result = dd->reduceAncillae(results.result, ancillary1, LEFT);
         results.result = dd->reduceAncillae(results.result, ancillary2, RIGHT);
 
-        results.equivalence = equals(results.result, createGoalMatrix());
-        results.maxActive   = std::max(results.maxActive, dd->mUniqueTable.getMaxActiveNodes());
+        if (dd->isCloseToIdentity(results.result, config.identityThreshold)) {
+            if (!results.result.w.approximatelyOne()) {
+                results.equivalence = Equivalence::EquivalentUpToGlobalPhase;
+            } else {
+                results.equivalence = Equivalence::Equivalent;
+            }
+        } else {
+            results.equivalence = Equivalence::NotEquivalent;
+        }
+        results.maxActive = std::max(results.maxActive, dd->mUniqueTable.getMaxActiveNodes());
 
         auto                          endVerification   = std::chrono::steady_clock::now();
         std::chrono::duration<double> preprocessingTime = endPreprocessing - start;
@@ -124,8 +132,8 @@ namespace ec {
     /// Alternate according to the gate count ratio between LEFT and RIGHT applications
     void ImprovedDDEquivalenceChecker::checkProportional(qc::MatrixDD& result, qc::Permutation& perm1, qc::Permutation& perm2) {
         auto ratio  = static_cast<unsigned int>(std::round(
-                static_cast<double>(std::max(qc1.getNops(), qc2.getNops())) /
-                static_cast<double>(std::min(qc1.getNops(), qc2.getNops()))));
+                 static_cast<double>(std::max(qc1.getNops(), qc2.getNops())) /
+                 static_cast<double>(std::min(qc1.getNops(), qc2.getNops()))));
         auto ratio1 = (qc1.getNops() > qc2.getNops()) ? ratio : 1;
         auto ratio2 = (qc1.getNops() > qc2.getNops()) ? 1 : ratio;
 
