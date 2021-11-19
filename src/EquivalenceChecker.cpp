@@ -12,8 +12,8 @@ namespace ec {
         qc1(qc1), qc2(qc2) {
         // currently, this modifies the underlying quantum circuits
         // in the future this might want to be avoided
-        qc1.stripIdleQubits(true);
-        qc2.stripIdleQubits(true);
+        qc1.stripIdleQubits();
+        qc2.stripIdleQubits();
 
         auto& larger_circuit  = qc1.getNqubits() > qc2.getNqubits() ? qc1 : qc2;
         auto& smaller_circuit = qc1.getNqubits() > qc2.getNqubits() ? qc2 : qc1;
