@@ -13,6 +13,6 @@ build-verbosity = 3
 [tool.cibuildwheel.linux]
 
 [tool.cibuildwheel.macos]
-archs = "x86_64 arm64"
+archs = "universal2"
 
 [tool.cibuildwheel.windows]
