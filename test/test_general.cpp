@@ -267,12 +267,15 @@ TEST_F(GeneralTest, FixOutputPermutationMismatch) {
 }
 
 TEST_F(GeneralTest, DynamicCircuit) {
-    auto s = qc::BitString(1);
-    auto bv = qc::BernsteinVazirani(s);
+    auto s   = qc::BitString(1);
+    auto bv  = qc::BernsteinVazirani(s);
     auto dbv = qc::BernsteinVazirani(s, true);
-    auto config = ec::Configuration{};
-    config.transformDynamicCircuit = true;
+
     auto checker = ec::ImprovedDDEquivalenceChecker(bv, dbv);
+
+    auto config                    = ec::Configuration{};
+    config.transformDynamicCircuit = true;
+
     auto result = checker.check(config);
     EXPECT_EQ(result.equivalence, ec::Equivalence::Equivalent);
 }
