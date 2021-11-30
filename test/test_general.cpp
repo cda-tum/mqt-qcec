@@ -267,7 +267,7 @@ TEST_F(GeneralTest, FixOutputPermutationMismatch) {
 }
 
 TEST_F(GeneralTest, DynamicCircuit) {
-    auto s   = qc::BitString(1);
+    auto s   = qc::BitString(3);
     auto bv  = qc::BernsteinVazirani(s);
     auto dbv = qc::BernsteinVazirani(s, true);
 
