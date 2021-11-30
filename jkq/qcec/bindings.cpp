@@ -138,6 +138,10 @@ PYBIND11_MODULE(pyqcec, m) {
                            R"pbdoc(
 					Optimization pass fusing consecutive single qubit gates
 				)pbdoc")
+            .def_readwrite("transform_dynamic_circuit", &ec::Configuration::transformDynamicCircuit,
+                           R"pbdoc(
+					Optimization pass that transforms dynamic circuits to static circuits for equivalence checking
+				)pbdoc")
             .def_readwrite("remove_diagonal_gates_before_measure", &ec::Configuration::removeDiagonalGatesBeforeMeasure,
                            R"pbdoc(
 					Optimization pass removing diagonal gates before measurements

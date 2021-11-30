@@ -28,6 +28,7 @@ namespace ec {
         bool fuseSingleQubitGates             = true;
         bool reconstructSWAPs                 = true;
         bool removeDiagonalGatesBeforeMeasure = false;
+        bool transformDynamicCircuit          = false;
 
         // configuration options for PowerOfSimulation equivalence checker
         double      fidelity_limit = 0.999;
@@ -49,6 +50,7 @@ namespace ec {
             optimizations["fuse consecutive single qubit gates"]  = fuseSingleQubitGates;
             optimizations["reconstruct swaps"]                    = reconstructSWAPs;
             optimizations["remove diagonal gates before measure"] = removeDiagonalGatesBeforeMeasure;
+            optimizations["transform dynamic circuit"]            = transformDynamicCircuit;
             if (method == ec::Method::Simulation) {
                 config["simulation config"]               = {};
                 auto& simulation                          = config["simulation config"];
