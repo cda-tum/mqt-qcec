@@ -5,6 +5,7 @@
 
 #include "CompilationFlowEquivalenceChecker.hpp"
 #include "SimulationBasedEquivalenceChecker.hpp"
+#include "algorithms/BernsteinVazirani.hpp"
 
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
@@ -263,4 +264,15 @@ TEST_F(GeneralTest, FixOutputPermutationMismatch) {
     auto                   results = ec.check();
 
     EXPECT_TRUE(results.consideredEquivalent());
+}
+
+TEST_F(GeneralTest, DynamicCircuit) {
+    auto s = qc::BitString(1);
+    auto bv = qc::BernsteinVazirani(s);
+    auto dbv = qc::BernsteinVazirani(s, true);
+    auto config = ec::Configuration{};
+    config.transformDynamicCircuit = true;
+    auto checker = ec::ImprovedDDEquivalenceChecker(bv, dbv);
+    auto result = checker.check(config);
+    EXPECT_EQ(result.equivalence, ec::Equivalence::Equivalent);
 }
