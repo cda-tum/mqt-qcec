@@ -128,7 +128,7 @@ PYBIND11_MODULE(pyqcec, m) {
 				)pbdoc")
             .def_readwrite("identity_threshold", &ec::Configuration::identityThreshold,
                            R"pbdoc(
-					Numerical threshold used for checking the similarity to the identity matrix
+					Numerical threshold used for checking the similarity to the identity matrix (default: 1e-10)
 				)pbdoc")
             .def_readwrite("reconstruct_swaps", &ec::Configuration::reconstructSWAPs,
                            R"pbdoc(
