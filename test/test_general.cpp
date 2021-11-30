@@ -278,4 +278,11 @@ TEST_F(GeneralTest, DynamicCircuit) {
 
     auto result = checker.check(config);
     EXPECT_EQ(result.equivalence, ec::Equivalence::Equivalent);
+
+    auto bv2  = qc::BernsteinVazirani(s);
+    auto dbv2 = qc::BernsteinVazirani(s, true);
+
+    auto checker2 = ec::ImprovedDDEquivalenceChecker(dbv2, bv2);
+    result        = checker2.check(config);
+    EXPECT_EQ(result.equivalence, ec::Equivalence::Equivalent);
 }
