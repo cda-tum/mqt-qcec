@@ -5,6 +5,7 @@
 
 #include "CompilationFlowEquivalenceChecker.hpp"
 #include "SimulationBasedEquivalenceChecker.hpp"
+#include "algorithms/BernsteinVazirani.hpp"
 
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
@@ -67,10 +68,7 @@ TEST_F(GeneralTest, NonUnitary) {
     std::stringstream ss2{bell_circuit};
     ASSERT_NO_THROW(qc_alternative.import(ss2, qc::OpenQASM));
     ec::EquivalenceChecker ec(qc_original, qc_alternative);
-    EXPECT_THROW(ec.check(), qc::QFRException);
-
-    ec::EquivalenceChecker ec2(qc_alternative, qc_original);
-    EXPECT_THROW(ec.check(), qc::QFRException);
+    EXPECT_THROW(ec.check(), std::runtime_error);
 }
 
 TEST_F(GeneralTest, SwitchDifferentlySizedCircuits) {
@@ -138,7 +136,7 @@ TEST_F(GeneralTest, IntermediateMeasurementNotSupported) {
     std::stringstream ss2{bell_circuit};
     ASSERT_NO_THROW(qc_alternative.import(ss2, qc::OpenQASM));
     ec::EquivalenceChecker ec(qc_original, qc_alternative);
-    EXPECT_THROW(ec.check(), std::invalid_argument);
+    EXPECT_THROW(ec.check(), std::runtime_error);
 }
 
 TEST_F(GeneralTest, RemoveDiagonalGatesBeforeMeasure) {
@@ -266,4 +264,25 @@ TEST_F(GeneralTest, FixOutputPermutationMismatch) {
     auto                   results = ec.check();
 
     EXPECT_TRUE(results.consideredEquivalent());
+}
+
+TEST_F(GeneralTest, DynamicCircuit) {
+    auto s   = qc::BitString(3);
+    auto bv  = qc::BernsteinVazirani(s);
+    auto dbv = qc::BernsteinVazirani(s, true);
+
+    auto checker = ec::ImprovedDDEquivalenceChecker(bv, dbv);
+
+    auto config                    = ec::Configuration{};
+    config.transformDynamicCircuit = true;
+
+    auto result = checker.check(config);
+    EXPECT_EQ(result.equivalence, ec::Equivalence::Equivalent);
+
+    auto bv2  = qc::BernsteinVazirani(s);
+    auto dbv2 = qc::BernsteinVazirani(s, true);
+
+    auto checker2 = ec::ImprovedDDEquivalenceChecker(dbv2, bv2);
+    result        = checker2.check(config);
+    EXPECT_EQ(result.equivalence, ec::Equivalence::Equivalent);
 }
