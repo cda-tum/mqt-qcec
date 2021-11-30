@@ -67,10 +67,7 @@ TEST_F(GeneralTest, NonUnitary) {
     std::stringstream ss2{bell_circuit};
     ASSERT_NO_THROW(qc_alternative.import(ss2, qc::OpenQASM));
     ec::EquivalenceChecker ec(qc_original, qc_alternative);
-    EXPECT_THROW(ec.check(), qc::QFRException);
-
-    ec::EquivalenceChecker ec2(qc_alternative, qc_original);
-    EXPECT_THROW(ec.check(), qc::QFRException);
+    EXPECT_THROW(ec.check(), std::runtime_error);
 }
 
 TEST_F(GeneralTest, SwitchDifferentlySizedCircuits) {
@@ -138,7 +135,7 @@ TEST_F(GeneralTest, IntermediateMeasurementNotSupported) {
     std::stringstream ss2{bell_circuit};
     ASSERT_NO_THROW(qc_alternative.import(ss2, qc::OpenQASM));
     ec::EquivalenceChecker ec(qc_original, qc_alternative);
-    EXPECT_THROW(ec.check(), std::invalid_argument);
+    EXPECT_THROW(ec.check(), std::runtime_error);
 }
 
 TEST_F(GeneralTest, RemoveDiagonalGatesBeforeMeasure) {
