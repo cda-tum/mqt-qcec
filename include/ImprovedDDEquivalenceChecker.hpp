@@ -33,15 +33,6 @@ namespace ec {
         /// \return initial matrix
         qc::MatrixDD createInitialMatrix();
 
-        /// Create the goal matrix used for the G->I<-G' scheme.
-        /// [1 0] if the qubit is no ancillary
-        /// [0 1]
-        ///
-        /// [1 0] for an ancillary that is present in either circuit
-        /// [0 0]
-        /// \return goal matrix
-        qc::MatrixDD createGoalMatrix();
-
     public:
         ImprovedDDEquivalenceChecker(qc::QuantumComputation& qc1, qc::QuantumComputation& qc2):
             EquivalenceChecker(qc1, qc2) {

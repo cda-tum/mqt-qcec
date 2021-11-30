@@ -42,16 +42,6 @@ namespace ec {
         return e;
     }
 
-    qc::MatrixDD ImprovedDDEquivalenceChecker::createGoalMatrix() {
-        auto goalMatrix = dd->makeIdent(nqubits);
-        dd->incRef(goalMatrix);
-        goalMatrix = dd->reduceAncillae(goalMatrix, ancillary2, RIGHT);
-        goalMatrix = dd->reduceGarbage(goalMatrix, garbage2, RIGHT);
-        goalMatrix = dd->reduceAncillae(goalMatrix, ancillary1, LEFT);
-        goalMatrix = dd->reduceGarbage(goalMatrix, garbage1, LEFT);
-        return goalMatrix;
-    }
-
     /// Use dedicated method to check the equivalence of both provided circuits
     EquivalenceCheckingResults ImprovedDDEquivalenceChecker::check(const Configuration& config) {
         EquivalenceCheckingResults results{};
