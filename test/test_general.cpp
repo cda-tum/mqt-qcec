@@ -267,3 +267,34 @@ TEST_F(GeneralTest, FixOutputPermutationMismatch) {
 
     EXPECT_TRUE(results.consideredEquivalent());
 }
+
+TEST_F(GeneralTest, EquivalentUpToGlobalPhase) {
+    qc_original.addQubitRegister(1);
+    qc_original.x(0);
+    qc_original.z(0);
+    qc_original.x(0);
+    qc_original.z(0);
+    qc_alternative.addQubitRegister(1);
+
+    ec::ImprovedDDEquivalenceChecker improvedDDEquivalenceChecker(qc_original, qc_alternative);
+    auto results = improvedDDEquivalenceChecker.check();
+    EXPECT_EQ(results.equivalence, ec::Equivalence::EquivalentUpToGlobalPhase);
+
+    ec::CompilationFlowEquivalenceChecker compilationFlowEquivalenceChecker(qc_original, qc_alternative);
+    results = compilationFlowEquivalenceChecker.check();
+    EXPECT_EQ(results.equivalence, ec::Equivalence::EquivalentUpToGlobalPhase);
+}
+
+TEST_F(GeneralTest, NotEquivalent) {
+    qc_original.addQubitRegister(1);
+    qc_original.x(0);
+    qc_alternative.addQubitRegister(1);
+
+    ec::ImprovedDDEquivalenceChecker improvedDDEquivalenceChecker(qc_original, qc_alternative);
+    auto results = improvedDDEquivalenceChecker.check();
+    EXPECT_EQ(results.equivalence, ec::Equivalence::NotEquivalent);
+
+    ec::CompilationFlowEquivalenceChecker compilationFlowEquivalenceChecker(qc_original, qc_alternative);
+    results = compilationFlowEquivalenceChecker.check();
+    EXPECT_EQ(results.equivalence, ec::Equivalence::NotEquivalent);
+}
