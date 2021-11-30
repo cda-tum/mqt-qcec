@@ -131,9 +131,7 @@ namespace ec {
 
     /// Alternate according to the gate count ratio between LEFT and RIGHT applications
     void ImprovedDDEquivalenceChecker::checkProportional(qc::MatrixDD& result, qc::Permutation& perm1, qc::Permutation& perm2) {
-        auto ratio  = static_cast<unsigned int>(std::round(
-                 static_cast<double>(std::max(qc1.getNops(), qc2.getNops())) /
-                 static_cast<double>(std::min(qc1.getNops(), qc2.getNops()))));
+        auto ratio  = static_cast<unsigned int>(std::round(static_cast<double>(std::max(qc1.getNops(), qc2.getNops())) / static_cast<double>(std::min(qc1.getNops(), qc2.getNops()))));
         auto ratio1 = (qc1.getNops() > qc2.getNops()) ? ratio : 1;
         auto ratio2 = (qc1.getNops() > qc2.getNops()) ? 1 : ratio;
 
