@@ -226,6 +226,23 @@ namespace ec {
     void EquivalenceChecker::runPreCheckPasses(const Configuration& config) {
         setTolerance(config.tolerance);
 
+        const auto isDynamicCircuit1 = qc::CircuitOptimizer::isDynamicCircuit(qc1);
+        const auto isDynamicCircuit2 = qc::CircuitOptimizer::isDynamicCircuit(qc2);
+        if (isDynamicCircuit1 || isDynamicCircuit2) {
+            if (config.transformDynamicCircuit) {
+                if (isDynamicCircuit1) {
+                    qc::CircuitOptimizer::eliminateResets(qc1);
+                    qc::CircuitOptimizer::deferMeasurements(qc1);
+                }
+                if (isDynamicCircuit2) {
+                    qc::CircuitOptimizer::eliminateResets(qc2);
+                    qc::CircuitOptimizer::deferMeasurements(qc2);
+                }
+            } else {
+                throw std::runtime_error("One of the circuits contains mid-circuit non-unitary primitives. Configure your instance with `transformDynamicCircuit=true`.");
+            }
+        }
+
         if (config.removeDiagonalGatesBeforeMeasure) {
             qc::CircuitOptimizer::removeDiagonalGatesBeforeMeasure(qc1);
             qc::CircuitOptimizer::removeDiagonalGatesBeforeMeasure(qc2);
