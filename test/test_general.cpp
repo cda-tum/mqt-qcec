@@ -277,7 +277,7 @@ TEST_F(GeneralTest, EquivalentUpToGlobalPhase) {
     qc_alternative.addQubitRegister(1);
 
     ec::ImprovedDDEquivalenceChecker improvedDDEquivalenceChecker(qc_original, qc_alternative);
-    auto results = improvedDDEquivalenceChecker.check();
+    auto                             results = improvedDDEquivalenceChecker.check();
     EXPECT_EQ(results.equivalence, ec::Equivalence::EquivalentUpToGlobalPhase);
 
     ec::CompilationFlowEquivalenceChecker compilationFlowEquivalenceChecker(qc_original, qc_alternative);
@@ -291,7 +291,7 @@ TEST_F(GeneralTest, NotEquivalent) {
     qc_alternative.addQubitRegister(1);
 
     ec::ImprovedDDEquivalenceChecker improvedDDEquivalenceChecker(qc_original, qc_alternative);
-    auto results = improvedDDEquivalenceChecker.check();
+    auto                             results = improvedDDEquivalenceChecker.check();
     EXPECT_EQ(results.equivalence, ec::Equivalence::NotEquivalent);
 
     ec::CompilationFlowEquivalenceChecker compilationFlowEquivalenceChecker(qc_original, qc_alternative);
