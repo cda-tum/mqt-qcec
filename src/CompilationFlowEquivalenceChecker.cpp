@@ -33,6 +33,12 @@ namespace ec {
             }
 
             if (it1 != end1 && it2 != end2) {
+                if (results.result.p->ident && gatesAreIdentical(perm1, perm2)) {
+                    ++it1;
+                    ++it2;
+                    continue;
+                }
+
                 auto cost1 = costFunction((*it1)->getType(), (*it1)->getControls().size());
                 auto cost2 = costFunction((*it2)->getType(), (*it2)->getControls().size());
 

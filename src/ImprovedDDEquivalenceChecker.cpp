@@ -112,6 +112,11 @@ namespace ec {
     /// Alternate between LEFT and RIGHT applications
     void ImprovedDDEquivalenceChecker::checkNaive(qc::MatrixDD& result, qc::Permutation& perm1, qc::Permutation& perm2) {
         while (it1 != end1 && it2 != end2) {
+            if (result.p->ident && gatesAreIdentical(perm1, perm2)) {
+                ++it1;
+                ++it2;
+                continue;
+            }
             applyGate(qc1, it1, result, perm1, LEFT);
             ++it1;
             applyGate(qc2, it2, result, perm2, RIGHT);
@@ -126,6 +131,12 @@ namespace ec {
         auto ratio2 = (qc1.getNops() > qc2.getNops()) ? 1 : ratio;
 
         while (it1 != end1 && it2 != end2) {
+            if (result.p->ident && gatesAreIdentical(perm1, perm2)) {
+                ++it1;
+                ++it2;
+                continue;
+            }
+
             for (unsigned int i = 0; i < ratio1 && it1 != end1; ++i) {
                 applyGate(qc1, it1, result, perm1, LEFT);
                 ++it1;
