@@ -52,6 +52,7 @@ namespace ec {
             optimizations["reconstruct swaps"]                    = reconstructSWAPs;
             optimizations["remove diagonal gates before measure"] = removeDiagonalGatesBeforeMeasure;
             optimizations["transform dynamic circuit"]            = transformDynamicCircuit;
+            optimizations["reorder operations"]                   = reorderOperations;
             if (method == ec::Method::Simulation) {
                 config["simulation config"]               = {};
                 auto& simulation                          = config["simulation config"];
