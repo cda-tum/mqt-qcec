@@ -29,6 +29,7 @@ namespace ec {
         bool reconstructSWAPs                 = true;
         bool removeDiagonalGatesBeforeMeasure = false;
         bool transformDynamicCircuit          = false;
+        bool reorderOperations                = true;
 
         // configuration options for PowerOfSimulation equivalence checker
         double      fidelity_limit = 0.999;

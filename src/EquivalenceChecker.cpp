@@ -266,8 +266,10 @@ namespace ec {
             qc::CircuitOptimizer::singleQubitGateFusion(qc2);
         }
 
-        qc::CircuitOptimizer::reorderOperations(qc1);
-        qc::CircuitOptimizer::reorderOperations(qc2);
+        if (config.reorderOperations) {
+            qc::CircuitOptimizer::reorderOperations(qc1);
+            qc::CircuitOptimizer::reorderOperations(qc2);
+        }
 
         it1  = qc1.begin();
         it2  = qc2.begin();

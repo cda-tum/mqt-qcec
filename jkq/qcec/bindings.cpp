@@ -142,6 +142,10 @@ PYBIND11_MODULE(pyqcec, m) {
                            R"pbdoc(
 					Optimization pass that transforms dynamic circuits to static circuits for equivalence checking
 				)pbdoc")
+            .def_readwrite("reorder_operations", &ec::Configuration::reorderOperations,
+                           R"pbdoc(
+					Optimization pass that reorders operations to eliminate unnecessary dependencies
+				)pbdoc")
             .def_readwrite("remove_diagonal_gates_before_measure", &ec::Configuration::removeDiagonalGatesBeforeMeasure,
                            R"pbdoc(
 					Optimization pass removing diagonal gates before measurements

@@ -90,6 +90,7 @@ The verification procedure can be configured with the following settings and opt
     - `fuse_single_qubit_gates`: Fuse consecutive single qubit gates (*on* per default)
     - `remove_diagonal_gates_before_measure`: Remove diagonal gates before measurements (*off* by default)
     - `tranform_dynamic_circuit`: Transform dynamic to static circuit (*off* by default)
+    - `reorder_operations`: Reorder operations in order to eliminate unnecessary dependencies (*on* by default)
     
 The `qcec.Results` class that is returned by the `verify` function provides `json()` and `csv()` methods to produce JSON or CSV formatted output.
 
