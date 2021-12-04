@@ -10,7 +10,7 @@ namespace ec {
 
     EquivalenceChecker::EquivalenceChecker(qc::QuantumComputation& qc1, qc::QuantumComputation& qc2):
         qc1(qc1), qc2(qc2) {
-        // currently this modifies the underlying quantum circuits
+        // currently, this modifies the underlying quantum circuits
         // in the future this might want to be avoided
         qc1.stripIdleQubits();
         qc2.stripIdleQubits();
@@ -226,6 +226,31 @@ namespace ec {
     void EquivalenceChecker::runPreCheckPasses(const Configuration& config) {
         setTolerance(config.tolerance);
 
+        const auto isDynamicCircuit1 = qc::CircuitOptimizer::isDynamicCircuit(qc1);
+        const auto isDynamicCircuit2 = qc::CircuitOptimizer::isDynamicCircuit(qc2);
+        if (isDynamicCircuit1 || isDynamicCircuit2) {
+            if (config.transformDynamicCircuit) {
+                if (isDynamicCircuit1) {
+                    qc::CircuitOptimizer::eliminateResets(qc1);
+                    qc::CircuitOptimizer::deferMeasurements(qc1);
+                    initial1   = qc1.initialLayout;
+                    output1    = qc1.outputPermutation;
+                    ancillary1 = qc1.ancillary;
+                    garbage1   = qc1.garbage;
+                }
+                if (isDynamicCircuit2) {
+                    qc::CircuitOptimizer::eliminateResets(qc2);
+                    qc::CircuitOptimizer::deferMeasurements(qc2);
+                    initial2   = qc2.initialLayout;
+                    output2    = qc2.outputPermutation;
+                    ancillary2 = qc2.ancillary;
+                    garbage2   = qc2.garbage;
+                }
+            } else {
+                throw std::runtime_error("One of the circuits contains mid-circuit non-unitary primitives. Configure your instance with `transformDynamicCircuit=true`.");
+            }
+        }
+
         if (config.removeDiagonalGatesBeforeMeasure) {
             qc::CircuitOptimizer::removeDiagonalGatesBeforeMeasure(qc1);
             qc::CircuitOptimizer::removeDiagonalGatesBeforeMeasure(qc2);
@@ -239,6 +264,11 @@ namespace ec {
         if (config.fuseSingleQubitGates) {
             qc::CircuitOptimizer::singleQubitGateFusion(qc1);
             qc::CircuitOptimizer::singleQubitGateFusion(qc2);
+        }
+
+        if (config.reorderOperations) {
+            qc::CircuitOptimizer::reorderOperations(qc1);
+            qc::CircuitOptimizer::reorderOperations(qc2);
         }
 
         it1  = qc1.begin();

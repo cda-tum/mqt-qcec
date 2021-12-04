@@ -70,11 +70,12 @@ The verification procedure can be configured with the following settings and opt
         - simulation
     - `tolerance`: Numerical tolerance used during computation (`1e-13` per default)
 - Settinggs for the ![G \rightarrow \mathbb{I} \leftarrow G'](https://render.githubusercontent.com/render/math?math=G%20%5Crightarrow%20%5Cmathbb%7BI%7D%20%5Cleftarrow%20G') method:
-    - `strategy`: strategy to use for the scheme
+    - `strategy`: Strategy to use for the scheme
         - naive
         - proportional (*default*)
         - lookahead
         - compilationflow
+    - `identity_threshold`: Numerical tolerance used for checking the similarity to the identity matrix (`1e-10` per default)
 - Settings for the simulation-based method:
     - `fidelity`: Fidelity limit for comparison (`0.999` per default)
     - `max_sims`: Maximum number of simulations to conduct (`16` per default)
@@ -88,6 +89,8 @@ The verification procedure can be configured with the following settings and opt
     - `reconstruct_swaps`: Reconstruct SWAP operations from consecutive CNOTs (*on* per default)
     - `fuse_single_qubit_gates`: Fuse consecutive single qubit gates (*on* per default)
     - `remove_diagonal_gates_before_measure`: Remove diagonal gates before measurements (*off* by default)
+    - `tranform_dynamic_circuit`: Transform dynamic to static circuit (*off* by default)
+    - `reorder_operations`: Reorder operations in order to eliminate unnecessary dependencies (*on* by default)
     
 The `qcec.Results` class that is returned by the `verify` function provides `json()` and `csv()` methods to produce JSON or CSV formatted output.
 

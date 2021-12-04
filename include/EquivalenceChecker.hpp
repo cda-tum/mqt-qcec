@@ -19,14 +19,17 @@ namespace ec {
                             RIGHT = false };
 
     struct Configuration {
-        ec::Method   method    = ec::Method::G_I_Gp;
-        ec::Strategy strategy  = ec::Strategy::Proportional;
-        dd::fp       tolerance = dd::ComplexTable<>::tolerance();
+        ec::Method   method            = ec::Method::G_I_Gp;
+        ec::Strategy strategy          = ec::Strategy::Proportional;
+        dd::fp       tolerance         = dd::ComplexTable<>::tolerance();
+        dd::fp       identityThreshold = 1e-10;
 
         // configuration options for optimizations
         bool fuseSingleQubitGates             = true;
         bool reconstructSWAPs                 = true;
         bool removeDiagonalGatesBeforeMeasure = false;
+        bool transformDynamicCircuit          = false;
+        bool reorderOperations                = true;
 
         // configuration options for PowerOfSimulation equivalence checker
         double      fidelity_limit = 0.999;
@@ -39,7 +42,8 @@ namespace ec {
             nlohmann::json config{};
             config["method"] = ec::toString(method);
             if (method == ec::Method::G_I_Gp) {
-                config["strategy"] = ec::toString(strategy);
+                config["strategy"]           = ec::toString(strategy);
+                config["identity threshold"] = identityThreshold;
             }
             config["tolerance"]                                   = tolerance;
             config["optimizations"]                               = {};
@@ -47,6 +51,8 @@ namespace ec {
             optimizations["fuse consecutive single qubit gates"]  = fuseSingleQubitGates;
             optimizations["reconstruct swaps"]                    = reconstructSWAPs;
             optimizations["remove diagonal gates before measure"] = removeDiagonalGatesBeforeMeasure;
+            optimizations["transform dynamic circuit"]            = transformDynamicCircuit;
+            optimizations["reorder operations"]                   = reorderOperations;
             if (method == ec::Method::Simulation) {
                 config["simulation config"]               = {};
                 auto& simulation                          = config["simulation config"];
