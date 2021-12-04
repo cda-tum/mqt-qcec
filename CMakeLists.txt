@@ -1,8 +1,8 @@
-cmake_minimum_required(VERSION 3.14...3.21)
+cmake_minimum_required(VERSION 3.14...3.22)
 
 project(qcec
         LANGUAGES CXX
-        VERSION 1.10.2
+        VERSION 1.10.3
         DESCRIPTION "QCEC - A JKQ tool for Quantum Circuit Equivalence Checking"
         )
 
@@ -19,6 +19,14 @@ option(BUILD_QCEC_TESTS "Also build tests for QMAP project")
 if (DEFINED ENV{DEPLOY})
 	set(DEPLOY $ENV{DEPLOY} CACHE BOOL "Use deployment configuration from environment" FORCE)
 	message(STATUS "Setting deployment configuration to '${DEPLOY}' from environment")
+endif ()
+
+# set deployment specific options
+if (DEPLOY)
+	# build a universal macOS binary in case this is a deployment build
+	set(CMAKE_OSX_ARCHITECTURES "x86_64;arm64" CACHE STRING "" FORCE)
+	# set the macOS deployment target appropriately
+	set(CMAKE_OSX_DEPLOYMENT_TARGET "10.15" CACHE STRING "" FORCE)
 endif ()
 
 # build type settings
