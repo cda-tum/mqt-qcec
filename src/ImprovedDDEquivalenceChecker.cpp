@@ -42,16 +42,6 @@ namespace ec {
         return e;
     }
 
-    qc::MatrixDD ImprovedDDEquivalenceChecker::createGoalMatrix() {
-        auto goalMatrix = dd->makeIdent(nqubits);
-        dd->incRef(goalMatrix);
-        goalMatrix = dd->reduceAncillae(goalMatrix, ancillary2, RIGHT);
-        goalMatrix = dd->reduceGarbage(goalMatrix, garbage2, RIGHT);
-        goalMatrix = dd->reduceAncillae(goalMatrix, ancillary1, LEFT);
-        goalMatrix = dd->reduceGarbage(goalMatrix, garbage1, LEFT);
-        return goalMatrix;
-    }
-
     /// Use dedicated method to check the equivalence of both provided circuits
     EquivalenceCheckingResults ImprovedDDEquivalenceChecker::check(const Configuration& config) {
         EquivalenceCheckingResults results{};
@@ -99,8 +89,16 @@ namespace ec {
         results.result = dd->reduceAncillae(results.result, ancillary1, LEFT);
         results.result = dd->reduceAncillae(results.result, ancillary2, RIGHT);
 
-        results.equivalence = equals(results.result, createGoalMatrix());
-        results.maxActive   = std::max(results.maxActive, dd->mUniqueTable.getMaxActiveNodes());
+        if (dd->isCloseToIdentity(results.result, config.identityThreshold)) {
+            if (!results.result.w.approximatelyOne()) {
+                results.equivalence = Equivalence::EquivalentUpToGlobalPhase;
+            } else {
+                results.equivalence = Equivalence::Equivalent;
+            }
+        } else {
+            results.equivalence = Equivalence::NotEquivalent;
+        }
+        results.maxActive = std::max(results.maxActive, dd->mUniqueTable.getMaxActiveNodes());
 
         auto                          endVerification   = std::chrono::steady_clock::now();
         std::chrono::duration<double> preprocessingTime = endPreprocessing - start;
@@ -114,6 +112,11 @@ namespace ec {
     /// Alternate between LEFT and RIGHT applications
     void ImprovedDDEquivalenceChecker::checkNaive(qc::MatrixDD& result, qc::Permutation& perm1, qc::Permutation& perm2) {
         while (it1 != end1 && it2 != end2) {
+            if (result.p->ident && gatesAreIdentical(perm1, perm2)) {
+                ++it1;
+                ++it2;
+                continue;
+            }
             applyGate(qc1, it1, result, perm1, LEFT);
             ++it1;
             applyGate(qc2, it2, result, perm2, RIGHT);
@@ -123,13 +126,17 @@ namespace ec {
 
     /// Alternate according to the gate count ratio between LEFT and RIGHT applications
     void ImprovedDDEquivalenceChecker::checkProportional(qc::MatrixDD& result, qc::Permutation& perm1, qc::Permutation& perm2) {
-        auto ratio  = static_cast<unsigned int>(std::round(
-                static_cast<double>(std::max(qc1.getNops(), qc2.getNops())) /
-                static_cast<double>(std::min(qc1.getNops(), qc2.getNops()))));
+        auto ratio  = static_cast<unsigned int>(std::round(static_cast<double>(std::max(qc1.getNops(), qc2.getNops())) / static_cast<double>(std::min(qc1.getNops(), qc2.getNops()))));
         auto ratio1 = (qc1.getNops() > qc2.getNops()) ? ratio : 1;
         auto ratio2 = (qc1.getNops() > qc2.getNops()) ? 1 : ratio;
 
         while (it1 != end1 && it2 != end2) {
+            if (result.p->ident && gatesAreIdentical(perm1, perm2)) {
+                ++it1;
+                ++it2;
+                continue;
+            }
+
             for (unsigned int i = 0; i < ratio1 && it1 != end1; ++i) {
                 applyGate(qc1, it1, result, perm1, LEFT);
                 ++it1;

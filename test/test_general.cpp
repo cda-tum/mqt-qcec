@@ -266,6 +266,37 @@ TEST_F(GeneralTest, FixOutputPermutationMismatch) {
     EXPECT_TRUE(results.consideredEquivalent());
 }
 
+TEST_F(GeneralTest, EquivalentUpToGlobalPhase) {
+    qc_original.addQubitRegister(1);
+    qc_original.x(0);
+    qc_original.z(0);
+    qc_original.x(0);
+    qc_original.z(0);
+    qc_alternative.addQubitRegister(1);
+
+    ec::ImprovedDDEquivalenceChecker improvedDDEquivalenceChecker(qc_original, qc_alternative);
+    auto                             results = improvedDDEquivalenceChecker.check();
+    EXPECT_EQ(results.equivalence, ec::Equivalence::EquivalentUpToGlobalPhase);
+
+    ec::CompilationFlowEquivalenceChecker compilationFlowEquivalenceChecker(qc_original, qc_alternative);
+    results = compilationFlowEquivalenceChecker.check();
+    EXPECT_EQ(results.equivalence, ec::Equivalence::EquivalentUpToGlobalPhase);
+}
+
+TEST_F(GeneralTest, NotEquivalent) {
+    qc_original.addQubitRegister(1);
+    qc_original.x(0);
+    qc_alternative.addQubitRegister(1);
+
+    ec::ImprovedDDEquivalenceChecker improvedDDEquivalenceChecker(qc_original, qc_alternative);
+    auto                             results = improvedDDEquivalenceChecker.check();
+    EXPECT_EQ(results.equivalence, ec::Equivalence::NotEquivalent);
+
+    ec::CompilationFlowEquivalenceChecker compilationFlowEquivalenceChecker(qc_original, qc_alternative);
+    results = compilationFlowEquivalenceChecker.check();
+    EXPECT_EQ(results.equivalence, ec::Equivalence::NotEquivalent);
+}
+
 TEST_F(GeneralTest, DynamicCircuit) {
     auto s   = qc::BitString(3);
     auto bv  = qc::BernsteinVazirani(s);
@@ -285,4 +316,79 @@ TEST_F(GeneralTest, DynamicCircuit) {
     auto checker2 = ec::ImprovedDDEquivalenceChecker(dbv2, bv2);
     result        = checker2.check(config);
     EXPECT_EQ(result.equivalence, ec::Equivalence::Equivalent);
+}
+
+TEST_F(GeneralTest, CancelIdenticalGates) {
+    qc_original.addQubitRegister(3);
+    qc_original.x(0);
+    qc_original.x(0, 1_pc);
+
+    auto checker = ec::ImprovedDDEquivalenceChecker(qc_original, qc_original);
+
+    auto config     = ec::Configuration{};
+    config.strategy = ec::Strategy::Naive;
+
+    auto result = checker.check(config);
+    EXPECT_TRUE(result.consideredEquivalent());
+
+    config.strategy = ec::Strategy::Proportional;
+    result          = checker.check(config);
+
+    EXPECT_TRUE(result.consideredEquivalent());
+
+    auto cfchecker = ec::CompilationFlowEquivalenceChecker(qc_original, qc_original);
+    result         = cfchecker.check();
+
+    EXPECT_TRUE(result.consideredEquivalent());
+}
+
+TEST_F(GeneralTest, NoGateCancellation) {
+    qc_original.addQubitRegister(2);
+    qc_alternative.addQubitRegister(2);
+
+    // ignore swaps
+    qc_original.swap(0, 1);
+    qc_alternative.swap(0, 1);
+
+    // different gates that cannot be cancelled
+    qc_original.z(0);
+    qc_original.x(1);
+    qc_alternative.x(1);
+    qc_alternative.z(0);
+
+    // single qubit gates that cannot be cancelled
+    qc_original.x(0);
+    qc_alternative.x(1);
+    qc_original.x(1);
+    qc_alternative.x(0);
+
+    // two-qubit gates that cannot be cancelled
+    qc_original.x(0, 1_pc);
+    qc_alternative.x(1, 0_pc);
+    qc_original.x(0, 1_pc);
+    qc_alternative.x(1, 0_pc);
+
+    // gates with parameters that cannot be cancelled
+    qc_original.phase(0, 2.0);
+    qc_alternative.phase(0, -2.0);
+    qc_original.phase(0, -2.0);
+    qc_alternative.phase(0, 2.0);
+
+    // gates with different number of controls that cannot be cancelled
+    qc_original.x(0);
+    qc_alternative.x(0, 1_pc);
+    qc_original.x(0, 1_pc);
+    qc_alternative.x(0);
+
+    auto config                 = ec::Configuration{};
+    config.reorderOperations    = false;
+    config.fuseSingleQubitGates = false;
+    config.reconstructSWAPs     = false;
+    config.strategy             = ec::Strategy::Naive;
+
+    auto checker = ec::ImprovedDDEquivalenceChecker(qc_original, qc_alternative);
+
+    auto result = checker.check(config);
+
+    EXPECT_TRUE(result.consideredEquivalent());
 }

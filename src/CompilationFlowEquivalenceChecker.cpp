@@ -33,6 +33,12 @@ namespace ec {
             }
 
             if (it1 != end1 && it2 != end2) {
+                if (results.result.p->ident && gatesAreIdentical(perm1, perm2)) {
+                    ++it1;
+                    ++it2;
+                    continue;
+                }
+
                 auto cost1 = costFunction((*it1)->getType(), (*it1)->getControls().size());
                 auto cost2 = costFunction((*it2)->getType(), (*it2)->getControls().size());
 
@@ -78,8 +84,15 @@ namespace ec {
         results.result = dd->reduceAncillae(results.result, ancillary1, LEFT);
         results.result = dd->reduceAncillae(results.result, ancillary2, RIGHT);
 
-        auto goal_matrix    = createGoalMatrix();
-        results.equivalence = equals(results.result, goal_matrix);
+        if (dd->isCloseToIdentity(results.result, config.identityThreshold)) {
+            if (!results.result.w.approximatelyOne()) {
+                results.equivalence = Equivalence::EquivalentUpToGlobalPhase;
+            } else {
+                results.equivalence = Equivalence::Equivalent;
+            }
+        } else {
+            results.equivalence = Equivalence::NotEquivalent;
+        }
 
         auto                          endVerification   = std::chrono::steady_clock::now();
         std::chrono::duration<double> preprocessingTime = endPreprocessing - start;

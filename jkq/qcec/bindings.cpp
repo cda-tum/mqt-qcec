@@ -126,6 +126,10 @@ PYBIND11_MODULE(pyqcec, m) {
                            R"pbdoc(
 					Numerical tolerance used during computation
 				)pbdoc")
+            .def_readwrite("identity_threshold", &ec::Configuration::identityThreshold,
+                           R"pbdoc(
+					Numerical threshold used for checking the similarity to the identity matrix (default: 1e-10)
+				)pbdoc")
             .def_readwrite("reconstruct_swaps", &ec::Configuration::reconstructSWAPs,
                            R"pbdoc(
 					Optimization pass reconstructing SWAP operations
@@ -137,6 +141,10 @@ PYBIND11_MODULE(pyqcec, m) {
             .def_readwrite("transform_dynamic_circuit", &ec::Configuration::transformDynamicCircuit,
                            R"pbdoc(
 					Optimization pass that transforms dynamic circuits to static circuits for equivalence checking
+				)pbdoc")
+            .def_readwrite("reorder_operations", &ec::Configuration::reorderOperations,
+                           R"pbdoc(
+					Optimization pass that reorders operations to eliminate unnecessary dependencies
 				)pbdoc")
             .def_readwrite("remove_diagonal_gates_before_measure", &ec::Configuration::removeDiagonalGatesBeforeMeasure,
                            R"pbdoc(

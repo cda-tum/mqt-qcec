@@ -10,7 +10,7 @@ namespace ec {
 
     EquivalenceChecker::EquivalenceChecker(qc::QuantumComputation& qc1, qc::QuantumComputation& qc2):
         qc1(qc1), qc2(qc2) {
-        // currently this modifies the underlying quantum circuits
+        // currently, this modifies the underlying quantum circuits
         // in the future this might want to be avoided
         qc1.stripIdleQubits();
         qc2.stripIdleQubits();
@@ -264,6 +264,11 @@ namespace ec {
         if (config.fuseSingleQubitGates) {
             qc::CircuitOptimizer::singleQubitGateFusion(qc1);
             qc::CircuitOptimizer::singleQubitGateFusion(qc2);
+        }
+
+        if (config.reorderOperations) {
+            qc::CircuitOptimizer::reorderOperations(qc1);
+            qc::CircuitOptimizer::reorderOperations(qc2);
         }
 
         it1  = qc1.begin();
