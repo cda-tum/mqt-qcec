@@ -49,7 +49,7 @@ JKQ QCEC is mainly developed as a C++ library with an easy-to-use Python interfa
     ```
   However, in order to get the best performance out of QCEC, it is recommended to build it locally from the source distribution (see [system requirements](#system-requirements)) via
     ```bash
-    pip install --no-binary jkq.qcec
+    pip install jkq.qcec --no-binary jkq.qcec
     ```
   This enables platform specific compiler optimizations that cannot be enabled on portable wheels.
 - Once installed, start using it in Python:
