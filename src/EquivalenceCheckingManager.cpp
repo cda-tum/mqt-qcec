@@ -164,9 +164,14 @@ namespace ec {
             qc::CircuitOptimizer::singleQubitGateFusion(qc2);
         }
 
+        if (configuration.optimizations.reorderOperations) {
+            qc::CircuitOptimizer::reorderOperations(qc1);
+            qc::CircuitOptimizer::reorderOperations(qc2);
+        }
+
         // remove final measurements from both circuits so that the underlying functionality should be unitary
-        qc::CircuitOptimizer::removeFinalMeasurements(this->qc1);
-        qc::CircuitOptimizer::removeFinalMeasurements(this->qc2);
+        qc::CircuitOptimizer::removeFinalMeasurements(qc1);
+        qc::CircuitOptimizer::removeFinalMeasurements(qc2);
     }
 
     EquivalenceCriterion EquivalenceCheckingManager::check() {

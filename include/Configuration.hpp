@@ -36,6 +36,7 @@ namespace ec {
             bool reconstructSWAPs                 = true;
             bool removeDiagonalGatesBeforeMeasure = false;
             bool transformDynamicCircuit          = false;
+            bool reorderOperations                = true;
         };
 
         // configuration options for application schemes
@@ -70,7 +71,6 @@ namespace ec {
 
         [[nodiscard]] nlohmann::json json() const {
             nlohmann::json config{};
-            config["execution"]            = {};
             auto& exe                      = config["execution"];
             exe["tolerance"]               = execution.numericalTolerance;
             exe["parallel"]                = execution.parallel;
@@ -79,15 +79,14 @@ namespace ec {
             exe["run_simulation_scheme"]   = execution.runSimulationScheme;
             exe["run_alternating_scheme"]  = execution.runAlternatingScheme;
 
-            config["optimizations"]                     = {};
             auto& opt                                   = config["optimizations"];
             opt["fix_output_permutation_mismatch"]      = optimizations.fixOutputPermutationMismatch;
             opt["fuse_consecutive_single_qubit_gates"]  = optimizations.fuseSingleQubitGates;
             opt["reconstruct_swaps"]                    = optimizations.reconstructSWAPs;
             opt["remove_diagonal_gates_before_measure"] = optimizations.removeDiagonalGatesBeforeMeasure;
             opt["transform_dynamic_circuit"]            = optimizations.transformDynamicCircuit;
+            opt["reorder_operations"]                   = optimizations.reorderOperations;
 
-            config["application"] = {};
             auto& app             = config["application"];
             app["type"]           = ec::toString(application.scheme);
             if (application.scheme == ApplicationSchemeType::GateCost) {
@@ -99,13 +98,11 @@ namespace ec {
             }
 
             if (execution.runConstructionScheme || execution.runAlternatingScheme) {
-                config["functionality"] = {};
                 auto& fun               = config["functionality"];
                 fun["trace_threshold"]  = functionality.traceThreshold;
             }
 
             if (execution.runSimulationScheme) {
-                config["simulation"]               = {};
                 auto& sim                          = config["simulation"];
                 sim["fidelity_threshold"]          = simulation.fidelityThreshold;
                 sim["max_sims"]                    = simulation.maxSims;
