@@ -33,6 +33,8 @@ namespace ec {
         void                 finish() override;
         void                 postprocess() override;
         EquivalenceCriterion checkEquivalence() override;
+
+        bool gatesAreIdentical();
     };
 } // namespace ec
 

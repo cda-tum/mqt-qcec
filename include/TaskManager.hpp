@@ -49,6 +49,8 @@ namespace ec {
 
         [[nodiscard]] const qc::QuantumComputation* getCircuit() const { return qc; }
 
+        [[nodiscard]] const qc::Permutation& getPermutation() const { return permutation; }
+
         void advanceIterator() { ++iterator; }
 
         void applyGate(DDType& to) {
