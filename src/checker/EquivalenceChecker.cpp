@@ -56,27 +56,24 @@ namespace ec {
         // equivalent. However, numerical instabilities might create a scenario where two nodes differ besides
         // their underlying decision diagrams being extremely close (for some definition of `close`).
         if constexpr (std::is_same_v<DDType, qc::MatrixDD>) {
-            // for matrices this is resolved by calculating their Frobenius inner product tr(U V^-1)
-            // and comparing it to some threshold.
-            dd::ComplexValue trace{};
+            // for matrices this can be resolved by calculating their Frobenius inner product tr(U V^-1) and comparing it to some threshold.
+            // in a similar fashion, we can simply compare U V^-1 with the identity, which results in a much simpler check that is not prone to overflow.
+            bool isClose{};
             if (e.p->ident) {
-                trace = dd->trace(f);
+                isClose = dd->isCloseToIdentity(f, configuration.functionality.traceThreshold);
             } else if (f.p->ident) {
-                trace = dd->trace(e);
+                isClose = dd->isCloseToIdentity(e, configuration.functionality.traceThreshold);
             } else {
-                trace = dd->trace(dd->multiply(e, dd->conjugateTranspose(f)));
+                auto g  = dd->multiply(e, dd->conjugateTranspose(f));
+                isClose = dd->isCloseToIdentity(g, configuration.functionality.traceThreshold);
             }
 
-            // whenever tr(U V^-1) ≃ 2^n, both decision diagrams should be considered equivalent
-            const auto normalizedRealPart = trace.r / std::exp2(e.p->v);
-            if (std::abs(normalizedRealPart - 1.0) < configuration.functionality.traceThreshold) {
-                return EquivalenceCriterion::Equivalent;
-            } else {
-                // whenever |tr(U V^-1)|^2 ≃ 2^n, both decision diagrams should be considered equivalent up to global phase
-                const auto normalizedSquaredMagnitude = (trace.r * trace.r + trace.i * trace.i) / std::exp2(e.p->v);
-                if (std::abs(normalizedSquaredMagnitude - 1.0) < configuration.functionality.traceThreshold) {
+            if (isClose) {
+                // whenever the top edge weights differ, both decision diagrams are only equivalent up to a global phase
+                if (!e.w.approximatelyEquals(f.w)) {
                     return EquivalenceCriterion::EquivalentUpToGlobalPhase;
                 }
+                return EquivalenceCriterion::Equivalent;
             }
         } else {
             // for vectors this is resolved by computing the inner product (or fidelity) between both decision
