@@ -44,9 +44,9 @@ namespace ec {
             ApplicationSchemeType scheme = ApplicationSchemeType::Proportional;
 
             // options for the gate cost application scheme
-            bool                                           useProfile = false;
-            std::string                                    profileLocation{};
-            std::function<std::size_t(GateCostLUTKeyType)> costFunction = [](GateCostLUTKeyType) { return 1U; };
+            bool         useProfile = false;
+            std::string  profileLocation{};
+            CostFunction costFunction = [](const GateCostLUTKeyType&) { return 1U; };
         };
 
         struct Functionality {
@@ -71,7 +71,7 @@ namespace ec {
 
         [[nodiscard]] nlohmann::json json() const {
             nlohmann::json config{};
-            auto& exe                      = config["execution"];
+            auto&          exe             = config["execution"];
             exe["tolerance"]               = execution.numericalTolerance;
             exe["parallel"]                = execution.parallel;
             exe["nthreads"]                = execution.parallel ? execution.nthreads : 1U;
@@ -87,8 +87,8 @@ namespace ec {
             opt["transform_dynamic_circuit"]            = optimizations.transformDynamicCircuit;
             opt["reorder_operations"]                   = optimizations.reorderOperations;
 
-            auto& app             = config["application"];
-            app["type"]           = ec::toString(application.scheme);
+            auto& app   = config["application"];
+            app["type"] = ec::toString(application.scheme);
             if (application.scheme == ApplicationSchemeType::GateCost) {
                 if (application.useProfile) {
                     app["profile"] = application.profileLocation;
@@ -98,8 +98,8 @@ namespace ec {
             }
 
             if (execution.runConstructionScheme || execution.runAlternatingScheme) {
-                auto& fun               = config["functionality"];
-                fun["trace_threshold"]  = functionality.traceThreshold;
+                auto& fun              = config["functionality"];
+                fun["trace_threshold"] = functionality.traceThreshold;
             }
 
             if (execution.runSimulationScheme) {

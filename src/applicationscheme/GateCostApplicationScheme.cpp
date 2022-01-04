@@ -7,7 +7,7 @@
 
 namespace ec {
     template<class DDType>
-    void GateCostApplicationScheme<DDType>::populateLUT(const std::function<std::size_t(GateCostLUTKeyType)>& costFunction, const qc::QuantumComputation* qc) {
+    void GateCostApplicationScheme<DDType>::populateLUT(const CostFunction& costFunction, const qc::QuantumComputation* qc) {
         for (const auto& op: *qc) {
             const auto               type      = op->getType();
             const auto               nControls = op->getNcontrols();
@@ -23,7 +23,7 @@ namespace ec {
             return {1U, 1U};
 
         const auto& op   = this->taskManager1();
-        auto        key  = GateCostLUTKeyType{op->getType(), op->getNcontrols()};
+        const auto  key  = GateCostLUTKeyType{op->getType(), op->getNcontrols()};
         std::size_t cost = 1U;
         if (auto it = gateCostLUT.find(key); it != gateCostLUT.end()) {
             cost = it->second;
@@ -32,7 +32,7 @@ namespace ec {
     }
 
     template<class DDType>
-    GateCostApplicationScheme<DDType>::GateCostApplicationScheme(TaskManager<DDType>& taskManager1, TaskManager<DDType>& taskManager2, const std::function<size_t(GateCostLUTKeyType)>& costFunction):
+    GateCostApplicationScheme<DDType>::GateCostApplicationScheme(TaskManager<DDType>& taskManager1, TaskManager<DDType>& taskManager2, const CostFunction& costFunction):
         ApplicationScheme<DDType>(taskManager1, taskManager2) {
         populateLUT(costFunction, taskManager1.getCircuit());
         populateLUT(costFunction, taskManager2.getCircuit());

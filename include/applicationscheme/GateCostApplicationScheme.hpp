@@ -28,6 +28,7 @@ namespace std {
 namespace ec {
     using GateCostLUTKeyType = std::pair<qc::OpType, dd::QubitCount>;
     using GateCostLUT        = std::unordered_map<GateCostLUTKeyType, std::size_t>;
+    using CostFunction       = std::function<std::size_t(const GateCostLUTKeyType&)>;
 
     template<class DDType>
     class GateCostApplicationScheme: public ApplicationScheme<DDType> {
@@ -35,7 +36,7 @@ namespace ec {
         GateCostApplicationScheme(TaskManager<DDType>& taskManager1, TaskManager<DDType>& taskManager2):
             ApplicationScheme<DDType>(taskManager1, taskManager2) {}
 
-        GateCostApplicationScheme(TaskManager<DDType>& taskManager1, TaskManager<DDType>& taskManager2, const std::function<std::size_t(GateCostLUTKeyType)>& costFunction);
+        GateCostApplicationScheme(TaskManager<DDType>& taskManager1, TaskManager<DDType>& taskManager2, const CostFunction& costFunction);
 
         GateCostApplicationScheme(TaskManager<DDType>& taskManager1, TaskManager<DDType>& taskManager2, const std::string& filename);
 
@@ -44,7 +45,7 @@ namespace ec {
     protected:
         GateCostLUT gateCostLUT{};
 
-        void populateLUT(const std::function<std::size_t(GateCostLUTKeyType)>& costFunction, const qc::QuantumComputation* qc);
+        void populateLUT(const CostFunction& costFunction, const qc::QuantumComputation* qc);
 
         // read gate cost LUT from file
         // very simple file format:
@@ -53,6 +54,76 @@ namespace ec {
         void populateLUT(const std::string& filename);
         void populateLUT(std::istream& is);
     };
+
+    std::size_t LegacyIBMCostFunction(const GateCostLUTKeyType& key) {
+        const auto [gate, nc] = key;
+        switch (gate) {
+            case qc::I:
+                return 1;
+
+            case qc::X:
+                if (nc <= 1)
+                    return 1;
+                else {
+                    return 2 * (nc - 2) * (2 * LegacyIBMCostFunction({qc::Phase, 0}) + 2 * LegacyIBMCostFunction({qc::U2, 0}) + 3 * LegacyIBMCostFunction({qc::X, 1})) + 6 * LegacyIBMCostFunction({qc::X, 1}) + 8 * LegacyIBMCostFunction({qc::U3, 0});
+                }
+
+            case qc::U3:
+            case qc::U2:
+            case qc::V:
+            case qc::Vdag:
+            case qc::RX:
+            case qc::RY:
+            case qc::H:
+            case qc::SX:
+            case qc::SXdag:
+                if (nc == 0) return 1;
+                if (nc == 1)
+                    return 2 * LegacyIBMCostFunction({qc::X, 1}) + 4 * LegacyIBMCostFunction({qc::U3, 0});
+                else
+                    return 2 * LegacyIBMCostFunction({qc::X, nc}) + 4 * LegacyIBMCostFunction({qc::U3, 0}); // heuristic
+
+            case qc::Phase:
+            case qc::S:
+            case qc::Sdag:
+            case qc::T:
+            case qc::Tdag:
+            case qc::RZ:
+                if (nc == 0) return 1;
+                if (nc == 1)
+                    return 2 * LegacyIBMCostFunction({qc::X, 1}) + 3 * LegacyIBMCostFunction({qc::Phase, 0});
+                else
+                    return 2 * LegacyIBMCostFunction({qc::X, nc}) + 3 * LegacyIBMCostFunction({qc::U3, 0}); // heuristic
+
+            case qc::Y:
+            case qc::Z:
+                if (nc == 0)
+                    return 1;
+                else
+                    return LegacyIBMCostFunction({qc::X, nc}) + 2 * LegacyIBMCostFunction({qc::U3, 0});
+
+            case qc::SWAP:
+                return LegacyIBMCostFunction({qc::X, nc}) + 2 * LegacyIBMCostFunction({qc::X, 1});
+
+            case qc::iSWAP:
+                return LegacyIBMCostFunction({qc::SWAP, nc}) + 2 * LegacyIBMCostFunction({qc::S, nc - 1}) + LegacyIBMCostFunction({qc::Z, nc});
+
+            case qc::Peres:
+            case qc::Peresdag:
+                return LegacyIBMCostFunction({qc::X, nc}) + LegacyIBMCostFunction({qc::X, nc - 1});
+
+            case qc::Compound: // this assumes that compound operations only arise from single qubit fusion
+            case qc::Measure:
+            case qc::Barrier:
+            case qc::ShowProbabilities:
+            case qc::Snapshot:
+                return 1; // these operations are assumed to incur no cost, but to advance the procedure 1 is used
+
+            default:
+                std::cerr << "No cost for gate " << std::to_string(gate) << " -> assuming cost of 1!" << std::endl;
+                return 1;
+        }
+    }
 } // namespace ec
 
 #endif //QCEC_GATECOSTAPPLICATIONSCHEME_HPP
