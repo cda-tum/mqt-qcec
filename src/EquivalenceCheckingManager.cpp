@@ -177,11 +177,15 @@ namespace ec {
     EquivalenceCriterion EquivalenceCheckingManager::check() {
         const auto start = std::chrono::steady_clock::now();
 
-        /// TODO: orchestrate the check
-
+        auto equivalence = EquivalenceCriterion::NoInformation;
+        if (!configuration.execution.parallel || configuration.execution.nthreads <= 1) {
+            equivalence = checkSequential();
+        } else {
+            equivalence = checkParallel();
+        }
         const auto end = std::chrono::steady_clock::now();
         checkTime      = std::chrono::duration<double>(end - start).count();
-        return EquivalenceCriterion::NoInformation;
+        return equivalence;
     }
 
     EquivalenceCheckingManager::EquivalenceCheckingManager(const qc::QuantumComputation& qc1, const qc::QuantumComputation& qc2, const Configuration& configuration):
@@ -204,7 +208,7 @@ namespace ec {
         setupAncillariesAndGarbage();
 
         if (this->qc1.getNqubitsWithoutAncillae() != this->qc2.getNqubitsWithoutAncillae()) {
-            std::cerr << "[QCEC] Warning: circuits have different number of primary inputs! Proceed with caution!" << std::endl;
+            std::clog << "[QCEC] Warning: circuits have different number of primary inputs! Proceed with caution!" << std::endl;
         }
 
         // try to fix a potential mismatch in the output permutations of both circuits
@@ -218,7 +222,82 @@ namespace ec {
         // initialize the stimuli generator
         stateGenerator = StateGenerator(configuration.simulation.seed);
 
+        // check whether the number of selected stimuli does exceed the maximum number of unique computational basis states
+        if (configuration.execution.runSimulationScheme && configuration.simulation.stateType == StateType::ComputationalBasis) {
+            const auto        nq           = this->qc1.getNqubitsWithoutAncillae();
+            const std::size_t uniqueStates = 1ULL << nq;
+            if (configuration.simulation.maxSims > uniqueStates) {
+                this->configuration.simulation.maxSims = uniqueStates;
+                std::clog << "[QCEC] Info: Maximum number of simulations reduced due to number of qubits" << std::endl;
+            }
+        }
+
         const auto end    = std::chrono::steady_clock::now();
         preprocessingTime = std::chrono::duration<double>(end - start).count();
+    }
+
+    EquivalenceCriterion EquivalenceCheckingManager::checkSequential() {
+        auto equivalence = EquivalenceCriterion::NoInformation;
+
+        if (configuration.execution.runSimulationScheme) {
+            DDSimulationChecker simulationChecker(qc1, qc2, configuration);
+            while (performedSimulations < configuration.simulation.maxSims) {
+                // configure simulation based checker
+                simulationChecker.setRandomInitialState(stateGenerator);
+
+                // run the simulation
+                const auto result = simulationChecker.run();
+                ++performedSimulations;
+
+                // break if non-equivalence has been shown
+                if (result == EquivalenceCriterion::NotEquivalent) {
+                    equivalence = EquivalenceCriterion::NotEquivalent;
+                    break;
+                }
+
+                // Otherwise, circuits are probably equivalent and execution can continue
+                equivalence = EquivalenceCriterion::ProbablyEquivalent;
+            }
+
+            // Circuits have been shown to be non-equivalent
+            if (equivalence == EquivalenceCriterion::NotEquivalent) {
+                if (configuration.simulation.storeCEXinput) {
+                    cexInput = simulationChecker.getInitialVector();
+                }
+                if (configuration.simulation.storeCEXoutput) {
+                    cexOutput1 = simulationChecker.getInternalVector1();
+                    cexOutput2 = simulationChecker.getInternalVector2();
+                }
+                return equivalence;
+            }
+        }
+
+        if (configuration.execution.runAlternatingScheme) {
+            DDAlternatingChecker alternatingChecker(qc1, qc2, configuration);
+            const auto           result = alternatingChecker.run();
+
+            // if the alternating check produces a result, this is final
+            if (result != EquivalenceCriterion::NoInformation) {
+                return result;
+            }
+        }
+
+        if (configuration.execution.runConstructionScheme) {
+            DDConstructionChecker constructionChecker(qc1, qc2, configuration);
+            const auto            result = constructionChecker.run();
+
+            // if the construction check produces a result, this is final
+            if (result != EquivalenceCriterion::NoInformation) {
+                return result;
+            }
+        }
+
+        return equivalence;
+    }
+
+    EquivalenceCriterion EquivalenceCheckingManager::checkParallel() {
+        /// TODO: orchestrate the parallel check
+
+        return EquivalenceCriterion::NoInformation;
     }
 } // namespace ec

@@ -10,6 +10,10 @@
 
 namespace ec {
     class DDConstructionChecker: public EquivalenceChecker<qc::MatrixDD> {
+    public:
+        DDConstructionChecker(const qc::QuantumComputation& qc1, const qc::QuantumComputation& qc2, const ec::Configuration& configuration):
+            EquivalenceChecker(qc1, qc2, configuration) {}
+
     protected:
         void initializeTask(TaskManager<qc::MatrixDD>& task) override;
     };

@@ -36,7 +36,7 @@ namespace ec {
 
         const std::unique_ptr<qc::Operation>& operator()() const { return *iterator; }
 
-        DDType getInternalState() const {
+        [[nodiscard]] const DDType& getInternalState() const {
             return internalState;
         }
         void setInternalState(const DDType& state) {
@@ -114,6 +114,16 @@ namespace ec {
             }
         }
         void reduceGarbage() { reduceGarbage(internalState); }
+
+        void incRef(DDType& state) {
+            package->incRef(state);
+        }
+        void incRef() { incRef(internalState); }
+
+        void decRef(DDType& state) {
+            package->decRef(state);
+        }
+        void decRef() { decRef(internalState); }
     };
 } // namespace ec
 

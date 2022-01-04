@@ -15,7 +15,23 @@ namespace ec {
         EquivalenceChecker(qc1, qc2, configuration), initialState(initialState) {}
 
     void DDSimulationChecker::initializeTask(TaskManager<qc::VectorDD>& task) {
-        dd->incRef(initialState);
         task.setInternalState(initialState);
+        task.incRef();
     }
+
+    EquivalenceCriterion DDSimulationChecker::checkEquivalence() {
+        const auto equivalence = EquivalenceChecker::checkEquivalence();
+
+        // adjust reference counts to facilitate reuse of the simulation checker
+        taskManager1.decRef();
+        taskManager2.decRef();
+
+        return equivalence;
+    }
+
+    void DDSimulationChecker::setRandomInitialState(StateGenerator& generator) {
+        const auto nancillary = nqubits = qc1.getNqubitsWithoutAncillae();
+        initialState                    = generator.generateRandomState(dd, nqubits, nancillary, configuration.simulation.stateType);
+    }
+
 } // namespace ec

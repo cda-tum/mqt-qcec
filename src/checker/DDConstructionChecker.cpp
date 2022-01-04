@@ -8,8 +8,8 @@
 namespace ec {
     void DDConstructionChecker::initializeTask(TaskManager<qc::MatrixDD>& task) {
         auto initial = dd->makeIdent(nqubits);
-        dd->incRef(initial);
         task.setInternalState(initial);
+        task.incRef();
         task.reduceAncillae();
     }
 } // namespace ec

@@ -40,6 +40,9 @@ namespace ec {
         double checkTime{};
 
         std::size_t performedSimulations = 0U;
+        dd::CVec    cexInput{};
+        dd::CVec    cexOutput1{};
+        dd::CVec    cexOutput2{};
 
         /// Given that one circuit has more qubits than the other, the difference is assumed to arise from ancillary qubits.
         /// This function changes the additional qubits in the larger circuit to ancillary qubits.
@@ -53,6 +56,17 @@ namespace ec {
 
         /// Run all configured optimization passes
         void runOptimizationPasses();
+
+        /// Sequential Equivalence Check (TCAD'21)
+        /// First, a couple of simulations with various stimuli are conducted.
+        /// If any of those stimuli produce output states with a fidelity not close to 1, the non-equivalence has been shown and the check is finished.
+        /// Given that a couple of simulations did not show any signs of non-equivalence, the circuits are probably equivalent.
+        /// To assure this, the alternating decision diagram checker is invoked to determine the equivalence.
+        EquivalenceCriterion checkSequential();
+
+        /// Parallel Equivalence Check
+        /// The parallel flow makes use of the available processing power by orchestrating all configured checks in a parallel fashion
+        EquivalenceCriterion checkParallel();
     };
 } // namespace ec
 
