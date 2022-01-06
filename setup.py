@@ -67,7 +67,7 @@ with open(README_PATH) as readme_file:
 
 setup(
     name='jkq.qcec',
-    version='1.10.3',
+    version='1.10.4',
     author='Lukas Burgholzer',
     author_email='lukas.burgholzer@jku.at',
     description='QCEC - A JKQ tool for Quantum Circuit Equivalence Checking',
