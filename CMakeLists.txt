@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.14...3.22)
 
 project(qcec
         LANGUAGES CXX
-        VERSION 1.10.3
+        VERSION 1.10.4
         DESCRIPTION "QCEC - A JKQ tool for Quantum Circuit Equivalence Checking"
         )
 
@@ -23,8 +23,6 @@ endif ()
 
 # set deployment specific options
 if (DEPLOY)
-	# build a universal macOS binary in case this is a deployment build
-	set(CMAKE_OSX_ARCHITECTURES "x86_64;arm64" CACHE STRING "" FORCE)
 	# set the macOS deployment target appropriately
 	set(CMAKE_OSX_DEPLOYMENT_TARGET "10.15" CACHE STRING "" FORCE)
 endif ()
