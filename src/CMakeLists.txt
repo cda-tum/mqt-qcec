@@ -5,6 +5,7 @@ add_library(${PROJECT_NAME}
             ${${PROJECT_NAME}_SOURCE_DIR}/include/Configuration.hpp
             ${${PROJECT_NAME}_SOURCE_DIR}/include/EquivalenceCriterion.hpp
             ${${PROJECT_NAME}_SOURCE_DIR}/include/EquivalenceCheckingManager.hpp
+            ${${PROJECT_NAME}_SOURCE_DIR}/include/ThreadSafeQueue.hpp
 
             ${CMAKE_CURRENT_SOURCE_DIR}/EquivalenceCheckingManager.cpp
 
