@@ -6,14 +6,14 @@
 #ifndef QCEC_DDSIMULATIONCHECKER_HPP
 #define QCEC_DDSIMULATIONCHECKER_HPP
 
-#include "checker/EquivalenceChecker.hpp"
+#include "checker/DDEquivalenceChecker.hpp"
 
 namespace ec {
-    class DDSimulationChecker: public EquivalenceChecker<qc::VectorDD> {
+    class DDSimulationChecker: public DDEquivalenceChecker<qc::VectorDD> {
     public:
-        DDSimulationChecker(const qc::QuantumComputation& qc1, const qc::QuantumComputation& qc2, const ec::Configuration& configuration);
+        DDSimulationChecker(const qc::QuantumComputation& qc1, const qc::QuantumComputation& qc2, const ec::Configuration& configuration, bool& done);
 
-        DDSimulationChecker(const qc::QuantumComputation& qc1, const qc::QuantumComputation& qc2, const ec::Configuration& configuration, const qc::VectorDD& initialState);
+        DDSimulationChecker(const qc::QuantumComputation& qc1, const qc::QuantumComputation& qc2, const ec::Configuration& configuration, bool& done, const qc::VectorDD& initialState);
 
         [[nodiscard]] const qc::VectorDD& getInitialState() const { return initialState; }
 

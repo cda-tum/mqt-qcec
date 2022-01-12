@@ -6,13 +6,13 @@
 #include "checker/DDSimulationChecker.hpp"
 
 namespace ec {
-    DDSimulationChecker::DDSimulationChecker(const qc::QuantumComputation& qc1, const qc::QuantumComputation& qc2, const Configuration& configuration):
-        EquivalenceChecker(qc1, qc2, configuration) {
+    DDSimulationChecker::DDSimulationChecker(const qc::QuantumComputation& qc1, const qc::QuantumComputation& qc2, const Configuration& configuration, bool& done):
+        DDEquivalenceChecker(qc1, qc2, configuration, done) {
         initialState = dd->makeZeroState(nqubits);
     }
 
-    DDSimulationChecker::DDSimulationChecker(const qc::QuantumComputation& qc1, const qc::QuantumComputation& qc2, const Configuration& configuration, const qc::VectorDD& initialState):
-        EquivalenceChecker(qc1, qc2, configuration), initialState(initialState) {}
+    DDSimulationChecker::DDSimulationChecker(const qc::QuantumComputation& qc1, const qc::QuantumComputation& qc2, const Configuration& configuration, bool& done, const qc::VectorDD& initialState):
+        DDEquivalenceChecker(qc1, qc2, configuration, done), initialState(initialState) {}
 
     void DDSimulationChecker::initializeTask(TaskManager<qc::VectorDD>& task) {
         task.setInternalState(initialState);
@@ -20,7 +20,7 @@ namespace ec {
     }
 
     EquivalenceCriterion DDSimulationChecker::checkEquivalence() {
-        const auto equivalence = EquivalenceChecker::checkEquivalence();
+        equivalence = DDEquivalenceChecker::checkEquivalence();
 
         // adjust reference counts to facilitate reuse of the simulation checker
         taskManager1.decRef();

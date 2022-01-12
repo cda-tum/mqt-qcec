@@ -6,13 +6,13 @@
 #ifndef QCEC_DDCONSTRUCTIONCHECKER_HPP
 #define QCEC_DDCONSTRUCTIONCHECKER_HPP
 
-#include "checker/EquivalenceChecker.hpp"
+#include "checker/DDEquivalenceChecker.hpp"
 
 namespace ec {
-    class DDConstructionChecker: public EquivalenceChecker<qc::MatrixDD> {
+    class DDConstructionChecker: public DDEquivalenceChecker<qc::MatrixDD> {
     public:
-        DDConstructionChecker(const qc::QuantumComputation& qc1, const qc::QuantumComputation& qc2, const ec::Configuration& configuration):
-            EquivalenceChecker(qc1, qc2, configuration) {}
+        DDConstructionChecker(const qc::QuantumComputation& qc1, const qc::QuantumComputation& qc2, const ec::Configuration& configuration, bool& done):
+            DDEquivalenceChecker(qc1, qc2, configuration, done) {}
 
     protected:
         void initializeTask(TaskManager<qc::MatrixDD>& task) override;

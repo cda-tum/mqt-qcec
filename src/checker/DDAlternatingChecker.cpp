@@ -54,12 +54,14 @@ namespace ec {
     }
 
     void DDAlternatingChecker::execute() {
-        while (!taskManager1.finished() && !taskManager2.finished()) {
+        while (!taskManager1.finished() && !taskManager2.finished() && !done) {
             // skip over any SWAP operations
             taskManager1.applySwapOperations(functionality);
             taskManager2.applySwapOperations(functionality);
 
             if (!taskManager1.finished() && !taskManager2.finished()) {
+                if (done) return;
+
                 // whenever the current functionality resembles the identity, identical gates on both sides cancel
                 if (functionality.p->ident && gatesAreIdentical()) {
                     taskManager1.advanceIterator();
@@ -71,7 +73,9 @@ namespace ec {
                 const auto [apply1, apply2] = (*applicationScheme)();
 
                 // advance both tasks correspondingly
+                if (done) return;
                 taskManager1.advance(functionality, apply1);
+                if (done) return;
                 taskManager2.advance(functionality, apply2);
             }
         }
@@ -79,21 +83,28 @@ namespace ec {
 
     void DDAlternatingChecker::finish() {
         taskManager1.finish(functionality);
+        if (done) return;
         taskManager2.finish(functionality);
     }
 
     void DDAlternatingChecker::postprocess() {
         // ensure that the permutations that were tracked throughout the circuit match the expected output permutations
         taskManager1.changePermutation(functionality);
+        if (done) return;
         taskManager2.changePermutation(functionality);
+        if (done) return;
 
         // sum up the contributions of garbage qubits
         taskManager1.reduceGarbage(functionality);
+        if (done) return;
         taskManager2.reduceGarbage(functionality);
+        if (done) return;
 
         // TODO: check whether reducing ancillaries here is theoretically sound
         taskManager1.reduceAncillae(functionality);
+        if (done) return;
         taskManager2.reduceAncillae(functionality);
+        if (done) return;
     }
 
     EquivalenceCriterion DDAlternatingChecker::checkEquivalence() {

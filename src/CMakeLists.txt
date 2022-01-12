@@ -9,7 +9,7 @@ add_library(${PROJECT_NAME}
 
             ${CMAKE_CURRENT_SOURCE_DIR}/EquivalenceCheckingManager.cpp
 
-            ${CMAKE_CURRENT_SOURCE_DIR}/checker/EquivalenceChecker.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/checker/DDEquivalenceChecker.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/checker/DDConstructionChecker.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/checker/DDSimulationChecker.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/checker/DDAlternatingChecker.cpp

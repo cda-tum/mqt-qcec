@@ -3,20 +3,16 @@
 * See file README.md or go to http://iic.jku.at/eda/research/quantum_verification/ for more information.
 */
 
-#include "checker/EquivalenceChecker.hpp"
-
-#include <utility>
+#include "checker/DDEquivalenceChecker.hpp"
 
 namespace ec {
 
     template<class DDType>
-    EquivalenceChecker<DDType>::EquivalenceChecker(const qc::QuantumComputation& qc1, const qc::QuantumComputation& qc2, Configuration configuration):
-        qc1(qc1), qc2(qc2),
-        nqubits(std::max(qc1.getNqubits(), qc2.getNqubits())),
+    DDEquivalenceChecker<DDType>::DDEquivalenceChecker(const qc::QuantumComputation& qc1, const qc::QuantumComputation& qc2, Configuration configuration, bool& done):
+        EquivalenceChecker(qc1, qc2, configuration, done),
         dd(std::make_unique<dd::Package>(nqubits)),
         taskManager1(TaskManager<DDType>(qc1, dd)),
-        taskManager2(TaskManager<DDType>(qc1, dd)),
-        configuration(std::move(configuration)) {
+        taskManager2(TaskManager<DDType>(qc1, dd)) {
         switch (this->configuration.application.scheme) {
             case ApplicationSchemeType::OneToOne:
                 applicationScheme = std::make_unique<OneToOneApplicationScheme<DDType>>(taskManager1, taskManager2);
@@ -42,7 +38,7 @@ namespace ec {
     }
 
     template<class DDType>
-    EquivalenceCriterion EquivalenceChecker<DDType>::equals(const DDType& e, const DDType& f) {
+    EquivalenceCriterion DDEquivalenceChecker<DDType>::equals(const DDType& e, const DDType& f) {
         // both node pointers being equivalent is the strongest indication that the two decision diagrams are equivalent
         if (e.p == f.p) {
             // whenever the top edge weights differ, both decision diagrams are only equivalent up to a global phase
@@ -96,23 +92,35 @@ namespace ec {
     }
 
     template<class DDType>
-    EquivalenceCriterion EquivalenceChecker<DDType>::run() {
+    EquivalenceCriterion DDEquivalenceChecker<DDType>::run() {
         const auto start = std::chrono::steady_clock::now();
 
         // initialize the internal representation (initial state, initial matrix, etc.)
         initialize();
 
+        if (done)
+            return equivalence;
+
         // execute the equivalence checking scheme
         execute();
+
+        if (done)
+            return equivalence;
 
         // finish off both circuits
         finish();
 
+        if (done)
+            return equivalence;
+
         // postprocess the result
         postprocess();
 
+        if (done)
+            return equivalence;
+
         // check the equivalence
-        const auto equivalence = checkEquivalence();
+        equivalence = checkEquivalence();
 
         // determine maximum number of nodes used
         if constexpr (std::is_same_v<DDType, qc::MatrixDD>) {
@@ -122,20 +130,20 @@ namespace ec {
         }
 
         const auto end = std::chrono::steady_clock::now();
-        runtime        = std::chrono::duration<double>(end - start).count();
+        runtime += std::chrono::duration<double>(end - start).count();
 
         return equivalence;
     }
 
     template<class DDType>
-    void EquivalenceChecker<DDType>::initialize() {
+    void DDEquivalenceChecker<DDType>::initialize() {
         initializeTask(taskManager1);
         initializeTask(taskManager2);
     }
 
     template<class DDType>
-    void EquivalenceChecker<DDType>::execute() {
-        while (!taskManager1.finished() && !taskManager2.finished()) {
+    void DDEquivalenceChecker<DDType>::execute() {
+        while (!taskManager1.finished() && !taskManager2.finished() && !done) {
             // skip over any SWAP operations
             taskManager1.applySwapOperations();
             taskManager2.applySwapOperations();
@@ -145,41 +153,45 @@ namespace ec {
                 const auto [apply1, apply2] = (*applicationScheme)();
 
                 // advance both tasks correspondingly
+                if (done) return;
                 taskManager1.advance(apply1);
+                if (done) return;
                 taskManager2.advance(apply2);
             }
         }
     }
 
     template<class DDType>
-    void EquivalenceChecker<DDType>::finish() {
+    void DDEquivalenceChecker<DDType>::finish() {
         taskManager1.finish();
+        if (done) return;
         taskManager2.finish();
     }
 
     template<class DDType>
-    void EquivalenceChecker<DDType>::postprocessTask(TaskManager<DDType>& task) {
+    void DDEquivalenceChecker<DDType>::postprocessTask(TaskManager<DDType>& task) {
         // ensure that the permutation that was tracked throughout the circuit matches the expected output permutation
         task.changePermutation();
-
+        if (done) return;
         // eliminate the superfluous contributions of ancillary qubits (this only has an effect on matrices)
         task.reduceAncillae();
-
+        if (done) return;
         // sum up the contributions of garbage qubits
         task.reduceGarbage();
     }
 
     template<class DDType>
-    void EquivalenceChecker<DDType>::postprocess() {
+    void DDEquivalenceChecker<DDType>::postprocess() {
         postprocessTask(taskManager1);
+        if (done) return;
         postprocessTask(taskManager2);
     }
 
     template<class DDType>
-    EquivalenceCriterion EquivalenceChecker<DDType>::checkEquivalence() {
+    EquivalenceCriterion DDEquivalenceChecker<DDType>::checkEquivalence() {
         return equals(taskManager1.getInternalState(), taskManager2.getInternalState());
     }
 
-    template class EquivalenceChecker<qc::VectorDD>;
-    template class EquivalenceChecker<qc::MatrixDD>;
+    template class DDEquivalenceChecker<qc::VectorDD>;
+    template class DDEquivalenceChecker<qc::MatrixDD>;
 } // namespace ec

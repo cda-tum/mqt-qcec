@@ -7,13 +7,13 @@
 #define QCEC_DDALTERNATINGCHECKER_HPP
 
 #include "applicationscheme/LookaheadApplicationScheme.hpp"
-#include "checker/EquivalenceChecker.hpp"
+#include "checker/DDEquivalenceChecker.hpp"
 
 namespace ec {
-    class DDAlternatingChecker: public EquivalenceChecker<qc::MatrixDD> {
+    class DDAlternatingChecker: public DDEquivalenceChecker<qc::MatrixDD> {
     public:
-        DDAlternatingChecker(const qc::QuantumComputation& qc1, const qc::QuantumComputation& qc2, const ec::Configuration& configuration):
-            EquivalenceChecker(qc1, qc2, configuration) {
+        DDAlternatingChecker(const qc::QuantumComputation& qc1, const qc::QuantumComputation& qc2, const ec::Configuration& configuration, bool& done):
+            DDEquivalenceChecker(qc1, qc2, configuration, done) {
             // gates from the second circuit shall be applied "from the right"
             taskManager2.flipDirection();
 

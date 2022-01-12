@@ -12,8 +12,11 @@
 #include "nlohmann/json.hpp"
 #include "simulation/StateGenerator.hpp"
 
+#include <chrono>
 #include <functional>
 #include <thread>
+
+using namespace std::chrono_literals;
 
 namespace ec {
     struct Configuration {
@@ -21,8 +24,9 @@ namespace ec {
         struct Execution {
             dd::fp numericalTolerance = dd::ComplexTable<>::tolerance();
 
-            bool        parallel = true;
-            std::size_t nthreads = std::max(1U, std::thread::hardware_concurrency());
+            bool                 parallel = true;
+            std::size_t          nthreads = std::max(2U, std::thread::hardware_concurrency());
+            std::chrono::seconds timeout  = 0s;
 
             bool runConstructionScheme = false;
             bool runSimulationScheme   = true;
@@ -78,6 +82,8 @@ namespace ec {
             exe["run_construction_scheme"] = execution.runConstructionScheme;
             exe["run_simulation_scheme"]   = execution.runSimulationScheme;
             exe["run_alternating_scheme"]  = execution.runAlternatingScheme;
+            if (execution.timeout > 0s)
+                exe["timeout"] = execution.timeout.count();
 
             auto& opt                                   = config["optimizations"];
             opt["fix_output_permutation_mismatch"]      = optimizations.fixOutputPermutationMismatch;
