@@ -8,7 +8,6 @@
 
 #include "CircuitOptimizer.hpp"
 #include "Configuration.hpp"
-#include "EquivalenceCheckingResults.hpp"
 #include "EquivalenceCriterion.hpp"
 #include "QuantumComputation.hpp"
 #include "TaskManager.hpp"

@@ -18,9 +18,6 @@ add_library(${PROJECT_NAME}
             ${CMAKE_CURRENT_SOURCE_DIR}/applicationscheme/ProportionalApplicationScheme.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/applicationscheme/GateCostApplicationScheme.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/applicationscheme/LookaheadApplicationScheme.cpp
-
-            ${${PROJECT_NAME}_SOURCE_DIR}/include/EquivalenceCheckingResults.hpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/EquivalenceCheckingResults.cpp
             )
 # set include directories
 target_include_directories(${PROJECT_NAME} PUBLIC $<BUILD_INTERFACE:${${PROJECT_NAME}_SOURCE_DIR}/include>)
