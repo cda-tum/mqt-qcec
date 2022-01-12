@@ -174,11 +174,18 @@ namespace ec {
         qc::CircuitOptimizer::removeFinalMeasurements(qc2);
     }
 
-    EquivalenceCriterion EquivalenceCheckingManager::check() {
+    EquivalenceCriterion EquivalenceCheckingManager::run() {
         const auto start = std::chrono::steady_clock::now();
 
+        done             = false;
         auto equivalence = EquivalenceCriterion::NoInformation;
-        if (!configuration.execution.parallel || configuration.execution.nthreads <= 1) {
+
+        if (!configuration.anythingToExecute()) {
+            std::clog << "Nothing to be executed. Check your configuration!" << std::endl;
+            return equivalence;
+        }
+
+        if (!configuration.execution.parallel || configuration.execution.nthreads <= 1 || configuration.onlySingleTask()) {
             equivalence = checkSequential();
         } else {
             equivalence = checkParallel();
@@ -239,15 +246,32 @@ namespace ec {
     EquivalenceCriterion EquivalenceCheckingManager::checkSequential() {
         auto equivalence = EquivalenceCriterion::NoInformation;
 
+        // in case a timeout is configured, a separate thread is started that sets the `done` flag after the timeout has passed
+        if (configuration.execution.timeout > 0s) {
+            auto timeoutThread = std::thread([&, timeout = configuration.execution.timeout] {
+                std::this_thread::sleep_for(timeout);
+                done = true;
+            });
+            timeoutThread.detach();
+        }
+
         if (configuration.execution.runSimulationScheme) {
-            DDSimulationChecker simulationChecker(qc1, qc2, configuration);
-            while (performedSimulations < configuration.simulation.maxSims) {
+            DDSimulationChecker simulationChecker(qc1, qc2, configuration, done);
+            while (startedSimulations < configuration.simulation.maxSims && !done) {
                 // configure simulation based checker
                 simulationChecker.setRandomInitialState(stateGenerator);
 
                 // run the simulation
+                ++startedSimulations;
                 const auto result = simulationChecker.run();
-                ++performedSimulations;
+
+                // if the run completed but has not yielded any information this indicates a timeout
+                if (result == EquivalenceCriterion::NoInformation) {
+                    if (!done) {
+                        std::clog << "Simulation run returned without any information. Something probably went wrong. Exiting!" << std::endl;
+                    }
+                    return equivalence;
+                }
 
                 // break if non-equivalence has been shown
                 if (result == EquivalenceCriterion::NotEquivalent) {
@@ -273,7 +297,7 @@ namespace ec {
         }
 
         if (configuration.execution.runAlternatingScheme) {
-            DDAlternatingChecker alternatingChecker(qc1, qc2, configuration);
+            DDAlternatingChecker alternatingChecker(qc1, qc2, configuration, done);
             const auto           result = alternatingChecker.run();
 
             // if the alternating check produces a result, this is final
@@ -283,7 +307,7 @@ namespace ec {
         }
 
         if (configuration.execution.runConstructionScheme) {
-            DDConstructionChecker constructionChecker(qc1, qc2, configuration);
+            DDConstructionChecker constructionChecker(qc1, qc2, configuration, done);
             const auto            result = constructionChecker.run();
 
             // if the construction check produces a result, this is final
@@ -296,8 +320,149 @@ namespace ec {
     }
 
     EquivalenceCriterion EquivalenceCheckingManager::checkParallel() {
-        /// TODO: orchestrate the parallel check
+        auto equivalence = EquivalenceCriterion::NoInformation;
 
-        return EquivalenceCriterion::NoInformation;
+        std::chrono::steady_clock::time_point deadline{};
+        if (configuration.execution.timeout > 0s) {
+            deadline = std::chrono::steady_clock::now() + configuration.execution.timeout;
+        }
+
+        const auto maxThreads      = configuration.execution.nthreads;
+        const auto runAlternating  = configuration.execution.runAlternatingScheme;
+        const auto runConstruction = configuration.execution.runConstructionScheme;
+        const auto runSimulation   = configuration.execution.runSimulationScheme && configuration.simulation.maxSims > 0;
+
+        const std::size_t tasksToExecute = configuration.simulation.maxSims +
+                                           (runAlternating ? 1U : 0U) +
+                                           (runConstruction ? 1U : 0U);
+
+        const auto effectiveThreads = std::min(maxThreads, tasksToExecute);
+
+        // reserve space for as many equivalence checkers as there will be parallel threads
+        checkers.resize(effectiveThreads);
+
+        // create a thread safe queue which is used to check for available results
+        ThreadSafeQueue<std::size_t> queue{};
+        std::size_t                  id = 0U;
+
+        // reserve space for the threads
+        std::vector<std::thread> threads{};
+        threads.reserve(effectiveThreads);
+
+        if (runAlternating) {
+            // start a new thread that constructs and runs the alternating check
+            threads.emplace_back([&, id] {
+                checkers[id] = std::make_unique<DDAlternatingChecker>(qc1, qc2, configuration, done);
+                checkers[id]->run();
+                queue.push(id);
+            });
+            ++id;
+        }
+
+        if (runConstruction) {
+            // start a new thread that constructs and runs the construction check
+            threads.emplace_back([&, id] {
+                checkers[id] = std::make_unique<DDConstructionChecker>(qc1, qc2, configuration, done);
+                checkers[id]->run();
+                queue.push(id);
+            });
+            ++id;
+        }
+
+        if (runSimulation) {
+            const auto effectiveThreadsLeft = effectiveThreads - threads.size();
+            // launch as many simulations as possible
+            for (std::size_t i = 0; i < effectiveThreadsLeft; ++i) {
+                threads.emplace_back([&, id] {
+                    checkers[id] = std::make_unique<DDSimulationChecker>(qc1, qc2, configuration, done);
+                    {
+                        auto*           checker = dynamic_cast<DDSimulationChecker*>(checkers[id].get());
+                        std::lock_guard stateGeneratorLock(stateGeneratorMutex);
+                        checker->setRandomInitialState(stateGenerator);
+                    }
+                    checkers[id]->run();
+                    queue.push(id);
+                });
+                ++id;
+                ++startedSimulations;
+            }
+        }
+
+        // wait in a loop while no definitive result has been obtained
+        while (!done) {
+            std::shared_ptr<std::size_t> completedID{};
+            if (configuration.execution.timeout > 0s) {
+                completedID = queue.waitAndPopUntil(deadline);
+            } else {
+                completedID = queue.waitAndPop();
+            }
+
+            // in case no completed ID has been returned this indicates a timeout and the computation should stop
+            if (!completedID) {
+                done = true;
+                break;
+            }
+
+            // otherwise, a checker has finished its execution
+            // join the respective thread (which should return immediately)
+            threads.at(*completedID).join();
+
+            // in case non-equivalence has been shown, the execution can be stopped
+            auto*      checker = checkers.at(*completedID).get();
+            const auto result  = checker->getEquivalence();
+            if (result == EquivalenceCriterion::NoInformation) {
+                std::clog << "Finished equivalence check provides no information. Something probably went wrong. Exiting." << std::endl;
+                break;
+            }
+
+            if (result == EquivalenceCriterion::NotEquivalent) {
+                done        = true;
+                equivalence = result;
+                break;
+            }
+
+            // the alternating and the construction checker provide definitive answers once they finish
+            if (dynamic_cast<DDAlternatingChecker*>(checker) || dynamic_cast<DDConstructionChecker*>(checker)) {
+                done        = true;
+                equivalence = result;
+                break;
+            }
+
+            // at this point, the only option is that this is a simulation checker
+            if (auto* simChecker = dynamic_cast<DDSimulationChecker*>(checker)) {
+                // if the simulation has not shown the non-equivalence, then both circuits are considered probably equivalent
+                equivalence = EquivalenceCriterion::ProbablyEquivalent;
+
+                // it has to be checked, whether further simulations shall be conducted
+                if (startedSimulations < configuration.simulation.maxSims) {
+                    threads[*completedID] = std::thread([&, id = *completedID] {
+                        {
+                            std::lock_guard stateGeneratorLock(stateGeneratorMutex);
+                            simChecker->setRandomInitialState(stateGenerator);
+                        }
+                        simChecker->run();
+                        queue.push(id);
+                    });
+                    ++startedSimulations;
+                } else {
+                    // in case only simulations are performed and every single one is done, everything is done
+                    if (!runAlternating && !runConstruction) {
+                        done = true;
+                        break;
+                    }
+                }
+            }
+        }
+
+        // cleanup threads that are still running by simply detaching them.
+        // at the moment this seems like the only way to prematurely return once a result has been determined (without waiting for all other tasks to complete)
+        // unfortunately, this may leak some resources
+        for (auto& thread: threads) {
+            if (thread.joinable()) {
+                thread.detach();
+            }
+        }
+
+        return equivalence;
     }
 } // namespace ec

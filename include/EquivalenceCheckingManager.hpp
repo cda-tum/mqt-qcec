@@ -10,6 +10,7 @@
 #include "Configuration.hpp"
 #include "EquivalenceCriterion.hpp"
 #include "QuantumComputation.hpp"
+#include "ThreadSafeQueue.hpp"
 #include "checker/DDAlternatingChecker.hpp"
 #include "checker/DDConstructionChecker.hpp"
 #include "checker/DDSimulationChecker.hpp"
@@ -17,6 +18,10 @@
 
 #include <chrono>
 #include <thread>
+#include <mutex>
+#include <atomic>
+#include <memory>
+#include <vector>
 
 namespace ec {
 
@@ -26,7 +31,7 @@ namespace ec {
 
         static void setTolerance(dd::fp tol) { dd::ComplexTable<>::setTolerance(tol); }
 
-        EquivalenceCriterion check();
+        EquivalenceCriterion run();
 
     protected:
         qc::QuantumComputation qc1{};
@@ -35,11 +40,15 @@ namespace ec {
         Configuration configuration{};
 
         StateGenerator stateGenerator;
+        std::mutex     stateGeneratorMutex{};
+
+        bool                                             done{false};
+        std::vector<std::unique_ptr<EquivalenceChecker>> checkers{};
 
         double preprocessingTime{};
         double checkTime{};
 
-        std::size_t performedSimulations = 0U;
+        std::size_t startedSimulations = 0U;
         dd::CVec    cexInput{};
         dd::CVec    cexOutput1{};
         dd::CVec    cexOutput2{};

@@ -60,7 +60,7 @@ namespace ec {
         // configuration options for the simulation scheme
         struct Simulation {
             double      fidelityThreshold = 1e-8;
-            std::size_t maxSims           = 16;
+            std::size_t maxSims           = std::max(16U, std::thread::hardware_concurrency() - 2);
             StateType   stateType         = StateType::ComputationalBasis;
             std::size_t seed              = 0U;
             bool        storeCEXinput     = false;
@@ -72,6 +72,23 @@ namespace ec {
         Application   application{};
         Functionality functionality{};
         Simulation    simulation{};
+
+        [[nodiscard]] bool anythingToExecute() const {
+            return (execution.runSimulationScheme && simulation.maxSims > 0) || execution.runAlternatingScheme || execution.runConstructionScheme;
+        }
+
+        [[nodiscard]] bool onlySingleTask() const {
+            // only a single simulation shall be performed
+            if (execution.runSimulationScheme && simulation.maxSims == 1 && !execution.runAlternatingScheme && !execution.runConstructionScheme)
+                return true;
+
+            // no simulations and only one of the other checks shall be performed
+            if (!execution.runSimulationScheme && (execution.runAlternatingScheme ^ execution.runConstructionScheme)) {
+                return true;
+            }
+
+            return false;
+        }
 
         [[nodiscard]] nlohmann::json json() const {
             nlohmann::json config{};
