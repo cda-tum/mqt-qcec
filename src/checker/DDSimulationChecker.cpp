@@ -30,7 +30,7 @@ namespace ec {
     }
 
     void DDSimulationChecker::setRandomInitialState(StateGenerator& generator) {
-        const auto nancillary = nqubits = qc1.getNqubitsWithoutAncillae();
+        const auto nancillary = nqubits - qc1.getNqubitsWithoutAncillae();
         initialState                    = generator.generateRandomState(dd, nqubits, nancillary, configuration.simulation.stateType);
     }
 
