@@ -174,25 +174,24 @@ namespace ec {
         qc::CircuitOptimizer::removeFinalMeasurements(qc2);
     }
 
-    EquivalenceCriterion EquivalenceCheckingManager::run() {
+    void EquivalenceCheckingManager::run() {
         const auto start = std::chrono::steady_clock::now();
 
-        done             = false;
-        auto equivalence = EquivalenceCriterion::NoInformation;
+        done        = false;
+        equivalence = EquivalenceCriterion::NoInformation;
 
         if (!configuration.anythingToExecute()) {
             std::clog << "Nothing to be executed. Check your configuration!" << std::endl;
-            return equivalence;
+            return;
         }
 
         if (!configuration.execution.parallel || configuration.execution.nthreads <= 1 || configuration.onlySingleTask()) {
-            equivalence = checkSequential();
+            checkSequential();
         } else {
-            equivalence = checkParallel();
+            checkParallel();
         }
         const auto end = std::chrono::steady_clock::now();
         checkTime      = std::chrono::duration<double>(end - start).count();
-        return equivalence;
     }
 
     EquivalenceCheckingManager::EquivalenceCheckingManager(const qc::QuantumComputation& qc1, const qc::QuantumComputation& qc2, const Configuration& configuration):
@@ -243,9 +242,7 @@ namespace ec {
         preprocessingTime = std::chrono::duration<double>(end - start).count();
     }
 
-    EquivalenceCriterion EquivalenceCheckingManager::checkSequential() {
-        auto equivalence = EquivalenceCriterion::NoInformation;
-
+    void EquivalenceCheckingManager::checkSequential() {
         // in case a timeout is configured, a separate thread is started that sets the `done` flag after the timeout has passed
         if (configuration.execution.timeout > 0s) {
             auto timeoutThread = std::thread([&, timeout = configuration.execution.timeout] {
@@ -270,7 +267,7 @@ namespace ec {
                     if (!done) {
                         std::clog << "Simulation run returned without any information. Something probably went wrong. Exiting!" << std::endl;
                     }
-                    return equivalence;
+                    return;
                 }
 
                 // break if non-equivalence has been shown
@@ -292,7 +289,7 @@ namespace ec {
                     cexOutput1 = simulationChecker.getInternalVector1();
                     cexOutput2 = simulationChecker.getInternalVector2();
                 }
-                return equivalence;
+                return;
             }
         }
 
@@ -302,7 +299,8 @@ namespace ec {
 
             // if the alternating check produces a result, this is final
             if (result != EquivalenceCriterion::NoInformation) {
-                return result;
+                equivalence = result;
+                return;
             }
         }
 
@@ -312,16 +310,13 @@ namespace ec {
 
             // if the construction check produces a result, this is final
             if (result != EquivalenceCriterion::NoInformation) {
-                return result;
+                equivalence = result;
+                return;
             }
         }
-
-        return equivalence;
     }
 
-    EquivalenceCriterion EquivalenceCheckingManager::checkParallel() {
-        auto equivalence = EquivalenceCriterion::NoInformation;
-
+    void EquivalenceCheckingManager::checkParallel() {
         std::chrono::steady_clock::time_point deadline{};
         if (configuration.execution.timeout > 0s) {
             deadline = std::chrono::steady_clock::now() + configuration.execution.timeout;
@@ -462,7 +457,5 @@ namespace ec {
                 thread.detach();
             }
         }
-
-        return equivalence;
     }
 } // namespace ec

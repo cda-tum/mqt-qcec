@@ -31,7 +31,7 @@ namespace ec {
 
         static void setTolerance(dd::fp tol) { dd::ComplexTable<>::setTolerance(tol); }
 
-        EquivalenceCriterion run();
+        void run();
 
     protected:
         qc::QuantumComputation qc1{};
@@ -47,6 +47,8 @@ namespace ec {
 
         double preprocessingTime{};
         double checkTime{};
+
+        EquivalenceCriterion equivalence{};
 
         std::size_t startedSimulations = 0U;
         dd::CVec    cexInput{};
@@ -71,11 +73,11 @@ namespace ec {
         /// If any of those stimuli produce output states with a fidelity not close to 1, the non-equivalence has been shown and the check is finished.
         /// Given that a couple of simulations did not show any signs of non-equivalence, the circuits are probably equivalent.
         /// To assure this, the alternating decision diagram checker is invoked to determine the equivalence.
-        EquivalenceCriterion checkSequential();
+        void checkSequential();
 
         /// Parallel Equivalence Check
         /// The parallel flow makes use of the available processing power by orchestrating all configured checks in a parallel fashion
-        EquivalenceCriterion checkParallel();
+        void checkParallel();
     };
 } // namespace ec
 
