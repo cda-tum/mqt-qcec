@@ -31,6 +31,11 @@ namespace ec {
 
         EquivalenceCriterion run() override;
 
+        void json(nlohmann::json& j) const override {
+            EquivalenceChecker::json(j);
+            j["max_nodes"] = maxActiveNodes;
+        }
+
     protected:
         std::unique_ptr<dd::Package> dd;
 

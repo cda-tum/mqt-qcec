@@ -34,6 +34,11 @@ namespace ec {
             return runtime;
         }
 
+        virtual void json(nlohmann::json& j) const {
+            j["equivalence"] = toString(equivalence);
+            j["runtime"]     = runtime;
+        }
+
     protected:
         const qc::QuantumComputation& qc1;
         const qc::QuantumComputation& qc2;

@@ -25,6 +25,11 @@ namespace ec {
             }
         }
 
+        void json(nlohmann::json& j) const override {
+            DDEquivalenceChecker::json(j);
+            j["checker"] = "decision_diagram_alternating";
+        }
+
     protected:
         qc::MatrixDD functionality{};
 

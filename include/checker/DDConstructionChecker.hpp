@@ -14,6 +14,11 @@ namespace ec {
         DDConstructionChecker(const qc::QuantumComputation& qc1, const qc::QuantumComputation& qc2, const ec::Configuration& configuration, bool& done):
             DDEquivalenceChecker(qc1, qc2, configuration, done) {}
 
+        void json(nlohmann::json& j) const override {
+            DDEquivalenceChecker::json(j);
+            j["checker"] = "decision_diagram_construction";
+        }
+
     protected:
         void initializeTask(TaskManager<qc::MatrixDD>& task) override;
     };

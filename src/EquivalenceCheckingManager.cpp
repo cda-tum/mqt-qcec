@@ -177,8 +177,8 @@ namespace ec {
     void EquivalenceCheckingManager::run() {
         const auto start = std::chrono::steady_clock::now();
 
-        done        = false;
-        equivalence = EquivalenceCriterion::NoInformation;
+        done                = false;
+        results.equivalence = EquivalenceCriterion::NoInformation;
 
         if (!configuration.anythingToExecute()) {
             std::clog << "Nothing to be executed. Check your configuration!" << std::endl;
@@ -191,7 +191,7 @@ namespace ec {
             checkParallel();
         }
         const auto end = std::chrono::steady_clock::now();
-        checkTime      = std::chrono::duration<double>(end - start).count();
+        results.checkTime = std::chrono::duration<double>(end - start).count();
     }
 
     EquivalenceCheckingManager::EquivalenceCheckingManager(const qc::QuantumComputation& qc1, const qc::QuantumComputation& qc2, const Configuration& configuration):
@@ -239,7 +239,7 @@ namespace ec {
         }
 
         const auto end    = std::chrono::steady_clock::now();
-        preprocessingTime = std::chrono::duration<double>(end - start).count();
+        results.preprocessingTime = std::chrono::duration<double>(end - start).count();
     }
 
     void EquivalenceCheckingManager::checkSequential() {
@@ -254,13 +254,14 @@ namespace ec {
 
         if (configuration.execution.runSimulationScheme) {
             DDSimulationChecker simulationChecker(qc1, qc2, configuration, done);
-            while (startedSimulations < configuration.simulation.maxSims && !done) {
+            while (results.startedSimulations < configuration.simulation.maxSims && !done) {
                 // configure simulation based checker
                 simulationChecker.setRandomInitialState(stateGenerator);
 
                 // run the simulation
-                ++startedSimulations;
+                ++results.startedSimulations;
                 const auto result = simulationChecker.run();
+                ++results.performedSimulations;
 
                 // if the run completed but has not yielded any information this indicates a timeout
                 if (result == EquivalenceCriterion::NoInformation) {
@@ -272,22 +273,22 @@ namespace ec {
 
                 // break if non-equivalence has been shown
                 if (result == EquivalenceCriterion::NotEquivalent) {
-                    equivalence = EquivalenceCriterion::NotEquivalent;
+                    results.equivalence = EquivalenceCriterion::NotEquivalent;
                     break;
                 }
 
                 // Otherwise, circuits are probably equivalent and execution can continue
-                equivalence = EquivalenceCriterion::ProbablyEquivalent;
+                results.equivalence = EquivalenceCriterion::ProbablyEquivalent;
             }
 
             // Circuits have been shown to be non-equivalent
-            if (equivalence == EquivalenceCriterion::NotEquivalent) {
+            if (results.equivalence == EquivalenceCriterion::NotEquivalent) {
                 if (configuration.simulation.storeCEXinput) {
-                    cexInput = simulationChecker.getInitialVector();
+                    results.cexInput = simulationChecker.getInitialVector();
                 }
                 if (configuration.simulation.storeCEXoutput) {
-                    cexOutput1 = simulationChecker.getInternalVector1();
-                    cexOutput2 = simulationChecker.getInternalVector2();
+                    results.cexOutput1 = simulationChecker.getInternalVector1();
+                    results.cexOutput2 = simulationChecker.getInternalVector2();
                 }
                 return;
             }
@@ -299,7 +300,7 @@ namespace ec {
 
             // if the alternating check produces a result, this is final
             if (result != EquivalenceCriterion::NoInformation) {
-                equivalence = result;
+                results.equivalence = result;
                 return;
             }
         }
@@ -310,7 +311,7 @@ namespace ec {
 
             // if the construction check produces a result, this is final
             if (result != EquivalenceCriterion::NoInformation) {
-                equivalence = result;
+                results.equivalence = result;
                 return;
             }
         }
@@ -379,7 +380,7 @@ namespace ec {
                     queue.push(id);
                 });
                 ++id;
-                ++startedSimulations;
+                ++results.startedSimulations;
             }
         }
 
@@ -411,25 +412,26 @@ namespace ec {
             }
 
             if (result == EquivalenceCriterion::NotEquivalent) {
-                done        = true;
-                equivalence = result;
+                done                = true;
+                results.equivalence = result;
                 break;
             }
 
             // the alternating and the construction checker provide definitive answers once they finish
             if (dynamic_cast<DDAlternatingChecker*>(checker) || dynamic_cast<DDConstructionChecker*>(checker)) {
-                done        = true;
-                equivalence = result;
+                done                = true;
+                results.equivalence = result;
                 break;
             }
 
             // at this point, the only option is that this is a simulation checker
             if (auto* simChecker = dynamic_cast<DDSimulationChecker*>(checker)) {
                 // if the simulation has not shown the non-equivalence, then both circuits are considered probably equivalent
-                equivalence = EquivalenceCriterion::ProbablyEquivalent;
+                results.equivalence = EquivalenceCriterion::ProbablyEquivalent;
+                ++results.performedSimulations;
 
                 // it has to be checked, whether further simulations shall be conducted
-                if (startedSimulations < configuration.simulation.maxSims) {
+                if (results.startedSimulations < configuration.simulation.maxSims) {
                     threads[*completedID] = std::thread([&, id = *completedID] {
                         {
                             std::lock_guard stateGeneratorLock(stateGeneratorMutex);
@@ -438,7 +440,7 @@ namespace ec {
                         simChecker->run();
                         queue.push(id);
                     });
-                    ++startedSimulations;
+                    ++results.startedSimulations;
                 } else {
                     // in case only simulations are performed and every single one is done, everything is done
                     if (!runAlternating && !runConstruction) {
@@ -457,5 +459,52 @@ namespace ec {
                 thread.detach();
             }
         }
+    }
+
+    nlohmann::json EquivalenceCheckingManager::json() const {
+        nlohmann::json res{};
+
+        addCircuitDescription(qc1, res["circuit1"]);
+        addCircuitDescription(qc2, res["circuit2"]);
+        res["configuration"] = configuration.json();
+        res["results"]       = results.json();
+
+        if (!checkers.empty()) {
+            res["checkers"]     = nlohmann::json::array();
+            auto checkerResults = res["checkers"];
+            for (auto& checker: checkers) {
+                nlohmann::json j{};
+                checker->json(j);
+                checkerResults.push_back(j);
+            }
+        }
+        return res;
+    }
+    nlohmann::json EquivalenceCheckingManager::Results::json() const {
+        nlohmann::json res{};
+        res["preprocessing_time"] = preprocessingTime;
+        res["check_time"]         = checkTime;
+        res["equivalence"]        = toString(equivalence);
+
+        if (startedSimulations > 0) {
+            auto& sim        = res["simulations"];
+            sim["started"]   = startedSimulations;
+            sim["performed"] = performedSimulations;
+
+            if (!cexInput.empty() || !cexOutput1.empty() || !cexOutput2.empty()) {
+                auto& cex = sim["verification_cex"];
+                if (!cexInput.empty()) {
+                    to_json(cex["input"], cexInput);
+                }
+                if (!cexOutput1.empty()) {
+                    to_json(cex["output1"], cexOutput1);
+                }
+                if (!cexOutput2.empty()) {
+                    to_json(cex["output2"], cexOutput2);
+                }
+            }
+        }
+
+        return res;
     }
 } // namespace ec

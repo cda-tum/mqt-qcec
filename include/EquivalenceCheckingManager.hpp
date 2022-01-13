@@ -16,11 +16,11 @@
 #include "checker/DDSimulationChecker.hpp"
 #include "simulation/StateGenerator.hpp"
 
-#include <chrono>
-#include <thread>
-#include <mutex>
 #include <atomic>
+#include <chrono>
 #include <memory>
+#include <mutex>
+#include <thread>
 #include <vector>
 
 namespace ec {
@@ -32,6 +32,12 @@ namespace ec {
         static void setTolerance(dd::fp tol) { dd::ComplexTable<>::setTolerance(tol); }
 
         void run();
+
+        [[nodiscard]] nlohmann::json json() const;
+
+        [[nodiscard]] EquivalenceCriterion equivalence() const {
+            return results.equivalence;
+        }
 
     protected:
         qc::QuantumComputation qc1{};
@@ -45,15 +51,34 @@ namespace ec {
         bool                                             done{false};
         std::vector<std::unique_ptr<EquivalenceChecker>> checkers{};
 
-        double preprocessingTime{};
-        double checkTime{};
+        struct Results {
+            double preprocessingTime{};
+            double checkTime{};
 
-        EquivalenceCriterion equivalence{};
+            EquivalenceCriterion equivalence{};
 
-        std::size_t startedSimulations = 0U;
-        dd::CVec    cexInput{};
-        dd::CVec    cexOutput1{};
-        dd::CVec    cexOutput2{};
+            std::size_t startedSimulations   = 0U;
+            std::size_t performedSimulations = 0U;
+            dd::CVec    cexInput{};
+            dd::CVec    cexOutput1{};
+            dd::CVec    cexOutput2{};
+
+            [[nodiscard]] nlohmann::json json() const;
+
+            static void to_json(nlohmann::json& j, const dd::CVec& stateVector) {
+                j = nlohmann::json::array();
+                for (const auto& amp: stateVector) {
+                    j.emplace_back(std::pair{amp.real(), amp.imag()});
+                }
+            }
+            static void from_json(const nlohmann::json& j, dd::CVec& stateVector) {
+                for (std::size_t i = 0; i < j.size(); ++i) {
+                    const auto& c  = j.at(i).get<std::pair<dd::fp, dd::fp>>();
+                    stateVector[i] = std::complex<dd::fp>(c.first, c.second);
+                }
+            }
+        };
+        Results results;
 
         /// Given that one circuit has more qubits than the other, the difference is assumed to arise from ancillary qubits.
         /// This function changes the additional qubits in the larger circuit to ancillary qubits.
@@ -78,6 +103,12 @@ namespace ec {
         /// Parallel Equivalence Check
         /// The parallel flow makes use of the available processing power by orchestrating all configured checks in a parallel fashion
         void checkParallel();
+
+        static void addCircuitDescription(const qc::QuantumComputation& qc, nlohmann::json& j) {
+            j["name"]     = qc.getName();
+            j["n_qubits"] = qc.getNqubits();
+            j["n_gates"]  = qc.getNops();
+        }
     };
 } // namespace ec
 
