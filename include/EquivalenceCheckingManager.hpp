@@ -34,6 +34,7 @@ namespace ec {
         void run();
 
         [[nodiscard]] nlohmann::json json() const;
+        [[nodiscard]] std::string    toString() const { return json().dump(2); }
 
         [[nodiscard]] EquivalenceCriterion equivalence() const {
             return results.equivalence;
