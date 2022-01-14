@@ -26,31 +26,6 @@ namespace ec {
 
     class EquivalenceCheckingManager {
     public:
-        EquivalenceCheckingManager(const qc::QuantumComputation& qc1, const qc::QuantumComputation& qc2, const Configuration& configuration = Configuration{});
-
-        static void setTolerance(dd::fp tol) { dd::ComplexTable<>::setTolerance(tol); }
-
-        void run();
-
-        [[nodiscard]] nlohmann::json json() const;
-        [[nodiscard]] std::string    toString() const { return json().dump(2); }
-
-        [[nodiscard]] EquivalenceCriterion equivalence() const {
-            return results.equivalence;
-        }
-
-    protected:
-        qc::QuantumComputation qc1{};
-        qc::QuantumComputation qc2{};
-
-        Configuration configuration{};
-
-        StateGenerator stateGenerator;
-        std::mutex     stateGeneratorMutex{};
-
-        bool                                             done{false};
-        std::vector<std::unique_ptr<EquivalenceChecker>> checkers{};
-
         struct Results {
             double preprocessingTime{};
             double checkTime{};
@@ -62,6 +37,20 @@ namespace ec {
             dd::CVec    cexInput{};
             dd::CVec    cexOutput1{};
             dd::CVec    cexOutput2{};
+
+            [[nodiscard]] bool consideredEquivalent() const {
+                switch (equivalence) {
+                    case EquivalenceCriterion::Equivalent:
+                    case EquivalenceCriterion::ProbablyEquivalent:
+                    case EquivalenceCriterion::EquivalentUpToGlobalPhase:
+                    case EquivalenceCriterion::EquivalentUpToPhase:
+                        return true;
+                    case EquivalenceCriterion::NotEquivalent:
+                    case EquivalenceCriterion::NoInformation:
+                    default:
+                        return false;
+                }
+            }
 
             [[nodiscard]] nlohmann::json json() const;
 
@@ -78,6 +67,34 @@ namespace ec {
                 }
             }
         };
+
+        EquivalenceCheckingManager(const qc::QuantumComputation& qc1, const qc::QuantumComputation& qc2, const Configuration& configuration = Configuration{});
+
+        static void setTolerance(dd::fp tol) { dd::ComplexTable<>::setTolerance(tol); }
+
+        void run();
+
+        [[nodiscard]] nlohmann::json json() const;
+        [[nodiscard]] std::string    toString() const { return json().dump(2); }
+
+        [[nodiscard]] EquivalenceCriterion equivalence() const {
+            return results.equivalence;
+        }
+        [[nodiscard]] Configuration getConfiguration() const { return configuration; }
+        [[nodiscard]] Results       getResults() const { return results; }
+
+    protected:
+        qc::QuantumComputation qc1{};
+        qc::QuantumComputation qc2{};
+
+        Configuration configuration{};
+
+        StateGenerator stateGenerator;
+        std::mutex     stateGeneratorMutex{};
+
+        bool                                             done{false};
+        std::vector<std::unique_ptr<EquivalenceChecker>> checkers{};
+
         Results results;
 
         /// Given that one circuit has more qubits than the other, the difference is assumed to arise from ancillary qubits.

@@ -190,7 +190,7 @@ namespace ec {
         } else {
             checkParallel();
         }
-        const auto end = std::chrono::steady_clock::now();
+        const auto end    = std::chrono::steady_clock::now();
         results.checkTime = std::chrono::duration<double>(end - start).count();
     }
 
@@ -238,7 +238,7 @@ namespace ec {
             }
         }
 
-        const auto end    = std::chrono::steady_clock::now();
+        const auto end            = std::chrono::steady_clock::now();
         results.preprocessingTime = std::chrono::duration<double>(end - start).count();
     }
 
@@ -253,14 +253,15 @@ namespace ec {
         }
 
         if (configuration.execution.runSimulationScheme) {
-            DDSimulationChecker simulationChecker(qc1, qc2, configuration, done);
+            checkers.emplace_back(std::make_unique<DDSimulationChecker>(qc1, qc2, configuration, done));
+            auto* simulationChecker = dynamic_cast<DDSimulationChecker*>(checkers.back().get());
             while (results.startedSimulations < configuration.simulation.maxSims && !done) {
                 // configure simulation based checker
-                simulationChecker.setRandomInitialState(stateGenerator);
+                simulationChecker->setRandomInitialState(stateGenerator);
 
                 // run the simulation
                 ++results.startedSimulations;
-                const auto result = simulationChecker.run();
+                const auto result = simulationChecker->run();
                 ++results.performedSimulations;
 
                 // if the run completed but has not yielded any information this indicates a timeout
@@ -284,19 +285,20 @@ namespace ec {
             // Circuits have been shown to be non-equivalent
             if (results.equivalence == EquivalenceCriterion::NotEquivalent) {
                 if (configuration.simulation.storeCEXinput) {
-                    results.cexInput = simulationChecker.getInitialVector();
+                    results.cexInput = simulationChecker->getInitialVector();
                 }
                 if (configuration.simulation.storeCEXoutput) {
-                    results.cexOutput1 = simulationChecker.getInternalVector1();
-                    results.cexOutput2 = simulationChecker.getInternalVector2();
+                    results.cexOutput1 = simulationChecker->getInternalVector1();
+                    results.cexOutput2 = simulationChecker->getInternalVector2();
                 }
                 return;
             }
         }
 
         if (configuration.execution.runAlternatingScheme) {
-            DDAlternatingChecker alternatingChecker(qc1, qc2, configuration, done);
-            const auto           result = alternatingChecker.run();
+            checkers.emplace_back(std::make_unique<DDAlternatingChecker>(qc1, qc2, configuration, done));
+            auto&      alternatingChecker = checkers.back();
+            const auto result             = alternatingChecker->run();
 
             // if the alternating check produces a result, this is final
             if (result != EquivalenceCriterion::NoInformation) {
@@ -306,8 +308,9 @@ namespace ec {
         }
 
         if (configuration.execution.runConstructionScheme) {
-            DDConstructionChecker constructionChecker(qc1, qc2, configuration, done);
-            const auto            result = constructionChecker.run();
+            checkers.emplace_back(std::make_unique<DDConstructionChecker>(qc1, qc2, configuration, done));
+            auto&      constructionChecker = checkers.back();
+            const auto result              = constructionChecker->run();
 
             // if the construction check produces a result, this is final
             if (result != EquivalenceCriterion::NoInformation) {
@@ -471,7 +474,7 @@ namespace ec {
 
         if (!checkers.empty()) {
             res["checkers"]     = nlohmann::json::array();
-            auto checkerResults = res["checkers"];
+            auto& checkerResults = res["checkers"];
             for (auto& checker: checkers) {
                 nlohmann::json j{};
                 checker->json(j);
@@ -484,7 +487,7 @@ namespace ec {
         nlohmann::json res{};
         res["preprocessing_time"] = preprocessingTime;
         res["check_time"]         = checkTime;
-        res["equivalence"]        = toString(equivalence);
+        res["equivalence"]        = ec::toString(equivalence);
 
         if (startedSimulations > 0) {
             auto& sim        = res["simulations"];
