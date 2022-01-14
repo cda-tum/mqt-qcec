@@ -13,6 +13,7 @@
 namespace ec {
     // A list of application schemes that implement the below interface
     enum class ApplicationSchemeType {
+        Sequential,
         OneToOne,
         Proportional,
         GateCost,
@@ -21,6 +22,8 @@ namespace ec {
 
     inline std::string toString(const ApplicationSchemeType& applicationScheme) {
         switch (applicationScheme) {
+            case ApplicationSchemeType::Sequential:
+                return "sequential";
             case ApplicationSchemeType::OneToOne:
                 return "one_to_one";
             case ApplicationSchemeType::Proportional:
@@ -34,13 +37,15 @@ namespace ec {
     }
 
     inline ApplicationSchemeType applicationSchemeFromString(const std::string& applicationScheme) {
-        if (applicationScheme == "one_to_one" || applicationScheme == "0") {
+        if (applicationScheme == "sequential" || applicationScheme == "0") {
+            return ApplicationSchemeType::Sequential;
+        } else if (applicationScheme == "one_to_one" || applicationScheme == "1") {
             return ApplicationSchemeType::OneToOne;
-        } else if (applicationScheme == "proportional" || applicationScheme == "1") {
+        } else if (applicationScheme == "proportional" || applicationScheme == "2") {
             return ApplicationSchemeType::Proportional;
-        } else if (applicationScheme == "gate_cost" || applicationScheme == "2") {
+        } else if (applicationScheme == "gate_cost" || applicationScheme == "3") {
             return ApplicationSchemeType::GateCost;
-        } else if (applicationScheme == "lookahead" || applicationScheme == "3") {
+        } else if (applicationScheme == "lookahead" || applicationScheme == "4") {
             return ApplicationSchemeType::Lookahead;
         } else {
             throw std::runtime_error("Unknown application scheme: " + applicationScheme);

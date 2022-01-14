@@ -16,6 +16,7 @@
 #include "applicationscheme/LookaheadApplicationScheme.hpp"
 #include "applicationscheme/OneToOneApplicationScheme.hpp"
 #include "applicationscheme/ProportionalApplicationScheme.hpp"
+#include "applicationscheme/SequentialApplicationScheme.hpp"
 
 #include <chrono>
 #include <map>
