@@ -55,14 +55,14 @@ namespace ec {
         }
     }
 
-    std::istream& operator>>(std::istream& in, EquivalenceCriterion& criterion) {
+    inline std::istream& operator>>(std::istream& in, EquivalenceCriterion& criterion) {
         std::string token;
         in >> token;
         criterion = fromString(token);
         return in;
     }
 
-    std::ostream& operator<<(std::ostream& out, EquivalenceCriterion& criterion) {
+    inline std::ostream& operator<<(std::ostream& out, EquivalenceCriterion& criterion) {
         out << toString(criterion);
         return out;
     }

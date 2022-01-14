@@ -15,7 +15,7 @@ namespace ec {
         Stabilizer
     };
 
-    std::string toString(const StateType& type) {
+    inline std::string toString(const StateType& type) {
         switch (type) {
             case StateType::ComputationalBasis:
                 return "computational_basis";
@@ -27,7 +27,7 @@ namespace ec {
         return " ";
     }
 
-    StateType stimuliTypeFromString(const std::string& type) {
+    inline StateType stateTypeFromString(const std::string& type) {
         if (type == "computational_basis" || type == "0") {
             return StateType::ComputationalBasis;
         } else if (type == "random_1Q_basis" || type == "1") {
@@ -39,14 +39,14 @@ namespace ec {
         }
     }
 
-    std::istream& operator>>(std::istream& in, StateType& type) {
+    inline std::istream& operator>>(std::istream& in, StateType& type) {
         std::string token;
         in >> token;
-        type = stimuliTypeFromString(token);
+        type = stateTypeFromString(token);
         return in;
     }
 
-    std::ostream& operator<<(std::ostream& out, StateType& type) {
+    inline std::ostream& operator<<(std::ostream& out, StateType& type) {
         out << toString(type);
         return out;
     }

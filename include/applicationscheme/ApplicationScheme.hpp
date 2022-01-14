@@ -48,14 +48,14 @@ namespace ec {
         }
     }
 
-    std::istream& operator>>(std::istream& in, ApplicationSchemeType& applicationScheme) {
+    inline std::istream& operator>>(std::istream& in, ApplicationSchemeType& applicationScheme) {
         std::string token;
         in >> token;
         applicationScheme = applicationSchemeFromString(token);
         return in;
     }
 
-    std::ostream& operator<<(std::ostream& out, ApplicationSchemeType& applicationScheme) {
+    inline std::ostream& operator<<(std::ostream& out, ApplicationSchemeType& applicationScheme) {
         out << toString(applicationScheme);
         return out;
     }
