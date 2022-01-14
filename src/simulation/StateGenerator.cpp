@@ -18,12 +18,8 @@ namespace ec {
             mt.seed(seed);
         }
 
-        // this generator produces 64bit random numbers that can be interpreted as computational basis states
-        computationalBasisStateGenerator = [&]() { return mt(); };
-
         // this generator produces random bases from the set { |0>, |1>, |+>, |->, |L>, |R> }
-        random1QBasisDistribution = std::uniform_int_distribution<unsigned short>(0, 5);
-        random1QBasisGenerator    = [&]() { return random1QBasisDistribution(mt); };
+        random1QBasisDistribution = std::uniform_int_distribution<std::size_t>(0, 5);
     }
 
     qc::VectorDD StateGenerator::generateRandomState(std::unique_ptr<dd::Package>& dd, dd::QubitCount totalQubits, dd::QubitCount ancillaryQubits, StateType type) {
@@ -77,7 +73,7 @@ namespace ec {
         // choose a random basis state for each qubit
         auto randomBasisState = std::vector<dd::BasisStates>(totalQubits, dd::BasisStates::zero);
         for (dd::QubitCount i = 0; i < randomQubits; ++i) {
-            switch (random1QBasisGenerator()) {
+            switch (random1QBasisDistribution(mt)) {
                 case 0:
                     randomBasisState[i] = dd::BasisStates::zero;
                     break;

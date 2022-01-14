@@ -31,11 +31,8 @@ namespace ec {
         std::size_t     seed = 0U;
         std::mt19937_64 mt;
 
-        std::function<std::size_t()>    computationalBasisStateGenerator;
-        std::unordered_set<std::size_t> generatedComputationalBasisStates{};
-
-        std::function<unsigned short()>               random1QBasisGenerator;
-        std::uniform_int_distribution<unsigned short> random1QBasisDistribution;
+        std::unordered_set<std::size_t>            generatedComputationalBasisStates{};
+        std::uniform_int_distribution<std::size_t> random1QBasisDistribution;
     };
 } // namespace ec
 
