@@ -12,7 +12,7 @@ namespace ec {
         EquivalenceChecker(qc1, qc2, configuration, done),
         dd(std::make_unique<dd::Package>(nqubits)),
         taskManager1(TaskManager<DDType>(qc1, dd)),
-        taskManager2(TaskManager<DDType>(qc1, dd)) {
+        taskManager2(TaskManager<DDType>(qc2, dd)) {
         switch (this->configuration.application.scheme) {
             case ApplicationSchemeType::Sequential:
                 applicationScheme = std::make_unique<SequentialApplicationScheme<DDType>>(taskManager1, taskManager2);
