@@ -52,10 +52,10 @@ namespace ec {
         }
 
         // generate a unique computational basis state
-        const std::uint_least64_t MASK = maxStates - 1;
-        auto [randomState, success]    = generatedComputationalBasisStates.insert(computationalBasisStateGenerator() & MASK);
+        std::uniform_int_distribution<std::uint_least64_t> distribution(0, maxStates - 1);
+        auto [randomState, success] = generatedComputationalBasisStates.insert(distribution(mt));
         while (!success) {
-            std::tie(randomState, success) = generatedComputationalBasisStates.insert(computationalBasisStateGenerator() & MASK);
+            std::tie(randomState, success) = generatedComputationalBasisStates.insert(distribution(mt));
         }
 
         // generate the bitvector corresponding to the random state
