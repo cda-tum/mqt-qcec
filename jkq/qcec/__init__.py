@@ -3,4 +3,4 @@
 # See file README.md or go to http://iic.jku.at/eda/research/quantum_verification/ for more information.
 #
 
-from .pyqcec import Method, Strategy, StimuliType, Configuration, Results, Equivalence, verify
+from .pyqcec import ApplicationStrategy, StateType, EquivalenceCriterion
