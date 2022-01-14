@@ -3,13 +3,10 @@
  * See file README.md or go to http://iic.jku.at/eda/research/quantum_verification/ for more information.
  */
 
-#include "ImprovedDDEquivalenceChecker.hpp"
-#include "SimulationBasedEquivalenceChecker.hpp"
+#include "EquivalenceCheckingManager.hpp"
 
 #include "gtest/gtest.h"
-#include <algorithm>
 #include <functional>
-#include <future>
 #include <iostream>
 #include <random>
 #include <string>
@@ -130,6 +127,13 @@ INSTANTIATE_TEST_SUITE_P(Journal, JournalTestNonEQ,
 	                         return ss.str(); });
 
 TEST_P(JournalTestNonEQ, PowerOfSimulation) {
+    config.execution.runAlternatingScheme  = false;
+    config.execution.runConstructionScheme = false;
+    config.execution.runSimulationScheme   = true;
+    config.execution.parallel              = false;
+    config.simulation.maxSims              = 16;
+    config.application.scheme              = ec::ApplicationSchemeType::OneToOne;
+
     for (unsigned short i = 0; i < tries; ++i) {
         qc_original.import(test_original_dir + std::get<0>(GetParam()) + ".real");
 
@@ -154,13 +158,13 @@ TEST_P(JournalTestNonEQ, PowerOfSimulation) {
             }
         } while (setExists(already_removed, removed));
         already_removed.insert(removed);
-
-        ec::SimulationBasedEquivalenceChecker noneq_sim(qc_original, qc_transpiled);
-        auto                                  results = noneq_sim.check(config);
+        ec::EquivalenceCheckingManager ecm(qc_original, qc_transpiled, config);
+        ecm.run();
+        auto results = ecm.getResults();
         std::cout << "[" << i << "] ";
-        results.printCSVEntry();
-        addToStatistics(i, results.verificationTime + results.preprocessingTime, results.nsims);
-        if (results.equivalence == ec::Equivalence::NotEquivalent) {
+        std::cout << toString(results.equivalence) << std::endl;
+        addToStatistics(i, results.checkTime + results.preprocessingTime, results.performedSimulations);
+        if (results.equivalence == ec::EquivalenceCriterion::NotEquivalent) {
             successes++;
         }
     }
@@ -183,6 +187,13 @@ protected:
     std::string transpiled_file{};
 
     void SetUp() override {
+        config.execution.parallel              = false;
+        config.execution.runConstructionScheme = false;
+        config.execution.runAlternatingScheme  = false;
+        config.execution.runSimulationScheme   = false;
+        config.simulation.maxSims              = 16;
+        config.application.scheme              = ec::ApplicationSchemeType::OneToOne;
+
         std::stringstream ss{};
         ss << test_transpiled_dir << GetParam() << "_transpiled.";
         //		if (GetParam() == "add6_196" || GetParam() == "cm150a_210") {
@@ -228,56 +239,61 @@ TEST_P(JournalTestEQ, EQReference) {
     qc_original.import(test_original_dir + GetParam() + ".real");
     qc_transpiled.import(transpiled_file);
 
-    ec::EquivalenceChecker equivalenceChecker(qc_original, qc_transpiled);
-    auto                   results = equivalenceChecker.check(config);
-    results.printCSVEntry();
-    results.print();
-    EXPECT_TRUE(results.consideredEquivalent());
+    config.execution.runConstructionScheme = true;
+
+    ec::EquivalenceCheckingManager ecm(qc_original, qc_transpiled, config);
+    ecm.run();
+    std::cout << ecm.toString() << std::endl;
+    EXPECT_TRUE(ecm.getResults().consideredEquivalent());
 }
 
 TEST_P(JournalTestEQ, EQNaive) {
     qc_original.import(test_original_dir + GetParam() + ".real");
     qc_transpiled.import(transpiled_file);
 
-    ec::ImprovedDDEquivalenceChecker equivalenceChecker(qc_original, qc_transpiled);
-    config.strategy = ec::Strategy::Naive;
-    auto results    = equivalenceChecker.check(config);
-    results.printCSVEntry();
-    results.print();
-    EXPECT_TRUE(results.consideredEquivalent());
+    config.execution.runAlternatingScheme = true;
+    config.application.scheme             = ec::ApplicationSchemeType::OneToOne;
+
+    ec::EquivalenceCheckingManager ecm(qc_original, qc_transpiled, config);
+    ecm.run();
+    std::cout << ecm.toString() << std::endl;
+    EXPECT_TRUE(ecm.getResults().consideredEquivalent());
 }
 
 TEST_P(JournalTestEQ, EQProportional) {
     qc_original.import(test_original_dir + GetParam() + ".real");
     qc_transpiled.import(transpiled_file);
 
-    ec::ImprovedDDEquivalenceChecker equivalenceChecker(qc_original, qc_transpiled);
-    config.strategy = ec::Strategy::Proportional;
-    auto results    = equivalenceChecker.check(config);
-    results.printCSVEntry();
-    results.print();
-    EXPECT_TRUE(results.consideredEquivalent());
+    config.execution.runAlternatingScheme = true;
+    config.application.scheme             = ec::ApplicationSchemeType::Proportional;
+
+    ec::EquivalenceCheckingManager ecm(qc_original, qc_transpiled, config);
+    ecm.run();
+    std::cout << ecm.toString() << std::endl;
+    EXPECT_TRUE(ecm.getResults().consideredEquivalent());
 }
 
 TEST_P(JournalTestEQ, EQLookahead) {
     qc_original.import(test_original_dir + GetParam() + ".real");
     qc_transpiled.import(transpiled_file);
 
-    ec::ImprovedDDEquivalenceChecker equivalenceChecker(qc_original, qc_transpiled);
-    config.strategy = ec::Strategy::Lookahead;
-    auto results    = equivalenceChecker.check(config);
-    results.printCSVEntry();
-    results.print();
-    EXPECT_TRUE(results.consideredEquivalent());
+    config.execution.runAlternatingScheme = true;
+    config.application.scheme             = ec::ApplicationSchemeType::Lookahead;
+
+    ec::EquivalenceCheckingManager ecm(qc_original, qc_transpiled, config);
+    ecm.run();
+    std::cout << ecm.toString() << std::endl;
+    EXPECT_TRUE(ecm.getResults().consideredEquivalent());
 }
 
 TEST_P(JournalTestEQ, EQPowerOfSimulation) {
     qc_original.import(test_original_dir + GetParam() + ".real");
     qc_transpiled.import(transpiled_file);
 
-    ec::SimulationBasedEquivalenceChecker equivalenceChecker(qc_original, qc_transpiled);
-    auto                                  results = equivalenceChecker.check(config);
-    results.printCSVEntry();
-    results.print();
-    EXPECT_TRUE(results.consideredEquivalent());
+    config.execution.runSimulationScheme = true;
+
+    ec::EquivalenceCheckingManager ecm(qc_original, qc_transpiled, config);
+    ecm.run();
+    std::cout << ecm.toString() << std::endl;
+    EXPECT_TRUE(ecm.getResults().consideredEquivalent());
 }

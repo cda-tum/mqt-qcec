@@ -3,11 +3,9 @@
  * See file README.md or go to http://iic.jku.at/eda/research/quantum_verification/ for more information.
  */
 
-#include "CompilationFlowEquivalenceChecker.hpp"
-#include "SimulationBasedEquivalenceChecker.hpp"
+#include "EquivalenceCheckingManager.hpp"
 
 #include "gtest/gtest.h"
-#include <algorithm>
 #include <functional>
 #include <string>
 
@@ -19,9 +17,18 @@ protected:
     std::string test_original_dir   = "./circuits/original/";
     std::string test_transpiled_dir = "./circuits/transpiled/";
 
+    ec::Configuration configuration{};
+
     void SetUp() override {
         qc_original.import(test_original_dir + GetParam() + ".real");
         qc_transpiled.import(test_transpiled_dir + GetParam() + "_transpiled.qasm");
+
+        configuration.execution.runAlternatingScheme  = true;
+        configuration.execution.runConstructionScheme = false;
+        configuration.execution.runSimulationScheme   = false;
+
+        configuration.application.scheme       = ec::ApplicationSchemeType::GateCost;
+        configuration.application.costFunction = ec::LegacyIBMCostFunction;
     }
 };
 
@@ -53,8 +60,8 @@ INSTANTIATE_TEST_SUITE_P(CompilationFlowTest, CompilationFlowTest,
 	                         return s; });
 
 TEST_P(CompilationFlowTest, EquivalenceCompilationFlow) {
-    ec::CompilationFlowEquivalenceChecker ec_flow(qc_original, qc_transpiled);
-    auto                                  results = ec_flow.check();
-    results.printCSVEntry();
-    EXPECT_TRUE(results.consideredEquivalent());
+    ec::EquivalenceCheckingManager ecm(qc_original, qc_transpiled, configuration);
+    ecm.run();
+    std::cout << ecm.toString() << std::endl;
+    EXPECT_TRUE(ecm.getResults().consideredEquivalent());
 }
