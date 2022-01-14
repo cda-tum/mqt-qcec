@@ -11,52 +11,16 @@ namespace ec {
         assert(package != nullptr);
 
         if (!cached1) {
-            // skip over any SWAP operations
-            taskManager1.applySwapOperations(*internalState);
-
-            if (taskManager1.finished()) {
-                // properly handle any cached operations on exit
-                if (cached2) {
-                    auto saved     = *internalState;
-                    *internalState = package->multiply(saved, op2);
-                    package->incRef(*internalState);
-                    package->decRef(saved);
-                    package->decRef(op2);
-                    cached2 = false;
-                    package->garbageCollect();
-                }
-                return {0U, 0U};
-            }
-
             // cache the current operation
             op1 = taskManager1.getDD();
             package->incRef(op1);
-            taskManager1.advanceIterator();
             cached1 = true;
         }
 
         if (!cached2) {
-            // skip over any SWAP operations
-            taskManager2.applySwapOperations(*internalState);
-
-            if (taskManager2.finished()) {
-                // properly handle any cached operations on exit
-                if (cached1) {
-                    auto saved     = *internalState;
-                    *internalState = package->multiply(op1, saved);
-                    package->incRef(*internalState);
-                    package->decRef(saved);
-                    package->decRef(op1);
-                    cached1 = false;
-                    package->garbageCollect();
-                }
-                return {0U, 0U};
-            }
-
             // cache the current operation
             op2 = taskManager2.getInverseDD();
             package->incRef(op2);
-            taskManager2.advanceIterator();
             cached2 = true;
         }
 
@@ -82,6 +46,40 @@ namespace ec {
         package->incRef(*internalState);
         package->decRef(saved);
         package->garbageCollect();
+
+        if (size1 <= size2) {
+            if (taskManager1.finished()) {
+                // properly handle any cached operations on exit
+                if (cached2) {
+                    saved          = *internalState;
+                    *internalState = package->multiply(saved, op2);
+                    package->incRef(*internalState);
+                    package->decRef(saved);
+                    package->decRef(op2);
+                    cached2 = false;
+                    package->garbageCollect();
+                }
+                return {0U, 0U};
+            } else {
+                taskManager1.advanceIterator();
+            }
+        } else {
+            if (taskManager2.finished()) {
+                // properly handle any cached operations on exit
+                if (cached1) {
+                    saved          = *internalState;
+                    *internalState = package->multiply(op1, saved);
+                    package->incRef(*internalState);
+                    package->decRef(saved);
+                    package->decRef(op1);
+                    cached1 = false;
+                    package->garbageCollect();
+                }
+                return {0U, 0U};
+            } else {
+                taskManager2.advanceIterator();
+            }
+        }
 
         // no operations shall be applied by the outer loop in which the application scheme is invoked
         return {0U, 0U};
