@@ -7,16 +7,9 @@
 
 namespace ec {
 
-    StateGenerator::StateGenerator(std::size_t seed) {
-        if (seed == 0) {
-            std::array<std::mt19937_64::result_type, std::mt19937_64::state_size> random_data{};
-            std::random_device                                                    rd;
-            std::generate(begin(random_data), end(random_data), std::ref(rd));
-            std::seed_seq seeds(begin(random_data), end(random_data));
-            mt.seed(seeds);
-        } else {
-            mt.seed(seed);
-        }
+    StateGenerator::StateGenerator(std::size_t seed):
+        seed(seed) {
+        seedGenerator(seed);
 
         // this generator produces random bases from the set { |0>, |1>, |+>, |->, |L>, |R> }
         random1QBasisDistribution = std::uniform_int_distribution<std::size_t>(0, 5);
@@ -122,6 +115,19 @@ namespace ec {
 
         // return the resulting decision diagram
         return initial;
+    }
+
+    void StateGenerator::seedGenerator(std::size_t s) {
+        seed = s;
+        if (seed == 0) {
+            std::array<std::mt19937_64::result_type, std::mt19937_64::state_size> random_data{};
+            std::random_device                                                    rd;
+            std::generate(begin(random_data), end(random_data), std::ref(rd));
+            std::seed_seq seeds(begin(random_data), end(random_data));
+            mt.seed(seeds);
+        } else {
+            mt.seed(seed);
+        }
     }
 
 } // namespace ec

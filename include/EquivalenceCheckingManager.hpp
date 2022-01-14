@@ -70,8 +70,6 @@ namespace ec {
 
         EquivalenceCheckingManager(const qc::QuantumComputation& qc1, const qc::QuantumComputation& qc2, const Configuration& configuration = Configuration{});
 
-        static void setTolerance(dd::fp tol) { dd::ComplexTable<>::setTolerance(tol); }
-
         void run();
 
         [[nodiscard]] nlohmann::json json() const;
@@ -82,6 +80,58 @@ namespace ec {
         }
         [[nodiscard]] Configuration getConfiguration() const { return configuration; }
         [[nodiscard]] Results       getResults() const { return results; }
+
+        // convenience functions for changing the configuration after the manager has been constructed:
+        // Execution: These settings may be changed to influence what is executed during `run`
+        void setTolerance(dd::fp tol) {
+            configuration.execution.numericalTolerance = tol;
+            dd::ComplexTable<>::setTolerance(tol);
+        }
+        void setParallel(bool parallel) { configuration.execution.parallel = parallel; }
+        void setNThreads(std::size_t nthreads) { configuration.execution.nthreads = nthreads; }
+        void setTimeout(std::chrono::seconds timeout) { configuration.execution.timeout = timeout; }
+        void runConstructionScheme(bool run) { configuration.execution.runConstructionScheme = run; }
+        void runAlternatingScheme(bool run) { configuration.execution.runAlternatingScheme = run; }
+        void runSimulationScheme(bool run) { configuration.execution.runSimulationScheme = run; }
+
+        // Optimization: Optimizations are applied during initialization. Already configured and applied optimizations cannot be reverted
+        void runFixOutputPermutationMismatch();
+        void fuseSingleQubitGates();
+        void reconstructSWAPs();
+        void removeDiagonalGatesBeforeMeasure();
+        void transformDynamicCircuit();
+        void reorderOperations();
+
+        // Application: These settings may be changed to influence the sequence in which gates are applied during the equivalence check
+        void setApplicationScheme(const ApplicationSchemeType applicationScheme) { configuration.application.scheme = applicationScheme; }
+        void setGateCostProfile(const std::string& profileLocation) {
+            configuration.application.scheme          = ApplicationSchemeType::GateCost;
+            configuration.application.useProfile      = true;
+            configuration.application.profileLocation = profileLocation;
+        }
+        void setGateCostFunction(const CostFunction& costFunction) {
+            configuration.application.scheme       = ApplicationSchemeType::GateCost;
+            configuration.application.useProfile   = false;
+            configuration.application.costFunction = costFunction;
+        }
+
+        // Functionality: These settings may be changed to adjust options for checkers considering the whole functionality
+        void setTraceThreshold(double traceThreshold) { configuration.functionality.traceThreshold = traceThreshold; }
+
+        // Simulation: These setting may be changed to adjust the kinds of simulations that are performed
+        void setFidelityThreshold(double fidelityThreshold) { configuration.simulation.fidelityThreshold = fidelityThreshold; }
+        void setMaxSims(std::size_t sims) {
+            if (sims == 0)
+                configuration.execution.runSimulationScheme = false;
+            configuration.simulation.maxSims = sims;
+        }
+        void setStateType(StateType stateType) { configuration.simulation.stateType = stateType; }
+        void setSeed(std::size_t seed) {
+            configuration.simulation.seed = seed;
+            stateGenerator.seedGenerator(seed);
+        }
+        void storeCEXinput(bool store) { configuration.simulation.storeCEXinput = store; }
+        void storeCEXoutput(bool store) { configuration.simulation.storeCEXoutput = store; }
 
     protected:
         qc::QuantumComputation qc1{};

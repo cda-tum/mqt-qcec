@@ -326,6 +326,11 @@ namespace ec {
             deadline = std::chrono::steady_clock::now() + configuration.execution.timeout;
         }
 
+        const auto threadLimit = std::thread::hardware_concurrency();
+        if (threadLimit != 0 && configuration.execution.nthreads > threadLimit) {
+            std::clog << "Trying to use more threads than the underlying architecture claims to support. Over-subscription might impact performance!" << std::endl;
+        }
+
         const auto maxThreads      = configuration.execution.nthreads;
         const auto runAlternating  = configuration.execution.runAlternatingScheme;
         const auto runConstruction = configuration.execution.runConstructionScheme;
@@ -482,6 +487,53 @@ namespace ec {
             }
         }
         return res;
+    }
+    void EquivalenceCheckingManager::runFixOutputPermutationMismatch() {
+        if (!configuration.optimizations.fixOutputPermutationMismatch) {
+            fixOutputPermutationMismatch();
+            configuration.optimizations.fixOutputPermutationMismatch = true;
+        }
+    }
+    void EquivalenceCheckingManager::fuseSingleQubitGates() {
+        if (!configuration.optimizations.fuseSingleQubitGates) {
+            qc::CircuitOptimizer::singleQubitGateFusion(qc1);
+            qc::CircuitOptimizer::singleQubitGateFusion(qc2);
+            configuration.optimizations.fuseSingleQubitGates = true;
+        }
+    }
+    void EquivalenceCheckingManager::reconstructSWAPs() {
+        if (!configuration.optimizations.reconstructSWAPs) {
+            qc::CircuitOptimizer::swapReconstruction(qc1);
+            qc::CircuitOptimizer::swapReconstruction(qc2);
+            configuration.optimizations.reconstructSWAPs = true;
+        }
+    }
+    void EquivalenceCheckingManager::removeDiagonalGatesBeforeMeasure() {
+        if (!configuration.optimizations.removeDiagonalGatesBeforeMeasure) {
+            qc::CircuitOptimizer::removeDiagonalGatesBeforeMeasure(qc1);
+            qc::CircuitOptimizer::removeDiagonalGatesBeforeMeasure(qc2);
+            configuration.optimizations.removeDiagonalGatesBeforeMeasure = true;
+        }
+    }
+    void EquivalenceCheckingManager::transformDynamicCircuit() {
+        if (!configuration.optimizations.transformDynamicCircuit) {
+            if (qc::CircuitOptimizer::isDynamicCircuit(qc1)) {
+                qc::CircuitOptimizer::eliminateResets(qc1);
+                qc::CircuitOptimizer::deferMeasurements(qc1);
+            }
+            if (qc::CircuitOptimizer::isDynamicCircuit(qc2)) {
+                qc::CircuitOptimizer::eliminateResets(qc2);
+                qc::CircuitOptimizer::deferMeasurements(qc2);
+            }
+            configuration.optimizations.transformDynamicCircuit = true;
+        }
+    }
+    void EquivalenceCheckingManager::reorderOperations() {
+        if (!configuration.optimizations.reorderOperations) {
+            qc::CircuitOptimizer::reorderOperations(qc1);
+            qc::CircuitOptimizer::reorderOperations(qc2);
+            configuration.optimizations.reorderOperations = true;
+        }
     }
     nlohmann::json EquivalenceCheckingManager::Results::json() const {
         nlohmann::json res{};

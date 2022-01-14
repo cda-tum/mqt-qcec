@@ -27,6 +27,8 @@ namespace ec {
 
         qc::VectorDD generateRandomStabilizerState(std::unique_ptr<dd::Package>& dd, dd::QubitCount totalQubits, dd::QubitCount ancillaryQubits = 0);
 
+        void seedGenerator(std::size_t seed);
+
     protected:
         std::size_t     seed = 0U;
         std::mt19937_64 mt;
