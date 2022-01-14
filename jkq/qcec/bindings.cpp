@@ -49,4 +49,4 @@ namespace ec {
         m.attr("__version__") = "dev";
 #endif
     }
-}
+} // namespace ec

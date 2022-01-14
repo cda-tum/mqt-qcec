@@ -473,7 +473,7 @@ namespace ec {
         res["results"]       = results.json();
 
         if (!checkers.empty()) {
-            res["checkers"]     = nlohmann::json::array();
+            res["checkers"]      = nlohmann::json::array();
             auto& checkerResults = res["checkers"];
             for (auto& checker: checkers) {
                 nlohmann::json j{};
