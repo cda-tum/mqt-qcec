@@ -3,8 +3,7 @@
 * See file README.md or go to http://iic.jku.at/eda/research/quantum_verification/ for more information.
 */
 
-#ifndef QCEC_GATECOSTAPPLICATIONSCHEME_HPP
-#define QCEC_GATECOSTAPPLICATIONSCHEME_HPP
+#pragma once
 
 #include "ApplicationScheme.hpp"
 #include "dd/Definitions.hpp"
@@ -55,7 +54,7 @@ namespace ec {
         void populateLUT(std::istream& is);
     };
 
-    std::size_t LegacyIBMCostFunction(const GateCostLUTKeyType& key) {
+    inline std::size_t LegacyIBMCostFunction(const GateCostLUTKeyType& key) {
         const auto [gate, nc] = key;
         switch (gate) {
             case qc::I:
@@ -125,5 +124,3 @@ namespace ec {
         }
     }
 } // namespace ec
-
-#endif //QCEC_GATECOSTAPPLICATIONSCHEME_HPP

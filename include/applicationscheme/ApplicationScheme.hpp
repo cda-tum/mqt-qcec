@@ -3,8 +3,7 @@
 * See file README.md or go to http://iic.jku.at/eda/research/quantum_verification/ for more information.
 */
 
-#ifndef QCEC_APPLICATIONSCHEME_HPP
-#define QCEC_APPLICATIONSCHEME_HPP
+#pragma once
 
 #include "QuantumComputation.hpp"
 #include "TaskManager.hpp"
@@ -80,4 +79,3 @@ namespace ec {
     };
 
 } // namespace ec
-#endif //QCEC_APPLICATIONSCHEME_HPP

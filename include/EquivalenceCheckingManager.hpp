@@ -3,8 +3,7 @@
 * See file README.md or go to http://iic.jku.at/eda/research/quantum_verification/ for more information.
 */
 
-#ifndef QCEC_EQUIVALENCECHECKINGMANAGER_HPP
-#define QCEC_EQUIVALENCECHECKINGMANAGER_HPP
+#pragma once
 
 #include "CircuitOptimizer.hpp"
 #include "Configuration.hpp"
@@ -112,5 +111,3 @@ namespace ec {
         }
     };
 } // namespace ec
-
-#endif //QCEC_EQUIVALENCECHECKINGMANAGER_HPP
