@@ -46,7 +46,11 @@ namespace ec {
         if (e.p == f.p) {
             // whenever the top edge weights differ, both decision diagrams are only equivalent up to a global phase
             if (!e.w.approximatelyEquals(f.w)) {
-                return EquivalenceCriterion::EquivalentUpToGlobalPhase;
+                if constexpr (std::is_same_v<DDType, qc::MatrixDD>) {
+                    return EquivalenceCriterion::EquivalentUpToGlobalPhase;
+                } else {
+                    return EquivalenceCriterion::EquivalentUpToPhase;
+                }
             }
             return EquivalenceCriterion::Equivalent;
         }
