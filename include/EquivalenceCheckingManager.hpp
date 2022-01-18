@@ -66,6 +66,9 @@ namespace ec {
                     stateVector[i] = std::complex<dd::fp>(c.first, c.second);
                 }
             }
+            [[nodiscard]] std::string toString() const {
+                return json().dump(2);
+            }
         };
 
         EquivalenceCheckingManager(const qc::QuantumComputation& qc1, const qc::QuantumComputation& qc2, const Configuration& configuration = Configuration{});
@@ -90,9 +93,9 @@ namespace ec {
         void setParallel(bool parallel) { configuration.execution.parallel = parallel; }
         void setNThreads(std::size_t nthreads) { configuration.execution.nthreads = nthreads; }
         void setTimeout(std::chrono::seconds timeout) { configuration.execution.timeout = timeout; }
-        void runConstructionScheme(bool run) { configuration.execution.runConstructionScheme = run; }
-        void runAlternatingScheme(bool run) { configuration.execution.runAlternatingScheme = run; }
-        void runSimulationScheme(bool run) { configuration.execution.runSimulationScheme = run; }
+        void setConstructionScheme(bool run) { configuration.execution.runConstructionScheme = run; }
+        void setSimulationScheme(bool run) { configuration.execution.runSimulationScheme = run; }
+        void setAlternatingScheme(bool run) { configuration.execution.runAlternatingScheme = run; }
 
         // Optimization: Optimizations are applied during initialization. Already configured and applied optimizations cannot be reverted
         void runFixOutputPermutationMismatch();
