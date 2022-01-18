@@ -48,8 +48,7 @@ namespace ec {
             ApplicationSchemeType scheme = ApplicationSchemeType::Proportional;
 
             // options for the gate cost application scheme
-            bool         useProfile = false;
-            std::string  profileLocation{};
+            std::string  profile{};
             CostFunction costFunction = [](const GateCostLUTKeyType&) { return 1U; };
         };
 
@@ -113,8 +112,8 @@ namespace ec {
             auto& app   = config["application"];
             app["type"] = ec::toString(application.scheme);
             if (application.scheme == ApplicationSchemeType::GateCost) {
-                if (application.useProfile) {
-                    app["profile"] = application.profileLocation;
+                if (!application.profile.empty()) {
+                    app["profile"] = application.profile;
                 } else {
                     app["profile"] = "cost_function";
                 }

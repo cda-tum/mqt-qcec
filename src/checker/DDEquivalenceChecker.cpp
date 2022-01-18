@@ -31,8 +31,8 @@ namespace ec {
                 }
                 break;
             case ApplicationSchemeType::GateCost:
-                if (configuration.application.useProfile) {
-                    applicationScheme = std::make_unique<GateCostApplicationScheme<DDType>>(taskManager1, taskManager2, configuration.application.profileLocation);
+                if (!configuration.application.profile.empty()) {
+                    applicationScheme = std::make_unique<GateCostApplicationScheme<DDType>>(taskManager1, taskManager2, configuration.application.profile);
                 } else {
                     applicationScheme = std::make_unique<GateCostApplicationScheme<DDType>>(taskManager1, taskManager2, configuration.application.costFunction);
                 }

@@ -9,11 +9,13 @@ namespace ec {
     template<class DDType>
     void GateCostApplicationScheme<DDType>::populateLUT(const CostFunction& costFunction, const qc::QuantumComputation* qc) {
         for (const auto& op: *qc) {
-            const auto               type      = op->getType();
-            const auto               nControls = op->getNcontrols();
-            const GateCostLUTKeyType key       = {type, nControls};
-            const auto               cost      = costFunction(key);
-            gateCostLUT.emplace(key, cost);
+            const auto type      = op->getType();
+            const auto nControls = op->getNcontrols();
+            const auto key       = GateCostLUTKeyType{type, nControls};
+            if (const auto it = gateCostLUT.find(key); it == gateCostLUT.end()) {
+                const auto cost = costFunction(key);
+                gateCostLUT.emplace(key, cost);
+            }
         }
     }
 
@@ -28,7 +30,7 @@ namespace ec {
         if (auto it = gateCostLUT.find(key); it != gateCostLUT.end()) {
             cost = it->second;
         }
-        return std::pair{1U, cost};
+        return {1U, cost};
     }
 
     template<class DDType>
@@ -39,7 +41,7 @@ namespace ec {
     }
 
     template<class DDType>
-    GateCostApplicationScheme<DDType>::GateCostApplicationScheme(TaskManager<DDType>& taskManager1, TaskManager<DDType>& taskManager2, [[maybe_unused]] const std::string& filename):
+    GateCostApplicationScheme<DDType>::GateCostApplicationScheme(TaskManager<DDType>& taskManager1, TaskManager<DDType>& taskManager2, const std::string& filename):
         ApplicationScheme<DDType>(taskManager1, taskManager2) {
         populateLUT(filename);
     }

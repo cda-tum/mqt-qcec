@@ -105,13 +105,11 @@ namespace ec {
         // Application: These settings may be changed to influence the sequence in which gates are applied during the equivalence check
         void setApplicationScheme(const ApplicationSchemeType applicationScheme) { configuration.application.scheme = applicationScheme; }
         void setGateCostProfile(const std::string& profileLocation) {
-            configuration.application.scheme          = ApplicationSchemeType::GateCost;
-            configuration.application.useProfile      = true;
-            configuration.application.profileLocation = profileLocation;
+            configuration.application.scheme  = ApplicationSchemeType::GateCost;
+            configuration.application.profile = profileLocation;
         }
         void setGateCostFunction(const CostFunction& costFunction) {
             configuration.application.scheme       = ApplicationSchemeType::GateCost;
-            configuration.application.useProfile   = false;
             configuration.application.costFunction = costFunction;
         }
 
