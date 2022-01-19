@@ -6,8 +6,6 @@ import sys
 
 sys.path.insert(0, os.path.abspath('../../jkq/qcec'))
 sys.path.insert(0, os.path.abspath('../jkq/qcec'))
-sys.path.insert(0, os.path.abspath('../../jkq/'))
-sys.path.insert(0, os.path.abspath('../jkq/'))
 
 # -- Project information -----------------------------------------------------
 project = 'QCEC'

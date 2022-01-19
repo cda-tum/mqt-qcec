@@ -84,10 +84,10 @@ jobs:
         env:
           CC:  "gcc-10"
           CXX: "g++-10"
+      - name: Install requirements
+        run:  pip install -r docs/requirements.txt
       - name: Build documentation
-        uses: ammaraskar/sphinx-action@master
-        with:
-          docs-folder: "docs/"
+        run:  cd docs && make html
       - uses: actions/upload-artifact@v2
         with:
           name: DocumentationHTML
