@@ -17,15 +17,15 @@ This constructs the manager using all the default options. The circuits to be ve
 
 * Python objects:
 
-    * `QuantumCircuit` from IBM's Qiskit **(preferred)**
-    * `QasmQobjExperiment` from IBM's Qiskit
+    * `QuantumCircuit` from IBM's `Qiskit <https://github.com/Qiskit/qiskit>`_ **(preferred)**
+    * `QasmQobjExperiment` from IBM's `Qiskit <https://github.com/Qiskit/qiskit>`_
 
 * Files
 
-    * `OpenQASM 2.0` (e.g. used by IBM's [Qiskit](https://github.com/Qiskit/qiskit)),
-    * `Real` (e.g. from [RevLib](http://revlib.org)),
-    * `TFC` (e.g. from [Reversible Logic Synthesis Benchmarks Page](http://webhome.cs.uvic.ca/~dmaslov/mach-read.html))
-    * `QC` (e.g. from [Feynman](https://github.com/meamy/feynman))
+    * `OpenQASM 2.0` (e.g. used by IBM's `Qiskit <https://github.com/Qiskit/qiskit>`_),
+    * `Real` (e.g. from `RevLib <http://revlib.org>`_),
+    * `TFC` (e.g. from `Reversible Logic Synthesis Benchmarks Page <http://webhome.cs.uvic.ca/~dmaslov/mach-read.html>`_)
+    * `QC` (e.g. from `Feynman <https://github.com/meamy/feynman>`_)
 
 There are two ways of configuring the manager at construction time, e.g., in order to set a timeout of `60` seconds:
 

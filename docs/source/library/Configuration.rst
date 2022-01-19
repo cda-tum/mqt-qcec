@@ -9,8 +9,8 @@ The :class:`Configuration` class provides all the means to configure QCEC. All o
 .. toctree::
    :maxdepth: 2
 
-   Execution
-   Optimizations
-   Application
-   Functionality
-   Simulation
+   configuration/Execution
+   configuration/Optimizations
+   configuration/Application
+   configuration/Functionality
+   configuration/Simulation
