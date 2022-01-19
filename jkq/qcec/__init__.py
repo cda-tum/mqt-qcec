@@ -4,3 +4,5 @@
 #
 
 from .pyqcec import ApplicationScheme, StateType, EquivalenceCriterion, EquivalenceCheckingManager, Configuration
+
+__all__ = ["ApplicationScheme", "StateType", "EquivalenceCriterion", "EquivalenceCheckingManager", "Configuration"]

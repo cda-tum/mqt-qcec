@@ -47,6 +47,8 @@ namespace ec {
 
         std::size_t maxActiveNodes{};
 
+        void initializeApplicationScheme(ApplicationSchemeType scheme);
+
         EquivalenceCriterion equals(const DDType& e, const DDType& f);
 
         virtual void                 initializeTask(TaskManager<DDType>&){};

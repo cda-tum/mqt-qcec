@@ -28,9 +28,9 @@ namespace ec {
             std::size_t          nthreads = std::max(2U, std::thread::hardware_concurrency());
             std::chrono::seconds timeout  = 0s;
 
-            bool runConstructionScheme = false;
-            bool runSimulationScheme   = true;
-            bool runAlternatingScheme  = true;
+            bool runConstructionChecker = false;
+            bool runSimulationChecker   = true;
+            bool runAlternatingChecker  = true;
         };
 
         // configuration options for pre-check optimizations
@@ -45,7 +45,9 @@ namespace ec {
 
         // configuration options for application schemes
         struct Application {
-            ApplicationSchemeType scheme = ApplicationSchemeType::Proportional;
+            ApplicationSchemeType constructionScheme = ApplicationSchemeType::Proportional;
+            ApplicationSchemeType simulationScheme   = ApplicationSchemeType::Proportional;
+            ApplicationSchemeType alternatingScheme  = ApplicationSchemeType::Proportional;
 
             // options for the gate cost application scheme
             std::string  profile{};
@@ -73,16 +75,16 @@ namespace ec {
         Simulation    simulation{};
 
         [[nodiscard]] bool anythingToExecute() const {
-            return (execution.runSimulationScheme && simulation.maxSims > 0) || execution.runAlternatingScheme || execution.runConstructionScheme;
+            return (execution.runSimulationChecker && simulation.maxSims > 0) || execution.runAlternatingChecker || execution.runConstructionChecker;
         }
 
         [[nodiscard]] bool onlySingleTask() const {
             // only a single simulation shall be performed
-            if (execution.runSimulationScheme && simulation.maxSims == 1 && !execution.runAlternatingScheme && !execution.runConstructionScheme)
+            if (execution.runSimulationChecker && simulation.maxSims == 1 && !execution.runAlternatingChecker && !execution.runConstructionChecker)
                 return true;
 
             // no simulations and only one of the other checks shall be performed
-            if (!execution.runSimulationScheme && (execution.runAlternatingScheme ^ execution.runConstructionScheme)) {
+            if (!execution.runSimulationChecker && (execution.runAlternatingChecker ^ execution.runConstructionChecker)) {
                 return true;
             }
 
@@ -91,13 +93,13 @@ namespace ec {
 
         [[nodiscard]] nlohmann::json json() const {
             nlohmann::json config{};
-            auto&          exe             = config["execution"];
-            exe["tolerance"]               = execution.numericalTolerance;
-            exe["parallel"]                = execution.parallel;
-            exe["nthreads"]                = execution.parallel ? execution.nthreads : 1U;
-            exe["run_construction_scheme"] = execution.runConstructionScheme;
-            exe["run_simulation_scheme"]   = execution.runSimulationScheme;
-            exe["run_alternating_scheme"]  = execution.runAlternatingScheme;
+            auto&          exe              = config["execution"];
+            exe["tolerance"]                = execution.numericalTolerance;
+            exe["parallel"]                 = execution.parallel;
+            exe["nthreads"]                 = execution.parallel ? execution.nthreads : 1U;
+            exe["run_construction_checker"] = execution.runConstructionChecker;
+            exe["run_simulation_checker"]   = execution.runSimulationChecker;
+            exe["run_alternating_checker"]  = execution.runAlternatingChecker;
             if (execution.timeout > 0s)
                 exe["timeout"] = execution.timeout.count();
 
@@ -109,9 +111,19 @@ namespace ec {
             opt["transform_dynamic_circuit"]            = optimizations.transformDynamicCircuit;
             opt["reorder_operations"]                   = optimizations.reorderOperations;
 
-            auto& app   = config["application"];
-            app["type"] = ec::toString(application.scheme);
-            if (application.scheme == ApplicationSchemeType::GateCost) {
+            auto& app = config["application"];
+            if (execution.runConstructionChecker) {
+                app["construction"] = ec::toString(application.constructionScheme);
+            }
+            if (execution.runSimulationChecker) {
+                app["simulation"] = ec::toString(application.simulationScheme);
+            }
+            if (execution.runAlternatingChecker) {
+                app["alternating"] = ec::toString(application.alternatingScheme);
+            }
+            if (application.constructionScheme == ApplicationSchemeType::GateCost ||
+                application.simulationScheme == ApplicationSchemeType::GateCost ||
+                application.alternatingScheme == ApplicationSchemeType::GateCost) {
                 if (!application.profile.empty()) {
                     app["profile"] = application.profile;
                 } else {
@@ -119,12 +131,12 @@ namespace ec {
                 }
             }
 
-            if (execution.runConstructionScheme || execution.runAlternatingScheme) {
+            if (execution.runConstructionChecker || execution.runAlternatingChecker) {
                 auto& fun              = config["functionality"];
                 fun["trace_threshold"] = functionality.traceThreshold;
             }
 
-            if (execution.runSimulationScheme) {
+            if (execution.runSimulationChecker) {
                 auto& sim                          = config["simulation"];
                 sim["fidelity_threshold"]          = simulation.fidelityThreshold;
                 sim["max_sims"]                    = simulation.maxSims;

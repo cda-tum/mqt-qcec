@@ -30,7 +30,7 @@ namespace ec {
             double preprocessingTime{};
             double checkTime{};
 
-            EquivalenceCriterion equivalence{};
+            EquivalenceCriterion equivalence = EquivalenceCriterion::NoInformation;
 
             std::size_t startedSimulations   = 0U;
             std::size_t performedSimulations = 0U;
@@ -92,10 +92,10 @@ namespace ec {
         }
         void setParallel(bool parallel) { configuration.execution.parallel = parallel; }
         void setNThreads(std::size_t nthreads) { configuration.execution.nthreads = nthreads; }
-        void setTimeout(std::chrono::seconds timeout) { configuration.execution.timeout = timeout; }
-        void setConstructionScheme(bool run) { configuration.execution.runConstructionScheme = run; }
-        void setSimulationScheme(bool run) { configuration.execution.runSimulationScheme = run; }
-        void setAlternatingScheme(bool run) { configuration.execution.runAlternatingScheme = run; }
+        void setTimeout(std::size_t timeout) { configuration.execution.timeout = std::chrono::seconds{timeout}; }
+        void setConstructionChecker(bool run) { configuration.execution.runConstructionChecker = run; }
+        void setSimulationChecker(bool run) { configuration.execution.runSimulationChecker = run; }
+        void setAlternatingChecker(bool run) { configuration.execution.runAlternatingChecker = run; }
 
         // Optimization: Optimizations are applied during initialization. Already configured and applied optimizations cannot be reverted
         void runFixOutputPermutationMismatch();
@@ -106,16 +106,48 @@ namespace ec {
         void reorderOperations();
 
         // Application: These settings may be changed to influence the sequence in which gates are applied during the equivalence check
-        void setApplicationScheme(const ApplicationSchemeType applicationScheme) { configuration.application.scheme = applicationScheme; }
+        void setConstructionApplicationScheme(const ApplicationSchemeType applicationScheme) { configuration.application.constructionScheme = applicationScheme; }
+        void setSimulationApplicationScheme(const ApplicationSchemeType applicationScheme) { configuration.application.simulationScheme = applicationScheme; }
+        void setAlternatingApplicationScheme(const ApplicationSchemeType applicationScheme) { configuration.application.alternatingScheme = applicationScheme; }
+        void setApplicationScheme(const ApplicationSchemeType applicationScheme) {
+            setConstructionApplicationScheme(applicationScheme);
+            setSimulationApplicationScheme(applicationScheme);
+            setAlternatingApplicationScheme(applicationScheme);
+        }
+        void setConstructionGateCostProfile(const std::string& profileLocation) {
+            configuration.application.constructionScheme = ApplicationSchemeType::GateCost;
+            configuration.application.profile            = profileLocation;
+        }
+        void setSimulationGateCostProfile(const std::string& profileLocation) {
+            configuration.application.simulationScheme = ApplicationSchemeType::GateCost;
+            configuration.application.profile          = profileLocation;
+        }
+        void setAlternatingGateCostProfile(const std::string& profileLocation) {
+            configuration.application.alternatingScheme = ApplicationSchemeType::GateCost;
+            configuration.application.profile           = profileLocation;
+        }
         void setGateCostProfile(const std::string& profileLocation) {
-            configuration.application.scheme  = ApplicationSchemeType::GateCost;
-            configuration.application.profile = profileLocation;
+            setConstructionGateCostProfile(profileLocation);
+            setSimulationGateCostProfile(profileLocation);
+            setAlternatingGateCostProfile(profileLocation);
+        }
+        void setConstructionGateCostFunction(const CostFunction& costFunction) {
+            configuration.application.constructionScheme = ApplicationSchemeType::GateCost;
+            configuration.application.costFunction       = costFunction;
+        }
+        void setSimulationGateCostFunction(const CostFunction& costFunction) {
+            configuration.application.simulationScheme = ApplicationSchemeType::GateCost;
+            configuration.application.costFunction     = costFunction;
+        }
+        void setAlternatingGateCostFunction(const CostFunction& costFunction) {
+            configuration.application.alternatingScheme = ApplicationSchemeType::GateCost;
+            configuration.application.costFunction      = costFunction;
         }
         void setGateCostFunction(const CostFunction& costFunction) {
-            configuration.application.scheme       = ApplicationSchemeType::GateCost;
-            configuration.application.costFunction = costFunction;
+            setConstructionGateCostFunction(costFunction);
+            setSimulationGateCostFunction(costFunction);
+            setAlternatingGateCostFunction(costFunction);
         }
-
         // Functionality: These settings may be changed to adjust options for checkers considering the whole functionality
         void setTraceThreshold(double traceThreshold) { configuration.functionality.traceThreshold = traceThreshold; }
 
@@ -123,7 +155,7 @@ namespace ec {
         void setFidelityThreshold(double fidelityThreshold) { configuration.simulation.fidelityThreshold = fidelityThreshold; }
         void setMaxSims(std::size_t sims) {
             if (sims == 0)
-                configuration.execution.runSimulationScheme = false;
+                configuration.execution.runSimulationChecker = false;
             configuration.simulation.maxSims = sims;
         }
         void setStateType(StateType stateType) { configuration.simulation.stateType = stateType; }

@@ -17,6 +17,8 @@ namespace ec {
             // gates from the second circuit shall be applied "from the right"
             taskManager2.flipDirection();
 
+            initializeApplicationScheme(this->configuration.application.alternatingScheme);
+
             // special treatment for the lookahead application scheme
             if (auto lookahead = dynamic_cast<LookaheadApplicationScheme*>(applicationScheme.get())) {
                 // initialize links for the internal state and the package of the lookahead scheme

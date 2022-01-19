@@ -13,31 +13,6 @@ namespace ec {
         dd(std::make_unique<dd::Package>(nqubits)),
         taskManager1(TaskManager<DDType>(qc1, dd)),
         taskManager2(TaskManager<DDType>(qc2, dd)) {
-        switch (this->configuration.application.scheme) {
-            case ApplicationSchemeType::Sequential:
-                applicationScheme = std::make_unique<SequentialApplicationScheme<DDType>>(taskManager1, taskManager2);
-                break;
-            case ApplicationSchemeType::OneToOne:
-                applicationScheme = std::make_unique<OneToOneApplicationScheme<DDType>>(taskManager1, taskManager2);
-                break;
-            case ApplicationSchemeType::Proportional:
-                applicationScheme = std::make_unique<ProportionalApplicationScheme<DDType>>(taskManager1, taskManager2);
-                break;
-            case ApplicationSchemeType::Lookahead:
-                if constexpr (std::is_same_v<DDType, qc::MatrixDD>) {
-                    applicationScheme = std::make_unique<LookaheadApplicationScheme>(taskManager1, taskManager2);
-                } else {
-                    throw std::runtime_error("Lookahead application scheme can only be used for matrices.");
-                }
-                break;
-            case ApplicationSchemeType::GateCost:
-                if (!configuration.application.profile.empty()) {
-                    applicationScheme = std::make_unique<GateCostApplicationScheme<DDType>>(taskManager1, taskManager2, configuration.application.profile);
-                } else {
-                    applicationScheme = std::make_unique<GateCostApplicationScheme<DDType>>(taskManager1, taskManager2, configuration.application.costFunction);
-                }
-                break;
-        }
     }
 
     template<class DDType>
@@ -197,6 +172,35 @@ namespace ec {
     template<class DDType>
     EquivalenceCriterion DDEquivalenceChecker<DDType>::checkEquivalence() {
         return equals(taskManager1.getInternalState(), taskManager2.getInternalState());
+    }
+
+    template<class DDType>
+    void DDEquivalenceChecker<DDType>::initializeApplicationScheme(ApplicationSchemeType scheme) {
+        switch (scheme) {
+            case ApplicationSchemeType::Sequential:
+                applicationScheme = std::make_unique<SequentialApplicationScheme<DDType>>(taskManager1, taskManager2);
+                break;
+            case ApplicationSchemeType::OneToOne:
+                applicationScheme = std::make_unique<OneToOneApplicationScheme<DDType>>(taskManager1, taskManager2);
+                break;
+            case ApplicationSchemeType::Proportional:
+                applicationScheme = std::make_unique<ProportionalApplicationScheme<DDType>>(taskManager1, taskManager2);
+                break;
+            case ApplicationSchemeType::Lookahead:
+                if constexpr (std::is_same_v<DDType, qc::MatrixDD>) {
+                    applicationScheme = std::make_unique<LookaheadApplicationScheme>(taskManager1, taskManager2);
+                } else {
+                    throw std::runtime_error("Lookahead application scheme can only be used for matrices.");
+                }
+                break;
+            case ApplicationSchemeType::GateCost:
+                if (!configuration.application.profile.empty()) {
+                    applicationScheme = std::make_unique<GateCostApplicationScheme<DDType>>(taskManager1, taskManager2, configuration.application.profile);
+                } else {
+                    applicationScheme = std::make_unique<GateCostApplicationScheme<DDType>>(taskManager1, taskManager2, configuration.application.costFunction);
+                }
+                break;
+        }
     }
 
     template class DDEquivalenceChecker<qc::VectorDD>;

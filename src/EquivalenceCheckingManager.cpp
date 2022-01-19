@@ -131,6 +131,9 @@ namespace ec {
     }
 
     void EquivalenceCheckingManager::runOptimizationPasses() {
+        if (qc1.empty() && qc2.empty())
+            return;
+
         const auto isDynamicCircuit1 = qc::CircuitOptimizer::isDynamicCircuit(qc1);
         const auto isDynamicCircuit2 = qc::CircuitOptimizer::isDynamicCircuit(qc2);
         if (isDynamicCircuit1 || isDynamicCircuit2) {
@@ -229,7 +232,7 @@ namespace ec {
         stateGenerator = StateGenerator(configuration.simulation.seed);
 
         // check whether the number of selected stimuli does exceed the maximum number of unique computational basis states
-        if (configuration.execution.runSimulationScheme && configuration.simulation.stateType == StateType::ComputationalBasis) {
+        if (configuration.execution.runSimulationChecker && configuration.simulation.stateType == StateType::ComputationalBasis) {
             const auto        nq           = this->qc1.getNqubitsWithoutAncillae();
             const std::size_t uniqueStates = 1ULL << nq;
             if (configuration.simulation.maxSims > uniqueStates) {
@@ -252,7 +255,7 @@ namespace ec {
             timeoutThread.detach();
         }
 
-        if (configuration.execution.runSimulationScheme) {
+        if (configuration.execution.runSimulationChecker) {
             checkers.emplace_back(std::make_unique<DDSimulationChecker>(qc1, qc2, configuration, done));
             auto* simulationChecker = dynamic_cast<DDSimulationChecker*>(checkers.back().get());
             while (results.startedSimulations < configuration.simulation.maxSims && !done) {
@@ -295,7 +298,7 @@ namespace ec {
             }
         }
 
-        if (configuration.execution.runAlternatingScheme) {
+        if (configuration.execution.runAlternatingChecker) {
             checkers.emplace_back(std::make_unique<DDAlternatingChecker>(qc1, qc2, configuration, done));
             auto&      alternatingChecker = checkers.back();
             const auto result             = alternatingChecker->run();
@@ -307,7 +310,7 @@ namespace ec {
             }
         }
 
-        if (configuration.execution.runConstructionScheme) {
+        if (configuration.execution.runConstructionChecker) {
             checkers.emplace_back(std::make_unique<DDConstructionChecker>(qc1, qc2, configuration, done));
             auto&      constructionChecker = checkers.back();
             const auto result              = constructionChecker->run();
@@ -332,9 +335,9 @@ namespace ec {
         }
 
         const auto maxThreads      = configuration.execution.nthreads;
-        const auto runAlternating  = configuration.execution.runAlternatingScheme;
-        const auto runConstruction = configuration.execution.runConstructionScheme;
-        const auto runSimulation   = configuration.execution.runSimulationScheme && configuration.simulation.maxSims > 0;
+        const auto runAlternating  = configuration.execution.runAlternatingChecker;
+        const auto runConstruction = configuration.execution.runConstructionChecker;
+        const auto runSimulation   = configuration.execution.runSimulationChecker && configuration.simulation.maxSims > 0;
 
         const std::size_t tasksToExecute = configuration.simulation.maxSims +
                                            (runAlternating ? 1U : 0U) +

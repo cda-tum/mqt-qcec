@@ -23,12 +23,12 @@ protected:
         qc_original.import(test_original_dir + GetParam() + ".real");
         qc_transpiled.import(test_transpiled_dir + GetParam() + "_transpiled.qasm");
 
-        configuration.execution.runAlternatingScheme  = true;
-        configuration.execution.runConstructionScheme = false;
-        configuration.execution.runSimulationScheme   = false;
+        configuration.execution.runAlternatingChecker  = true;
+        configuration.execution.runConstructionChecker = false;
+        configuration.execution.runSimulationChecker   = false;
 
-        configuration.application.scheme       = ec::ApplicationSchemeType::GateCost;
-        configuration.application.costFunction = ec::LegacyIBMCostFunction;
+        configuration.application.alternatingScheme = ec::ApplicationSchemeType::GateCost;
+        configuration.application.costFunction      = ec::LegacyIBMCostFunction;
     }
 };
 

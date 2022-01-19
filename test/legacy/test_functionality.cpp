@@ -21,12 +21,14 @@ protected:
     void SetUp() override {
         qc_original.import(test_original);
 
-        config.execution.parallel              = false;
-        config.execution.runConstructionScheme = false;
-        config.execution.runAlternatingScheme  = false;
-        config.execution.runSimulationScheme   = false;
-        config.simulation.maxSims              = 16;
-        config.application.scheme              = ec::ApplicationSchemeType::Sequential;
+        config.execution.parallel               = false;
+        config.execution.runConstructionChecker = false;
+        config.execution.runAlternatingChecker  = false;
+        config.execution.runSimulationChecker   = false;
+        config.simulation.maxSims               = 16;
+        config.application.constructionScheme   = ec::ApplicationSchemeType::Sequential;
+        config.application.simulationScheme     = ec::ApplicationSchemeType::Sequential;
+        config.application.alternatingScheme    = ec::ApplicationSchemeType::Sequential;
     }
 };
 
@@ -44,7 +46,7 @@ INSTANTIATE_TEST_SUITE_P(TestCircuits, FunctionalityTest,
 TEST_P(FunctionalityTest, Reference) {
     qc_alternative.import(test_alternative_dir + "test_" + GetParam() + ".qasm");
 
-    config.execution.runConstructionScheme = true;
+    config.execution.runConstructionChecker = true;
 
     ec::EquivalenceCheckingManager ecm(qc_original, qc_alternative, config);
     ecm.run();
@@ -55,8 +57,8 @@ TEST_P(FunctionalityTest, Reference) {
 TEST_P(FunctionalityTest, Proportional) {
     qc_alternative.import(test_alternative_dir + "test_" + GetParam() + ".qasm");
 
-    config.execution.runAlternatingScheme = true;
-    config.application.scheme             = ec::ApplicationSchemeType::Proportional;
+    config.execution.runAlternatingChecker = true;
+    config.application.alternatingScheme   = ec::ApplicationSchemeType::Proportional;
 
     ec::EquivalenceCheckingManager ecm(qc_original, qc_alternative, config);
     ecm.run();
@@ -67,8 +69,8 @@ TEST_P(FunctionalityTest, Proportional) {
 TEST_P(FunctionalityTest, Lookahead) {
     qc_alternative.import(test_alternative_dir + "test_" + GetParam() + ".qasm");
 
-    config.execution.runAlternatingScheme = true;
-    config.application.scheme             = ec::ApplicationSchemeType::Lookahead;
+    config.execution.runAlternatingChecker = true;
+    config.application.alternatingScheme   = ec::ApplicationSchemeType::Lookahead;
 
     ec::EquivalenceCheckingManager ecm(qc_original, qc_alternative, config);
     ecm.run();
@@ -79,8 +81,8 @@ TEST_P(FunctionalityTest, Lookahead) {
 TEST_P(FunctionalityTest, Naive) {
     qc_alternative.import(test_alternative_dir + "test_" + GetParam() + ".qasm");
 
-    config.execution.runAlternatingScheme = true;
-    config.application.scheme             = ec::ApplicationSchemeType::OneToOne;
+    config.execution.runAlternatingChecker = true;
+    config.application.alternatingScheme   = ec::ApplicationSchemeType::OneToOne;
 
     ec::EquivalenceCheckingManager ecm(qc_original, qc_alternative, config);
     ecm.run();
@@ -91,9 +93,9 @@ TEST_P(FunctionalityTest, Naive) {
 TEST_P(FunctionalityTest, CompilationFlow) {
     qc_alternative.import(test_alternative_dir + "test_" + GetParam() + ".qasm");
 
-    config.execution.runAlternatingScheme = true;
-    config.application.scheme             = ec::ApplicationSchemeType::GateCost;
-    config.application.costFunction       = ec::LegacyIBMCostFunction;
+    config.execution.runAlternatingChecker = true;
+    config.application.alternatingScheme   = ec::ApplicationSchemeType::GateCost;
+    config.application.costFunction        = ec::LegacyIBMCostFunction;
 
     ec::EquivalenceCheckingManager ecm(qc_original, qc_alternative, config);
     ecm.run();
@@ -106,38 +108,38 @@ TEST_F(FunctionalityTest, test2) {
     qc_original.import(test_original);
     qc_alternative.import(test_alternative_dir + "test2_optimized.qasm");
 
-    config.execution.runConstructionScheme = true;
+    config.execution.runConstructionChecker = true;
 
     ec::EquivalenceCheckingManager ecm(qc_original, qc_alternative, config);
     ecm.run();
     std::cout << ecm.toString() << std::endl;
     EXPECT_TRUE(ecm.getResults().consideredEquivalent());
 
-    config.execution.runConstructionScheme = false;
-    config.execution.runAlternatingScheme  = true;
-    config.application.scheme              = ec::ApplicationSchemeType::Proportional;
+    config.execution.runConstructionChecker = false;
+    config.execution.runAlternatingChecker  = true;
+    config.application.alternatingScheme    = ec::ApplicationSchemeType::Proportional;
 
     ec::EquivalenceCheckingManager ecm2(qc_original, qc_alternative, config);
     ecm2.run();
     std::cout << ecm2.toString() << std::endl;
     EXPECT_TRUE(ecm2.getResults().consideredEquivalent());
 
-    config.application.scheme = ec::ApplicationSchemeType::Lookahead;
+    config.application.alternatingScheme = ec::ApplicationSchemeType::Lookahead;
 
     ec::EquivalenceCheckingManager ecm3(qc_original, qc_alternative, config);
     ecm3.run();
     std::cout << ecm3.toString() << std::endl;
     EXPECT_TRUE(ecm3.getResults().consideredEquivalent());
 
-    config.application.scheme = ec::ApplicationSchemeType::OneToOne;
+    config.application.alternatingScheme = ec::ApplicationSchemeType::OneToOne;
 
     ec::EquivalenceCheckingManager ecm4(qc_original, qc_alternative, config);
     ecm4.run();
     std::cout << ecm4.toString() << std::endl;
     EXPECT_TRUE(ecm4.getResults().consideredEquivalent());
 
-    config.application.scheme       = ec::ApplicationSchemeType::GateCost;
-    config.application.costFunction = ec::LegacyIBMCostFunction;
+    config.application.alternatingScheme = ec::ApplicationSchemeType::GateCost;
+    config.application.costFunction      = ec::LegacyIBMCostFunction;
 
     ec::EquivalenceCheckingManager ecm5(qc_original, qc_alternative, config);
     ecm5.run();

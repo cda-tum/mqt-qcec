@@ -9,10 +9,13 @@ namespace ec {
     DDSimulationChecker::DDSimulationChecker(const qc::QuantumComputation& qc1, const qc::QuantumComputation& qc2, const Configuration& configuration, bool& done):
         DDEquivalenceChecker(qc1, qc2, configuration, done) {
         initialState = dd->makeZeroState(nqubits);
+        initializeApplicationScheme(this->configuration.application.simulationScheme);
     }
 
     DDSimulationChecker::DDSimulationChecker(const qc::QuantumComputation& qc1, const qc::QuantumComputation& qc2, const Configuration& configuration, bool& done, const qc::VectorDD& initialState):
-        DDEquivalenceChecker(qc1, qc2, configuration, done), initialState(initialState) {}
+        DDEquivalenceChecker(qc1, qc2, configuration, done), initialState(initialState) {
+        initializeApplicationScheme(this->configuration.application.simulationScheme);
+    }
 
     void DDSimulationChecker::initializeTask(TaskManager<qc::VectorDD>& task) {
         task.setInternalState(initialState);

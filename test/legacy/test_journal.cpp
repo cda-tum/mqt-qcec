@@ -127,12 +127,12 @@ INSTANTIATE_TEST_SUITE_P(Journal, JournalTestNonEQ,
 	                         return ss.str(); });
 
 TEST_P(JournalTestNonEQ, PowerOfSimulation) {
-    config.execution.runAlternatingScheme  = false;
-    config.execution.runConstructionScheme = false;
-    config.execution.runSimulationScheme   = true;
-    config.execution.parallel              = false;
-    config.simulation.maxSims              = 16;
-    config.application.scheme              = ec::ApplicationSchemeType::OneToOne;
+    config.execution.runAlternatingChecker  = false;
+    config.execution.runConstructionChecker = false;
+    config.execution.runSimulationChecker   = true;
+    config.execution.parallel               = false;
+    config.simulation.maxSims               = 16;
+    config.application.simulationScheme     = ec::ApplicationSchemeType::OneToOne;
 
     for (unsigned short i = 0; i < tries; ++i) {
         qc_original.import(test_original_dir + std::get<0>(GetParam()) + ".real");
@@ -187,12 +187,12 @@ protected:
     std::string transpiled_file{};
 
     void SetUp() override {
-        config.execution.parallel              = false;
-        config.execution.runConstructionScheme = false;
-        config.execution.runAlternatingScheme  = false;
-        config.execution.runSimulationScheme   = false;
-        config.simulation.maxSims              = 16;
-        config.application.scheme              = ec::ApplicationSchemeType::OneToOne;
+        config.execution.parallel               = false;
+        config.execution.runConstructionChecker = false;
+        config.execution.runAlternatingChecker  = false;
+        config.execution.runSimulationChecker   = false;
+        config.simulation.maxSims               = 16;
+        config.application.simulationScheme     = ec::ApplicationSchemeType::OneToOne;
 
         std::stringstream ss{};
         ss << test_transpiled_dir << GetParam() << "_transpiled.";
@@ -239,7 +239,8 @@ TEST_P(JournalTestEQ, EQReference) {
     qc_original.import(test_original_dir + GetParam() + ".real");
     qc_transpiled.import(transpiled_file);
 
-    config.execution.runConstructionScheme = true;
+    config.execution.runConstructionChecker = true;
+    config.application.constructionScheme   = ec::ApplicationSchemeType::OneToOne;
 
     ec::EquivalenceCheckingManager ecm(qc_original, qc_transpiled, config);
     ecm.run();
@@ -251,8 +252,8 @@ TEST_P(JournalTestEQ, EQNaive) {
     qc_original.import(test_original_dir + GetParam() + ".real");
     qc_transpiled.import(transpiled_file);
 
-    config.execution.runAlternatingScheme = true;
-    config.application.scheme             = ec::ApplicationSchemeType::OneToOne;
+    config.execution.runAlternatingChecker = true;
+    config.application.alternatingScheme   = ec::ApplicationSchemeType::OneToOne;
 
     ec::EquivalenceCheckingManager ecm(qc_original, qc_transpiled, config);
     ecm.run();
@@ -264,8 +265,8 @@ TEST_P(JournalTestEQ, EQProportional) {
     qc_original.import(test_original_dir + GetParam() + ".real");
     qc_transpiled.import(transpiled_file);
 
-    config.execution.runAlternatingScheme = true;
-    config.application.scheme             = ec::ApplicationSchemeType::Proportional;
+    config.execution.runAlternatingChecker = true;
+    config.application.alternatingScheme   = ec::ApplicationSchemeType::Proportional;
 
     ec::EquivalenceCheckingManager ecm(qc_original, qc_transpiled, config);
     ecm.run();
@@ -277,8 +278,8 @@ TEST_P(JournalTestEQ, EQLookahead) {
     qc_original.import(test_original_dir + GetParam() + ".real");
     qc_transpiled.import(transpiled_file);
 
-    config.execution.runAlternatingScheme = true;
-    config.application.scheme             = ec::ApplicationSchemeType::Lookahead;
+    config.execution.runAlternatingChecker = true;
+    config.application.alternatingScheme   = ec::ApplicationSchemeType::Lookahead;
 
     ec::EquivalenceCheckingManager ecm(qc_original, qc_transpiled, config);
     ecm.run();
@@ -290,7 +291,7 @@ TEST_P(JournalTestEQ, EQPowerOfSimulation) {
     qc_original.import(test_original_dir + GetParam() + ".real");
     qc_transpiled.import(transpiled_file);
 
-    config.execution.runSimulationScheme = true;
+    config.execution.runSimulationChecker = true;
 
     ec::EquivalenceCheckingManager ecm(qc_original, qc_transpiled, config);
     ecm.run();
