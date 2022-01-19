@@ -1,8 +1,10 @@
 Notions of Equivalence
 ======================
 
-This class captures all the different notions of equivalence that can be the :class:`result <qcec.EquivalenceCheckingManager.Results>` of a :func:`~qcec.EquivalenceCheckingManager.run`.
+.. currentmodule:: jkq.qcec
 
-    .. autoclass:: qcec.EquivalenceCriterion
+This class captures all the different notions of equivalence that can be the :class:`result <jkq.qcec.EquivalenceCheckingManager.Results>` of a :func:`~jkq.qcec.EquivalenceCheckingManager.run`.
+
+    .. autoclass:: jkq.qcec.EquivalenceCriterion
         :undoc-members:
         :members:

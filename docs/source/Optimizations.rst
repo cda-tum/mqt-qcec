@@ -1,6 +1,6 @@
 Optimizations
 =============
 
-.. autoclass:: qcec.Configuration.Optimizations
+.. autoclass:: jkq.qcec.Configuration.Optimizations
     :members:
     :undoc-members:

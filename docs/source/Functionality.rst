@@ -1,6 +1,6 @@
 Functionality
 =============
 
-.. autoclass:: qcec.Configuration.Functionality
+.. autoclass:: jkq.qcec.Configuration.Functionality
     :members:
     :undoc-members:

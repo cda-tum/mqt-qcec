@@ -1,7 +1,7 @@
 State Types for Simulation
 ==========================
 
-The type of states that is used in the :attr:`simulation checker <qcec.Configuration.Execution.run_simulation_checker>` allows to trade off efficiency versus performance.
+The type of states that is used in the :attr:`simulation checker <jkq.qcec.Configuration.Execution.run_simulation_checker>` allows to trade off efficiency versus performance.
 
 * Random *computational basis states* already offer extremely high error detection rates in general and are comparatively fast to simulate, which makes them the default.
 
@@ -11,6 +11,6 @@ The type of states that is used in the :attr:`simulation checker <qcec.Configura
 
 For details, see :cite:p:`burgholzer2021randomStimuliGenerationQuantum`.
 
-    .. autoclass:: qcec.StateType
+    .. autoclass:: jkq.qcec.StateType
         :undoc-members:
         :members:

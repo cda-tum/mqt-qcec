@@ -1,6 +1,6 @@
 Simulation
 ==========
 
-.. autoclass:: qcec.Configuration.Simulation
+.. autoclass:: jkq.qcec.Configuration.Simulation
     :members:
     :undoc-members:

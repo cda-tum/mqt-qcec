@@ -2,7 +2,7 @@ Equivalence Checking Manager
 ============================
 This is the main class of QCEC that allows to check the equivalence of quantum circuits based on the methods proposed in :cite:p:`burgholzer2021advanced`. It features many configuration options that orchestrate the whole procedure. This page describes all the relevant methods of the Equivalence Checking Manager.
 
-    .. currentmodule:: qcec
+    .. currentmodule:: jkq.qcec
     .. autoclass:: EquivalenceCheckingManager
 
 Constructing an instance
