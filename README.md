@@ -2,17 +2,13 @@
 
 <h1>QCEC - A tool for Quantum Circuit Equivalence Checking</h1>
 
-<a href='https://github.com/chroline/well_app/releases'>
+<a href='https://github.com/iic-jku/qcec/releases'>
 <img src='https://img.shields.io/github/v/release/iic-jku/qcec?color=yellow&label=version&style=for-the-badge' alt="version">
 </a>
 
-<a href='https://iic.jku.at/eda/research/quantum_dd/tool/'>
 <img src="https://img.shields.io/badge/Solution-C++17-blue.svg?style=for-the-badge&logo=c%2B%2B&logoColor=b0c0c0&labelColor=363D44" alt="C++ solution"/>
-</a>
 
-<a href='https://iic.jku.at/eda/research/quantum_dd/tool/'>
 <img src="https://img.shields.io/badge/OS-linux%20%7C%20macos%20%7C%20windows-purple?style=for-the-badge&logo=Linux&logoColor=b0c0c0&labelColor=363D44" alt="Operating systems"/>
-</a>
 
 <a href='https://github.com/iic-jku/burgholzer/blob/master/LICENSE'>
 <img src='https://img.shields.io/github/license/iic-jku/qcec?style=for-the-badge' alt="licence">
