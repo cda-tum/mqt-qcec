@@ -454,10 +454,11 @@ namespace ec {
                 if (results.startedSimulations < configuration.simulation.maxSims) {
                     threads[*completedID] = std::thread([&, id = *completedID] {
                         {
+                            auto*           checker = dynamic_cast<DDSimulationChecker*>(checkers[id].get());
                             std::lock_guard stateGeneratorLock(stateGeneratorMutex);
-                            simChecker->setRandomInitialState(stateGenerator);
+                            checker->setRandomInitialState(stateGenerator);
                         }
-                        simChecker->run();
+                        checkers[id]->run();
                         queue.push(id);
                     });
                     ++results.startedSimulations;
@@ -473,7 +474,7 @@ namespace ec {
 
         // cleanup threads that are still running by simply detaching them.
         // at the moment this seems like the only way to prematurely return once a result has been determined (without waiting for all other tasks to complete)
-        // unfortunately, this may leak some resources
+        // unfortunately, this may leak some resources and might cause problems if `run` is called multiple times in a single process
         for (auto& thread: threads) {
             if (thread.joinable()) {
                 thread.detach();
