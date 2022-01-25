@@ -193,6 +193,11 @@ namespace ec {
         } else {
             checkParallel();
         }
+
+        // the check is done, notify all potentially waiting threads about its completion
+        done = true;
+        doneCond.notify_one();
+
         const auto end    = std::chrono::steady_clock::now();
         results.checkTime = std::chrono::duration<double>(end - start).count();
     }
@@ -249,8 +254,12 @@ namespace ec {
         // in case a timeout is configured, a separate thread is started that sets the `done` flag after the timeout has passed
         if (configuration.execution.timeout > 0s) {
             auto timeoutThread = std::thread([&, timeout = configuration.execution.timeout] {
-                std::this_thread::sleep_for(timeout);
-                done = true;
+                std::unique_lock doneLock(doneMutex);
+                auto             finished = doneCond.wait_for(doneLock, timeout, [&] { return done; });
+                // if the thread has already finished within the timeout, nothing has to be done
+                if (!finished) {
+                    done = true;
+                }
             });
             timeoutThread.detach();
         }
