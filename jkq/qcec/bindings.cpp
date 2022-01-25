@@ -229,59 +229,10 @@ namespace ec {
                 .def(py::init([](const std::string& str) -> EquivalenceCriterion { return fromString(str); }));
 
         // Class definitions
-        py::class_<Configuration>                configuration(m, "Configuration", "Configuration options for the QCEC quantum circuit equivalence checking tool");
-        py::class_<Configuration::Execution>     execution(configuration, "Execution", "Execution options");
-        py::class_<Configuration::Optimizations> optimizations(configuration, "Optimizations", "Optimization options");
-        py::class_<Configuration::Application>   application(configuration, "Application", "Application options");
-        py::class_<Configuration::Functionality> functionality(configuration, "Functionality", "Functionality options");
-        py::class_<Configuration::Simulation>    simulation(configuration, "Simulation", "Simulation options");
-
         py::class_<EquivalenceCheckingManager>          ecm(m, "EquivalenceCheckingManager", "Main class for orchestrating the equivalence check");
         py::class_<EquivalenceCheckingManager::Results> results(ecm, "Results", "Equivalence checking results");
 
-        // Configuration
-        configuration.def(py::init<>())
-                .def_readwrite("execution", &Configuration::execution)
-                .def_readwrite("optimizations", &Configuration::optimizations)
-                .def_readwrite("application", &Configuration::application)
-                .def_readwrite("functionality", &Configuration::functionality)
-                .def_readwrite("simulation", &Configuration::simulation)
-                .def("json", &Configuration::json)
-                .def("__repr__", &Configuration::toString);
-
-        execution.def(py::init<>())
-                .def_readwrite("numerical_tolerance", &Configuration::Execution::numericalTolerance)
-                .def_readwrite("parallel", &Configuration::Execution::parallel)
-                .def_readwrite("nthreads", &Configuration::Execution::nthreads)
-                .def_readwrite("timeout", &Configuration::Execution::timeout)
-                .def_readwrite("run_construction_checker", &Configuration::Execution::runConstructionChecker)
-                .def_readwrite("run_simulation_checker", &Configuration::Execution::runSimulationChecker)
-                .def_readwrite("run_alternating_checker", &Configuration::Execution::runAlternatingChecker);
-
-        optimizations.def(py::init<>())
-                .def_readwrite("fix_output_permutation_mismatch", &Configuration::Optimizations::fixOutputPermutationMismatch)
-                .def_readwrite("fuse_single_qubit_gates", &Configuration::Optimizations::fuseSingleQubitGates)
-                .def_readwrite("reconstruct_swaps", &Configuration::Optimizations::reconstructSWAPs)
-                .def_readwrite("remove_diagonal_gates_before_measure", &Configuration::Optimizations::removeDiagonalGatesBeforeMeasure)
-                .def_readwrite("transform_dynamic_circuit", &Configuration::Optimizations::transformDynamicCircuit)
-                .def_readwrite("reorder_operations", &Configuration::Optimizations::reorderOperations);
-
-        application.def(py::init<>())
-                .def_readwrite("constructionScheme", &Configuration::Application::constructionScheme)
-                .def_readwrite("simulationScheme", &Configuration::Application::simulationScheme)
-                .def_readwrite("alternatingScheme", &Configuration::Application::alternatingScheme)
-                .def_readwrite("profile", &Configuration::Application::profile);
-
-        functionality.def(py::init<>())
-                .def_readwrite("trace_treshold", &Configuration::Functionality::traceThreshold);
-
-        simulation.def(py::init<>())
-                .def_readwrite("fidelity_treshold", &Configuration::Simulation::fidelityThreshold)
-                .def_readwrite("max_sims", &Configuration::Simulation::maxSims)
-                .def_readwrite("state_type", &Configuration::Simulation::stateType)
-                .def_readwrite("seed", &Configuration::Simulation::seed)
-                .def_readwrite("store_cex_input", &Configuration::Simulation::storeCEXinput)
-                .def_readwrite("store_cex_output", &Configuration::Simulation::storeCEXoutput);
+        py::class_<Configuration> configuration(m, "Configuration", "Configuration options for the QCEC quantum circuit equivalence checking tool");
 
         // Constructors
         ecm.def(py::init(&createManagerFromOptions), "circ1"_a, "circ2"_a,
@@ -323,8 +274,8 @@ namespace ec {
                      "Set whether execution should happen in :attr:`~Configuration.Execution.parallel`.")
                 .def("set_nthreads", &EquivalenceCheckingManager::setNThreads, "nthreads"_a = std::max(2U, std::thread::hardware_concurrency()),
                      "Set the maximum number of :attr:`threads <.Configuration.Execution.nthreads>` to use.")
-                .def("set_timeout", &EquivalenceCheckingManager::setTimeout, "timeout"_a = 0s,
-                     "Set a :attr:`timeout <.Configuration.Execution.timeout>` for :func:`~EquivalenceCheckingManager.run`.")
+                .def("set_timeout", &EquivalenceCheckingManager::setTimeout, "timeout"_a = 0.0,
+                     "Set a :attr:`timeout <.Configuration.Execution.timeout>` (in seconds) for :func:`~EquivalenceCheckingManager.run`. The timeout can also be specified by a :class:`float`.")
                 .def("set_construction_checker", &EquivalenceCheckingManager::setConstructionChecker, "enable"_a = false,
                      "Set whether the :attr:`construction checker <.Configuration.Execution.run_construction_checker>` should be executed.")
                 .def("set_simulation_checker", &EquivalenceCheckingManager::setSimulationChecker, "enable"_a = true,
@@ -415,6 +366,56 @@ namespace ec {
                      "Returns a JSON-style dictionary of the results.")
                 .def("__repr__", &EquivalenceCheckingManager::Results::toString,
                      "Prints a JSON-formatted representation of the results.");
+
+        py::class_<Configuration::Execution>     execution(configuration, "Execution", "Options that orchestrate the :meth:`~.EquivalenceCheckingManager.run` method.");
+        py::class_<Configuration::Optimizations> optimizations(configuration, "Optimizations", "Options that influence which circuit optimizations are applied during pre-processing.");
+        py::class_<Configuration::Application>   application(configuration, "Application", "Options that describe the :class:`Application Scheme <.ApplicationScheme>` that is used for the individual equivalence checkers.");
+        py::class_<Configuration::Functionality> functionality(configuration, "Functionality", "Options for all checkers that consider the whole functionality of a circuit.");
+        py::class_<Configuration::Simulation>    simulation(configuration, "Simulation", "Options that influence the simulation-based equivalence checker.");
+
+        // Configuration
+        configuration.def(py::init<>())
+                .def_readwrite("execution", &Configuration::execution)
+                .def_readwrite("optimizations", &Configuration::optimizations)
+                .def_readwrite("application", &Configuration::application)
+                .def_readwrite("functionality", &Configuration::functionality)
+                .def_readwrite("simulation", &Configuration::simulation)
+                .def("json", &Configuration::json, "Returns a JSON-style dictionary of the configuration.")
+                .def("__repr__", &Configuration::toString, "Prints a JSON-formatted representation of the configuration.");
+
+        execution.def(py::init<>())
+                .def_readwrite("parallel", &Configuration::Execution::parallel, "Set whether execution should happen in parallel. Defaults to :code:`True`.")
+                .def_readwrite("nthreads", &Configuration::Execution::nthreads, "Set the maximum number of threads to use. Defaults to the maximum number of available threads reported by the OS.")
+                .def_readwrite("timeout", &Configuration::Execution::timeout, "Set a timeout for :meth:`~.EquivalenceCheckingManager.run` (in seconds). Either a :class:`datetime.timedelta` or :class:`float`. Defaults to :code:`0.`, which means no timeout.")
+                .def_readwrite("run_construction_checker", &Configuration::Execution::runConstructionChecker, "Set whether the construction checker should be executed. Defaults to :code:`False` since the alternating checker is to be preferred in most cases.")
+                .def_readwrite("run_simulation_checker", &Configuration::Execution::runSimulationChecker, "Set whether the simulation checker should be executed. Defaults to :code:`True` since simulations can quickly show the non-equivalence of circuits in many cases.")
+                .def_readwrite("run_alternating_checker", &Configuration::Execution::runAlternatingChecker, "Set whether the alternating checker should be executed. Defaults to :code:`True` since staying close to the identity can quickly show the equivalence of circuits in many cases.")
+                .def_readwrite("numerical_tolerance", &Configuration::Execution::numericalTolerance, "Set the numerical tolerance of the underlying decision diagram package. Defaults to :code:`~2e-13` and should only be changed by users who know what they are doing.");
+
+        optimizations.def(py::init<>())
+                .def_readwrite("fix_output_permutation_mismatch", &Configuration::Optimizations::fixOutputPermutationMismatch, "Try to fix potential mismatches in output permutations. This is experimental and, hence, defaults to :code:`False`.")
+                .def_readwrite("fuse_single_qubit_gates", &Configuration::Optimizations::fuseSingleQubitGates, "Fuse consecutive single-qubit gates by grouping them together. Defaults to :code:`True` as this typically increases the performance of the subsequent equivalence check.")
+                .def_readwrite("reconstruct_swaps", &Configuration::Optimizations::reconstructSWAPs, "Try to reconstruct SWAP gates that have been decomposed (into a sequence of 3 CNOT gates) or optimized away (as a consequence of a SWAP preceded or followed by a CNOT on the same qubits). Defaults to :code:`True` since this reconstruction enables the efficient tracking of logical to physical qubit permutations throughout circuits that have been mapped to a target architecture.")
+                .def_readwrite("remove_diagonal_gates_before_measure", &Configuration::Optimizations::removeDiagonalGatesBeforeMeasure, "Remove any diagonal gates at the end of the circuit. This might be desirable since any diagonal gate in front of a measurement does not influence the probabilities of the respective states. Defaults to :code:`False` since, in general, circuits differing by diagonal gates at the end should still be considered non-equivalent.")
+                .def_readwrite("transform_dynamic_circuit", &Configuration::Optimizations::transformDynamicCircuit, "Circuits containing dynamic circuit primitives such as mid-circuit measurements, resets, or classically-controlled operations cannot be verified in a straight-forward fashion due to the non-unitary nature of these primitives, which is why this setting defaults to :code:`False`. By enabling this optimization, any dynamic circuit is first transformed to a circuit without non-unitary primitives by, first, substituting qubit resets with new qubits and, then, applying the deferred measurement principle to defer measurements to the end.")
+                .def_readwrite("reorder_operations", &Configuration::Optimizations::reorderOperations, "The operations of a circuit are stored in a sequential container. This introduces some dependencies in the order of operations that are not naturally present in the quantum circuit. As a consequence, two quantum circuits that contain exactly the same operations, list their operations in different ways, also apply there operations in a different order. This optimization pass established a canonical ordering of operations by, first, constructing a directed, acyclic graph for the operations and, then, traversing it in a breadth-first fashion. Defaults to :code:`True`.");
+
+        application.def(py::init<>())
+                .def_readwrite("constructionScheme", &Configuration::Application::constructionScheme, "The :class:`Application Scheme <.ApplicationScheme>` used for the construction checker.")
+                .def_readwrite("simulationScheme", &Configuration::Application::simulationScheme, "The :class:`Application Scheme <.ApplicationScheme>` used for the simulation checker.")
+                .def_readwrite("alternatingScheme", &Configuration::Application::alternatingScheme, "The :class:`Application Scheme <.ApplicationScheme>` used for the alternating checker.")
+                .def_readwrite("profile", &Configuration::Application::profile, "The :attr:`Gate Cost <.ApplicationScheme.gate_cost>` application scheme can be configured with a profile that specifies the cost of gates. At the moment, this profile can be set via a file that is constructed similar to a lookup table. Every line :code:`<GATE_ID> <N_CONTROLS> <COST>` specified the cost for a given gate type and with a certain number of controls, e.g., :code:`X 0 1` denotes that a single-qubit X gate has a cost of :code:`1`, while :code:`X 2 15` denotes that a Toffoli gate has a cost of :code:`15`.");
+
+        functionality.def(py::init<>())
+                .def_readwrite("trace_threshold", &Configuration::Functionality::traceThreshold, "While decision diagrams are canonical in theory, i.e., equivalent circuits produce equivalent decision diagrams, numerical inaccuracies and approximations can harm this property. This can result in a scenario where two decision diagrams are really close to one another, but cannot be identified as such by standard methods (i.e., comparing their root pointers). Instead, for two decision diagrams :code:`U` and :code:`U'` representing the functionalities of two circuits :code:`G` and :code:`G'`, the trace of the product of one decision diagram with the inverse of the other can be computed and compared to the trace of the identity. Alternatively, it can be checked, whether :code:`U*U`^-1` is \"close enough\" to the identity by recursively checking that each decision diagram node is close enough to the identity structure (i.e., the first and last successor have weights close to one, while the second and third successor have weights close to zero). Whenever any decision diagram node differs from this structure by more than the configured threshold, the circuits are concluded to be non-equivalent. Defaults to :code:`1e-8`.");
+
+        simulation.def(py::init<>())
+                .def_readwrite("fidelity_threshold", &Configuration::Simulation::fidelityThreshold, "Similar to :attr:`trace threshold <.Configuration.Functionality.trace_threshold>`, this setting is here to tackle numerical inaccuracies and approximations for the simulation checker. Instead of computing a trace, the fidelity between the states resulting from the simulation is computed. Whenever the fidelity differs from :code:`1.` by more than the configured threshold, the circuits are concluded to be non-equivalent. Defaults to :code:`1e-8`.")
+                .def_readwrite("max_sims", &Configuration::Simulation::maxSims, "The maximum number of simulations to be started for the simulation checker. In practice, just a couple of simulations suffice in most cases to detect a potential non-equivalence. Either defaults to :code:`16` or the maximum number of available threads minus 2, whichever is more.")
+                .def_readwrite("state_type", &Configuration::Simulation::stateType, "The :class:`type of states <.StateType>` used for the simulations in the simulation checker.")
+                .def_readwrite("seed", &Configuration::Simulation::seed, "The seed used in the quantum state generator. Defaults to :code:`0`, which means that the seed is chosen non-deterministically for each program run.")
+                .def_readwrite("store_cex_input", &Configuration::Simulation::storeCEXinput, "Whether to store the input state that has lead to the determination of a counterexample. Since the memory required to store a full representation of a quantum state increases exponentially, this is only recommended for a small number of qubits and defaults to :code:`False`.")
+                .def_readwrite("store_cex_output", &Configuration::Simulation::storeCEXoutput, "Whether to store the resulting states that prove the non-equivalence of both circuits. Since the memory required to store a full representation of a quantum state increases exponentially, this is only recommended for a small number of qubits and defaults to :code:`False`.");
 
 #ifdef VERSION_INFO
         m.attr("__version__") = VERSION_INFO;
