@@ -92,7 +92,7 @@ namespace ec {
         }
         void setParallel(bool parallel) { configuration.execution.parallel = parallel; }
         void setNThreads(std::size_t nthreads) { configuration.execution.nthreads = nthreads; }
-        void setTimeout(std::size_t timeout) { configuration.execution.timeout = std::chrono::seconds{timeout}; }
+        void setTimeout(std::chrono::seconds timeout) { configuration.execution.timeout = timeout; }
         void setConstructionChecker(bool run) { configuration.execution.runConstructionChecker = run; }
         void setSimulationChecker(bool run) { configuration.execution.runSimulationChecker = run; }
         void setAlternatingChecker(bool run) { configuration.execution.runAlternatingChecker = run; }

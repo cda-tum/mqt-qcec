@@ -4,6 +4,7 @@
  */
 
 #include "EquivalenceCheckingManager.hpp"
+#include "pybind11/chrono.h"
 #include "pybind11/pybind11.h"
 #include "pybind11/stl.h"
 #include "pybind11_json/pybind11_json.hpp"
@@ -65,13 +66,13 @@ namespace ec {
 
     std::unique_ptr<EquivalenceCheckingManager> createManagerFromOptions(const py::object& circ1, const py::object& circ2,
                                                                          // Execution
-                                                                         dd::fp      numericalTolerance     = dd::ComplexTable<>::tolerance(),
-                                                                         bool        parallel               = true,
-                                                                         std::size_t nthreads               = std::max(2U, std::thread::hardware_concurrency()),
-                                                                         std::size_t timeout                = 0U,
-                                                                         bool        runConstructionChecker = false,
-                                                                         bool        runSimulationChecker   = true,
-                                                                         bool        runAlternatingChecker  = true,
+                                                                         dd::fp               numericalTolerance     = dd::ComplexTable<>::tolerance(),
+                                                                         bool                 parallel               = true,
+                                                                         std::size_t          nthreads               = std::max(2U, std::thread::hardware_concurrency()),
+                                                                         std::chrono::seconds timeout                = 0s,
+                                                                         bool                 runConstructionChecker = false,
+                                                                         bool                 runSimulationChecker   = true,
+                                                                         bool                 runAlternatingChecker  = true,
                                                                          // Optimization
                                                                          bool fixOutputPermutationMismatch     = false,
                                                                          bool fuseSingleQubitGates             = true,
@@ -98,7 +99,7 @@ namespace ec {
         configuration.execution.numericalTolerance     = numericalTolerance;
         configuration.execution.parallel               = parallel;
         configuration.execution.nthreads               = nthreads;
-        configuration.execution.timeout                = std::chrono::seconds{timeout};
+        configuration.execution.timeout                = timeout;
         configuration.execution.runConstructionChecker = runConstructionChecker;
         configuration.execution.runSimulationChecker   = runSimulationChecker;
         configuration.execution.runAlternatingChecker  = runAlternatingChecker;
@@ -322,7 +323,7 @@ namespace ec {
                      "Set whether execution should happen in :attr:`~Configuration.Execution.parallel`.")
                 .def("set_nthreads", &EquivalenceCheckingManager::setNThreads, "nthreads"_a = std::max(2U, std::thread::hardware_concurrency()),
                      "Set the maximum number of :attr:`threads <.Configuration.Execution.nthreads>` to use.")
-                .def("set_timeout", &EquivalenceCheckingManager::setTimeout, "timeout"_a = 0U,
+                .def("set_timeout", &EquivalenceCheckingManager::setTimeout, "timeout"_a = 0s,
                      "Set a :attr:`timeout <.Configuration.Execution.timeout>` for :func:`~EquivalenceCheckingManager.run`.")
                 .def("set_construction_checker", &EquivalenceCheckingManager::setConstructionChecker, "enable"_a = false,
                      "Set whether the :attr:`construction checker <.Configuration.Execution.run_construction_checker>` should be executed.")
