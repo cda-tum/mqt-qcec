@@ -12,12 +12,6 @@ namespace ec {
     public:
         DDSimulationChecker(const qc::QuantumComputation& qc1, const qc::QuantumComputation& qc2, const ec::Configuration& configuration, bool& done) noexcept;
 
-        DDSimulationChecker(const qc::QuantumComputation& qc1, const qc::QuantumComputation& qc2, const ec::Configuration& configuration, bool& done, const qc::VectorDD& initialState) noexcept;
-
-        [[nodiscard]] const qc::VectorDD& getInitialState() const { return initialState; }
-
-        void setInitialState(const qc::VectorDD& state) { initialState = state; }
-
         void setRandomInitialState(StateGenerator& generator);
 
         [[nodiscard]] dd::CVec getInitialVector() const { return dd->getVector(initialState); }
