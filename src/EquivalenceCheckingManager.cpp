@@ -486,9 +486,18 @@ namespace ec {
         results.checkTime = std::chrono::duration<double>(end - start).count();
 
         // cleanup threads that are still running by joining them
+        // start by joining all the completed threads, which should succeed instantly
+        while (!queue.empty()) {
+            const auto completedID = queue.waitAndPop();
+            auto&      thread      = threads.at(*completedID);
+            if (thread.joinable())
+                thread.join();
+        }
+
+        // afterwards, join all threads that are still (potentially) running.
         // at the moment there seems to be no solution for prematurely killing running threads without risking synchronisation issues.
         // on the positive side, joining should avoid all of these potential issues
-        // on the negative side, one potentially has to wait for a long-running operation that is applied during the equivalence check to finish in order to continue
+        // on the negative side, one of the threads might still be stuck in a long-running operation and does not check for the `done` signal until this operation completes
         for (auto& thread: threads) {
             if (thread.joinable()) {
                 thread.join();
