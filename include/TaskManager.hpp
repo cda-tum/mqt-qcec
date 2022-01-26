@@ -3,15 +3,14 @@
 * See file README.md or go to http://iic.jku.at/eda/research/quantum_verification/ for more information.
 */
 
-#ifndef QCEC_TASKMANAGER_HPP
-#define QCEC_TASKMANAGER_HPP
+#pragma once
 
 #include "QuantumComputation.hpp"
 #include "dd/Package.hpp"
 
 namespace ec {
-    enum Direction : bool { LEFT  = true,
-                            RIGHT = false };
+    enum Direction : bool { Left  = true,
+                            Right = false };
 
     template<class DDType>
     class TaskManager {
@@ -22,34 +21,34 @@ namespace ec {
         decltype(qc->end())           end;
         std::unique_ptr<dd::Package>& package;
         DDType                        internalState{};
-        ec::Direction                 direction = LEFT;
+        ec::Direction                 direction = Left;
 
     public:
-        explicit TaskManager(const qc::QuantumComputation& qc, std::unique_ptr<dd::Package>& package, const ec::Direction& direction = LEFT):
+        explicit TaskManager(const qc::QuantumComputation& qc, std::unique_ptr<dd::Package>& package, const ec::Direction& direction = Left) noexcept:
             qc(&qc), package(package), direction(direction) {
             permutation = qc.initialLayout;
             iterator    = qc.begin();
             end         = qc.end();
         }
 
-        [[nodiscard]] bool finished() const { return iterator == end; }
+        [[nodiscard]] bool finished() const noexcept { return iterator == end; }
 
         const std::unique_ptr<qc::Operation>& operator()() const { return *iterator; }
 
-        [[nodiscard]] const DDType& getInternalState() const {
+        [[nodiscard]] const DDType& getInternalState() const noexcept {
             return internalState;
         }
-        void setInternalState(const DDType& state) {
+        void setInternalState(const DDType& state) noexcept {
             internalState = state;
         }
-        void flipDirection() { direction = (direction == LEFT) ? RIGHT : LEFT; }
+        void flipDirection() noexcept { direction = (direction == Left) ? Right : Left; }
 
         inline qc::MatrixDD getDD() { return (*iterator)->getDD(package, permutation); }
         inline qc::MatrixDD getInverseDD() { return (*iterator)->getInverseDD(package, permutation); }
 
-        [[nodiscard]] const qc::QuantumComputation* getCircuit() const { return qc; }
+        [[nodiscard]] const qc::QuantumComputation* getCircuit() const noexcept { return qc; }
 
-        [[nodiscard]] const qc::Permutation& getPermutation() const { return permutation; }
+        [[nodiscard]] const qc::Permutation& getPermutation() const noexcept { return permutation; }
 
         void advanceIterator() { ++iterator; }
 
@@ -59,7 +58,7 @@ namespace ec {
                 // direction has no effect on state vector DDs
                 to = package->multiply(getDD(), to);
             } else {
-                if (direction == LEFT) {
+                if (direction == Left) {
                     to = package->multiply(getDD(), to);
                 } else {
                     to = package->multiply(to, getInverseDD());
@@ -78,14 +77,14 @@ namespace ec {
         }
         void applySwapOperations() { applySwapOperations(internalState); }
 
-        void advance(DDType& state, std::size_t nops = 1) {
+        void advance(DDType& state, std::size_t steps = 1U) {
             // TODO: it might make sense to explore whether gate fusion improves performance
-            for (std::size_t i = 0; i < nops && !finished(); ++i) {
+            for (std::size_t i = 0U; i < steps && !finished(); ++i) {
                 applyGate(state);
                 applySwapOperations(state);
             }
         }
-        void advance(std::size_t nops = 1) { advance(internalState, nops); }
+        void advance(std::size_t steps = 1U) { advance(internalState, steps); }
 
         void finish(DDType& state) {
             while (!finished()) {
@@ -126,5 +125,3 @@ namespace ec {
         void decRef() { decRef(internalState); }
     };
 } // namespace ec
-
-#endif //QCEC_TASKMANAGER_HPP

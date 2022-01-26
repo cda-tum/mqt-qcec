@@ -585,13 +585,13 @@ namespace ec {
             if (!cexInput.empty() || !cexOutput1.empty() || !cexOutput2.empty()) {
                 auto& cex = sim["verification_cex"];
                 if (!cexInput.empty()) {
-                    to_json(cex["input"], cexInput);
+                    toJson(cex["input"], cexInput);
                 }
                 if (!cexOutput1.empty()) {
-                    to_json(cex["output1"], cexOutput1);
+                    toJson(cex["output1"], cexOutput1);
                 }
                 if (!cexOutput2.empty()) {
-                    to_json(cex["output2"], cexOutput2);
+                    toJson(cex["output2"], cexOutput2);
                 }
             }
         }

@@ -8,7 +8,7 @@
 namespace ec {
 
     template<class DDType>
-    DDEquivalenceChecker<DDType>::DDEquivalenceChecker(const qc::QuantumComputation& qc1, const qc::QuantumComputation& qc2, Configuration configuration, bool& done):
+    DDEquivalenceChecker<DDType>::DDEquivalenceChecker(const qc::QuantumComputation& qc1, const qc::QuantumComputation& qc2, Configuration configuration, bool& done) noexcept:
         EquivalenceChecker(qc1, qc2, configuration, done),
         dd(std::make_unique<dd::Package>(nqubits)),
         taskManager1(TaskManager<DDType>(qc1, dd)),
@@ -34,9 +34,9 @@ namespace ec {
         // equivalent. However, numerical instabilities might create a scenario where two nodes differ besides
         // their underlying decision diagrams being extremely close (for some definition of `close`).
         if constexpr (std::is_same_v<DDType, qc::MatrixDD>) {
-            // for matrices this can be resolved by calculating their Frobenius inner product tr(U V^-1) and comparing it to some threshold.
+            // for matrices this can be resolved by calculating their Frobenius inner product trace(U V^-1) and comparing it to some threshold.
             // in a similar fashion, we can simply compare U V^-1 with the identity, which results in a much simpler check that is not prone to overflow.
-            bool isClose{};
+            bool isClose;
             if (e.p->ident) {
                 isClose = dd->isCloseToIdentity(f, configuration.functionality.traceThreshold);
             } else if (f.p->ident) {
@@ -80,26 +80,30 @@ namespace ec {
         // initialize the internal representation (initial state, initial matrix, etc.)
         initialize();
 
-        if (done)
+        if (done) {
             return equivalence;
+        }
 
         // execute the equivalence checking scheme
         execute();
 
-        if (done)
+        if (done) {
             return equivalence;
+        }
 
         // finish off both circuits
         finish();
 
-        if (done)
+        if (done) {
             return equivalence;
+        }
 
         // postprocess the result
         postprocess();
 
-        if (done)
+        if (done) {
             return equivalence;
+        }
 
         // check the equivalence
         equivalence = checkEquivalence();
@@ -135,9 +139,13 @@ namespace ec {
                 const auto [apply1, apply2] = (*applicationScheme)();
 
                 // advance both tasks correspondingly
-                if (done) return;
+                if (done) {
+                    return;
+                }
                 taskManager1.advance(apply1);
-                if (done) return;
+                if (done) {
+                    return;
+                }
                 taskManager2.advance(apply2);
             }
         }
@@ -146,7 +154,9 @@ namespace ec {
     template<class DDType>
     void DDEquivalenceChecker<DDType>::finish() {
         taskManager1.finish();
-        if (done) return;
+        if (done) {
+            return;
+        }
         taskManager2.finish();
     }
 
@@ -154,10 +164,14 @@ namespace ec {
     void DDEquivalenceChecker<DDType>::postprocessTask(TaskManager<DDType>& task) {
         // ensure that the permutation that was tracked throughout the circuit matches the expected output permutation
         task.changePermutation();
-        if (done) return;
+        if (done) {
+            return;
+        }
         // eliminate the superfluous contributions of ancillary qubits (this only has an effect on matrices)
         task.reduceAncillae();
-        if (done) return;
+        if (done) {
+            return;
+        }
         // sum up the contributions of garbage qubits
         task.reduceGarbage();
     }
@@ -165,7 +179,9 @@ namespace ec {
     template<class DDType>
     void DDEquivalenceChecker<DDType>::postprocess() {
         postprocessTask(taskManager1);
-        if (done) return;
+        if (done) {
+            return;
+        }
         postprocessTask(taskManager2);
     }
 

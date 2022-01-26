@@ -54,16 +54,10 @@ namespace ec {
 
             [[nodiscard]] nlohmann::json json() const;
 
-            static void to_json(nlohmann::json& j, const dd::CVec& stateVector) {
+            static void toJson(nlohmann::json& j, const dd::CVec& stateVector) {
                 j = nlohmann::json::array();
                 for (const auto& amp: stateVector) {
                     j.emplace_back(std::pair{amp.real(), amp.imag()});
-                }
-            }
-            static void from_json(const nlohmann::json& j, dd::CVec& stateVector) {
-                for (std::size_t i = 0; i < j.size(); ++i) {
-                    const auto& c  = j.at(i).get<std::pair<dd::fp, dd::fp>>();
-                    stateVector[i] = std::complex<dd::fp>(c.first, c.second);
                 }
             }
             [[nodiscard]] std::string toString() const {
@@ -154,8 +148,9 @@ namespace ec {
         // Simulation: These setting may be changed to adjust the kinds of simulations that are performed
         void setFidelityThreshold(double fidelityThreshold) { configuration.simulation.fidelityThreshold = fidelityThreshold; }
         void setMaxSims(std::size_t sims) {
-            if (sims == 0)
+            if (sims == 0U) {
                 configuration.execution.runSimulationChecker = false;
+            }
             configuration.simulation.maxSims = sims;
         }
         void setStateType(StateType stateType) { configuration.simulation.stateType = stateType; }

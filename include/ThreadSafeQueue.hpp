@@ -3,8 +3,7 @@
 * See file README.md or go to http://iic.jku.at/eda/research/quantum_verification/ for more information.
 */
 
-#ifndef QCEC_THREADSAFEQUEUE_HPP
-#define QCEC_THREADSAFEQUEUE_HPP
+#pragma once
 
 #include <chrono>
 #include <condition_variable>
@@ -96,5 +95,3 @@ public:
         return (head.get() == getTail());
     }
 };
-
-#endif //QCEC_THREADSAFEQUEUE_HPP

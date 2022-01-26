@@ -3,8 +3,7 @@
 * See file README.md or go to http://iic.jku.at/eda/research/quantum_verification/ for more information.
 */
 
-#ifndef QCEC_DDALTERNATINGCHECKER_HPP
-#define QCEC_DDALTERNATINGCHECKER_HPP
+#pragma once
 
 #include "applicationscheme/LookaheadApplicationScheme.hpp"
 #include "checker/DDEquivalenceChecker.hpp"
@@ -27,7 +26,7 @@ namespace ec {
             }
         }
 
-        void json(nlohmann::json& j) const override {
+        void json(nlohmann::json& j) const noexcept override {
             DDEquivalenceChecker::json(j);
             j["checker"] = "decision_diagram_alternating";
         }
@@ -44,5 +43,3 @@ namespace ec {
         bool gatesAreIdentical();
     };
 } // namespace ec
-
-#endif //QCEC_DDALTERNATINGCHECKER_HPP

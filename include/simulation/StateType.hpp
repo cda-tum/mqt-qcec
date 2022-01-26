@@ -3,8 +3,7 @@
 * See file README.md or go to http://iic.jku.at/eda/research/quantum_verification/ for more information.
 */
 
-#ifndef QCEC_STATETYPE_HPP
-#define QCEC_STATETYPE_HPP
+#pragma once
 
 #include <iostream>
 
@@ -15,7 +14,7 @@ namespace ec {
         Stabilizer
     };
 
-    inline std::string toString(const StateType& type) {
+    inline std::string toString(const StateType& type) noexcept {
         switch (type) {
             case StateType::ComputationalBasis:
                 return "computational_basis";
@@ -51,5 +50,3 @@ namespace ec {
         return out;
     }
 } // namespace ec
-
-#endif //QCEC_STATETYPE_HPP

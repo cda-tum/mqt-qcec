@@ -14,7 +14,7 @@
 namespace ec {
     class EquivalenceChecker {
     public:
-        EquivalenceChecker(const qc::QuantumComputation& qc1, const qc::QuantumComputation& qc2, Configuration configuration, bool& done):
+        EquivalenceChecker(const qc::QuantumComputation& qc1, const qc::QuantumComputation& qc2, Configuration configuration, bool& done) noexcept:
             qc1(qc1), qc2(qc2),
             nqubits(std::max(qc1.getNqubits(), qc2.getNqubits())),
             configuration(std::move(configuration)),
@@ -24,17 +24,17 @@ namespace ec {
 
         virtual EquivalenceCriterion run() = 0;
 
-        [[nodiscard]] const Configuration& getConfiguration() const {
+        [[nodiscard]] const Configuration& getConfiguration() const noexcept {
             return configuration;
         }
-        [[nodiscard]] EquivalenceCriterion getEquivalence() const {
+        [[nodiscard]] EquivalenceCriterion getEquivalence() const noexcept {
             return equivalence;
         }
-        [[nodiscard]] double getRuntime() const {
+        [[nodiscard]] double getRuntime() const noexcept {
             return runtime;
         }
 
-        virtual void json(nlohmann::json& j) const {
+        virtual void json(nlohmann::json& j) const noexcept {
             j["equivalence"] = toString(equivalence);
             j["runtime"]     = runtime;
         }

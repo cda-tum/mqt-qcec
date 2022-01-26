@@ -3,8 +3,7 @@
 * See file README.md or go to http://iic.jku.at/eda/research/quantum_verification/ for more information.
 */
 
-#ifndef QCEC_STATEGENERATOR_HPP
-#define QCEC_STATEGENERATOR_HPP
+#pragma once
 
 #include "StateType.hpp"
 #include "TaskManager.hpp"
@@ -17,15 +16,15 @@
 namespace ec {
     class StateGenerator {
     public:
-        explicit StateGenerator(std::size_t seed = 0);
+        explicit StateGenerator(std::size_t seed = 0U);
 
-        qc::VectorDD generateRandomState(std::unique_ptr<dd::Package>& dd, dd::QubitCount totalQubits, dd::QubitCount ancillaryQubits = 0, StateType type = StateType::ComputationalBasis);
+        qc::VectorDD generateRandomState(std::unique_ptr<dd::Package>& dd, dd::QubitCount totalQubits, dd::QubitCount ancillaryQubits = 0U, StateType type = StateType::ComputationalBasis);
 
-        qc::VectorDD generateRandomComputationalBasisState(std::unique_ptr<dd::Package>& dd, dd::QubitCount totalQubits, dd::QubitCount ancillaryQubits = 0);
+        qc::VectorDD generateRandomComputationalBasisState(std::unique_ptr<dd::Package>& dd, dd::QubitCount totalQubits, dd::QubitCount ancillaryQubits = 0U);
 
-        qc::VectorDD generateRandom1QBasisState(std::unique_ptr<dd::Package>& dd, dd::QubitCount totalQubits, dd::QubitCount ancillaryQubits = 0);
+        qc::VectorDD generateRandom1QBasisState(std::unique_ptr<dd::Package>& dd, dd::QubitCount totalQubits, dd::QubitCount ancillaryQubits = 0U);
 
-        qc::VectorDD generateRandomStabilizerState(std::unique_ptr<dd::Package>& dd, dd::QubitCount totalQubits, dd::QubitCount ancillaryQubits = 0);
+        qc::VectorDD generateRandomStabilizerState(std::unique_ptr<dd::Package>& dd, dd::QubitCount totalQubits, dd::QubitCount ancillaryQubits = 0U);
 
         void seedGenerator(std::size_t seed);
 
@@ -37,5 +36,3 @@ namespace ec {
         std::uniform_int_distribution<std::size_t> random1QBasisDistribution;
     };
 } // namespace ec
-
-#endif //QCEC_STATEGENERATOR_HPP

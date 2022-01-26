@@ -28,11 +28,11 @@ namespace ec {
     template<class DDType>
     class DDEquivalenceChecker: public EquivalenceChecker {
     public:
-        DDEquivalenceChecker(const qc::QuantumComputation& qc1, const qc::QuantumComputation& qc2, Configuration configuration, bool& done);
+        DDEquivalenceChecker(const qc::QuantumComputation& qc1, const qc::QuantumComputation& qc2, Configuration configuration, bool& done) noexcept;
 
         EquivalenceCriterion run() override;
 
-        void json(nlohmann::json& j) const override {
+        void json(nlohmann::json& j) const noexcept override {
             EquivalenceChecker::json(j);
             j["max_nodes"] = maxActiveNodes;
         }

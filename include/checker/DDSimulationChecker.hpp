@@ -3,17 +3,16 @@
 * See file README.md or go to http://iic.jku.at/eda/research/quantum_verification/ for more information.
 */
 
-#ifndef QCEC_DDSIMULATIONCHECKER_HPP
-#define QCEC_DDSIMULATIONCHECKER_HPP
+#pragma once
 
 #include "checker/DDEquivalenceChecker.hpp"
 
 namespace ec {
     class DDSimulationChecker: public DDEquivalenceChecker<qc::VectorDD> {
     public:
-        DDSimulationChecker(const qc::QuantumComputation& qc1, const qc::QuantumComputation& qc2, const ec::Configuration& configuration, bool& done);
+        DDSimulationChecker(const qc::QuantumComputation& qc1, const qc::QuantumComputation& qc2, const ec::Configuration& configuration, bool& done) noexcept;
 
-        DDSimulationChecker(const qc::QuantumComputation& qc1, const qc::QuantumComputation& qc2, const ec::Configuration& configuration, bool& done, const qc::VectorDD& initialState);
+        DDSimulationChecker(const qc::QuantumComputation& qc1, const qc::QuantumComputation& qc2, const ec::Configuration& configuration, bool& done, const qc::VectorDD& initialState) noexcept;
 
         [[nodiscard]] const qc::VectorDD& getInitialState() const { return initialState; }
 
@@ -25,7 +24,7 @@ namespace ec {
         [[nodiscard]] dd::CVec getInternalVector1() const { return dd->getVector(taskManager1.getInternalState()); }
         [[nodiscard]] dd::CVec getInternalVector2() const { return dd->getVector(taskManager2.getInternalState()); }
 
-        void json(nlohmann::json& j) const override {
+        void json(nlohmann::json& j) const noexcept override {
             DDEquivalenceChecker::json(j);
             j["checker"] = "decision_diagram_simulation";
         }
@@ -38,5 +37,3 @@ namespace ec {
         EquivalenceCriterion checkEquivalence() override;
     };
 } // namespace ec
-
-#endif //QCEC_DDSIMULATIONCHECKER_HPP

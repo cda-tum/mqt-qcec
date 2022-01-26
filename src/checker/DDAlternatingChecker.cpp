@@ -16,36 +16,36 @@ namespace ec {
         // reduced matrix for every ancillary without any restriction
         // TODO: check whether the way ancillaries are handled here is theoretically sound
         std::vector<bool> ancillary(nqubits);
-        for (auto q = static_cast<dd::Qubit>(nqubits - 1); q >= 0; --q) {
+        for (auto q = static_cast<dd::Qubit>(nqubits - 1U); q >= 0; --q) {
             if (qc1.logicalQubitIsAncillary(q) && qc2.logicalQubitIsAncillary(q)) {
                 bool found1  = false;
-                bool isidle1 = false;
+                bool isIdle1 = false;
                 for (const auto& in1: qc1.initialLayout) {
                     if (in1.second == q) {
                         found1  = true;
-                        isidle1 = qc1.isIdleQubit(in1.first);
+                        isIdle1 = qc1.isIdleQubit(in1.first);
                         break;
                     }
                 }
                 bool found2  = false;
-                bool isidle2 = false;
+                bool isIdle2 = false;
                 for (const auto& in2: qc2.initialLayout) {
                     if (in2.second == q) {
                         found2  = true;
-                        isidle2 = qc2.isIdleQubit(in2.first);
+                        isIdle2 = qc2.isIdleQubit(in2.first);
                         break;
                     }
                 }
 
                 // qubit only really exists or is acted on in one of the circuits
-                if ((found1 ^ found2) || (isidle1 ^ isidle2)) {
+                if ((found1 != found2) || (isIdle1 != isIdle2)) {
                     ancillary[q] = true;
                 }
             }
         }
 
         // reduce the ancillary qubit contributions
-        // [1 0] if the qubit is no ancillary or it is acted upon by both circuits
+        // [1 0] if the qubit is no ancillary, or it is acted upon by both circuits
         // [0 1]
         //
         // [1 0] for an ancillary that is present in one circuit and not acted upon in the other
@@ -60,7 +60,9 @@ namespace ec {
             taskManager2.applySwapOperations(functionality);
 
             if (!taskManager1.finished() && !taskManager2.finished()) {
-                if (done) return;
+                if (done) {
+                    return;
+                }
 
                 // whenever the current functionality resembles the identity, identical gates on both sides cancel
                 if (functionality.p->ident && configuration.application.alternatingScheme != ApplicationSchemeType::Lookahead && gatesAreIdentical()) {
@@ -73,9 +75,13 @@ namespace ec {
                 const auto [apply1, apply2] = (*applicationScheme)();
 
                 // advance both tasks correspondingly
-                if (done) return;
+                if (done) {
+                    return;
+                }
                 taskManager1.advance(functionality, apply1);
-                if (done) return;
+                if (done) {
+                    return;
+                }
                 taskManager2.advance(functionality, apply2);
             }
         }
@@ -83,28 +89,42 @@ namespace ec {
 
     void DDAlternatingChecker::finish() {
         taskManager1.finish(functionality);
-        if (done) return;
+        if (done) {
+            return;
+        }
         taskManager2.finish(functionality);
     }
 
     void DDAlternatingChecker::postprocess() {
         // ensure that the permutations that were tracked throughout the circuit match the expected output permutations
         taskManager1.changePermutation(functionality);
-        if (done) return;
+        if (done) {
+            return;
+        }
         taskManager2.changePermutation(functionality);
-        if (done) return;
+        if (done) {
+            return;
+        }
 
         // sum up the contributions of garbage qubits
         taskManager1.reduceGarbage(functionality);
-        if (done) return;
+        if (done) {
+            return;
+        }
         taskManager2.reduceGarbage(functionality);
-        if (done) return;
+        if (done) {
+            return;
+        }
 
         // TODO: check whether reducing ancillaries here is theoretically sound
         taskManager1.reduceAncillae(functionality);
-        if (done) return;
+        if (done) {
+            return;
+        }
         taskManager2.reduceAncillae(functionality);
-        if (done) return;
+        if (done) {
+            return;
+        }
     }
 
     EquivalenceCriterion DDAlternatingChecker::checkEquivalence() {
@@ -132,8 +152,9 @@ namespace ec {
     }
 
     bool DDAlternatingChecker::gatesAreIdentical() {
-        if (taskManager1.finished() || taskManager2.finished())
+        if (taskManager1.finished() || taskManager2.finished()) {
             return false;
+        }
 
         const auto& op1 = *taskManager1();
         const auto& op2 = *taskManager2();
@@ -151,14 +172,14 @@ namespace ec {
         }
 
         // SWAPs are not handled by this routine
-        if (op1.getType() == qc::SWAP && nc1 == 0) {
+        if (op1.getType() == qc::SWAP && nc1 == 0U) {
             return false;
         }
 
         // check parameters
         const auto param1 = op1.getParameter();
         const auto param2 = op2.getParameter();
-        for (std::size_t p = 0; p < qc::MAX_PARAMETERS; ++p) {
+        for (std::size_t p = 0U; p < qc::MAX_PARAMETERS; ++p) {
             // it might make sense to use fuzzy comparison here
             if (param1[p] != param2[p]) {
                 return false;
@@ -166,7 +187,7 @@ namespace ec {
         }
 
         // check controls
-        if (nc1 != 0) {
+        if (nc1 != 0U) {
             dd::Controls controls1{};
             for (const auto& control: op1.getControls()) {
                 controls1.emplace(dd::Control{taskManager1.getPermutation().at(control.qubit), control.type});

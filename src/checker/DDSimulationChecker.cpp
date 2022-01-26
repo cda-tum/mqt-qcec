@@ -6,13 +6,13 @@
 #include "checker/DDSimulationChecker.hpp"
 
 namespace ec {
-    DDSimulationChecker::DDSimulationChecker(const qc::QuantumComputation& qc1, const qc::QuantumComputation& qc2, const Configuration& configuration, bool& done):
+    DDSimulationChecker::DDSimulationChecker(const qc::QuantumComputation& qc1, const qc::QuantumComputation& qc2, const Configuration& configuration, bool& done) noexcept:
         DDEquivalenceChecker(qc1, qc2, configuration, done) {
         initialState = dd->makeZeroState(nqubits);
         initializeApplicationScheme(this->configuration.application.simulationScheme);
     }
 
-    DDSimulationChecker::DDSimulationChecker(const qc::QuantumComputation& qc1, const qc::QuantumComputation& qc2, const Configuration& configuration, bool& done, const qc::VectorDD& initialState):
+    DDSimulationChecker::DDSimulationChecker(const qc::QuantumComputation& qc1, const qc::QuantumComputation& qc2, const Configuration& configuration, bool& done, const qc::VectorDD& initialState) noexcept:
         DDEquivalenceChecker(qc1, qc2, configuration, done), initialState(initialState) {
         initializeApplicationScheme(this->configuration.application.simulationScheme);
     }

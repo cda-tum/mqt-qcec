@@ -18,7 +18,7 @@ namespace ec {
         EquivalentUpToPhase
     };
 
-    inline std::string toString(const EquivalenceCriterion& criterion) {
+    inline std::string toString(const EquivalenceCriterion& criterion) noexcept {
         switch (criterion) {
             case EquivalenceCriterion::NotEquivalent:
                 return "not_equivalent";

@@ -3,8 +3,7 @@
 * See file README.md or go to http://iic.jku.at/eda/research/quantum_verification/ for more information.
 */
 
-#ifndef QCEC_DDCONSTRUCTIONCHECKER_HPP
-#define QCEC_DDCONSTRUCTIONCHECKER_HPP
+#pragma once
 
 #include "checker/DDEquivalenceChecker.hpp"
 
@@ -19,7 +18,7 @@ namespace ec {
             initializeApplicationScheme(this->configuration.application.constructionScheme);
         }
 
-        void json(nlohmann::json& j) const override {
+        void json(nlohmann::json& j) const noexcept override {
             DDEquivalenceChecker::json(j);
             j["checker"] = "decision_diagram_construction";
         }
@@ -28,5 +27,3 @@ namespace ec {
         void initializeTask(TaskManager<qc::MatrixDD>& task) override;
     };
 } // namespace ec
-
-#endif //QCEC_DDCONSTRUCTIONCHECKER_HPP

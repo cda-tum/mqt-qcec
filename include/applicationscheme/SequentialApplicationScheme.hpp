@@ -9,20 +9,19 @@
 
 namespace ec {
     template<class DDType>
-    class SequentialApplicationScheme: public ApplicationScheme<DDType> {
+    class SequentialApplicationScheme final: public ApplicationScheme<DDType> {
     public:
-        SequentialApplicationScheme(TaskManager<DDType>& taskManager1, TaskManager<DDType>& taskManager2):
-            ApplicationScheme<DDType>(taskManager1, taskManager2) {
-            ngates1 = taskManager1.getCircuit()->getNops();
-            ngates2 = taskManager2.getCircuit()->getNops();
+        SequentialApplicationScheme(TaskManager<DDType>& taskManager1, TaskManager<DDType>& taskManager2) noexcept:
+            ApplicationScheme<DDType>(taskManager1, taskManager2),
+            gates1(taskManager1.getCircuit()->getNops()),
+            gates2(taskManager2.getCircuit()->getNops()) {}
+
+        std::pair<size_t, size_t> operator()() noexcept final {
+            return {gates1, gates2};
         }
 
-        std::pair<size_t, size_t> operator()() override {
-            return {ngates1, ngates2};
-        }
-
-    protected:
-        std::size_t ngates1{};
-        std::size_t ngates2{};
+    private:
+        const std::size_t gates1{};
+        const std::size_t gates2{};
     };
 } // namespace ec

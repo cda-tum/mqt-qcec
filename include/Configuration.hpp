@@ -3,8 +3,7 @@
 * See file README.md or go to http://iic.jku.at/eda/research/quantum_verification/ for more information.
 */
 
-#ifndef QCEC_CONFIGURATION_HPP
-#define QCEC_CONFIGURATION_HPP
+#pragma once
 
 #include "applicationscheme/ApplicationScheme.hpp"
 #include "applicationscheme/GateCostApplicationScheme.hpp"
@@ -155,4 +154,3 @@ namespace ec {
         }
     };
 } // namespace ec
-#endif //QCEC_CONFIGURATION_HPP

@@ -89,7 +89,7 @@ namespace ec {
                                                                          double traceThreshold = 1e-8,
                                                                          // Simulation
                                                                          double            fidelityThreshold = 1e-8,
-                                                                         std::size_t       maxSims           = std::max(16U, std::thread::hardware_concurrency() - 2),
+                                                                         std::size_t       maxSims           = std::max(16U, std::thread::hardware_concurrency() - 2U),
                                                                          const py::object& stateType         = py::str("computational_basis"),
                                                                          std::size_t       seed              = 0U,
                                                                          bool              storeCEXinput     = false,
@@ -253,9 +253,9 @@ namespace ec {
                 "simulation_scheme"_a                    = "proportional",
                 "alternating_scheme"_a                   = "proportional",
                 "profile"_a                              = "",
-                "trace_treshold"_a                       = 1e-8,
+                "trace_threshold"_a                      = 1e-8,
                 "fidelity_threshold"_a                   = 1e-8,
-                "max_sims"_a                             = std::max(16U, std::thread::hardware_concurrency() - 2),
+                "max_sims"_a                             = std::max(16U, std::thread::hardware_concurrency() - 2U),
                 "state_type"_a                           = "computational_basis",
                 "seed"_a                                 = 0U,
                 "store_cex_input"_a                      = false,
@@ -318,7 +318,7 @@ namespace ec {
                 // Simulation
                 .def("set_fidelity_threshold", &EquivalenceCheckingManager::setFidelityThreshold, "threshold"_a = 1e-8,
                      "Set the :attr:`fidelity threshold <.Configuration.Simulation.fidelity_threshold>` used for comparing two states or state vectors.")
-                .def("set_max_sims", &EquivalenceCheckingManager::setMaxSims, "sims"_a = std::max(16U, std::thread::hardware_concurrency() - 2),
+                .def("set_max_sims", &EquivalenceCheckingManager::setMaxSims, "sims"_a = std::max(16U, std::thread::hardware_concurrency() - 2U),
                      "Set the :attr:`maximum number of simulations <.Configuration.Simulation.max_sims>` to be started for the simulation checker.")
                 .def("set_state_type", &EquivalenceCheckingManager::setStateType, "type"_a = "computational_basis",
                      "Set the :attr:`type of states <.Configuration.Simulation.state_type>` used for the simulations in the simulation checker.")

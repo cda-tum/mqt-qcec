@@ -20,7 +20,7 @@ namespace ec {
         Lookahead
     };
 
-    inline std::string toString(const ApplicationSchemeType& applicationScheme) {
+    inline std::string toString(const ApplicationSchemeType& applicationScheme) noexcept {
         switch (applicationScheme) {
             case ApplicationSchemeType::Sequential:
                 return "sequential";
@@ -70,7 +70,7 @@ namespace ec {
     template<class DDType>
     class ApplicationScheme {
     public:
-        ApplicationScheme(TaskManager<DDType>& taskManager1, TaskManager<DDType>& taskManager2):
+        ApplicationScheme(TaskManager<DDType>& taskManager1, TaskManager<DDType>& taskManager2) noexcept:
             taskManager1(taskManager1), taskManager2(taskManager2){};
 
         virtual ~ApplicationScheme() = default;

@@ -8,17 +8,14 @@
 namespace ec {
     template<class DDType>
     ProportionalApplicationScheme<DDType>::ProportionalApplicationScheme(TaskManager<DDType>& taskManager1, TaskManager<DDType>& taskManager2):
-        ApplicationScheme<DDType>(taskManager1, taskManager2) {
-        const auto size1 = taskManager1.getCircuit()->size();
-        const auto size2 = taskManager2.getCircuit()->size();
-        firstIsLarger    = size1 > size2;
-        const auto max   = firstIsLarger ? size1 : size2;
-        const auto min   = firstIsLarger ? size2 : size1;
-        gateRatio        = std::max((max + min / 2U) / min, static_cast<std::size_t>(1U));
-    }
+        ApplicationScheme<DDType>(taskManager1, taskManager2),
+        size1(taskManager1.getCircuit()->size()),
+        size2(taskManager2.getCircuit()->size()),
+        firstIsLarger(size1 > size2),
+        gateRatio(computeGateRatio()) {}
 
     template<class DDType>
-    std::pair<size_t, size_t> ProportionalApplicationScheme<DDType>::operator()() {
+    std::pair<size_t, size_t> ProportionalApplicationScheme<DDType>::operator()() noexcept {
         if (firstIsLarger) {
             return {gateRatio, 1U};
         } else {

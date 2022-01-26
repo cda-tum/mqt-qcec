@@ -7,7 +7,7 @@
 
 namespace ec {
     void DDConstructionChecker::initializeTask(TaskManager<qc::MatrixDD>& task) {
-        auto initial = dd->makeIdent(nqubits);
+        const auto initial = dd->makeIdent(nqubits);
         task.setInternalState(initial);
         task.incRef();
         task.reduceAncillae();
