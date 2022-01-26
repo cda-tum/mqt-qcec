@@ -61,7 +61,7 @@ namespace ec {
         // configuration options for the simulation scheme
         struct Simulation {
             double      fidelityThreshold = 1e-8;
-            std::size_t maxSims           = std::max(16U, std::thread::hardware_concurrency() - 2);
+            std::size_t maxSims           = std::max(16U, std::thread::hardware_concurrency() - 2U);
             StateType   stateType         = StateType::ComputationalBasis;
             std::size_t seed              = 0U;
             bool        storeCEXinput     = false;
@@ -74,24 +74,25 @@ namespace ec {
         Functionality functionality{};
         Simulation    simulation{};
 
-        [[nodiscard]] bool anythingToExecute() const {
-            return (execution.runSimulationChecker && simulation.maxSims > 0) || execution.runAlternatingChecker || execution.runConstructionChecker;
+        [[nodiscard]] bool anythingToExecute() const noexcept {
+            return (execution.runSimulationChecker && simulation.maxSims > 0U) || execution.runAlternatingChecker || execution.runConstructionChecker;
         }
 
-        [[nodiscard]] bool onlySingleTask() const {
+        [[nodiscard]] bool onlySingleTask() const noexcept {
             // only a single simulation shall be performed
-            if (execution.runSimulationChecker && simulation.maxSims == 1 && !execution.runAlternatingChecker && !execution.runConstructionChecker)
+            if (execution.runSimulationChecker && simulation.maxSims == 1U && !execution.runAlternatingChecker && !execution.runConstructionChecker) {
                 return true;
+            }
 
             // no simulations and only one of the other checks shall be performed
-            if (!execution.runSimulationChecker && (execution.runAlternatingChecker ^ execution.runConstructionChecker)) {
+            if (!execution.runSimulationChecker && (execution.runAlternatingChecker != execution.runConstructionChecker)) {
                 return true;
             }
 
             return false;
         }
 
-        [[nodiscard]] nlohmann::json json() const {
+        [[nodiscard]] nlohmann::json json() const noexcept {
             nlohmann::json config{};
             auto&          exe              = config["execution"];
             exe["tolerance"]                = execution.numericalTolerance;
@@ -100,9 +101,9 @@ namespace ec {
             exe["run_construction_checker"] = execution.runConstructionChecker;
             exe["run_simulation_checker"]   = execution.runSimulationChecker;
             exe["run_alternating_checker"]  = execution.runAlternatingChecker;
-            if (execution.timeout > 0s)
+            if (execution.timeout > 0s) {
                 exe["timeout"] = execution.timeout.count();
-
+            }
             auto& opt                                   = config["optimizations"];
             opt["fix_output_permutation_mismatch"]      = optimizations.fixOutputPermutationMismatch;
             opt["fuse_consecutive_single_qubit_gates"]  = optimizations.fuseSingleQubitGates;
@@ -149,7 +150,7 @@ namespace ec {
             return config;
         }
 
-        [[nodiscard]] std::string toString() const {
+        [[nodiscard]] std::string toString() const noexcept {
             return json().dump(2);
         }
     };
