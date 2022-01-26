@@ -178,8 +178,6 @@ namespace ec {
     }
 
     void EquivalenceCheckingManager::run() {
-        const auto start = std::chrono::steady_clock::now();
-
         done                = false;
         results.equivalence = EquivalenceCriterion::NoInformation;
 
@@ -193,13 +191,6 @@ namespace ec {
         } else {
             checkParallel();
         }
-
-        // the check is done, notify all potentially waiting threads about its completion
-        done = true;
-        doneCond.notify_one();
-
-        const auto end    = std::chrono::steady_clock::now();
-        results.checkTime = std::chrono::duration<double>(end - start).count();
     }
 
     EquivalenceCheckingManager::EquivalenceCheckingManager(const qc::QuantumComputation& qc1, const qc::QuantumComputation& qc2, const Configuration& configuration):
@@ -251,6 +242,8 @@ namespace ec {
     }
 
     void EquivalenceCheckingManager::checkSequential() {
+        const auto start = std::chrono::steady_clock::now();
+
         // in case a timeout is configured, a separate thread is started that sets the `done` flag after the timeout has passed
         if (configuration.execution.timeout > 0s) {
             auto timeoutThread = std::thread([&, timeout = configuration.execution.timeout] {
@@ -303,11 +296,14 @@ namespace ec {
                     results.cexOutput1 = simulationChecker->getInternalVector1();
                     results.cexOutput2 = simulationChecker->getInternalVector2();
                 }
-                return;
+
+                // everything is done
+                done = true;
+                doneCond.notify_one();
             }
         }
 
-        if (configuration.execution.runAlternatingChecker) {
+        if (configuration.execution.runAlternatingChecker && !done) {
             checkers.emplace_back(std::make_unique<DDAlternatingChecker>(qc1, qc2, configuration, done));
             auto&      alternatingChecker = checkers.back();
             const auto result             = alternatingChecker->run();
@@ -315,11 +311,14 @@ namespace ec {
             // if the alternating check produces a result, this is final
             if (result != EquivalenceCriterion::NoInformation) {
                 results.equivalence = result;
-                return;
+
+                // everything is done
+                done = true;
+                doneCond.notify_one();
             }
         }
 
-        if (configuration.execution.runConstructionChecker) {
+        if (configuration.execution.runConstructionChecker && !done) {
             checkers.emplace_back(std::make_unique<DDConstructionChecker>(qc1, qc2, configuration, done));
             auto&      constructionChecker = checkers.back();
             const auto result              = constructionChecker->run();
@@ -327,15 +326,23 @@ namespace ec {
             // if the construction check produces a result, this is final
             if (result != EquivalenceCriterion::NoInformation) {
                 results.equivalence = result;
-                return;
+
+                // everything is done
+                done = true;
+                doneCond.notify_one();
             }
         }
+
+        const auto end    = std::chrono::steady_clock::now();
+        results.checkTime = std::chrono::duration<double>(end - start).count();
     }
 
     void EquivalenceCheckingManager::checkParallel() {
+        const auto start = std::chrono::steady_clock::now();
+
         std::chrono::steady_clock::time_point deadline{};
         if (configuration.execution.timeout > 0s) {
-            deadline = std::chrono::steady_clock::now() + configuration.execution.timeout;
+            deadline = start + configuration.execution.timeout;
         }
 
         const auto threadLimit = std::thread::hardware_concurrency();
@@ -474,6 +481,9 @@ namespace ec {
                 }
             }
         }
+
+        const auto end    = std::chrono::steady_clock::now();
+        results.checkTime = std::chrono::duration<double>(end - start).count();
 
         // cleanup threads that are still running by joining them
         // at the moment there seems to be no solution for prematurely killing running threads without risking synchronisation issues.
