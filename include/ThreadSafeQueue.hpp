@@ -41,12 +41,6 @@ private:
         return headLock;
     }
 
-    auto waitForDataWithTimeout(const std::chrono::seconds& timeout) {
-        std::unique_lock headLock(headMutex);
-        dataCond.wait_for(headLock, timeout, [&] { return head.get() != getTail(); });
-        return headLock;
-    }
-
     template<typename Clock, typename Dur>
     auto waitForDataUntil(const std::chrono::time_point<Clock, Dur>& timepoint) {
         std::unique_lock headLock(headMutex);
@@ -56,14 +50,6 @@ private:
 
     auto waitPopHead() {
         auto headLock(waitForData());
-        return popHead();
-    }
-
-    auto waitPopHeadWithTimeout(const std::chrono::seconds& timeout) {
-        auto headLock(waitForDataWithTimeout(timeout));
-        if (head.get() == getTail()) {
-            return std::unique_ptr<Node>();
-        }
         return popHead();
     }
 
@@ -78,18 +64,13 @@ private:
 
 public:
     ThreadSafeQueue():
-        head(new Node), tail(head.get()) {}
+        head(std::make_unique<Node>()), tail(head.get()) {}
     ThreadSafeQueue(const ThreadSafeQueue& other) = delete;
     ThreadSafeQueue& operator=(const ThreadSafeQueue& other) = delete;
 
     std::shared_ptr<T> waitAndPop() {
         auto const oldHead = waitPopHead();
         return oldHead->data;
-    }
-
-    std::shared_ptr<T> waitAndPopWithTimeout(const std::chrono::seconds& timeout) {
-        auto const oldHead = waitPopHeadWithTimeout(timeout);
-        return oldHead ? oldHead->data : std::shared_ptr<T>();
     }
 
     template<typename Clock, typename Dur>
@@ -99,8 +80,8 @@ public:
     }
 
     void push(T value) {
-        auto                  data(std::make_shared<T>(std::move(value)));
-        std::unique_ptr<Node> p(new Node);
+        auto data(std::make_shared<T>(std::move(value)));
+        auto p = std::make_unique<Node>();
         {
             std::lock_guard tailLock(tailMutex);
             tail->data          = data;
