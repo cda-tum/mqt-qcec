@@ -443,6 +443,20 @@ namespace ec {
             if (result == EquivalenceCriterion::NotEquivalent) {
                 done                = true;
                 results.equivalence = result;
+
+                // some special handling in case non-equivalence has been shown by a simulation run
+                if (auto simulationChecker = dynamic_cast<DDSimulationChecker*>(checker)) {
+                    results.performedSimulations++;
+
+                    if (configuration.simulation.storeCEXinput) {
+                        results.cexInput = simulationChecker->getInitialVector();
+                    }
+                    if (configuration.simulation.storeCEXoutput) {
+                        results.cexOutput1 = simulationChecker->getInternalVector1();
+                        results.cexOutput2 = simulationChecker->getInternalVector2();
+                    }
+                }
+
                 break;
             }
 
@@ -474,7 +488,7 @@ namespace ec {
                     ++results.startedSimulations;
                 } else {
                     // in case only simulations are performed and every single one is done, everything is done
-                    if (!runAlternating && !runConstruction) {
+                    if (!runAlternating && !runConstruction && results.performedSimulations == configuration.simulation.maxSims) {
                         done = true;
                         break;
                     }
