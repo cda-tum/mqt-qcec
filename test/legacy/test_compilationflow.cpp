@@ -65,3 +65,13 @@ TEST_P(CompilationFlowTest, EquivalenceCompilationFlow) {
     std::cout << ecm.toString() << std::endl;
     EXPECT_TRUE(ecm.getResults().consideredEquivalent());
 }
+
+TEST_P(CompilationFlowTest, EquivalenceCompilationFlowParallel) {
+    configuration.execution.runSimulationChecker = true;
+    configuration.execution.parallel             = true;
+
+    ec::EquivalenceCheckingManager ecm(qc_original, qc_transpiled, configuration);
+    ecm.run();
+    std::cout << ecm.toString() << std::endl;
+    EXPECT_TRUE(ecm.getResults().consideredEquivalent());
+}

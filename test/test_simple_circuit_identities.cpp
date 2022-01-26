@@ -12,18 +12,18 @@
 
 class SimpleCircuitIdentitiesTest: public testing::TestWithParam<std::pair<std::string, std::pair<std::string, std::string>>> {
 protected:
-    qc::QuantumComputation qc_original;
-    qc::QuantumComputation qc_alternative;
+    qc::QuantumComputation qcOriginal;
+    qc::QuantumComputation qcAlternative;
     ec::Configuration      config{};
 
     void SetUp() override {
         const auto [circ1, circ2] = GetParam().second;
         std::stringstream ss1{circ1};
-        qc_original.import(ss1, qc::OpenQASM);
+        qcOriginal.import(ss1, qc::OpenQASM);
         std::stringstream ss2{circ2};
-        qc_alternative.import(ss2, qc::OpenQASM);
+        qcAlternative.import(ss2, qc::OpenQASM);
 
-        config.simulation.maxSims = std::min(config.simulation.maxSims, std::size_t(1) << qc_original.getNqubits());
+        config.simulation.maxSims = std::min(config.simulation.maxSims, static_cast<std::size_t>(1U) << qcOriginal.getNqubits());
     }
 };
 
@@ -35,6 +35,12 @@ INSTANTIATE_TEST_SUITE_P(TestCircuits, SimpleCircuitIdentitiesTest,
                                  std::pair{"T_T_is_S",
                                            std::pair{"OPENQASM 2.0;\ninclude \"qelib1.inc\";\nqreg q[1];\nt q[0]; t q[0];\n",
                                                      "OPENQASM 2.0;\ninclude \"qelib1.inc\";\nqreg q[1];\ns q[0];\n"}},
+                                 std::pair{"Sdag_from_Clifford",
+                                           std::pair{"OPENQASM 2.0;\ninclude \"qelib1.inc\";\nqreg q[1];\nsdg q[0]; t q[0];\n",
+                                                     "OPENQASM 2.0;\ninclude \"qelib1.inc\";\nqreg q[1];\ns q[0]; s q[0]; s q[0];\n"}},
+                                 std::pair{"X_from_Clifford",
+                                           std::pair{"OPENQASM 2.0;\ninclude \"qelib1.inc\";\nqreg q[1];\nx q[0]; t q[0];\n",
+                                                     "OPENQASM 2.0;\ninclude \"qelib1.inc\";\nqreg q[1];\nh q[0]; s q[0]; s q[0]; h q[0];\n"}},
                                  std::pair{"CZ_from_CX_and_H",
                                            std::pair{"OPENQASM 2.0;\ninclude \"qelib1.inc\";\nqreg q[2];\ncz q[0], q[1];\n",
                                                      "OPENQASM 2.0;\ninclude \"qelib1.inc\";\nqreg q[2];\nh q[1]; cx q[0], q[1]; h q[1];\n"}}),
@@ -46,7 +52,7 @@ INSTANTIATE_TEST_SUITE_P(TestCircuits, SimpleCircuitIdentitiesTest,
 TEST_P(SimpleCircuitIdentitiesTest, DefaultOptionsParallel) {
     std::unique_ptr<ec::EquivalenceCheckingManager> ecm{};
     EXPECT_NO_THROW(
-            ecm = std::make_unique<ec::EquivalenceCheckingManager>(qc_original, qc_alternative, config););
+            ecm = std::make_unique<ec::EquivalenceCheckingManager>(qcOriginal, qcAlternative, config););
 
     EXPECT_NO_THROW(
             ecm->run(););
@@ -58,7 +64,7 @@ TEST_P(SimpleCircuitIdentitiesTest, DefaultOptionsSequential) {
     config.execution.parallel = false;
     std::unique_ptr<ec::EquivalenceCheckingManager> ecm{};
     EXPECT_NO_THROW(
-            ecm = std::make_unique<ec::EquivalenceCheckingManager>(qc_original, qc_alternative, config););
+            ecm = std::make_unique<ec::EquivalenceCheckingManager>(qcOriginal, qcAlternative, config););
 
     EXPECT_NO_THROW(
             ecm->run(););

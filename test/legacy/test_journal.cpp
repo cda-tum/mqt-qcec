@@ -73,12 +73,12 @@ protected:
         gates_to_remove = std::get<1>(GetParam());
 
         min_time = max_time = avg_time = 0.;
-        min_sims = max_sims = 0;
+        min_sims = max_sims = 0U;
         avg_sims            = 0.;
     }
 
     void addToStatistics(unsigned short try_count, double time, unsigned short nsims) {
-        if (try_count == 0) {
+        if (try_count == 0U) {
             min_time = max_time = avg_time = time;
             min_sims = max_sims = nsims;
             avg_sims            = nsims;
@@ -132,7 +132,7 @@ TEST_P(JournalTestNonEQ, PowerOfSimulation) {
     config.execution.runSimulationChecker   = true;
     config.execution.parallel               = false;
     config.simulation.maxSims               = 16;
-    config.application.simulationScheme     = ec::ApplicationSchemeType::OneToOne;
+    config.application.simulationScheme     = ec::ApplicationSchemeType::Sequential;
 
     for (unsigned short i = 0; i < tries; ++i) {
         qc_original.import(test_original_dir + std::get<0>(GetParam()) + ".real");
@@ -172,7 +172,56 @@ TEST_P(JournalTestNonEQ, PowerOfSimulation) {
               << ";" << tries << ";"
               << min_sims << ";" << max_sims << ";" << avg_sims << ";"
               << min_time << ";" << max_time << ";" << avg_time << ";"
-              << (double)successes / (double)tries << ";" << std::endl;
+              << static_cast<double>(successes) / static_cast<double>(tries) << ";" << std::endl;
+}
+
+TEST_P(JournalTestNonEQ, PowerOfSimulationParallel) {
+    config.execution.runAlternatingChecker  = false;
+    config.execution.runConstructionChecker = false;
+    config.execution.runSimulationChecker   = true;
+    config.execution.parallel               = true;
+    config.simulation.maxSims               = 16;
+    config.application.simulationScheme     = ec::ApplicationSchemeType::Sequential;
+
+    for (unsigned short i = 0; i < tries; ++i) {
+        qc_original.import(test_original_dir + std::get<0>(GetParam()) + ".real");
+
+        // generate non-eq circuit
+        std::set<unsigned long long> removed{};
+        do {
+            qc_transpiled.import(transpiled_file);
+            removed.clear();
+            for (unsigned short j = 0; j < gates_to_remove; ++j) {
+                auto gate_to_remove = rng() % qc_transpiled.getNops();
+                while (removed.count(gate_to_remove)) {
+                    gate_to_remove = rng() % qc_transpiled.getNops();
+                }
+                removed.insert(gate_to_remove);
+                auto it = qc_transpiled.begin();
+                std::advance(it, gate_to_remove);
+                if (it == qc_transpiled.end()) {
+                    continue;
+                }
+
+                qc_transpiled.erase(it);
+            }
+        } while (setExists(already_removed, removed));
+        already_removed.insert(removed);
+        ec::EquivalenceCheckingManager ecm(qc_original, qc_transpiled, config);
+        ecm.run();
+        auto results = ecm.getResults();
+        std::cout << "[" << i << "] ";
+        std::cout << toString(results.equivalence) << std::endl;
+        addToStatistics(i, results.checkTime + results.preprocessingTime, results.performedSimulations);
+        if (results.equivalence == ec::EquivalenceCriterion::NotEquivalent) {
+            successes++;
+        }
+    }
+    std::cout << qc_original.getName() << ";" << qc_original.getNqubits() << ";" << qc_original.getNops() << ";" << qc_transpiled.getNops()
+              << ";" << tries << ";"
+              << min_sims << ";" << max_sims << ";" << avg_sims << ";"
+              << min_time << ";" << max_time << ";" << avg_time << ";"
+              << static_cast<double>(successes) / static_cast<double>(tries) << ";" << std::endl;
 }
 
 class JournalTestEQ: public testing::TestWithParam<std::string> {
