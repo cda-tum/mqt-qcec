@@ -14,6 +14,8 @@
 <img src='https://img.shields.io/github/license/iic-jku/qcec?style=for-the-badge' alt="licence">
 </a>
 
+<img src='images/QCEC_getting_started.png' alt="QCEC - Getting Started">
+
 ---
 
 A tool for Quantum Circuit Equivalence Checking developed by the
