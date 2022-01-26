@@ -80,30 +80,22 @@ namespace ec {
         // initialize the internal representation (initial state, initial matrix, etc.)
         initialize();
 
-        if (done) {
-            return equivalence;
-        }
+        if (done) { return equivalence; }
 
         // execute the equivalence checking scheme
         execute();
 
-        if (done) {
-            return equivalence;
-        }
+        if (done) { return equivalence; }
 
         // finish off both circuits
         finish();
 
-        if (done) {
-            return equivalence;
-        }
+        if (done) { return equivalence; }
 
         // postprocess the result
         postprocess();
 
-        if (done) {
-            return equivalence;
-        }
+        if (done) { return equivalence; }
 
         // check the equivalence
         equivalence = checkEquivalence();
@@ -139,13 +131,9 @@ namespace ec {
                 const auto [apply1, apply2] = (*applicationScheme)();
 
                 // advance both tasks correspondingly
-                if (done) {
-                    return;
-                }
+                if (done) { return; }
                 taskManager1.advance(apply1);
-                if (done) {
-                    return;
-                }
+                if (done) { return; }
                 taskManager2.advance(apply2);
             }
         }
@@ -154,9 +142,7 @@ namespace ec {
     template<class DDType>
     void DDEquivalenceChecker<DDType>::finish() {
         taskManager1.finish();
-        if (done) {
-            return;
-        }
+        if (done) { return; }
         taskManager2.finish();
     }
 
@@ -164,14 +150,10 @@ namespace ec {
     void DDEquivalenceChecker<DDType>::postprocessTask(TaskManager<DDType>& task) {
         // ensure that the permutation that was tracked throughout the circuit matches the expected output permutation
         task.changePermutation();
-        if (done) {
-            return;
-        }
+        if (done) { return; }
         // eliminate the superfluous contributions of ancillary qubits (this only has an effect on matrices)
         task.reduceAncillae();
-        if (done) {
-            return;
-        }
+        if (done) { return; }
         // sum up the contributions of garbage qubits
         task.reduceGarbage();
     }
@@ -179,9 +161,7 @@ namespace ec {
     template<class DDType>
     void DDEquivalenceChecker<DDType>::postprocess() {
         postprocessTask(taskManager1);
-        if (done) {
-            return;
-        }
+        if (done) { return; }
         postprocessTask(taskManager2);
     }
 
