@@ -16,6 +16,8 @@ protected:
     qc::QuantumComputation qcAlternative;
     ec::Configuration      config{};
 
+    std::unique_ptr<ec::EquivalenceCheckingManager> ecm{};
+
     void SetUp() override {
         const auto [circ1, circ2] = GetParam().second;
         std::stringstream ss1{circ1};
@@ -24,6 +26,12 @@ protected:
         qcAlternative.import(ss2, qc::OpenQASM);
 
         config.simulation.maxSims = std::min(config.simulation.maxSims, static_cast<std::size_t>(1U) << qcOriginal.getNqubits());
+
+        EXPECT_NO_THROW(ecm = std::make_unique<ec::EquivalenceCheckingManager>(qcOriginal, qcAlternative, config););
+    }
+
+    void TearDown() override {
+        std::cout << ecm->toString() << std::endl;
     }
 };
 
@@ -43,31 +51,34 @@ INSTANTIATE_TEST_SUITE_P(TestCircuits, SimpleCircuitIdentitiesTest,
                                                      "OPENQASM 2.0;\ninclude \"qelib1.inc\";\nqreg q[1];\nh q[0]; s q[0]; s q[0]; h q[0];\n"}},
                                  std::pair{"CZ_from_CX_and_H",
                                            std::pair{"OPENQASM 2.0;\ninclude \"qelib1.inc\";\nqreg q[2];\ncz q[0], q[1];\n",
-                                                     "OPENQASM 2.0;\ninclude \"qelib1.inc\";\nqreg q[2];\nh q[1]; cx q[0], q[1]; h q[1];\n"}}),
+                                                     "OPENQASM 2.0;\ninclude \"qelib1.inc\";\nqreg q[2];\nh q[1]; cx q[0], q[1]; h q[1];\n"}},
+                                 std::pair{"Global_Phase",
+                                           std::pair{"OPENQASM 2.0;\ninclude \"qelib1.inc\";\nqreg q[1];\nz q[0]; x q[0]; z q[0];\n",
+                                                     "OPENQASM 2.0;\ninclude \"qelib1.inc\";\nqreg q[1];\n x q[0];\n"}}),
                          [](const testing::TestParamInfo<SimpleCircuitIdentitiesTest::ParamType>& info) {
                              std::stringstream ss{};
                              ss << info.param.first;
                              return ss.str(); });
 
 TEST_P(SimpleCircuitIdentitiesTest, DefaultOptionsParallel) {
-    std::unique_ptr<ec::EquivalenceCheckingManager> ecm{};
-    EXPECT_NO_THROW(
-            ecm = std::make_unique<ec::EquivalenceCheckingManager>(qcOriginal, qcAlternative, config););
+    EXPECT_NO_THROW(ecm->run(););
 
-    EXPECT_NO_THROW(
-            ecm->run(););
-
-    EXPECT_EQ(ecm->equivalence(), ec::EquivalenceCriterion::Equivalent);
+    EXPECT_TRUE(ecm->getResults().consideredEquivalent());
 }
 
 TEST_P(SimpleCircuitIdentitiesTest, DefaultOptionsSequential) {
-    config.execution.parallel = false;
-    std::unique_ptr<ec::EquivalenceCheckingManager> ecm{};
-    EXPECT_NO_THROW(
-            ecm = std::make_unique<ec::EquivalenceCheckingManager>(qcOriginal, qcAlternative, config););
+    ecm->setParallel(false);
 
-    EXPECT_NO_THROW(
-            ecm->run(););
+    EXPECT_NO_THROW(ecm->run(););
 
-    EXPECT_EQ(ecm->equivalence(), ec::EquivalenceCriterion::Equivalent);
+    EXPECT_TRUE(ecm->getResults().consideredEquivalent());
+}
+
+TEST_P(SimpleCircuitIdentitiesTest, DefaultOptionsOnlySimulation) {
+    ecm->setAlternatingChecker(false);
+    ecm->setConstructionChecker(false);
+
+    EXPECT_NO_THROW(ecm->run(););
+
+    EXPECT_TRUE(ecm->getResults().consideredEquivalent());
 }
