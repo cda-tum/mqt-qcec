@@ -375,11 +375,12 @@ namespace ec {
             ++id;
         }
 
-        if (runConstruction) {
+        if (runConstruction && !done) {
             // start a new thread that constructs and runs the construction check
             threads.emplace_back([&, id] {
                 checkers[id] = std::make_unique<DDConstructionChecker>(qc1, qc2, configuration, done);
-                checkers[id]->run();
+                if (!done)
+                    checkers[id]->run();
                 queue.push(id);
             });
             ++id;
@@ -388,15 +389,16 @@ namespace ec {
         if (runSimulation) {
             const auto effectiveThreadsLeft = effectiveThreads - threads.size();
             // launch as many simulations as possible
-            for (std::size_t i = 0; i < effectiveThreadsLeft; ++i) {
+            for (std::size_t i = 0; i < effectiveThreadsLeft && !done; ++i) {
                 threads.emplace_back([&, id] {
-                    checkers[id] = std::make_unique<DDSimulationChecker>(qc1, qc2, configuration, done);
+                    checkers[id]  = std::make_unique<DDSimulationChecker>(qc1, qc2, configuration, done);
+                    auto* checker = dynamic_cast<DDSimulationChecker*>(checkers[id].get());
                     {
-                        auto*           checker = dynamic_cast<DDSimulationChecker*>(checkers[id].get());
                         std::lock_guard stateGeneratorLock(stateGeneratorMutex);
                         checker->setRandomInitialState(stateGenerator);
                     }
-                    checkers[id]->run();
+                    if (!done)
+                        checkers[id]->run();
                     queue.push(id);
                 });
                 ++id;
@@ -445,7 +447,7 @@ namespace ec {
             }
 
             // at this point, the only option is that this is a simulation checker
-            if (auto* simChecker = dynamic_cast<DDSimulationChecker*>(checker)) {
+            if (dynamic_cast<DDSimulationChecker*>(checker)) {
                 // if the simulation has not shown the non-equivalence, then both circuits are considered probably equivalent
                 results.equivalence = EquivalenceCriterion::ProbablyEquivalent;
                 ++results.performedSimulations;
@@ -458,7 +460,8 @@ namespace ec {
                             std::lock_guard stateGeneratorLock(stateGeneratorMutex);
                             checker->setRandomInitialState(stateGenerator);
                         }
-                        checkers[id]->run();
+                        if (!done)
+                            checkers[id]->run();
                         queue.push(id);
                     });
                     ++results.startedSimulations;
@@ -472,12 +475,13 @@ namespace ec {
             }
         }
 
-        // cleanup threads that are still running by simply detaching them.
-        // at the moment this seems like the only way to prematurely return once a result has been determined (without waiting for all other tasks to complete)
-        // unfortunately, this may leak some resources and might cause problems if `run` is called multiple times in a single process
+        // cleanup threads that are still running by joining them
+        // at the moment there seems to be no solution for prematurely killing running threads without risking synchronisation issues.
+        // on the positive side, joining should avoid all of these potential issues
+        // on the negative side, one potentially has to wait for a long-running operation that is applied during the equivalence check to finish in order to continue
         for (auto& thread: threads) {
             if (thread.joinable()) {
-                thread.detach();
+                thread.join();
             }
         }
     }
