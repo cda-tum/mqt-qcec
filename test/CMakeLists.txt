@@ -29,7 +29,8 @@ package_add_test(${PROJECT_NAME}_test
                  legacy/test_functionality.cpp
                  legacy/test_journal.cpp
                  legacy/test_compilationflow.cpp
-                 legacy/test_simulation.cpp)
+                 legacy/test_simulation.cpp
+                 test_simple_circuit_identities.cpp)
 
 add_custom_command(TARGET ${PROJECT_NAME}_test
                    POST_BUILD
