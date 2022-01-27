@@ -42,7 +42,7 @@ A tool for Quantum Circuit Equivalence Checking developed by the
 <h2>Quick Links</h2>
 
 <a href='https://qcec.readthedocs.io/'>
-<img src='https://img.shields.io/badge/DOCUMENTATION-gray?style=for-the-badge' alt="documentation">
+<img src='https://img.shields.io/badge/DOCUMENTATION-purple?style=for-the-badge' alt="documentation">
 </a>
 
 <a href='https://iic.jku.at/eda/research/quantum/'>

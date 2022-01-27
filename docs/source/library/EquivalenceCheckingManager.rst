@@ -29,7 +29,7 @@ This constructs the manager using all the default options. The circuits to be ve
 
 There are two ways of configuring the manager at construction time, e.g., in order to set a timeout of `60` seconds:
 
-* Creating and modifying a :class:`Configuration` object that is then passed to the constructor
+* Creating and modifying a :class:`Configuration` object that is then passed to the constructor.
 
     .. code-block:: python
 
@@ -37,11 +37,13 @@ There are two ways of configuring the manager at construction time, e.g., in ord
         config.execution.timeout = 60
         ecm = EquivalenceCheckingManager(circ1=qc1, circ2=qc2, config=config)
 
-* Setting individual options via the appropriate keyword arguments
+* Setting individual options via the appropriate keyword arguments.
 
     .. code-block:: python
 
         ecm = EquivalenceCheckingManager(circ1=qc1, circ2=qc2, timeout=60)
+
+  Every keyword argument that takes an enum value can either be conveniently specified as a string (e.g., :code:`state_type="stabilizer"`) or by providing the respective enum value (e.g., :code:`state_type=qcec.StateType.stabilizer`).
 
     .. automethod:: EquivalenceCheckingManager.__init__
 
