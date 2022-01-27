@@ -239,7 +239,7 @@ namespace ec {
                 "numerical_tolerance"_a                  = dd::ComplexTable<>::tolerance(),
                 "parallel"_a                             = true,
                 "nthreads"_a                             = std::max(2U, std::thread::hardware_concurrency()),
-                "timeout"_a                              = 0U,
+                "timeout"_a                              = 0s,
                 "run_construction_checker"_a             = false,
                 "run_simulation_checker"_a               = true,
                 "run_alternating_checker"_a              = true,
