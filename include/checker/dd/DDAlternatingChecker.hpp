@@ -5,8 +5,8 @@
 
 #pragma once
 
-#include "applicationscheme/LookaheadApplicationScheme.hpp"
 #include "DDEquivalenceChecker.hpp"
+#include "applicationscheme/LookaheadApplicationScheme.hpp"
 
 namespace ec {
     class DDAlternatingChecker: public DDEquivalenceChecker<qc::MatrixDD> {

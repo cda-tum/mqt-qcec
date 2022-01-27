@@ -7,7 +7,6 @@
 
 #include "CircuitOptimizer.hpp"
 #include "Configuration.hpp"
-#include "checker/EquivalenceChecker.hpp"
 #include "EquivalenceCriterion.hpp"
 #include "QuantumComputation.hpp"
 #include "TaskManager.hpp"
@@ -17,6 +16,7 @@
 #include "applicationscheme/OneToOneApplicationScheme.hpp"
 #include "applicationscheme/ProportionalApplicationScheme.hpp"
 #include "applicationscheme/SequentialApplicationScheme.hpp"
+#include "checker/EquivalenceChecker.hpp"
 
 #include <chrono>
 #include <map>
