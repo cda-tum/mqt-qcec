@@ -3,7 +3,7 @@
 * See file README.md or go to http://iic.jku.at/eda/research/quantum_verification/ for more information.
 */
 
-#include "applicationscheme/LookaheadApplicationScheme.hpp"
+#include "checker/dd/applicationscheme/LookaheadApplicationScheme.hpp"
 
 namespace ec {
     std::pair<size_t, size_t> ec::LookaheadApplicationScheme::operator()() {

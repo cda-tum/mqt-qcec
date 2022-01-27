@@ -13,7 +13,7 @@
 #include "checker/dd/DDAlternatingChecker.hpp"
 #include "checker/dd/DDConstructionChecker.hpp"
 #include "checker/dd/DDSimulationChecker.hpp"
-#include "simulation/StateGenerator.hpp"
+#include "checker/dd/simulation/StateGenerator.hpp"
 
 #include <atomic>
 #include <chrono>

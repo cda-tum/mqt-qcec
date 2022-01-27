@@ -5,11 +5,11 @@
 
 #pragma once
 
-#include "applicationscheme/ApplicationScheme.hpp"
-#include "applicationscheme/GateCostApplicationScheme.hpp"
+#include "checker/dd/applicationscheme/ApplicationScheme.hpp"
+#include "checker/dd/applicationscheme/GateCostApplicationScheme.hpp"
+#include "checker/dd/simulation/StateGenerator.hpp"
 #include "dd/Package.hpp"
 #include "nlohmann/json.hpp"
-#include "simulation/StateGenerator.hpp"
 
 #include <chrono>
 #include <functional>

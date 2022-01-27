@@ -1,6 +1,4 @@
 add_library(${PROJECT_NAME}
-            ${${PROJECT_NAME}_SOURCE_DIR}/include/simulation
-            ${${PROJECT_NAME}_SOURCE_DIR}/include/applicationscheme
             ${${PROJECT_NAME}_SOURCE_DIR}/include/checker
             ${${PROJECT_NAME}_SOURCE_DIR}/include/Configuration.hpp
             ${${PROJECT_NAME}_SOURCE_DIR}/include/EquivalenceCriterion.hpp
@@ -14,11 +12,11 @@ add_library(${PROJECT_NAME}
             ${CMAKE_CURRENT_SOURCE_DIR}/checker/dd/DDSimulationChecker.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/checker/dd/DDAlternatingChecker.cpp
 
-            ${CMAKE_CURRENT_SOURCE_DIR}/simulation/StateGenerator.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/checker/dd/simulation/StateGenerator.cpp
 
-            ${CMAKE_CURRENT_SOURCE_DIR}/applicationscheme/ProportionalApplicationScheme.cpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/applicationscheme/GateCostApplicationScheme.cpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/applicationscheme/LookaheadApplicationScheme.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/checker/dd/applicationscheme/ProportionalApplicationScheme.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/checker/dd/applicationscheme/GateCostApplicationScheme.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/checker/dd/applicationscheme/LookaheadApplicationScheme.cpp
             )
 # set include directories
 target_include_directories(${PROJECT_NAME} PUBLIC $<BUILD_INTERFACE:${${PROJECT_NAME}_SOURCE_DIR}/include>)

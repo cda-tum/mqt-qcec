@@ -3,7 +3,7 @@
 * See file README.md or go to http://iic.jku.at/eda/research/quantum_verification/ for more information.
 */
 
-#include "applicationscheme/ProportionalApplicationScheme.hpp"
+#include "checker/dd/applicationscheme/ProportionalApplicationScheme.hpp"
 
 namespace ec {
     template<class DDType>
