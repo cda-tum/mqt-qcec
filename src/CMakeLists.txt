@@ -9,10 +9,10 @@ add_library(${PROJECT_NAME}
 
             ${CMAKE_CURRENT_SOURCE_DIR}/EquivalenceCheckingManager.cpp
 
-            ${CMAKE_CURRENT_SOURCE_DIR}/checker/DDEquivalenceChecker.cpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/checker/DDConstructionChecker.cpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/checker/DDSimulationChecker.cpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/checker/DDAlternatingChecker.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/checker/dd/DDEquivalenceChecker.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/checker/dd/DDConstructionChecker.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/checker/dd/DDSimulationChecker.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/checker/dd/DDAlternatingChecker.cpp
 
             ${CMAKE_CURRENT_SOURCE_DIR}/simulation/StateGenerator.cpp
 

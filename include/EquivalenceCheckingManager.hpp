@@ -10,9 +10,9 @@
 #include "EquivalenceCriterion.hpp"
 #include "QuantumComputation.hpp"
 #include "ThreadSafeQueue.hpp"
-#include "checker/DDAlternatingChecker.hpp"
-#include "checker/DDConstructionChecker.hpp"
-#include "checker/DDSimulationChecker.hpp"
+#include "checker/dd/DDAlternatingChecker.hpp"
+#include "checker/dd/DDConstructionChecker.hpp"
+#include "checker/dd/DDSimulationChecker.hpp"
 #include "simulation/StateGenerator.hpp"
 
 #include <atomic>

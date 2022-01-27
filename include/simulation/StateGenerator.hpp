@@ -6,7 +6,7 @@
 #pragma once
 
 #include "StateType.hpp"
-#include "TaskManager.hpp"
+#include "checker/dd/TaskManager.hpp"
 #include "algorithms/RandomCliffordCircuit.hpp"
 #include "dd/Package.hpp"
 

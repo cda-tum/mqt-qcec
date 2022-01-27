@@ -3,7 +3,7 @@
 * See file README.md or go to http://iic.jku.at/eda/research/quantum_verification/ for more information.
 */
 
-#include "checker/DDSimulationChecker.hpp"
+#include "checker/dd/DDSimulationChecker.hpp"
 
 namespace ec {
     DDSimulationChecker::DDSimulationChecker(const qc::QuantumComputation& qc1, const qc::QuantumComputation& qc2, const Configuration& configuration, bool& done) noexcept:

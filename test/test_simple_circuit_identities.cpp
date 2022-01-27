@@ -82,3 +82,13 @@ TEST_P(SimpleCircuitIdentitiesTest, DefaultOptionsOnlySimulation) {
 
     EXPECT_TRUE(ecm->getResults().consideredEquivalent());
 }
+
+TEST_P(SimpleCircuitIdentitiesTest, DefaultOptionsOnlyConstruction) {
+    ecm->setAlternatingChecker(false);
+    ecm->setSimulationChecker(false);
+    ecm->setConstructionChecker(true);
+
+    EXPECT_NO_THROW(ecm->run(););
+
+    EXPECT_TRUE(ecm->getResults().consideredEquivalent());
+}

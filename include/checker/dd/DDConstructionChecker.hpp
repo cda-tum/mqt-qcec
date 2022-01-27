@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "checker/DDEquivalenceChecker.hpp"
+#include "DDEquivalenceChecker.hpp"
 
 namespace ec {
     class DDConstructionChecker: public DDEquivalenceChecker<qc::MatrixDD> {

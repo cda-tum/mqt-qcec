@@ -6,7 +6,7 @@
 #pragma once
 
 #include "QuantumComputation.hpp"
-#include "TaskManager.hpp"
+#include "checker/dd/TaskManager.hpp"
 
 #include <iostream>
 

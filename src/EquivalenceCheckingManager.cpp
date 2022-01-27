@@ -504,8 +504,9 @@ namespace ec {
         while (!queue.empty()) {
             const auto completedID = queue.waitAndPop();
             auto&      thread      = threads.at(*completedID);
-            if (thread.joinable())
+            if (thread.joinable()) {
                 thread.join();
+            }
         }
 
         // afterwards, join all threads that are still (potentially) running.

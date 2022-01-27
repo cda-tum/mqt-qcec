@@ -3,7 +3,7 @@
 * See file README.md or go to http://iic.jku.at/eda/research/quantum_verification/ for more information.
 */
 
-#include "checker/DDConstructionChecker.hpp"
+#include "checker/dd/DDConstructionChecker.hpp"
 
 namespace ec {
     void DDConstructionChecker::initializeTask(TaskManager<qc::MatrixDD>& task) {
