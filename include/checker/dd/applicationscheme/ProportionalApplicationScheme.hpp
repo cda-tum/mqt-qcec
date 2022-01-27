@@ -11,21 +11,21 @@ namespace ec {
     template<class DDType>
     class ProportionalApplicationScheme final: public ApplicationScheme<DDType> {
     public:
-        ProportionalApplicationScheme(TaskManager<DDType>& taskManager1, TaskManager<DDType>& taskManager2);
+        ProportionalApplicationScheme(TaskManager<DDType>& taskManager1, TaskManager<DDType>& taskManager2):
+            ApplicationScheme<DDType>(taskManager1, taskManager2),
+            gateRatio(computeGateRatio()) {}
 
-        std::pair<size_t, size_t> operator()() noexcept final;
-
-    private:
-        const std::size_t size1{};
-        const std::size_t size2{};
-
-        const bool        firstIsLarger = false;
-        const std::size_t gateRatio     = 1U;
-
-        [[nodiscard]] std::size_t computeGateRatio() const noexcept {
-            const auto max = firstIsLarger ? size1 : size2;
-            const auto min = firstIsLarger ? size2 : size1;
-            return std::max((max + min / 2U) / min, static_cast<std::size_t>(1U));
+        std::pair<size_t, size_t> operator()() noexcept final {
+            return {1U, gateRatio};
         }
+
+    protected:
+        [[nodiscard]] std::size_t computeGateRatio() const noexcept {
+            const std::size_t size1 = this->taskManager1.getCircuit()->size();
+            const std::size_t size2 = this->taskManager2.getCircuit()->size();
+            return std::max((size2 + size1 / 2U) / size1, static_cast<std::size_t>(1U));
+        }
+
+        const std::size_t gateRatio = 1U;
     };
 } // namespace ec

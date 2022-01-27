@@ -14,7 +14,6 @@ add_library(${PROJECT_NAME}
 
             ${CMAKE_CURRENT_SOURCE_DIR}/checker/dd/simulation/StateGenerator.cpp
 
-            ${CMAKE_CURRENT_SOURCE_DIR}/checker/dd/applicationscheme/ProportionalApplicationScheme.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/checker/dd/applicationscheme/GateCostApplicationScheme.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/checker/dd/applicationscheme/LookaheadApplicationScheme.cpp
             )
