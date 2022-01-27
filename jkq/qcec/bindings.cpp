@@ -81,19 +81,19 @@ namespace ec {
                                                                          bool transformDynamicCircuit          = false,
                                                                          bool reorderOperations                = true,
                                                                          // Application
-                                                                         const py::object&  constructionScheme = py::str("proportional"),
-                                                                         const py::object&  simulationScheme   = py::str("proportional"),
-                                                                         const py::object&  alternatingScheme  = py::str("proportional"),
-                                                                         const std::string& profile            = {},
+                                                                         const ApplicationSchemeType& constructionScheme = ApplicationSchemeType::Proportional,
+                                                                         const ApplicationSchemeType& simulationScheme   = ApplicationSchemeType::Proportional,
+                                                                         const ApplicationSchemeType& alternatingScheme  = ApplicationSchemeType::Proportional,
+                                                                         const std::string&           profile            = {},
                                                                          // Functionality
                                                                          double traceThreshold = 1e-8,
                                                                          // Simulation
-                                                                         double            fidelityThreshold = 1e-8,
-                                                                         std::size_t       maxSims           = std::max(16U, std::thread::hardware_concurrency() - 2U),
-                                                                         const py::object& stateType         = py::str("computational_basis"),
-                                                                         std::size_t       seed              = 0U,
-                                                                         bool              storeCEXinput     = false,
-                                                                         bool              storeCEXoutput    = false) {
+                                                                         double           fidelityThreshold = 1e-8,
+                                                                         std::size_t      maxSims           = std::max(16U, std::thread::hardware_concurrency() - 2U),
+                                                                         const StateType& stateType         = StateType::ComputationalBasis,
+                                                                         std::size_t      seed              = 0U,
+                                                                         bool             storeCEXinput     = false,
+                                                                         bool             storeCEXoutput    = false) {
         Configuration configuration{};
         // Execution
         configuration.execution.numericalTolerance     = numericalTolerance;
@@ -111,79 +111,25 @@ namespace ec {
         configuration.optimizations.transformDynamicCircuit          = transformDynamicCircuit;
         configuration.optimizations.reorderOperations                = reorderOperations;
         // Application
-        configuration.application.profile = profile;
-        try {
-            if (py::isinstance<py::str>(constructionScheme)) {
-                const auto str                               = constructionScheme.cast<std::string>();
-                const auto applicationScheme                 = applicationSchemeFromString(str);
-                configuration.application.constructionScheme = applicationScheme;
-            } else {
-                const auto applicationScheme                 = constructionScheme.cast<ApplicationSchemeType>();
-                configuration.application.constructionScheme = applicationScheme;
-            }
-            if (configuration.application.constructionScheme == ApplicationSchemeType::Lookahead) {
-                throw std::invalid_argument("Lookahead application scheme must not be used with construction checker.");
-            }
-        } catch (std::exception const& e) {
-            std::stringstream ss{};
-            ss << "Could not set application scheme for construction checker: " << e.what();
-            throw std::invalid_argument(ss.str());
+        configuration.application.profile            = profile;
+        configuration.application.constructionScheme = constructionScheme;
+        if (configuration.application.constructionScheme == ApplicationSchemeType::Lookahead) {
+            throw std::invalid_argument("Lookahead application scheme must not be used with construction checker.");
         }
-        try {
-            if (py::isinstance<py::str>(simulationScheme)) {
-                const auto str                             = simulationScheme.cast<std::string>();
-                const auto applicationScheme               = applicationSchemeFromString(str);
-                configuration.application.simulationScheme = applicationScheme;
-            } else {
-                const auto applicationScheme               = simulationScheme.cast<ApplicationSchemeType>();
-                configuration.application.simulationScheme = applicationScheme;
-            }
-            if (configuration.application.simulationScheme == ApplicationSchemeType::Lookahead) {
-                throw std::invalid_argument("Lookahead application scheme must not be used with simulation checker.");
-            }
-        } catch (std::exception const& e) {
-            std::stringstream ss{};
-            ss << "Could not set application scheme for simulation checker: " << e.what();
-            throw std::invalid_argument(ss.str());
+        configuration.application.simulationScheme = simulationScheme;
+        if (configuration.application.simulationScheme == ApplicationSchemeType::Lookahead) {
+            throw std::invalid_argument("Lookahead application scheme must not be used with simulation checker.");
         }
-        try {
-            if (py::isinstance<py::str>(alternatingScheme)) {
-                const auto str                              = alternatingScheme.cast<std::string>();
-                const auto applicationScheme                = applicationSchemeFromString(str);
-                configuration.application.alternatingScheme = applicationScheme;
-            } else {
-                const auto applicationScheme                = alternatingScheme.cast<ApplicationSchemeType>();
-                configuration.application.alternatingScheme = applicationScheme;
-            }
-        } catch (std::exception const& e) {
-            std::stringstream ss{};
-            ss << "Could not set application scheme for alternating checker: " << e.what();
-            throw std::invalid_argument(ss.str());
-        }
+        configuration.application.alternatingScheme = alternatingScheme;
         // Functionality
         configuration.functionality.traceThreshold = traceThreshold;
         // Simulation
         configuration.simulation.fidelityThreshold = fidelityThreshold;
         configuration.simulation.maxSims           = maxSims;
-
-        try {
-            if (py::isinstance<py::str>(stateType)) {
-                const auto str                     = stateType.cast<std::string>();
-                const auto type                    = stateTypeFromString(str);
-                configuration.simulation.stateType = type;
-            } else {
-                const auto type                    = stateType.cast<StateType>();
-                configuration.simulation.stateType = type;
-            }
-        } catch (std::exception const& e) {
-            std::stringstream ss{};
-            ss << "Could not set state type: " << e.what();
-            throw std::invalid_argument(ss.str());
-        }
-
-        configuration.simulation.seed           = seed;
-        configuration.simulation.storeCEXinput  = storeCEXinput;
-        configuration.simulation.storeCEXoutput = storeCEXoutput;
+        configuration.simulation.stateType         = stateType;
+        configuration.simulation.seed              = seed;
+        configuration.simulation.storeCEXinput     = storeCEXinput;
+        configuration.simulation.storeCEXoutput    = storeCEXoutput;
 
         return createManagerFromConfiguration(circ1, circ2, configuration);
     }
@@ -203,6 +149,7 @@ namespace ec {
                 .value("gate_cost", ApplicationSchemeType::GateCost,
                        "Each gate of the first circuit is associated with a corresponding cost according to some cost function *f(...)*. Whenever a gate *g* from the first circuit is applied *f(g)* gates are applied from the second circuit.")
                 .def(py::init([](const std::string& str) -> ApplicationSchemeType { return applicationSchemeFromString(str); }));
+        py::implicitly_convertible<std::string, ApplicationSchemeType>();
 
         py::enum_<StateType>(m, "StateType")
                 .value("computational_basis", StateType::ComputationalBasis,
@@ -212,6 +159,7 @@ namespace ec {
                 .value("stabilizer", StateType::Stabilizer,
                        "Randomly choose a stabilizer state by creating a random Clifford circuit.")
                 .def(py::init([](const std::string& str) -> StateType { return stateTypeFromString(str); }));
+        py::implicitly_convertible<std::string, StateType>();
 
         py::enum_<EquivalenceCriterion>(m, "EquivalenceCriterion")
                 .value("no_information", EquivalenceCriterion::NoInformation,
@@ -227,6 +175,7 @@ namespace ec {
                 .value("probably_equivalent", EquivalenceCriterion::ProbablyEquivalent,
                        "Circuits are probably equivalent. A result that is obtained whenever a couple of simulations did not show the non-equivalence.")
                 .def(py::init([](const std::string& str) -> EquivalenceCriterion { return fromString(str); }));
+        py::implicitly_convertible<std::string, EquivalenceCriterion>();
 
         // Class definitions
         py::class_<EquivalenceCheckingManager>          ecm(m, "EquivalenceCheckingManager", "Main class for orchestrating the equivalence check");
