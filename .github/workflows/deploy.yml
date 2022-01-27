@@ -84,7 +84,7 @@ jobs:
       - name: Install test requirements
         run:  pip install -r test/python/requirements-test.txt
       - name: Test package
-        run:  pytest test/python
+        run: cd test/python && pytest .
 
   upload_pypi:
     needs: [ build_wheels, build_m1_wheels, build_sdist, test_bindings ]
