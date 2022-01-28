@@ -233,7 +233,6 @@ namespace ec {
             const std::size_t uniqueStates = 1ULL << nq;
             if (configuration.simulation.maxSims > uniqueStates) {
                 this->configuration.simulation.maxSims = uniqueStates;
-                std::clog << "[QCEC] Info: Maximum number of simulations reduced due to number of qubits" << std::endl;
             }
         }
 

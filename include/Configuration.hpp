@@ -50,7 +50,7 @@ namespace ec {
 
             // options for the gate cost application scheme
             std::string  profile{};
-            CostFunction costFunction = [](const GateCostLUTKeyType&) { return 1U; };
+            CostFunction costFunction = LegacyIBMCostFunction;
         };
 
         struct Functionality {
