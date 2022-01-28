@@ -204,6 +204,9 @@ namespace ec {
         // set numeric tolerance used throughout the check
         setTolerance(configuration.execution.numericalTolerance);
 
+        // run all configured optimization passes
+        runOptimizationPasses();
+
         // strip away qubits that are not acted upon
         this->qc1.stripIdleQubits();
         this->qc2.stripIdleQubits();
@@ -220,9 +223,6 @@ namespace ec {
         if (configuration.optimizations.fixOutputPermutationMismatch) {
             fixOutputPermutationMismatch();
         }
-
-        // run all configured optimization passes
-        runOptimizationPasses();
 
         // initialize the stimuli generator
         stateGenerator = StateGenerator(configuration.simulation.seed);
