@@ -32,9 +32,6 @@ namespace ec {
     template<class DDType>
     class GateCostApplicationScheme: public ApplicationScheme<DDType> {
     public:
-        GateCostApplicationScheme(TaskManager<DDType>& taskManager1, TaskManager<DDType>& taskManager2) noexcept:
-            ApplicationScheme<DDType>(taskManager1, taskManager2) {}
-
         GateCostApplicationScheme(TaskManager<DDType>& taskManager1, TaskManager<DDType>& taskManager2, const CostFunction& costFunction);
 
         GateCostApplicationScheme(TaskManager<DDType>& taskManager1, TaskManager<DDType>& taskManager2, const std::string& filename);

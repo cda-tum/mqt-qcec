@@ -16,22 +16,23 @@ namespace ec {
 
     inline std::string toString(const StateType& type) noexcept {
         switch (type) {
-            case StateType::ComputationalBasis:
-                return "computational_basis";
             case StateType::Random1QBasis:
                 return "random_1Q_basis";
             case StateType::Stabilizer:
                 return "stabilizer";
+            case StateType::ComputationalBasis:
+            default:
+                return "computational_basis";
         }
         return " ";
     }
 
     inline StateType stateTypeFromString(const std::string& type) {
-        if (type == "computational_basis" || type == "0") {
+        if (type == "computational_basis" || type == "2") {
             return StateType::ComputationalBasis;
         } else if (type == "random_1Q_basis" || type == "1") {
             return StateType::Random1QBasis;
-        } else if (type == "stabilizer" || type == "2") {
+        } else if (type == "stabilizer" || type == "0") {
             return StateType::Stabilizer;
         } else {
             throw std::runtime_error("Unknown quantum state type: " + type);

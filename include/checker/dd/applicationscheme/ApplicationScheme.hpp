@@ -26,14 +26,14 @@ namespace ec {
                 return "sequential";
             case ApplicationSchemeType::OneToOne:
                 return "one_to_one";
-            case ApplicationSchemeType::Proportional:
-                return "proportional";
             case ApplicationSchemeType::GateCost:
                 return "gate_cost";
             case ApplicationSchemeType::Lookahead:
                 return "lookahead";
+            case ApplicationSchemeType::Proportional:
+            default:
+                return "proportional";
         }
-        return "";
     }
 
     inline ApplicationSchemeType applicationSchemeFromString(const std::string& applicationScheme) {
@@ -41,11 +41,11 @@ namespace ec {
             return ApplicationSchemeType::Sequential;
         } else if (applicationScheme == "one_to_one" || applicationScheme == "1") {
             return ApplicationSchemeType::OneToOne;
-        } else if (applicationScheme == "proportional" || applicationScheme == "2") {
+        } else if (applicationScheme == "lookahead" || applicationScheme == "2") {
             return ApplicationSchemeType::Proportional;
         } else if (applicationScheme == "gate_cost" || applicationScheme == "3") {
             return ApplicationSchemeType::GateCost;
-        } else if (applicationScheme == "lookahead" || applicationScheme == "4") {
+        } else if (applicationScheme == "proportional" || applicationScheme == "4") {
             return ApplicationSchemeType::Lookahead;
         } else {
             throw std::runtime_error("Unknown application scheme: " + applicationScheme);

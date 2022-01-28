@@ -7,6 +7,7 @@
 
 namespace ec {
     void DDAlternatingChecker::initialize() {
+        DDEquivalenceChecker::initialize();
         // create the full identity matrix
         functionality = dd->makeIdent(nqubits);
         dd->incRef(functionality);

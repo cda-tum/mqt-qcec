@@ -34,6 +34,7 @@ namespace ec {
     protected:
         qc::MatrixDD functionality{};
 
+        void                 initializeTask(TaskManager<qc::MatrixDD>&) override{};
         void                 initialize() override;
         void                 execute() override;
         void                 finish() override;

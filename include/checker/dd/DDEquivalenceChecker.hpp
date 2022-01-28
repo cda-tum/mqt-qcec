@@ -51,7 +51,7 @@ namespace ec {
 
         EquivalenceCriterion equals(const DDType& e, const DDType& f);
 
-        virtual void                 initializeTask(TaskManager<DDType>&){};
+        virtual void                 initializeTask(TaskManager<DDType>&) = 0;
         virtual void                 initialize();
         virtual void                 execute();
         virtual void                 finish();
