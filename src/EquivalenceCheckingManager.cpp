@@ -244,8 +244,9 @@ namespace ec {
         const auto start = std::chrono::steady_clock::now();
 
         // in case a timeout is configured, a separate thread is started that sets the `done` flag after the timeout has passed
+        std::thread timeoutThread{};
         if (configuration.execution.timeout > 0s) {
-            auto timeoutThread = std::thread([&, timeout = configuration.execution.timeout] {
+            timeoutThread = std::thread([&, timeout = configuration.execution.timeout] {
                 std::unique_lock doneLock(doneMutex);
                 auto             finished = doneCond.wait_for(doneLock, timeout, [&] { return done; });
                 // if the thread has already finished within the timeout, nothing has to be done
@@ -253,7 +254,6 @@ namespace ec {
                     done = true;
                 }
             });
-            timeoutThread.detach();
         }
 
         if (configuration.execution.runSimulationChecker) {
@@ -300,6 +300,14 @@ namespace ec {
                 done = true;
                 doneCond.notify_one();
             }
+
+            // in case only simulations are performed and every single one is done, everything is done
+            if (!configuration.execution.runAlternatingChecker &&
+                !configuration.execution.runConstructionChecker &&
+                results.performedSimulations == configuration.simulation.maxSims) {
+                done = true;
+                doneCond.notify_one();
+            }
         }
 
         if (configuration.execution.runAlternatingChecker && !done) {
@@ -334,6 +342,11 @@ namespace ec {
 
         const auto end    = std::chrono::steady_clock::now();
         results.checkTime = std::chrono::duration<double>(end - start).count();
+
+        // appropriately join the timeout thread, if it was launched
+        if (timeoutThread.joinable()) {
+            timeoutThread.join();
+        }
     }
 
     void EquivalenceCheckingManager::checkParallel() {
