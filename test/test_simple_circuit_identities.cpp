@@ -25,8 +25,6 @@ protected:
         std::stringstream ss2{circ2};
         qcAlternative.import(ss2, qc::OpenQASM);
 
-        config.simulation.maxSims = std::min(config.simulation.maxSims, static_cast<std::size_t>(1U) << qcOriginal.getNqubits());
-
         EXPECT_NO_THROW(ecm = std::make_unique<ec::EquivalenceCheckingManager>(qcOriginal, qcAlternative, config););
     }
 

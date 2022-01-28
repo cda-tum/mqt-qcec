@@ -20,14 +20,14 @@ protected:
     std::string test_original_dir   = "./circuits/original/";
     std::string test_transpiled_dir = "./circuits/transpiled/";
 
-    unsigned short tries = 10;
+    unsigned short tries = 10U;
 
     double         min_time = 0.;
     double         max_time = 0.;
     double         avg_time = 0.;
-    unsigned short min_sims = 0;
-    unsigned short max_sims = 0;
-    double         avg_sims = 0;
+    unsigned short min_sims = 0U;
+    unsigned short max_sims = 0U;
+    double         avg_sims = 0.;
 
     std::string transpiled_file{};
 
@@ -35,10 +35,10 @@ protected:
     std::uniform_int_distribution<unsigned long long> distribution;
     std::function<unsigned long long()>               rng;
 
-    unsigned short                         gates_to_remove = 0;
+    unsigned short                         gates_to_remove = 0U;
     std::set<std::set<unsigned long long>> already_removed{};
 
-    unsigned short successes = 0;
+    unsigned short successes = 0U;
 
     static bool setExists(std::set<std::set<unsigned long long>>& all, std::set<unsigned long long>& test) {
         // first entry
@@ -67,7 +67,7 @@ protected:
         std::generate(begin(random_data), end(random_data), [&]() { return rd(); });
         std::seed_seq seeds(begin(random_data), end(random_data));
         mt.seed(seeds);
-        distribution = decltype(distribution)(0, qc_transpiled.getNops() - 1);
+        distribution = decltype(distribution)(0U, qc_transpiled.getNops() - 1U);
         rng          = [&]() { return distribution(mt); };
 
         gates_to_remove = std::get<1>(GetParam());
@@ -87,8 +87,8 @@ protected:
             min_sims = std::min(min_sims, nsims);
             max_time = std::max(max_time, time);
             max_sims = std::max(max_sims, nsims);
-            avg_time = (avg_time * try_count + double(time)) / double(try_count + 1);
-            avg_sims = (avg_sims * try_count + double(nsims)) / double(try_count + 1);
+            avg_time = (avg_time * try_count + static_cast<double>(time)) / static_cast<double>(try_count + 1U);
+            avg_sims = (avg_sims * try_count + static_cast<double>(nsims)) / static_cast<double>(try_count + 1U);
         }
     }
 };
@@ -117,7 +117,7 @@ INSTANTIATE_TEST_SUITE_P(Journal, JournalTestNonEQ,
                                          //				                         "cm151a_211",
                                          //				                         "apla_203"
                                          ),
-                                 testing::Range(static_cast<unsigned short>(1), static_cast<unsigned short>(4), 2)),
+                                 testing::Range(static_cast<unsigned short>(1U), static_cast<unsigned short>(4U), 2)),
                          [](const testing::TestParamInfo<JournalTestNonEQ::ParamType>& info) {
 	                         std::string name = std::get<0>(info.param);
 	                         unsigned short gates_to_remove = std::get<1>(info.param);
@@ -131,10 +131,11 @@ TEST_P(JournalTestNonEQ, PowerOfSimulation) {
     config.execution.runConstructionChecker = false;
     config.execution.runSimulationChecker   = true;
     config.execution.parallel               = false;
-    config.simulation.maxSims               = 16;
+    config.execution.timeout                = 60s;
+    config.simulation.maxSims               = 16U;
     config.application.simulationScheme     = ec::ApplicationSchemeType::Sequential;
 
-    for (unsigned short i = 0; i < tries; ++i) {
+    for (unsigned short i = 0U; i < tries; ++i) {
         qc_original.import(test_original_dir + std::get<0>(GetParam()) + ".real");
 
         // generate non-eq circuit
@@ -142,7 +143,7 @@ TEST_P(JournalTestNonEQ, PowerOfSimulation) {
         do {
             qc_transpiled.import(transpiled_file);
             removed.clear();
-            for (unsigned short j = 0; j < gates_to_remove; ++j) {
+            for (unsigned short j = 0U; j < gates_to_remove; ++j) {
                 auto gate_to_remove = rng() % qc_transpiled.getNops();
                 while (removed.count(gate_to_remove)) {
                     gate_to_remove = rng() % qc_transpiled.getNops();
@@ -180,7 +181,8 @@ TEST_P(JournalTestNonEQ, PowerOfSimulationParallel) {
     config.execution.runConstructionChecker = false;
     config.execution.runSimulationChecker   = true;
     config.execution.parallel               = true;
-    config.simulation.maxSims               = 16;
+    config.execution.timeout                = 60s;
+    config.simulation.maxSims               = 16U;
     config.application.simulationScheme     = ec::ApplicationSchemeType::Sequential;
 
     for (unsigned short i = 0; i < tries; ++i) {
@@ -191,7 +193,7 @@ TEST_P(JournalTestNonEQ, PowerOfSimulationParallel) {
         do {
             qc_transpiled.import(transpiled_file);
             removed.clear();
-            for (unsigned short j = 0; j < gates_to_remove; ++j) {
+            for (unsigned short j = 0U; j < gates_to_remove; ++j) {
                 auto gate_to_remove = rng() % qc_transpiled.getNops();
                 while (removed.count(gate_to_remove)) {
                     gate_to_remove = rng() % qc_transpiled.getNops();
@@ -242,6 +244,7 @@ protected:
         config.execution.runSimulationChecker   = false;
         config.simulation.maxSims               = 16;
         config.application.simulationScheme     = ec::ApplicationSchemeType::OneToOne;
+        config.execution.timeout                = 60s;
 
         std::stringstream ss{};
         ss << test_transpiled_dir << GetParam() << "_transpiled.";

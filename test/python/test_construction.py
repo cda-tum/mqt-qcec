@@ -7,10 +7,10 @@ from qiskit import QuantumCircuit
 class QCECConstructionTests(unittest.TestCase):
     def setUp(self):
         # create a very simple quantum circuit
-        self.qc1 = QuantumCircuit(4)
+        self.qc1 = QuantumCircuit(1)
         self.qc1.h(0)
         # create a second (identical) circuit
-        self.qc2 = QuantumCircuit(4)
+        self.qc2 = QuantumCircuit(1)
         self.qc2.h(0)
 
         self.file1 = "../circuits/original/mlp4_245.real"
