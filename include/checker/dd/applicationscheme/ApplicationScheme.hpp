@@ -42,11 +42,11 @@ namespace ec {
         } else if (applicationScheme == "one_to_one" || applicationScheme == "1") {
             return ApplicationSchemeType::OneToOne;
         } else if (applicationScheme == "lookahead" || applicationScheme == "2") {
-            return ApplicationSchemeType::Proportional;
+            return ApplicationSchemeType::Lookahead;
         } else if (applicationScheme == "gate_cost" || applicationScheme == "3") {
             return ApplicationSchemeType::GateCost;
         } else if (applicationScheme == "proportional" || applicationScheme == "4") {
-            return ApplicationSchemeType::Lookahead;
+            return ApplicationSchemeType::Proportional;
         } else {
             throw std::runtime_error("Unknown application scheme: " + applicationScheme);
         }
