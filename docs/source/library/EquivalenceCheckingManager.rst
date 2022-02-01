@@ -69,7 +69,6 @@ In addition, the :class:`~.Configuration` of the manager can be altered after it
         .. automethod:: EquivalenceCheckingManager.reconstruct_swaps
         .. automethod:: EquivalenceCheckingManager.remove_diagonal_gates_before_measure
         .. automethod:: EquivalenceCheckingManager.reorder_operations
-        .. automethod:: EquivalenceCheckingManager.transform_dynamic_circuit
         .. automethod:: EquivalenceCheckingManager.fix_output_permutation_mismatch
 
 * :class:`Application Options <Configuration.Application>`

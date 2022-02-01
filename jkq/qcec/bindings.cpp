@@ -240,8 +240,6 @@ namespace ec {
                      ":attr:`Try to reconstruct SWAP gates <.Configuration.Optimizations.reconstruct_swaps>` that have been decomposed or optimized away.")
                 .def("remove_diagonal_gates_before_measure", &EquivalenceCheckingManager::removeDiagonalGatesBeforeMeasure,
                      ":attr:`Remove any diagonal gates at the end of the circuit <.Configuration.Optimizations.remove_diagonal_gates_before_measure>`.")
-                .def("transform_dynamic_circuit", &EquivalenceCheckingManager::transformDynamicCircuit,
-                     ":attr:`Transform dynamic circuit <.Configuration.Optimizations.transform_dynamic_circuit>` in order to verify it.")
                 .def("reorder_operations", &EquivalenceCheckingManager::reorderOperations,
                      ":attr:`Reorder operations <.Configuration.Optimizations.reorder_operations>` to establish canonical ordering.")
                 // Application

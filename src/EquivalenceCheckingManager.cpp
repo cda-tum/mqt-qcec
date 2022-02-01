@@ -578,19 +578,6 @@ namespace ec {
             configuration.optimizations.removeDiagonalGatesBeforeMeasure = true;
         }
     }
-    void EquivalenceCheckingManager::transformDynamicCircuit() {
-        if (!configuration.optimizations.transformDynamicCircuit) {
-            if (qc::CircuitOptimizer::isDynamicCircuit(qc1)) {
-                qc::CircuitOptimizer::eliminateResets(qc1);
-                qc::CircuitOptimizer::deferMeasurements(qc1);
-            }
-            if (qc::CircuitOptimizer::isDynamicCircuit(qc2)) {
-                qc::CircuitOptimizer::eliminateResets(qc2);
-                qc::CircuitOptimizer::deferMeasurements(qc2);
-            }
-            configuration.optimizations.transformDynamicCircuit = true;
-        }
-    }
     void EquivalenceCheckingManager::reorderOperations() {
         if (!configuration.optimizations.reorderOperations) {
             qc::CircuitOptimizer::reorderOperations(qc1);
