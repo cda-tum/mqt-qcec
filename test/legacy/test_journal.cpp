@@ -247,13 +247,11 @@ protected:
         config.execution.timeout                = 60s;
 
         std::stringstream ss{};
-        ss << test_transpiled_dir << GetParam() << "_transpiled.";
-        //		if (GetParam() == "add6_196" || GetParam() == "cm150a_210") {
-        //			ss << "real";
-        //		} else {
-        ss << "qasm";
-        //		}
+        ss << test_transpiled_dir << GetParam() << "_transpiled.qasm";
         transpiled_file = ss.str();
+
+        qc_original.import(test_original_dir + GetParam() + ".real");
+        qc_transpiled.import(transpiled_file);
     }
 };
 
@@ -288,9 +286,6 @@ INSTANTIATE_TEST_SUITE_P(Journal, JournalTestEQ,
 	                         return ss.str(); });
 
 TEST_P(JournalTestEQ, EQReference) {
-    qc_original.import(test_original_dir + GetParam() + ".real");
-    qc_transpiled.import(transpiled_file);
-
     config.execution.runConstructionChecker = true;
     config.application.constructionScheme   = ec::ApplicationSchemeType::OneToOne;
 
@@ -301,9 +296,6 @@ TEST_P(JournalTestEQ, EQReference) {
 }
 
 TEST_P(JournalTestEQ, EQNaive) {
-    qc_original.import(test_original_dir + GetParam() + ".real");
-    qc_transpiled.import(transpiled_file);
-
     config.execution.runAlternatingChecker = true;
     config.application.alternatingScheme   = ec::ApplicationSchemeType::OneToOne;
 
@@ -314,9 +306,6 @@ TEST_P(JournalTestEQ, EQNaive) {
 }
 
 TEST_P(JournalTestEQ, EQProportional) {
-    qc_original.import(test_original_dir + GetParam() + ".real");
-    qc_transpiled.import(transpiled_file);
-
     config.execution.runAlternatingChecker = true;
     config.application.alternatingScheme   = ec::ApplicationSchemeType::Proportional;
 
@@ -327,9 +316,6 @@ TEST_P(JournalTestEQ, EQProportional) {
 }
 
 TEST_P(JournalTestEQ, EQLookahead) {
-    qc_original.import(test_original_dir + GetParam() + ".real");
-    qc_transpiled.import(transpiled_file);
-
     config.execution.runAlternatingChecker = true;
     config.application.alternatingScheme   = ec::ApplicationSchemeType::Lookahead;
 
@@ -340,9 +326,60 @@ TEST_P(JournalTestEQ, EQLookahead) {
 }
 
 TEST_P(JournalTestEQ, EQPowerOfSimulation) {
-    qc_original.import(test_original_dir + GetParam() + ".real");
-    qc_transpiled.import(transpiled_file);
+    config.execution.runSimulationChecker = true;
 
+    ec::EquivalenceCheckingManager ecm(qc_original, qc_transpiled, config);
+    ecm.run();
+    std::cout << ecm.toString() << std::endl;
+    EXPECT_TRUE(ecm.getResults().consideredEquivalent());
+}
+
+TEST_P(JournalTestEQ, EQReferenceParallel) {
+    config.execution.parallel               = true;
+    config.execution.runConstructionChecker = true;
+    config.application.constructionScheme   = ec::ApplicationSchemeType::OneToOne;
+
+    ec::EquivalenceCheckingManager ecm(qc_original, qc_transpiled, config);
+    ecm.run();
+    std::cout << ecm.toString() << std::endl;
+    EXPECT_TRUE(ecm.getResults().consideredEquivalent());
+}
+
+TEST_P(JournalTestEQ, EQNaiveParallel) {
+    config.execution.parallel              = true;
+    config.execution.runAlternatingChecker = true;
+    config.application.alternatingScheme   = ec::ApplicationSchemeType::OneToOne;
+
+    ec::EquivalenceCheckingManager ecm(qc_original, qc_transpiled, config);
+    ecm.run();
+    std::cout << ecm.toString() << std::endl;
+    EXPECT_TRUE(ecm.getResults().consideredEquivalent());
+}
+
+TEST_P(JournalTestEQ, EQProportionalParallel) {
+    config.execution.parallel              = true;
+    config.execution.runAlternatingChecker = true;
+    config.application.alternatingScheme   = ec::ApplicationSchemeType::Proportional;
+
+    ec::EquivalenceCheckingManager ecm(qc_original, qc_transpiled, config);
+    ecm.run();
+    std::cout << ecm.toString() << std::endl;
+    EXPECT_TRUE(ecm.getResults().consideredEquivalent());
+}
+
+TEST_P(JournalTestEQ, EQLookaheadParallel) {
+    config.execution.parallel              = true;
+    config.execution.runAlternatingChecker = true;
+    config.application.alternatingScheme   = ec::ApplicationSchemeType::Lookahead;
+
+    ec::EquivalenceCheckingManager ecm(qc_original, qc_transpiled, config);
+    ecm.run();
+    std::cout << ecm.toString() << std::endl;
+    EXPECT_TRUE(ecm.getResults().consideredEquivalent());
+}
+
+TEST_P(JournalTestEQ, EQPowerOfSimulationParallel) {
+    config.execution.parallel             = true;
     config.execution.runSimulationChecker = true;
 
     ec::EquivalenceCheckingManager ecm(qc_original, qc_transpiled, config);
