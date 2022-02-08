@@ -571,13 +571,6 @@ namespace ec {
             configuration.optimizations.reconstructSWAPs = true;
         }
     }
-    void EquivalenceCheckingManager::removeDiagonalGatesBeforeMeasure() {
-        if (!configuration.optimizations.removeDiagonalGatesBeforeMeasure) {
-            qc::CircuitOptimizer::removeDiagonalGatesBeforeMeasure(qc1);
-            qc::CircuitOptimizer::removeDiagonalGatesBeforeMeasure(qc2);
-            configuration.optimizations.removeDiagonalGatesBeforeMeasure = true;
-        }
-    }
     void EquivalenceCheckingManager::reorderOperations() {
         if (!configuration.optimizations.reorderOperations) {
             qc::CircuitOptimizer::reorderOperations(qc1);

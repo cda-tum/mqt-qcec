@@ -95,7 +95,6 @@ namespace ec {
         void runFixOutputPermutationMismatch();
         void fuseSingleQubitGates();
         void reconstructSWAPs();
-        void removeDiagonalGatesBeforeMeasure();
         void reorderOperations();
 
         // Application: These settings may be changed to influence the sequence in which gates are applied during the equivalence check

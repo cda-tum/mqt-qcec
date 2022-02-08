@@ -238,8 +238,6 @@ namespace ec {
                      ":attr:`Fuse consecutive single qubit gates <.Configuration.Optimizations.fuse_single_qubit_gates>`.")
                 .def("reconstruct_swaps", &EquivalenceCheckingManager::reconstructSWAPs,
                      ":attr:`Try to reconstruct SWAP gates <.Configuration.Optimizations.reconstruct_swaps>` that have been decomposed or optimized away.")
-                .def("remove_diagonal_gates_before_measure", &EquivalenceCheckingManager::removeDiagonalGatesBeforeMeasure,
-                     ":attr:`Remove any diagonal gates at the end of the circuit <.Configuration.Optimizations.remove_diagonal_gates_before_measure>`.")
                 .def("reorder_operations", &EquivalenceCheckingManager::reorderOperations,
                      ":attr:`Reorder operations <.Configuration.Optimizations.reorder_operations>` to establish canonical ordering.")
                 // Application
