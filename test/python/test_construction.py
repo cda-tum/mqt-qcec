@@ -1,4 +1,3 @@
-import datetime
 import unittest
 
 from jkq import qcec

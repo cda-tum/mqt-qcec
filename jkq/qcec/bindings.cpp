@@ -346,9 +346,9 @@ namespace ec {
                 .def_readwrite("reorder_operations", &Configuration::Optimizations::reorderOperations, "The operations of a circuit are stored in a sequential container. This introduces some dependencies in the order of operations that are not naturally present in the quantum circuit. As a consequence, two quantum circuits that contain exactly the same operations, list their operations in different ways, also apply there operations in a different order. This optimization pass established a canonical ordering of operations by, first, constructing a directed, acyclic graph for the operations and, then, traversing it in a breadth-first fashion. Defaults to :code:`True`.");
 
         application.def(py::init<>())
-                .def_readwrite("constructionScheme", &Configuration::Application::constructionScheme, "The :class:`Application Scheme <.ApplicationScheme>` used for the construction checker.")
-                .def_readwrite("simulationScheme", &Configuration::Application::simulationScheme, "The :class:`Application Scheme <.ApplicationScheme>` used for the simulation checker.")
-                .def_readwrite("alternatingScheme", &Configuration::Application::alternatingScheme, "The :class:`Application Scheme <.ApplicationScheme>` used for the alternating checker.")
+                .def_readwrite("construction_scheme", &Configuration::Application::constructionScheme, "The :class:`Application Scheme <.ApplicationScheme>` used for the construction checker.")
+                .def_readwrite("simulation_scheme", &Configuration::Application::simulationScheme, "The :class:`Application Scheme <.ApplicationScheme>` used for the simulation checker.")
+                .def_readwrite("alternating_scheme", &Configuration::Application::alternatingScheme, "The :class:`Application Scheme <.ApplicationScheme>` used for the alternating checker.")
                 .def_readwrite("profile", &Configuration::Application::profile, "The :attr:`Gate Cost <.ApplicationScheme.gate_cost>` application scheme can be configured with a profile that specifies the cost of gates. At the moment, this profile can be set via a file that is constructed similar to a lookup table. Every line :code:`<GATE_ID> <N_CONTROLS> <COST>` specified the cost for a given gate type and with a certain number of controls, e.g., :code:`X 0 1` denotes that a single-qubit X gate has a cost of :code:`1`, while :code:`X 2 15` denotes that a Toffoli gate has a cost of :code:`15`.");
 
         functionality.def(py::init<>())
