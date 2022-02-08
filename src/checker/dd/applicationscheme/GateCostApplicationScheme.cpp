@@ -55,10 +55,10 @@ namespace ec {
     }
     template<class DDType>
     void GateCostApplicationScheme<DDType>::populateLUT(std::istream& is) {
-        qc::OpType     opType    = qc::OpType::None;
-        dd::QubitCount nControls = 0U;
-        std::size_t    cost      = 1U;
-        while (is >> opType >> nControls >> cost) {
+        qc::OpType  opType    = qc::OpType::None;
+        std::size_t nControls = 0U;
+        std::size_t cost      = 1U;
+        while (is.good() && (is >> opType >> nControls >> cost)) {
             gateCostLUT.emplace(std::pair{opType, nControls}, cost);
         }
     }
