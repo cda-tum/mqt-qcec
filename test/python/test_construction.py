@@ -1,3 +1,4 @@
+import datetime
 import unittest
 
 from jkq import qcec
@@ -29,3 +30,7 @@ class QCECConstructionTests(unittest.TestCase):
     def test_constructor_with_configuration(self):
         """Test constructing an instance from circuits and a configuration object"""
         qcec.EquivalenceCheckingManager(circ1=self.qc1, circ2=self.qc2, config=self.config)
+
+    def test_constructor_with_kwargs(self):
+        """Test constructing an instance from circuits and a (random) keyword argument"""
+        qcec.EquivalenceCheckingManager(circ1=self.qc1, circ2=self.qc2, timeout=60.)
