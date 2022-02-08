@@ -25,7 +25,9 @@ TEST_F(GeneralTest, DynamicCircuit) {
     auto bv  = qc::BernsteinVazirani(s);
     auto dbv = qc::BernsteinVazirani(s, true);
 
-    auto config                                  = ec::Configuration{};
+    auto config = ec::Configuration{};
+    EXPECT_THROW(ec::EquivalenceCheckingManager(bv, dbv, config), std::runtime_error);
+
     config.optimizations.transformDynamicCircuit = true;
 
     auto ecm = ec::EquivalenceCheckingManager(bv, dbv, config);
@@ -36,7 +38,7 @@ TEST_F(GeneralTest, DynamicCircuit) {
 
     std::cout << ecm.toString() << std::endl;
 
-    auto ecm2 = ec::EquivalenceCheckingManager(dbv, bv, config);
+    auto ecm2 = ec::EquivalenceCheckingManager(dbv, dbv, config);
 
     ecm2.run();
 

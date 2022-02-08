@@ -337,6 +337,7 @@ TEST_P(JournalTestEQ, EQPowerOfSimulation) {
 TEST_P(JournalTestEQ, EQReferenceParallel) {
     config.execution.parallel               = true;
     config.execution.runConstructionChecker = true;
+    config.execution.runSimulationChecker   = true; // additionally run simulations
     config.application.constructionScheme   = ec::ApplicationSchemeType::OneToOne;
 
     ec::EquivalenceCheckingManager ecm(qc_original, qc_transpiled, config);
