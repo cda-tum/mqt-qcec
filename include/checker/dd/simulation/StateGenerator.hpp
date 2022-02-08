@@ -28,6 +28,8 @@ namespace ec {
 
         void seedGenerator(std::size_t seed);
 
+        void clear() { generatedComputationalBasisStates.clear(); }
+
     protected:
         std::size_t     seed = 0U;
         std::mt19937_64 mt;

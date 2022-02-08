@@ -69,6 +69,12 @@ namespace ec {
 
         void run();
 
+        void reset() {
+            stateGenerator.clear();
+            results = Results{};
+            checkers.clear();
+        }
+
         [[nodiscard]] nlohmann::json json() const;
         [[nodiscard]] std::string    toString() const { return json().dump(2); }
 
@@ -173,7 +179,7 @@ namespace ec {
         std::mutex                                       doneMutex{};
         std::vector<std::unique_ptr<EquivalenceChecker>> checkers{};
 
-        Results results;
+        Results results{};
 
         /// Given that one circuit has more qubits than the other, the difference is assumed to arise from ancillary qubits.
         /// This function changes the additional qubits in the larger circuit to ancillary qubits.
