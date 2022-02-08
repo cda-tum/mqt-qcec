@@ -57,6 +57,12 @@ namespace ec {
     inline std::istream& operator>>(std::istream& in, EquivalenceCriterion& criterion) {
         std::string token;
         in >> token;
+
+        if (token.empty()) {
+            in.setstate(std::istream::failbit);
+            return in;
+        }
+
         criterion = fromString(token);
         return in;
     }

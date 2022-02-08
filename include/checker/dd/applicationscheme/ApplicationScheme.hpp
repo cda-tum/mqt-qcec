@@ -55,6 +55,12 @@ namespace ec {
     inline std::istream& operator>>(std::istream& in, ApplicationSchemeType& applicationScheme) {
         std::string token;
         in >> token;
+
+        if (token.empty()) {
+            in.setstate(std::istream::failbit);
+            return in;
+        }
+
         applicationScheme = applicationSchemeFromString(token);
         return in;
     }

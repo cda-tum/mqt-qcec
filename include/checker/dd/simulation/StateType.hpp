@@ -42,6 +42,12 @@ namespace ec {
     inline std::istream& operator>>(std::istream& in, StateType& type) {
         std::string token;
         in >> token;
+
+        if (token.empty()) {
+            in.setstate(std::istream::failbit);
+            return in;
+        }
+
         type = stateTypeFromString(token);
         return in;
     }
