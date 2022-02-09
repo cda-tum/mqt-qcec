@@ -71,13 +71,15 @@ TEST_F(GeneralTest, FixOutputPermutationMismatch) {
 }
 
 TEST_F(GeneralTest, RemoveDiagonalGatesBeforeMeasure) {
-    qc::QuantumComputation qc1(1U);
+    qc1.addQubitRegister(1U);
+    qc1.addClassicalRegister(1U);
     qc1.x(0);
     qc1.measure(0, 0U);
     std::cout << qc1 << std::endl;
     std::cout << "-----------------------------" << std::endl;
 
-    qc::QuantumComputation qc2(1U);
+    qc2.addQubitRegister(1U);
+    qc2.addClassicalRegister(1U);
     qc2.x(0);
     qc2.z(0);
     qc2.measure(0, 0U);
@@ -104,4 +106,20 @@ TEST_F(GeneralTest, RemoveDiagonalGatesBeforeMeasure) {
     ecm2.run();
     EXPECT_TRUE(ecm2.getResults().consideredEquivalent());
     std::cout << ecm2.toString() << std::endl;
+}
+
+TEST_F(GeneralTest, NothingToDo) {
+    qc1.addQubitRegister(1U);
+    qc1.x(0);
+    qc2.addQubitRegister(1U);
+    qc2.x(0);
+
+    auto config                             = ec::Configuration{};
+    config.execution.runAlternatingChecker  = false;
+    config.execution.runSimulationChecker   = false;
+    config.execution.runConstructionChecker = false;
+
+    auto ecm = ec::EquivalenceCheckingManager(qc1, qc2, config);
+    ecm.run();
+    EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::NoInformation);
 }

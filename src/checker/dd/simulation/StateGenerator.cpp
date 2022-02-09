@@ -17,14 +17,14 @@ namespace ec {
 
     qc::VectorDD StateGenerator::generateRandomState(std::unique_ptr<dd::Package>& dd, dd::QubitCount totalQubits, dd::QubitCount ancillaryQubits, StateType type) {
         switch (type) {
-            case ec::StateType::ComputationalBasis:
-                return generateRandomComputationalBasisState(dd, totalQubits, ancillaryQubits);
             case ec::StateType::Random1QBasis:
                 return generateRandom1QBasisState(dd, totalQubits, ancillaryQubits);
             case ec::StateType::Stabilizer:
                 return generateRandomStabilizerState(dd, totalQubits, ancillaryQubits);
+            case ec::StateType::ComputationalBasis:
+            default:
+                return generateRandomComputationalBasisState(dd, totalQubits, ancillaryQubits);
         }
-        return qc::VectorDD::zero;
     }
 
     qc::VectorDD StateGenerator::generateRandomComputationalBasisState(std::unique_ptr<dd::Package>& dd, dd::QubitCount totalQubits, dd::QubitCount ancillaryQubits) {
