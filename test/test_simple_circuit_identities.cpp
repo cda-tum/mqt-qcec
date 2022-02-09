@@ -25,6 +25,7 @@ protected:
         std::stringstream ss2{circ2};
         qcAlternative.import(ss2, qc::OpenQASM);
 
+        config.optimizations.reconstructSWAPs = false;
         EXPECT_NO_THROW(ecm = std::make_unique<ec::EquivalenceCheckingManager>(qcOriginal, qcAlternative, config););
     }
 
@@ -50,6 +51,12 @@ INSTANTIATE_TEST_SUITE_P(TestCircuits, SimpleCircuitIdentitiesTest,
                                  std::pair{"CZ_from_CX_and_H",
                                            std::pair{"OPENQASM 2.0;\ninclude \"qelib1.inc\";\nqreg q[2];\ncz q[0], q[1];\n",
                                                      "OPENQASM 2.0;\ninclude \"qelib1.inc\";\nqreg q[2];\nh q[1]; cx q[0], q[1]; h q[1];\n"}},
+                                 std::pair{"CS_from_CX_and_T",
+                                           std::pair{"OPENQASM 2.0;\ninclude \"qelib1.inc\";\nqreg q[2];\ncs q[0], q[1];\n",
+                                                     "OPENQASM 2.0;\ninclude \"qelib1.inc\";\nqreg q[2];\nt q[0]; cx q[0], q[1]; tdg q[1]; cx q[0], q[1]; t q[1];\n"}},
+                                 std::pair{"iSWAP_decomposition",
+                                           std::pair{"OPENQASM 2.0;\ninclude \"qelib1.inc\";\nqreg q[2];\niswap q[0], q[1];\n",
+                                                     "OPENQASM 2.0;\ninclude \"qelib1.inc\";\nqreg q[2];\ns q[0]; s q[1]; h q[0]; cx q[0],q[1]; cx q[1],q[0]; h q[1];\n"}},
                                  std::pair{"Global_Phase",
                                            std::pair{"OPENQASM 2.0;\ninclude \"qelib1.inc\";\nqreg q[1];\nz q[0]; x q[0]; z q[0];\n",
                                                      "OPENQASM 2.0;\ninclude \"qelib1.inc\";\nqreg q[1];\n x q[0];\n"}}),
@@ -86,6 +93,15 @@ TEST_P(SimpleCircuitIdentitiesTest, DefaultOptionsOnlyConstruction) {
     ecm->setSimulationChecker(false);
     ecm->setConstructionChecker(true);
 
+    EXPECT_NO_THROW(ecm->run(););
+
+    EXPECT_TRUE(ecm->getResults().consideredEquivalent());
+}
+
+TEST_P(SimpleCircuitIdentitiesTest, GateCostApplicationScheme) {
+    ecm->setSimulationChecker(false);
+    ecm->setAlternatingApplicationScheme(ec::ApplicationSchemeType::GateCost);
+    ecm->setGateCostFunction(&ec::LegacyIBMCostFunction);
     EXPECT_NO_THROW(ecm->run(););
 
     EXPECT_TRUE(ecm->getResults().consideredEquivalent());
