@@ -41,6 +41,7 @@ namespace ec {
         void                 postprocess() override;
         EquivalenceCriterion checkEquivalence() override;
 
+        // at some point this routine should probably make its way into the QFR library
         bool gatesAreIdentical();
     };
 } // namespace ec

@@ -141,15 +141,26 @@ namespace ec {
         const auto& op2 = *taskManager2();
 
         // check type
-        if (op1.getType() != op2.getType()) { return false; }
+        if (op1.getType() != op2.getType()) {
+            return false;
+        }
+
+        // quickly abort for compound operations
+        if (op1.getType() == qc::Compound) {
+            return false;
+        }
 
         // check number of controls
         const auto nc1 = op1.getNcontrols();
         const auto nc2 = op2.getNcontrols();
-        if (nc1 != nc2) { return false; }
+        if (nc1 != nc2) {
+            return false;
+        }
 
         // SWAPs are not handled by this routine
-        if (op1.getType() == qc::SWAP && nc1 == 0U) { return false; }
+        if (op1.getType() == qc::SWAP && nc1 == 0U) {
+            return false;
+        }
 
         // check parameters
         const auto param1 = op1.getParameter();
