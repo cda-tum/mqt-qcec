@@ -68,6 +68,12 @@ TEST_F(GeneralTest, FixOutputPermutationMismatch) {
     ec::EquivalenceCheckingManager ecm(qc1, qc2, config);
     ecm.run();
     EXPECT_TRUE(ecm.getResults().consideredEquivalent());
+
+    // also try post initialization routine
+    ec::EquivalenceCheckingManager ecm2(qc1, qc2);
+    ecm2.runFixOutputPermutationMismatch();
+    ecm2.run();
+    EXPECT_TRUE(ecm2.getResults().consideredEquivalent());
 }
 
 TEST_F(GeneralTest, RemoveDiagonalGatesBeforeMeasure) {

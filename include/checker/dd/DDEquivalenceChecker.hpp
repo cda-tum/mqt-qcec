@@ -49,6 +49,7 @@ namespace ec {
 
         void initializeApplicationScheme(ApplicationSchemeType scheme);
 
+        // at some point this routine should probably make its way into the DD package in some form
         EquivalenceCriterion equals(const DDType& e, const DDType& f);
 
         virtual void                 initializeTask(TaskManager<DDType>&) = 0;

@@ -25,7 +25,9 @@ protected:
         std::stringstream ss2{circ2};
         qcAlternative.import(ss2, qc::OpenQASM);
 
-        config.optimizations.reconstructSWAPs = false;
+        config.optimizations.reconstructSWAPs     = false;
+        config.optimizations.fuseSingleQubitGates = false;
+        config.optimizations.reorderOperations    = false;
         EXPECT_NO_THROW(ecm = std::make_unique<ec::EquivalenceCheckingManager>(qcOriginal, qcAlternative, config););
     }
 
@@ -102,6 +104,27 @@ TEST_P(SimpleCircuitIdentitiesTest, GateCostApplicationScheme) {
     ecm->setSimulationChecker(false);
     ecm->setAlternatingApplicationScheme(ec::ApplicationSchemeType::GateCost);
     ecm->setGateCostFunction(&ec::LegacyIBMCostFunction);
+    EXPECT_NO_THROW(ecm->run(););
+
+    EXPECT_TRUE(ecm->getResults().consideredEquivalent());
+}
+
+TEST_P(SimpleCircuitIdentitiesTest, ReorderingOperations) {
+    ecm->reorderOperations();
+    EXPECT_NO_THROW(ecm->run(););
+
+    EXPECT_TRUE(ecm->getResults().consideredEquivalent());
+}
+
+TEST_P(SimpleCircuitIdentitiesTest, FuseSingleQubitGates) {
+    ecm->fuseSingleQubitGates();
+    EXPECT_NO_THROW(ecm->run(););
+
+    EXPECT_TRUE(ecm->getResults().consideredEquivalent());
+}
+
+TEST_P(SimpleCircuitIdentitiesTest, ReconstructSWAPs) {
+    ecm->reconstructSWAPs();
     EXPECT_NO_THROW(ecm->run(););
 
     EXPECT_TRUE(ecm->getResults().consideredEquivalent());
