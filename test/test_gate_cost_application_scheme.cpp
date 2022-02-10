@@ -3,6 +3,7 @@
 * See file README.md or go to http://iic.jku.at/eda/research/quantum_verification/ for more information.
 */
 
+#include "EquivalenceCheckingManager.hpp"
 #include "checker/dd/applicationscheme/GateCostApplicationScheme.hpp"
 
 #include "gtest/gtest.h"
@@ -45,6 +46,12 @@ TEST_F(GateCostApplicationSchemeTest, SchemeFromProfile) {
 
     EXPECT_EQ(left, 1U);
     EXPECT_EQ(right, 15U);
+
+    ec::Configuration config{};
+    config.application.profile = filename;
+    ec::EquivalenceCheckingManager ecm(qc, qc, config);
+    ecm.run();
+    EXPECT_TRUE(ecm.getResults().consideredEquivalent());
 }
 
 TEST_F(GateCostApplicationSchemeTest, iSWAP) {
