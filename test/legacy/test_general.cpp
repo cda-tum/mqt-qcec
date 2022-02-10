@@ -129,3 +129,53 @@ TEST_F(GeneralTest, NothingToDo) {
     ecm.run();
     EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::NoInformation);
 }
+
+TEST_F(GeneralTest, NoGateCancellation) {
+    qc1.addQubitRegister(2U);
+    qc2.addQubitRegister(2U);
+
+    // ignore swaps
+    qc1.swap(0, 1);
+    qc2.swap(0, 1);
+
+    // different gates that cannot be cancelled
+    qc1.z(0);
+    qc1.x(1);
+    qc2.x(1);
+    qc2.z(0);
+
+    // single qubit gates that cannot be cancelled
+    qc1.x(0);
+    qc2.x(1);
+    qc1.x(1);
+    qc2.x(0);
+
+    // two-qubit gates that cannot be cancelled
+    qc1.x(0, 1_pc);
+    qc2.x(1, 0_pc);
+    qc1.x(0, 1_pc);
+    qc2.x(1, 0_pc);
+
+    // gates with parameters that cannot be cancelled
+    qc1.phase(0, 2.0);
+    qc2.phase(0, -2.0);
+    qc1.phase(0, -2.0);
+    qc2.phase(0, 2.0);
+
+    // gates with different number of controls that cannot be cancelled
+    qc1.x(0);
+    qc2.x(0, 1_pc);
+    qc1.x(0, 1_pc);
+    qc2.x(0);
+
+    auto config                               = ec::Configuration{};
+    config.optimizations.reorderOperations    = false;
+    config.optimizations.fuseSingleQubitGates = false;
+    config.optimizations.reconstructSWAPs     = false;
+    config.application.alternatingScheme      = ec::ApplicationSchemeType::OneToOne;
+
+    ec::EquivalenceCheckingManager ecm(qc1, qc2, config);
+    ecm.run();
+    EXPECT_TRUE(ecm.getResults().consideredEquivalent());
+    std::cout << ecm.toString() << std::endl;
+}
