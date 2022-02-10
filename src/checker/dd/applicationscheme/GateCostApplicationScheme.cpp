@@ -135,10 +135,10 @@ namespace ec {
             case qc::SWAP:
                 return LegacyIBMCostFunction({qc::X, nc}) + 2U * LegacyIBMCostFunction({qc::X, 1});
             case qc::iSWAP:
-                return LegacyIBMCostFunction({qc::SWAP, nc}) + 2U * LegacyIBMCostFunction({qc::S, nc - 1U}) + LegacyIBMCostFunction({qc::Z, nc});
+                return 2U * LegacyIBMCostFunction({qc::X, nc + 1U}) + 2U * LegacyIBMCostFunction({qc::S, nc}) + 2U * LegacyIBMCostFunction({qc::H, nc});
             case qc::Peres:
             case qc::Peresdag:
-                return LegacyIBMCostFunction({qc::X, nc}) + LegacyIBMCostFunction({qc::X, nc - 1U});
+                return LegacyIBMCostFunction({qc::X, nc + 1U}) + LegacyIBMCostFunction({qc::X, nc});
             default:
                 return 1U;
         }
