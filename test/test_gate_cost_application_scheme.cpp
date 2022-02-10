@@ -46,3 +46,29 @@ TEST_F(GateCostApplicationSchemeTest, SchemeFromProfile) {
     EXPECT_EQ(left, 1U);
     EXPECT_EQ(right, 15U);
 }
+
+TEST_F(GateCostApplicationSchemeTest, iSWAP) {
+    qc.iswap(0, 1);
+
+    auto tm = ec::TaskManager<qc::MatrixDD>(qc, dd);
+
+    auto scheme = ec::GateCostApplicationScheme(tm, tm, &ec::LegacyIBMCostFunction);
+
+    const auto [left, right] = scheme();
+
+    EXPECT_EQ(left, 1U);
+    EXPECT_EQ(right, 6U);
+}
+
+TEST_F(GateCostApplicationSchemeTest, Peres) {
+    qc.peres(1, 2, 0_pc);
+
+    auto tm = ec::TaskManager<qc::MatrixDD>(qc, dd);
+
+    auto scheme = ec::GateCostApplicationScheme(tm, tm, &ec::LegacyIBMCostFunction);
+
+    const auto [left, right] = scheme();
+
+    EXPECT_EQ(left, 1U);
+    EXPECT_EQ(right, 15U);
+}
