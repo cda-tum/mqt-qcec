@@ -48,7 +48,8 @@ TEST_F(GateCostApplicationSchemeTest, SchemeFromProfile) {
     EXPECT_EQ(right, 15U);
 
     ec::Configuration config{};
-    config.application.profile = filename;
+    config.application.profile           = filename;
+    config.application.alternatingScheme = ec::ApplicationSchemeType::GateCost;
     ec::EquivalenceCheckingManager ecm(qc, qc, config);
     ecm.run();
     EXPECT_TRUE(ecm.getResults().consideredEquivalent());
