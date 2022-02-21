@@ -4,6 +4,8 @@ updates:
     directory:         "/"
     schedule:
       interval: "weekly"
+      day: "friday"
+      time: "06:00"
     assignees:
       - "burgholzer"
 
@@ -11,6 +13,8 @@ updates:
     directory:         "/"
     schedule:
       interval: "weekly"
+      day: "friday"
+      time: "06:00"
     assignees:
       - "burgholzer"
 
@@ -18,6 +22,8 @@ updates:
     directory:         "/docs"
     schedule:
       interval: "weekly"
+      day: "friday"
+      time: "06:00"
     assignees:
       - "burgholzer"
 
@@ -25,5 +31,7 @@ updates:
     directory:         "/test/python"
     schedule:
       interval: "weekly"
+      day: "friday"
+      time: "06:00"
     assignees:
       - "burgholzer"
