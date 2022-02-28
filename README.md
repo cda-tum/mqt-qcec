@@ -1,25 +1,27 @@
-[![PyPI](https://img.shields.io/pypi/v/jkq.qcec?logo=pypi&style=plastic)](https://pypi.org/project/jkq.qcec/)
-[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/iic-jku/qcec/CI?logo=github&style=plastic)](https://github.com/iic-jku/qcec/actions?query=workflow%3A%22CI%22)
-[![Codecov branch](https://img.shields.io/codecov/c/github/iic-jku/qcec/master?label=codecov&logo=codecov&style=plastic)](https://codecov.io/gh/iic-jku/qcec)
-![GitHub](https://img.shields.io/github/license/iic-jku/qcec?style=plastic)
-[![toolset: JKQ](https://img.shields.io/badge/toolset-JKQ-blue?style=plastic)](https://github.com/iic-jku/jkq)
+[![PyPI](https://img.shields.io/pypi/v/mqt.qcec?logo=pypi&style=plastic)](https://pypi.org/project/mqt.qcec/)
+[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/cda-tum/qcec/CI?logo=github&style=plastic)](https://github.com/cda-tum/qcec/actions?query=workflow%3A%22CI%22)
+[![Codecov branch](https://img.shields.io/codecov/c/github/cda-tum/qcec/master?label=codecov&logo=codecov&style=plastic)](https://codecov.io/gh/cda-tum/qcec)
+![GitHub](https://img.shields.io/github/license/cda-tum/qcec?style=plastic)
 [![arXiv](https://img.shields.io/static/v1?label=arXiv&message=2004.08420&color=inactive&style=plastic)](https://arxiv.org/abs/2004.08420)
 [![arXiv](https://img.shields.io/static/v1?label=arXiv&message=2009.02376&color=inactive&style=plastic)](https://arxiv.org/abs/2009.02376)
 [![arXiv](https://img.shields.io/static/v1?label=arXiv&message=2011.07288&color=inactive&style=plastic)](https://arxiv.org/abs/2011.07288)
 
-# QCEC - A JKQ tool for **Q**uantum **C**ircuit **E**quivalence **C**hecking
+# MQT QCEC - A tool for **Q**uantum **C**ircuit **E**quivalence **C**hecking
 
-A JKQ tool for Quantum Circuit Equivalence Checking by the [Institute for Integrated Circuits](http://iic.jku.at/eda/) at the [Johannes Kepler University Linz](https://jku.at) based on methods proposed in [[1]](https://arxiv.org/abs/2004.08420), [[2]](https://arxiv.org/abs/2009.02376), [[3]](https://arxiv.org/abs/2011.07288). 
+A tool for Quantum Circuit Equivalence Checking by the [Institute for Integrated Circuits](http://iic.jku.at/eda/) at the [Johannes Kepler University Linz](https://jku.at) based on methods proposed in [[1]](https://arxiv.org/abs/2004.08420)
+, [[2]](https://arxiv.org/abs/2009.02376), [[3]](https://arxiv.org/abs/2011.07288).
 
-[[1]](https://arxiv.org/abs/2004.08420) L. Burgholzer and R. Wille. **"Advanced Equivalence Checking for Quantum Circuits"**. IEEE Transactions on Computer Aided Design of Integrated Circuits and Systems (TCAD), 2021 (pre-print [arXiv:2004.08420](https://arxiv.org/abs/2004.08420))
+[[1]](https://arxiv.org/abs/2004.08420) L. Burgholzer and R. Wille. **"Advanced Equivalence Checking for Quantum Circuits"**. IEEE Transactions on Computer Aided Design of Integrated Circuits and Systems (TCAD), 2021 (
+pre-print [arXiv:2004.08420](https://arxiv.org/abs/2004.08420))
 
 [[2]](https://arxiv.org/abs/2009.02376) L. Burgholzer, R. Raymond, and R. Wille. **"Verifying Results of the IBM Qiskit Quantum Circuit Compilation Flow"**. In International Conference on Quantum Computing and Engineering (QCE), 2020 (pre-print [arXiv:2009.02376](https://arxiv.org/abs/2009.02376))
 
 [[3]](https://arxiv.org/abs/2011.07288) L. Burgholzer, R. Kueng, and R. Wille. **"Random Stimuli Generation for the Verification of Quantum Circuits"**. In Asia and South Pacific Design Automation Conference (ASP-DAC), 2021 (pre-print [arxiv:2011.07288](https://arxiv.org/abs/2011.07288)) 
 
 This tool can be used for checking the equivalence of two quantum circuits provided in any of the following formats:
- * `QuantumCircuit` object from IBM's [Qiskit](https://github.com/Qiskit/qiskit) (only through the JKQ QCEC Python bindings)
- * `OpenQASM` (e.g. used by IBM's [Qiskit](https://github.com/Qiskit/qiskit)),
+
+* `QuantumCircuit` object from IBM's [Qiskit](https://github.com/Qiskit/qiskit) (only through the MQT QCEC Python bindings)
+* `OpenQASM` (e.g. used by IBM's [Qiskit](https://github.com/Qiskit/qiskit)),
  * `Real` (e.g. from [RevLib](http://revlib.org)),
  * `TFC` (e.g. from [Reversible Logic Synthesis Benchmarks Page](http://webhome.cs.uvic.ca/~dmaslov/mach-read.html))
  * `QC` (e.g. from [Feynman](https://github.com/meamy/feynman))
@@ -36,25 +38,28 @@ This tool can be used for checking the equivalence of two quantum circuits provi
   - **Global Quantum Stimuli** - random stabilizer states [[3, Section 3.3]](https://arxiv.org/pdf/2011.07288.pdf#page=4)
 - **Verification of compilation results** - A dedicated scheme for verifying results of the IBM Qiskit Compilation Flow explicitly exploiting certain knowledge about the compilation process. [[2]](https://arxiv.org/pdf/2009.02376.pdf)
 
-The tool builds upon [our decision diagram (DD) package](https://github.com/iic-jku/dd_package.git) as well as [our quantum functionality representation (QFR)](https://github.com/iic-jku/qfr.git). For more information, please visit [iic.jku.at/eda/research/quantum_verification](http://iic.jku.at/eda/research/quantum_verification). If you want to visually explore decision diagrams for quantum computing, check out our installation-free web-tool [JKQ DDVis](https://iic.jku.at/eda/research/quantum_dd/tool/).
+The tool builds upon [our decision diagram (DD) package](https://github.com/cda-tum/dd_package.git) as well as [our quantum functionality representation (QFR)](https://github.com/cda-tum/qfr.git). For more information, please
+visit [iic.jku.at/eda/research/quantum_verification](http://iic.jku.at/eda/research/quantum_verification). If you want to visually explore decision diagrams for quantum computing, check out our installation-free
+web-tool [MQT DDVis](https://iic.jku.at/eda/research/quantum_dd/tool/).
 
-If you have any questions, feel free to contact us via [iic-quantum@jku.at](mailto:iic-quantum@jku.at) or by creating an issue on [GitHub](https://guthub.com/iic-jku/qcec/issues).
+If you have any questions, feel free to contact us via [iic-quantum@jku.at](mailto:iic-quantum@jku.at) or by creating an issue on [GitHub](https://guthub.com/cda-tum/qcec/issues).
 
 ## Usage
 
-JKQ QCEC is mainly developed as a C++ library with an easy-to-use Python interface. 
+MQT QCEC is mainly developed as a C++ library with an easy-to-use Python interface.
+
 - In order to make the library as easy to use as possible (without compilation), we provide pre-built wheels for most common platforms (64-bit Linux, MacOS, Windows). These can be installed using
     ```bash
-    pip install jkq.qcec
+    pip install mqt.qcec
     ```
   However, in order to get the best performance out of QCEC, it is recommended to build it locally from the source distribution (see [system requirements](#system-requirements)) via
     ```bash
-    pip install jkq.qcec --no-binary jkq.qcec
+    pip install mqt.qcec --no-binary mqt.qcec
     ```
   This enables platform specific compiler optimizations that cannot be enabled on portable wheels.
 - Once installed, start using it in Python:
     ```python
-    from jkq.qcec import *
+    from mqt.qcec import *
     
     config = Configuration()
     <...>  # set configuration options
@@ -95,9 +100,10 @@ The verification procedure can be configured with the following settings and opt
 The `qcec.Results` class that is returned by the `verify` function provides `json()` and `csv()` methods to produce JSON or CSV formatted output.
 
 ### Integration of IBM Qiskit
-The JKQ QCEC tool is designed to natively integrate with IBM Qiskit. In particular, using our tool to verify, e.g., the results of IBM Qiskit's quantum circuit compilation flow, is as easy as:
+
+The MQT QCEC tool is designed to natively integrate with IBM Qiskit. In particular, using our tool to verify, e.g., the results of IBM Qiskit's quantum circuit compilation flow, is as easy as:
 ```python
-from jkq.qcec import Configuration, Strategy, verify
+from mqt.qcec import Configuration, Strategy, verify
 from qiskit import QuantumCircuit, transpile
 
 # create your quantum circuit
@@ -119,7 +125,7 @@ result = verify(qc, qc_comp, config)
 
 ### Command-line Executable
 
-JKQ QCEC also provides a **standalone executable** with command-line interface called `qcec_app`. It provides the same options as the Python module as flags (e.g., `--method <method>` for setting the method) and produces JSON formatted
+MQT QCEC also provides a **standalone executable** with command-line interface called `qcec_app`. It provides the same options as the Python module as flags (e.g., `--method <method>` for setting the method) and produces JSON formatted
 output. For a full list of options, call `qcec_app --help`.
 
 ### System requirements
@@ -132,7 +138,7 @@ found [here](https://docs.microsoft.com/en-us/cpp/build/clang-support-msbuild?vi
 
 ### Library Organisation
 
-Internally the JKQ QCEC library works in the following way
+Internally the MQT QCEC library works in the following way
 
 - Import both input files into a `qc::QuantumComputation` object
     ```c++
@@ -177,7 +183,7 @@ Internally the JKQ QCEC library works in the following way
 
 To start off, clone this repository using
 ```shell
-git clone --recurse-submodules -j8 https://github.com/iic-jku/qcec 
+git clone --recurse-submodules -j8 https://github.com/cda-tum/qcec 
 ```
 Note the `--recurse-submodules` flag. It is required to also clone all the required submodules. If you happen to forget passing the flag on your initial clone, you can initialize all the submodules by executing `git submodule update --init --recursive` in the main project directory.
 

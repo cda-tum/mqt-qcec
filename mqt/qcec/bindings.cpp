@@ -1,5 +1,5 @@
 /*
- * This file is part of JKQ QCEC library which is released under the MIT license.
+ * This file is part of MQT QCEC library which is released under the MIT license.
  * See file README.md or go to http://iic.jku.at/eda/research/quantum/ for more information.
  */
 
@@ -74,7 +74,7 @@ ec::EquivalenceCheckingResults verify(const py::object&        circ1,
 }
 
 PYBIND11_MODULE(pyqcec, m) {
-    m.doc() = "Python interface for the JKQ QCEC quantum circuit equivalence checking tool";
+    m.doc() = "Python interface for the MQT QCEC quantum circuit equivalence checking tool";
 
     py::enum_<ec::Method>(m, "Method")
             .value("reference", ec::Method::Reference)
@@ -103,7 +103,7 @@ PYBIND11_MODULE(pyqcec, m) {
             .value("probably_equivalent", ec::Equivalence::ProbablyEquivalent);
 
     py::class_<ec::Configuration>(m, "Configuration",
-                                  "Configuration options for the JKQ QCEC quantum circuit equivalence checking tool")
+                                  "Configuration options for the MQT QCEC quantum circuit equivalence checking tool")
             .def(py::init<>())
             .def_readwrite(
                     "method", &ec::Configuration::method,
@@ -176,7 +176,7 @@ PYBIND11_MODULE(pyqcec, m) {
             .def("__repr__", &ec::Configuration::toString);
 
     py::class_<ec::EquivalenceCheckingResults>(m, "Results",
-                                               "Results of the JKQ QCEC quantum circuit equivalence checking tool")
+                                               "Results of the MQT QCEC quantum circuit equivalence checking tool")
             .def(py::init<>())
             .def_readwrite(
                     "circuit1", &ec::EquivalenceCheckingResults::circuit1,

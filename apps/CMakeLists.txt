@@ -1,5 +1,5 @@
 add_executable(${PROJECT_NAME}_app ${CMAKE_CURRENT_SOURCE_DIR}/app.cpp)
-target_link_libraries(${PROJECT_NAME}_app PRIVATE JKQ::${PROJECT_NAME})
+target_link_libraries(${PROJECT_NAME}_app PRIVATE MQT::${PROJECT_NAME})
 
 add_custom_command(TARGET ${PROJECT_NAME}_app
                    POST_BUILD
@@ -8,7 +8,7 @@ add_custom_command(TARGET ${PROJECT_NAME}_app
                    VERBATIM)
 
 add_executable(${PROJECT_NAME}_sim_app ${CMAKE_CURRENT_SOURCE_DIR}/sim_app.cpp)
-target_link_libraries(${PROJECT_NAME}_sim_app PRIVATE JKQ::${PROJECT_NAME})
+target_link_libraries(${PROJECT_NAME}_sim_app PRIVATE MQT::${PROJECT_NAME})
 
 add_custom_command(TARGET ${PROJECT_NAME}_sim_app
                    POST_BUILD

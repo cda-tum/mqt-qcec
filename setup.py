@@ -75,19 +75,19 @@ with open(README_PATH) as readme_file:
     README = readme_file.read()
 
 setup(
-    name='jkq.qcec',
-    version='1.10.4',
+    name='mqt.qcec',
+    version='1.10.5',
     author='Lukas Burgholzer',
     author_email='lukas.burgholzer@jku.at',
-    description='QCEC - A JKQ tool for Quantum Circuit Equivalence Checking',
+    description='MQT QCEC - A tool for Quantum Circuit Equivalence Checking',
     long_description=README,
     long_description_content_type="text/markdown",
     license="MIT",
     url="https://iic.jku.at/eda/research/quantum_verification",
-    ext_modules=[CMakeExtension('pyqcec', namespace='jkq.qcec.')],
+    ext_modules=[CMakeExtension('pyqcec', namespace='mqt.qcec.')],
     cmdclass=dict(build_ext=CMakeBuild),
     zip_safe=False,
-    packages=find_namespace_packages(include=['jkq.*']),
+    packages=find_namespace_packages(include=['mqt.*']),
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         "Programming Language :: Python :: 3",
@@ -100,10 +100,10 @@ setup(
         "Natural Language :: English",
         "Topic :: Scientific/Engineering :: Electronic Design Automation (EDA)",
     ],
-    keywords="jkq quantum verification",
+    keywords="mqt quantum verification",
     project_urls={
-        'Source': 'https://github.com/iic-jku/qcec/',
-        'Tracker': 'https://github.com/iic-jku/qcec/issues',
+        'Source': 'https://github.com/cda-tum/qcec/',
+        'Tracker': 'https://github.com/cda-tum/qcec/issues',
         'Research': 'https://iic.jku.at/eda/research/quantum_verification',
     }
 )

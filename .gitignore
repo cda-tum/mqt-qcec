@@ -4,4 +4,4 @@ cmake-build-*
 venv
 dist
 *egg-info
-jkq/qcec/pyqcec*
+mqt/qcec/pyqcec*
