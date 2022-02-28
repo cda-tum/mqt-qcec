@@ -1,8 +1,7 @@
 [![PyPI](https://img.shields.io/pypi/v/jkq.qcec?logo=pypi&style=plastic)](https://pypi.org/project/jkq.qcec/)
-[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/iic-jku/qcec/CI?logo=github&style=plastic)](https://github.com/iic-jku/qcec/actions?query=workflow%3A%22CI%22)
-[![Codecov branch](https://img.shields.io/codecov/c/github/iic-jku/qcec/master?label=codecov&logo=codecov&style=plastic)](https://codecov.io/gh/iic-jku/qcec)
-![GitHub](https://img.shields.io/github/license/iic-jku/qcec?style=plastic)
-[![toolset: JKQ](https://img.shields.io/badge/toolset-JKQ-blue?style=plastic)](https://github.com/iic-jku/jkq)
+[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/cda-tum/qcec/CI?logo=github&style=plastic)](https://github.com/cda-tum/qcec/actions?query=workflow%3A%22CI%22)
+[![Codecov branch](https://img.shields.io/codecov/c/github/cda-tum/qcec/master?label=codecov&logo=codecov&style=plastic)](https://codecov.io/gh/cda-tum/qcec)
+![GitHub](https://img.shields.io/github/license/cda-tum/qcec?style=plastic)
 [![arXiv](https://img.shields.io/static/v1?label=arXiv&message=2004.08420&color=inactive&style=plastic)](https://arxiv.org/abs/2004.08420)
 [![arXiv](https://img.shields.io/static/v1?label=arXiv&message=2009.02376&color=inactive&style=plastic)](https://arxiv.org/abs/2009.02376)
 [![arXiv](https://img.shields.io/static/v1?label=arXiv&message=2011.07288&color=inactive&style=plastic)](https://arxiv.org/abs/2011.07288)
@@ -36,9 +35,11 @@ This tool can be used for checking the equivalence of two quantum circuits provi
   - **Global Quantum Stimuli** - random stabilizer states [[3, Section 3.3]](https://arxiv.org/pdf/2011.07288.pdf#page=4)
 - **Verification of compilation results** - A dedicated scheme for verifying results of the IBM Qiskit Compilation Flow explicitly exploiting certain knowledge about the compilation process. [[2]](https://arxiv.org/pdf/2009.02376.pdf)
 
-The tool builds upon [our decision diagram (DD) package](https://github.com/iic-jku/dd_package.git) as well as [our quantum functionality representation (QFR)](https://github.com/iic-jku/qfr.git). For more information, please visit [iic.jku.at/eda/research/quantum_verification](http://iic.jku.at/eda/research/quantum_verification). If you want to visually explore decision diagrams for quantum computing, check out our installation-free web-tool [JKQ DDVis](https://iic.jku.at/eda/research/quantum_dd/tool/).
+The tool builds upon [our decision diagram (DD) package](https://github.com/cda-tum/dd_package.git) as well as [our quantum functionality representation (QFR)](https://github.com/cda-tum/qfr.git). For more information, please
+visit [iic.jku.at/eda/research/quantum_verification](http://iic.jku.at/eda/research/quantum_verification). If you want to visually explore decision diagrams for quantum computing, check out our installation-free
+web-tool [JKQ DDVis](https://iic.jku.at/eda/research/quantum_dd/tool/).
 
-If you have any questions, feel free to contact us via [iic-quantum@jku.at](mailto:iic-quantum@jku.at) or by creating an issue on [GitHub](https://guthub.com/iic-jku/qcec/issues).
+If you have any questions, feel free to contact us via [iic-quantum@jku.at](mailto:iic-quantum@jku.at) or by creating an issue on [GitHub](https://guthub.com/cda-tum/qcec/issues).
 
 ## Usage
 
@@ -177,7 +178,7 @@ Internally the JKQ QCEC library works in the following way
 
 To start off, clone this repository using
 ```shell
-git clone --recurse-submodules -j8 https://github.com/iic-jku/qcec 
+git clone --recurse-submodules -j8 https://github.com/cda-tum/qcec 
 ```
 Note the `--recurse-submodules` flag. It is required to also clone all the required submodules. If you happen to forget passing the flag on your initial clone, you can initialize all the submodules by executing `git submodule update --init --recursive` in the main project directory.
 
