@@ -76,7 +76,7 @@ with open(README_PATH) as readme_file:
 
 setup(
     name='mqt.qcec',
-    version='1.10.4',
+    version='1.10.5',
     author='Lukas Burgholzer',
     author_email='lukas.burgholzer@jku.at',
     description='MQT QCEC - A tool for Quantum Circuit Equivalence Checking',

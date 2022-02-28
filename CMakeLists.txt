@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.14...3.22)
 
 project(qcec
         LANGUAGES CXX
-        VERSION 1.10.4
+        VERSION 1.10.5
         DESCRIPTION "MQT QCEC - A tool for Quantum Circuit Equivalence Checking"
         )
 
