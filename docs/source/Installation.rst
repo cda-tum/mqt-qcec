@@ -1,7 +1,7 @@
 Installation
 ============
 
-*QCEC* is mainly developed as a *C++* library that builds upon `our decision diagram (DD) package <https://github.com/iic-jku/dd_package.git>`_ as well as `our quantum functionality representation (QFR) <https://github.com/iic-jku/qfr.git>`_.
+*QCEC* is mainly developed as a *C++* library that builds upon `our decision diagram (DD) package <https://github.com/cda-tum/dd_package.git>`_ as well as `our quantum functionality representation (QFR) <https://github.com/cda-tum/qfr.git>`_.
 In order to make the tool as accessible as possible, it comes with an easy-to-use Python interface.
 
 User
@@ -11,7 +11,7 @@ We encourage installing QCEC via pip (preferably in a `virtual environment <http
 
     .. code-block:: console
 
-        (venv) $ pip install jkq.qcec
+        (venv) $ pip install mqt.qcec
 
 In most practical cases (under 64-bit Linux, MacOS incl. Apple Silicon, and Windows), this requires no compilation and merely downloads and installs a platform-specific pre-built wheel.
 
@@ -19,12 +19,12 @@ However, in order to get the best performance out of *QCEC* and enable platform-
 
     .. code-block:: console
 
-        (venv) $ pip install jkq.qcec --no-binary jkq.qcec
+        (venv) $ pip install mqt.qcec --no-binary mqt.qcec
 
 This requires a *C++* compiler supporting *C++17* and a minimum CMake version of *3.14*.
 
 The library is continuously tested under Linux, MacOS, and Windows using the `latest available system versions for GitHub Actions <https://github.com/actions/virtual-environments>`_.
-In order to access the latest build logs, visit `qcec/actions/workflows/ci.yml <https://github.com/iic-jku/qcec/actions/workflows/ci.yml>`_.
+In order to access the latest build logs, visit `qcec/actions/workflows/ci.yml <https://github.com/cda-tum/qcec/actions/workflows/ci.yml>`_.
 
 **Disclaimer**: We noticed some issues when compiling with Microsoft's *MSCV* compiler toolchain. If you want to start development on this project under Windows, consider using the *clang* compiler toolchain. A detailed description of how to set this up can be found `here <https://docs.microsoft.com/en-us/cpp/build/clang-support-msbuild?view=msvc-160>`_.
 
@@ -35,7 +35,7 @@ In order to start developing, clone the *QCEC* repository using
 
     .. code-block:: console
 
-        $ git clone --recurse-submodules https://github.com/iic-jku/qcec
+        $ git clone --recurse-submodules https://github.com/cda-tum/qcec
 
 Note the :code:`--recurse-submodules` flag. It is required to also clone all the required submodules. If you happen to forget passing the flag on your initial clone, you can initialize all the submodules by executing :code:`git submodule update --init --recursive` in the main project directory.
 
@@ -66,12 +66,12 @@ Building the project this way generates
 
 - the main library :code:`libqcec.a` (Unix) / :code:`qcec.lib` (Windows) in the :code:`build/src` directory
 - a test executable :code:`qcec_test` containing unit tests in the :code:`build/test` directory (this requires passing :code:`-DBUILD_QCEC_TESTS=ON` to CMake during configuration)
-- the Python bindings library :code:`pyqcec.<...>` in the :code:`build/jkq/qcec` directory (this requires passing :code:`-DBINDINGS=ON` to CMake during configuration)
+- the Python bindings library :code:`pyqcec.<...>` in the :code:`build/mqt/qcec` directory (this requires passing :code:`-DBINDINGS=ON` to CMake during configuration)
 
 Working on the Python module
 ----------------------------
 
-The :code:`jkq.qcec` Python module can be conveniently built locally by calling
+The :code:`mqt.qcec` Python module can be conveniently built locally by calling
 
     .. code-block:: console
 
@@ -79,5 +79,5 @@ The :code:`jkq.qcec` Python module can be conveniently built locally by calling
 
 The :code:`--editable` flag ensures that changes in the Python code are instantly available without re-running the command.
 
-`Pybind11 <https://pybind11.readthedocs.io/>`_ is used for providing bindings of the *C++* core library to Python (see `bindings.cpp <https://github.com/iic-jku/qcec/tree/master/jkq/qcec/bindings.cpp>`_).
+`Pybind11 <https://pybind11.readthedocs.io/>`_ is used for providing bindings of the *C++* core library to Python (see `bindings.cpp <https://github.com/cda-tum/qcec/tree/master/mqt/qcec/bindings.cpp>`_).
 If parts of the *C++* code have been changed, the above command has to be run again to make the changes visible in Python.

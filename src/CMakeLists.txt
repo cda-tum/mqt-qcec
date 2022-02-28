@@ -24,9 +24,9 @@ target_include_directories(${PROJECT_NAME} PUBLIC $<BUILD_INTERFACE:${${PROJECT_
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)
 set_target_properties(${PROJECT_NAME} PROPERTIES CMAKE_CXX_STANDARD_REQUIRED ON CXX_EXTENSIONS OFF)
 
-# add JKQ::qfr library
+# add MQT::qfr library
 add_subdirectory("${PROJECT_SOURCE_DIR}/extern/qfr" "extern/qfr")
-target_link_libraries(${PROJECT_NAME} PUBLIC JKQ::qfr)
+target_link_libraries(${PROJECT_NAME} PUBLIC MQT::qfr)
 
 # enable interprocedural optimization if it is supported
 include(CheckIPOSupported)
@@ -59,13 +59,13 @@ if(GENERATE_POSITION_INDEPENDENT_CODE OR BINDINGS)
 	include(CheckPIESupported)
 	check_pie_supported()
 	set_target_properties(${PROJECT_NAME} PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
-endif()
+endif ()
 
 # add coverage compiler and linker flag to the library and all targets that link against it, if COVERAGE is set
 if (COVERAGE)
 	target_compile_options(${PROJECT_NAME} PUBLIC --coverage)
 	target_link_libraries(${PROJECT_NAME} PUBLIC --coverage)
-endif()
+endif ()
 
-# add JKQ alias
-add_library(JKQ::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
+# add MQT alias
+add_library(MQT::${PROJECT_NAME} ALIAS ${PROJECT_NAME})

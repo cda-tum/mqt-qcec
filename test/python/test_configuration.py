@@ -1,7 +1,7 @@
 import datetime
 import unittest
 
-from jkq import qcec
+from mqt import qcec
 
 
 class QCECConfigurationTests(unittest.TestCase):

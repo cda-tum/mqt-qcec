@@ -2,16 +2,16 @@
 
 <h1>QCEC - A tool for Quantum Circuit Equivalence Checking</h1>
 
-<a href='https://github.com/iic-jku/qcec/releases'>
-<img src='https://img.shields.io/github/v/release/iic-jku/qcec?color=yellow&label=version&style=for-the-badge' alt="version">
+<a href='https://github.com/cda-tum/qcec/releases'>
+<img src='https://img.shields.io/github/v/release/cda-tum/qcec?color=yellow&label=version&style=for-the-badge' alt="version">
 </a>
 
 <img src="https://img.shields.io/badge/Solution-C++17-blue.svg?style=for-the-badge&logo=c%2B%2B&logoColor=b0c0c0&labelColor=363D44" alt="C++ solution"/>
 
 <img src="https://img.shields.io/badge/OS-linux%20%7C%20macos%20%7C%20windows-purple?style=for-the-badge&logo=Linux&logoColor=b0c0c0&labelColor=363D44" alt="Operating systems"/>
 
-<a href='https://github.com/iic-jku/burgholzer/blob/master/LICENSE'>
-<img src='https://img.shields.io/github/license/iic-jku/qcec?style=for-the-badge' alt="licence">
+<a href='https://github.com/cda-tum/burgholzer/blob/master/LICENSE'>
+<img src='https://img.shields.io/github/license/cda-tum/qcec?style=for-the-badge' alt="licence">
 </a>
 
 <img src='images/QCEC_getting_started.png' alt="QCEC - Getting Started">
@@ -57,12 +57,12 @@ A tool for Quantum Circuit Equivalence Checking developed by the
 
 <h2>Project Status</h2>
 
-<a href='https://github.com/iic-jku/qcec/actions/workflows/ci.yml'>
-<img src='https://img.shields.io/github/workflow/status/iic-jku/qcec/CI?label=C%2B%2B%20CI&logo=github&style=for-the-badge' alt="CI Status">
+<a href='https://github.com/cda-tum/qcec/actions/workflows/ci.yml'>
+<img src='https://img.shields.io/github/workflow/status/cda-tum/qcec/CI?label=C%2B%2B%20CI&logo=github&style=for-the-badge' alt="CI Status">
 </a>
 
-<a href='https://github.com/iic-jku/qcec/actions/workflows/deploy.yml'>
-<img src="https://img.shields.io/github/workflow/status/iic-jku/qcec/Deploy%20to%20PyPI?label=Python%20Wheels&logo=github&style=for-the-badge" alt="Python Wheels Status" >
+<a href='https://github.com/cda-tum/qcec/actions/workflows/deploy.yml'>
+<img src="https://img.shields.io/github/workflow/status/cda-tum/qcec/Deploy%20to%20PyPI?label=Python%20Wheels&logo=github&style=for-the-badge" alt="Python Wheels Status" >
 </a>
 
 <a href='https://qcec.readthedocs.io/'>
@@ -70,16 +70,16 @@ A tool for Quantum Circuit Equivalence Checking developed by the
 </a>
 <br>
 
-<a href='https://codecov.io/gh/iic-jku/qcec'>
-<img src="https://img.shields.io/codecov/c/github/iic-jku/qcec/master?label=codecov&logo=codecov&style=for-the-badge" alt="Python Wheels Status" >
+<a href='https://codecov.io/gh/cda-tum/qcec'>
+<img src="https://img.shields.io/codecov/c/github/cda-tum/qcec/master?label=codecov&logo=codecov&style=for-the-badge" alt="Python Wheels Status" >
 </a>
 
-<a href='https://github.com/iic-jku/qcec/actions/workflows/codeql-analysis.yml'>
-<img src="https://img.shields.io/github/workflow/status/iic-jku/qcec/CodeQL?label=Code%20QL&logo=github&style=for-the-badge" alt="CodeQL Status" >
+<a href='https://github.com/cda-tum/qcec/actions/workflows/codeql-analysis.yml'>
+<img src="https://img.shields.io/github/workflow/status/cda-tum/qcec/CodeQL?label=Code%20QL&logo=github&style=for-the-badge" alt="CodeQL Status" >
 </a>
 
 ---
 
-If you have any questions, feel free to contact us via <a href='mailto:iic-quantum@jku.at'>iic-quantum@jku.at</a> or by creating an issue on <a href='https://github.com/iic-jku/qcec/issues'>GitHub</a>.
+If you have any questions, feel free to contact us via <a href='mailto:iic-quantum@jku.at'>iic-quantum@jku.at</a> or by creating an issue on <a href='https://github.com/cda-tum/qcec/issues'>GitHub</a>.
 
 </div>

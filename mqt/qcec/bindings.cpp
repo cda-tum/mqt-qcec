@@ -1,5 +1,5 @@
 /*
- * This file is part of JKQ QCEC library which is released under the MIT license.
+ * This file is part of MQT QCEC library which is released under the MIT license.
  * See file README.md or go to http://iic.jku.at/eda/research/quantum/ for more information.
  */
 
@@ -135,7 +135,7 @@ namespace ec {
     }
 
     PYBIND11_MODULE(pyqcec, m) {
-        m.doc() = "Python interface for the JKQ QCEC quantum circuit equivalence checking tool";
+        m.doc() = "Python interface for the MQT QCEC quantum circuit equivalence checking tool";
 
         py::enum_<ApplicationSchemeType>(m, "ApplicationScheme")
                 .value("sequential", ApplicationSchemeType::Sequential,

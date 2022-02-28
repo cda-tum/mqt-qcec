@@ -1,6 +1,6 @@
 import unittest
 
-from jkq import qcec
+from mqt import qcec
 from qiskit import QuantumCircuit
 
 
