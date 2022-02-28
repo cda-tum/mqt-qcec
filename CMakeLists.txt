@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.14...3.22)
 project(qcec
         LANGUAGES CXX
         VERSION 1.10.4
-        DESCRIPTION "QCEC - A JKQ tool for Quantum Circuit Equivalence Checking"
+        DESCRIPTION "MQT QCEC - A tool for Quantum Circuit Equivalence Checking"
         )
 
 # enable organization of targets into folders
@@ -60,5 +60,5 @@ endif()
 
 # add Python binding code
 if(BINDINGS)
-	add_subdirectory(jkq/qcec)
+	add_subdirectory(mqt/qcec)
 endif()

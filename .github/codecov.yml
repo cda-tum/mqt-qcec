@@ -1,6 +1,6 @@
 ignore:
   - "extern/**/*"
-  - "jkq/**/*"
+  - "mqt/**/*"
   - "test/**/*"
 
 coverage:

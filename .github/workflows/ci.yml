@@ -108,6 +108,6 @@ jobs:
           submodules: recursive
       - uses: DoozyX/clang-format-lint-action@v0.13
         with:
-          source: 'apps include src test jkq/qcec'
+          source: 'apps include src test mqt/qcec'
           extensions: 'h,hpp,c,cpp'
           clangFormatVersion: 12

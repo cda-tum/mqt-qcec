@@ -1,12 +1,14 @@
 include README.md LICENSE CMakeLists.txt
-include src/*
-include include/*
-include apps/*
-graft jkq/*
+graft src
+graft include
+graft mqt/qcec
+graft jkq
+graft apps
 include extern/qfr/CMakeLists.txt
 graft extern/qfr/src
 graft extern/qfr/include
-graft extern/qfr/jkq/qfr
+graft extern/qfr/mqt/qfr
+graft extern/qfr/jkq
 include extern/qfr/extern/dd_package/CMakeLists.txt
 graft extern/qfr/extern/dd_package/include
 graft extern/qfr/extern/json
