@@ -86,10 +86,7 @@ jobs:
         with:
           submodules: recursive
       - name: Configure CMake
-        run:  cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=Debug -DBUILD_QCEC_TESTS=ON -DCOVERAGE=1
-        env:
-          CC:  "gcc-10"
-          CXX: "g++-10"
+        run:  cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=Debug -DBUILD_QCEC_TESTS=ON -DBINDINGS=ON -DCOVERAGE=1
       - name: Build
         run:  cmake --build "${{github.workspace}}/build" --config Debug --target qcec_test
       - name:              Test
