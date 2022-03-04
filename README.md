@@ -8,8 +8,9 @@
 
 # MQT QCEC - A tool for Quantum Circuit Equivalence Checking
 
-A tool for quantum circuit equivalence checking developed by the [Institute for Integrated Circuits](https://iic.jku.at/eda/) at the [Johannes Kepler University Linz](https://jku.at).
-QCEC builds upon [our quantum functionality representation (QFR)](https://github.com/cda-tum/qfr) which in turn builds on [our decision diagram (DD) package](https://github.com/cda-tum/dd_package.git).
+A tool for quantum circuit equivalence checking developed by the [Institute for Integrated Circuits](https://iic.jku.at/eda/) at the [Johannes Kepler University Linz](https://jku.at) and the Chair for Design Automation at
+the [Technical University of Munich](https://www.tum.de/). QCEC is part of the Munich Quantum Toolkit (formerly known as JKQ). It builds upon [our quantum functionality representation (QFR)](https://github.com/cda-tum/qfr)
+and [our decision diagram (DD) package](https://github.com/cda-tum/dd_package.git).
 
 **Detailed documentation on all available methods, options, and input formats is available at [ReadTheDocs](https://qcec.readthedocs.io/en/latest/).**
 
