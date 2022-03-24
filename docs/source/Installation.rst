@@ -1,7 +1,7 @@
 Installation
 ============
 
-*QCEC* is mainly developed as a *C++* library that builds upon `our decision diagram (DD) package <https://github.com/cda-tum/dd_package.git>`_ as well as `our quantum functionality representation (QFR) <https://github.com/cda-tum/qfr.git>`_.
+QCEC is mainly developed as a C++ library that builds upon `our decision diagram (DD) package <https://github.com/cda-tum/dd_package.git>`_ as well as `our quantum functionality representation (QFR) <https://github.com/cda-tum/qfr.git>`_.
 In order to make the tool as accessible as possible, it comes with an easy-to-use Python interface.
 
 User
@@ -15,13 +15,13 @@ We encourage installing QCEC via pip (preferably in a `virtual environment <http
 
 In most practical cases (under 64-bit Linux, MacOS incl. Apple Silicon, and Windows), this requires no compilation and merely downloads and installs a platform-specific pre-built wheel.
 
-However, in order to get the best performance out of *QCEC* and enable platform-specific compiler optimizations that cannot be enabled on portable wheels, it is recommended to build the package from source via:
+However, in order to get the best performance out of QCEC and enable platform-specific compiler optimizations that cannot be enabled on portable wheels, it is recommended to build the package from source via:
 
     .. code-block:: console
 
         (venv) $ pip install mqt.qcec --no-binary mqt.qcec
 
-This requires a *C++* compiler supporting *C++17* and a minimum CMake version of *3.14*.
+This requires a C++ compiler supporting *C++17* and a minimum CMake version of *3.14*.
 
 The library is continuously tested under Linux, MacOS, and Windows using the `latest available system versions for GitHub Actions <https://github.com/actions/virtual-environments>`_.
 In order to access the latest build logs, visit `qcec/actions/workflows/ci.yml <https://github.com/cda-tum/qcec/actions/workflows/ci.yml>`_.
@@ -31,7 +31,7 @@ In order to access the latest build logs, visit `qcec/actions/workflows/ci.yml <
 Developer
 #########
 
-In order to start developing, clone the *QCEC* repository using
+In order to start developing, clone the QCEC repository using
 
     .. code-block:: console
 
@@ -39,9 +39,9 @@ In order to start developing, clone the *QCEC* repository using
 
 Note the :code:`--recurse-submodules` flag. It is required to also clone all the required submodules. If you happen to forget passing the flag on your initial clone, you can initialize all the submodules by executing :code:`git submodule update --init --recursive` in the main project directory.
 
-A *C++* compiler supporting *C++17* and a minimum CMake version of *3.14* is required to build the project.
+A C++ compiler supporting *C++17* and a minimum CMake version of *3.14* is required to build the project.
 
-Working on the core *C++* library
+Working on the core C++ library
 ---------------------------------
 
 Our projects use *CMake* as the main build configuration tool. Building a project using CMake is a two-stage process. First, CMake needs to be *configured* by calling
@@ -79,5 +79,5 @@ The :code:`mqt.qcec` Python module can be conveniently built locally by calling
 
 The :code:`--editable` flag ensures that changes in the Python code are instantly available without re-running the command.
 
-`Pybind11 <https://pybind11.readthedocs.io/>`_ is used for providing bindings of the *C++* core library to Python (see `bindings.cpp <https://github.com/cda-tum/qcec/tree/master/mqt/qcec/bindings.cpp>`_).
-If parts of the *C++* code have been changed, the above command has to be run again to make the changes visible in Python.
+`Pybind11 <https://pybind11.readthedocs.io/>`_ is used for providing bindings of the C++ core library to Python (see `bindings.cpp <https://github.com/cda-tum/qcec/tree/master/mqt/qcec/bindings.cpp>`_).
+If parts of the C++ code have been changed, the above command has to be run again to make the changes visible in Python.
