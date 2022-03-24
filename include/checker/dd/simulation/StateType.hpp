@@ -9,9 +9,9 @@
 
 namespace ec {
     enum class StateType {
-        ComputationalBasis,
-        Random1QBasis,
-        Stabilizer
+        ComputationalBasis = 0,
+        Random1QBasis = 1,
+        Stabilizer = 2
     };
 
     inline std::string toString(const StateType& type) noexcept {
@@ -28,11 +28,11 @@ namespace ec {
     }
 
     inline StateType stateTypeFromString(const std::string& type) {
-        if (type == "computational_basis" || type == "2") {
+        if (type == "computational_basis" || type == "0") {
             return StateType::ComputationalBasis;
         } else if (type == "random_1Q_basis" || type == "1") {
             return StateType::Random1QBasis;
-        } else if (type == "stabilizer" || type == "0") {
+        } else if (type == "stabilizer" || type == "2") {
             return StateType::Stabilizer;
         } else {
             throw std::runtime_error("Unknown quantum state type: " + type);

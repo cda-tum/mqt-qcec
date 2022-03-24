@@ -13,11 +13,11 @@
 namespace ec {
     // A list of application schemes that implement the below interface
     enum class ApplicationSchemeType {
-        Sequential,
-        OneToOne,
-        Proportional,
-        GateCost,
-        Lookahead
+        Sequential = 0,
+        OneToOne = 1,
+        Lookahead = 2,
+        GateCost = 3,
+        Proportional = 4
     };
 
     inline std::string toString(const ApplicationSchemeType& applicationScheme) noexcept {
@@ -26,10 +26,10 @@ namespace ec {
                 return "sequential";
             case ApplicationSchemeType::OneToOne:
                 return "one_to_one";
-            case ApplicationSchemeType::GateCost:
-                return "gate_cost";
             case ApplicationSchemeType::Lookahead:
                 return "lookahead";
+            case ApplicationSchemeType::GateCost:
+                return "gate_cost";
             case ApplicationSchemeType::Proportional:
             default:
                 return "proportional";
