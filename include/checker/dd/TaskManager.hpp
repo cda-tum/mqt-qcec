@@ -15,7 +15,7 @@ namespace ec {
     template<class DDType>
     class TaskManager {
     protected:
-        const qc::QuantumComputation* qc = nullptr;
+        const qc::QuantumComputation* qc;
         qc::Permutation               permutation{};
         decltype(qc->begin())         iterator;
         decltype(qc->end())           end;
@@ -43,8 +43,8 @@ namespace ec {
         }
         void flipDirection() noexcept { direction = (direction == Left) ? Right : Left; }
 
-        inline qc::MatrixDD getDD() { return (*iterator)->getDD(package, permutation); }
-        inline qc::MatrixDD getInverseDD() { return (*iterator)->getInverseDD(package, permutation); }
+        [[nodiscard]] inline qc::MatrixDD getDD() { return (*iterator)->getDD(package, permutation); }
+        [[nodiscard]] inline qc::MatrixDD getInverseDD() { return (*iterator)->getInverseDD(package, permutation); }
 
         [[nodiscard]] const qc::QuantumComputation* getCircuit() const noexcept { return qc; }
 
