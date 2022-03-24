@@ -26,6 +26,6 @@ namespace ec {
             return std::max((size2 + size1 / 2U) / size1, static_cast<std::size_t>(1U));
         }
 
-        const std::size_t gateRatio = 1U;
+        const std::size_t gateRatio;
     };
 } // namespace ec

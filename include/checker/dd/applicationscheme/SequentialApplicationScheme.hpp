@@ -21,7 +21,7 @@ namespace ec {
         }
 
     private:
-        const std::size_t gates1{};
-        const std::size_t gates2{};
+        const std::size_t gates1;
+        const std::size_t gates2;
     };
 } // namespace ec
