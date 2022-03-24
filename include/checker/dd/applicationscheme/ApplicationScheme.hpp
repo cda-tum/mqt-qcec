@@ -13,10 +13,10 @@
 namespace ec {
     // A list of application schemes that implement the below interface
     enum class ApplicationSchemeType {
-        Sequential = 0,
-        OneToOne = 1,
-        Lookahead = 2,
-        GateCost = 3,
+        Sequential   = 0,
+        OneToOne     = 1,
+        Lookahead    = 2,
+        GateCost     = 3,
         Proportional = 4
     };
 

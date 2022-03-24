@@ -10,12 +10,12 @@
 
 namespace ec {
     enum class EquivalenceCriterion {
-        NotEquivalent = 0,
-        Equivalent = 1,
-        NoInformation = 2,
-        ProbablyEquivalent = 3,
+        NotEquivalent             = 0,
+        Equivalent                = 1,
+        NoInformation             = 2,
+        ProbablyEquivalent        = 3,
         EquivalentUpToGlobalPhase = 4,
-        EquivalentUpToPhase = 5
+        EquivalentUpToPhase       = 5
     };
 
     inline std::string toString(const EquivalenceCriterion& criterion) noexcept {

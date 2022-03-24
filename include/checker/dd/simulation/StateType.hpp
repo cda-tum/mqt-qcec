@@ -10,8 +10,8 @@
 namespace ec {
     enum class StateType {
         ComputationalBasis = 0,
-        Random1QBasis = 1,
-        Stabilizer = 2
+        Random1QBasis      = 1,
+        Stabilizer         = 2
     };
 
     inline std::string toString(const StateType& type) noexcept {
