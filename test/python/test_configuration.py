@@ -1,40 +1,45 @@
 import datetime
-import unittest
+import pytest
 
 from mqt import qcec
 
 
-class QCECConfigurationTests(unittest.TestCase):
-    def setUp(self):
-        self.config = qcec.Configuration()
+@pytest.mark.parametrize("application_scheme_string, application_scheme_enum", [
+    ("sequential", qcec.ApplicationScheme.sequential),
+    ("one_to_one", qcec.ApplicationScheme.one_to_one),
+    ("lookahead", qcec.ApplicationScheme.lookahead),
+    ("gate_cost", qcec.ApplicationScheme.gate_cost),
+    ("proportional", qcec.ApplicationScheme.proportional),
+])
+def test_application_scheme(application_scheme_enum, application_scheme_string):
+    assert qcec.ApplicationScheme(application_scheme_string) == application_scheme_enum
 
-    def test_timeout(self):
-        """Test setting a timeout"""
-        self.config.execution.timeout = 60.
-        self.config.execution.timeout = datetime.timedelta(seconds=60)
+    config = qcec.Configuration()
 
-    def test_application_scheme(self):
-        self.config.application.alternating_scheme = "sequential"
-        self.config.application.alternating_scheme = qcec.ApplicationScheme.sequential
+    config.application.construction_scheme = application_scheme_enum
+    config.application.construction_scheme = application_scheme_string
 
-        self.config.application.alternating_scheme = "one_to_one"
-        self.config.application.alternating_scheme = qcec.ApplicationScheme.one_to_one
+    config.application.simulation_scheme = application_scheme_enum
+    config.application.simulation_scheme = application_scheme_string
 
-        self.config.application.alternating_scheme = "lookahead"
-        self.config.application.alternating_scheme = qcec.ApplicationScheme.lookahead
+    config.application.alternating_scheme = application_scheme_enum
+    config.application.alternating_scheme = application_scheme_string
 
-        self.config.application.alternating_scheme = "gate_cost"
-        self.config.application.alternating_scheme = qcec.ApplicationScheme.gate_cost
 
-        self.config.application.alternating_scheme = "proportional"
-        self.config.application.alternating_scheme = qcec.ApplicationScheme.proportional
+def test_timeout():
+    config = qcec.Configuration()
+    config.execution.timeout = 60.
+    config.execution.timeout = datetime.timedelta(seconds=60)
 
-    def test_state_type(self):
-        self.config.simulation.state_type = "computational_basis"
-        self.config.simulation.state_type = qcec.StateType.computational_basis
 
-        self.config.simulation.state_type = "random_1Q_basis"
-        self.config.simulation.state_type = qcec.StateType.random_1Q_basis
+@pytest.mark.parametrize("state_type_string, state_type_enum", [
+    ("computational_basis", qcec.StateType.computational_basis),
+    ("random_1Q_basis", qcec.StateType.random_1Q_basis),
+    ("stabilizer", qcec.StateType.stabilizer),
+])
+def test_state_type(state_type_enum, state_type_string):
+    assert qcec.StateType(state_type_string) == state_type_enum
 
-        self.config.simulation.state_type = "stabilizer"
-        self.config.simulation.state_type = qcec.StateType.stabilizer
+    config = qcec.Configuration()
+    config.simulation.state_type = state_type_enum
+    config.simulation.state_type = state_type_string
