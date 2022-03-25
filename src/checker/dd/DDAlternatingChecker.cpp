@@ -140,62 +140,7 @@ namespace ec {
         const auto& op1 = *taskManager1();
         const auto& op2 = *taskManager2();
 
-        // check type
-        if (op1.getType() != op2.getType()) {
-            return false;
-        }
-
-        // quickly abort for compound operations
-        if (op1.getType() == qc::Compound) {
-            return false;
-        }
-
-        // check number of controls
-        const auto nc1 = op1.getNcontrols();
-        const auto nc2 = op2.getNcontrols();
-        if (nc1 != nc2) {
-            return false;
-        }
-
-        // SWAPs are not handled by this routine
-        if (op1.getType() == qc::SWAP && nc1 == 0U) {
-            return false;
-        }
-
-        // check parameters
-        const auto param1 = op1.getParameter();
-        const auto param2 = op2.getParameter();
-        for (std::size_t p = 0U; p < qc::MAX_PARAMETERS; ++p) {
-            // it might make sense to use fuzzy comparison here
-            if (param1[p] != param2[p]) { return false; }
-        }
-
-        // check controls
-        if (nc1 != 0U) {
-            dd::Controls controls1{};
-            for (const auto& control: op1.getControls()) {
-                controls1.emplace(dd::Control{taskManager1.getPermutation().at(control.qubit), control.type});
-            }
-            dd::Controls controls2{};
-            for (const auto& control: op2.getControls()) {
-                controls2.emplace(dd::Control{taskManager2.getPermutation().at(control.qubit), control.type});
-            }
-            if (controls1 != controls2) { return false; }
-        }
-
-        // check targets
-        std::set<dd::Qubit> targets1{};
-        for (const auto& target: op1.getTargets()) {
-            targets1.emplace(taskManager1.getPermutation().at(target));
-        }
-        std::set<dd::Qubit> targets2{};
-        for (const auto& target: op2.getTargets()) {
-            targets2.emplace(taskManager2.getPermutation().at(target));
-        }
-        if (targets1 != targets2) { return false; }
-
-        // operations are identical
-        return true;
+        return op1.equals(op2);
     }
 
 } // namespace ec
