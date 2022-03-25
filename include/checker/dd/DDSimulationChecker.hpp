@@ -10,7 +10,7 @@
 namespace ec {
     class DDSimulationChecker: public DDEquivalenceChecker<qc::VectorDD> {
     public:
-        DDSimulationChecker(const qc::QuantumComputation& qc1, const qc::QuantumComputation& qc2, const ec::Configuration& configuration, bool& done) noexcept;
+        DDSimulationChecker(const qc::QuantumComputation& qc1, const qc::QuantumComputation& qc2, const ec::Configuration& configuration) noexcept;
 
         void setRandomInitialState(StateGenerator& generator);
 

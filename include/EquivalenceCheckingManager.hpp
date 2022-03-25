@@ -205,6 +205,16 @@ namespace ec {
         /// The parallel flow makes use of the available processing power by orchestrating all configured checks in a parallel fashion
         void checkParallel();
 
+        /// Signal all checker that they shall abort the computation as soon as possible since a result has been determined
+        void setAndSignalDone() {
+            done = true;
+            for (auto& checker: checkers) {
+                if (checker) {
+                    checker->signalDone();
+                }
+            }
+        }
+
         static void addCircuitDescription(const qc::QuantumComputation& qc, nlohmann::json& j) {
             j["name"]     = qc.getName();
             j["n_qubits"] = qc.getNqubits();

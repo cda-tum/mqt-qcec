@@ -6,8 +6,8 @@
 #include "checker/dd/DDSimulationChecker.hpp"
 
 namespace ec {
-    DDSimulationChecker::DDSimulationChecker(const qc::QuantumComputation& qc1, const qc::QuantumComputation& qc2, const Configuration& configuration, bool& done) noexcept:
-        DDEquivalenceChecker(qc1, qc2, configuration, done) {
+    DDSimulationChecker::DDSimulationChecker(const qc::QuantumComputation& qc1, const qc::QuantumComputation& qc2, const Configuration& configuration) noexcept:
+        DDEquivalenceChecker(qc1, qc2, configuration) {
         initialState = dd->makeZeroState(nqubits);
         initializeApplicationScheme(this->configuration.application.simulationScheme);
     }

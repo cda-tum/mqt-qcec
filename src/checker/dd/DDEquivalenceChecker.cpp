@@ -8,8 +8,8 @@
 namespace ec {
 
     template<class DDType>
-    DDEquivalenceChecker<DDType>::DDEquivalenceChecker(const qc::QuantumComputation& qc1, const qc::QuantumComputation& qc2, Configuration configuration, bool& done) noexcept:
-        EquivalenceChecker(qc1, qc2, configuration, done),
+    DDEquivalenceChecker<DDType>::DDEquivalenceChecker(const qc::QuantumComputation& qc1, const qc::QuantumComputation& qc2, Configuration configuration) noexcept:
+        EquivalenceChecker(qc1, qc2, configuration),
         dd(std::make_unique<dd::Package>(nqubits)),
         taskManager1(TaskManager<DDType>(qc1, dd)),
         taskManager2(TaskManager<DDType>(qc2, dd)) {
@@ -80,22 +80,22 @@ namespace ec {
         // initialize the internal representation (initial state, initial matrix, etc.)
         initialize();
 
-        if (done) { return equivalence; }
+        if (isDone()) { return equivalence; }
 
         // execute the equivalence checking scheme
         execute();
 
-        if (done) { return equivalence; }
+        if (isDone()) { return equivalence; }
 
         // finish off both circuits
         finish();
 
-        if (done) { return equivalence; }
+        if (isDone()) { return equivalence; }
 
         // postprocess the result
         postprocess();
 
-        if (done) { return equivalence; }
+        if (isDone()) { return equivalence; }
 
         // check the equivalence
         equivalence = checkEquivalence();
@@ -121,7 +121,7 @@ namespace ec {
 
     template<class DDType>
     void DDEquivalenceChecker<DDType>::execute() {
-        while (!taskManager1.finished() && !taskManager2.finished() && !done) {
+        while (!taskManager1.finished() && !taskManager2.finished() && !isDone()) {
             // skip over any SWAP operations
             taskManager1.applySwapOperations();
             taskManager2.applySwapOperations();
@@ -131,9 +131,9 @@ namespace ec {
                 const auto [apply1, apply2] = (*applicationScheme)();
 
                 // advance both tasks correspondingly
-                if (done) { return; }
+                if (isDone()) { return; }
                 taskManager1.advance(apply1);
-                if (done) { return; }
+                if (isDone()) { return; }
                 taskManager2.advance(apply2);
             }
         }
@@ -142,7 +142,7 @@ namespace ec {
     template<class DDType>
     void DDEquivalenceChecker<DDType>::finish() {
         taskManager1.finish();
-        if (done) { return; }
+        if (isDone()) { return; }
         taskManager2.finish();
     }
 
@@ -150,10 +150,10 @@ namespace ec {
     void DDEquivalenceChecker<DDType>::postprocessTask(TaskManager<DDType>& task) {
         // ensure that the permutation that was tracked throughout the circuit matches the expected output permutation
         task.changePermutation();
-        if (done) { return; }
+        if (isDone()) { return; }
         // eliminate the superfluous contributions of ancillary qubits (this only has an effect on matrices)
         task.reduceAncillae();
-        if (done) { return; }
+        if (isDone()) { return; }
         // sum up the contributions of garbage qubits
         task.reduceGarbage();
     }
@@ -161,7 +161,7 @@ namespace ec {
     template<class DDType>
     void DDEquivalenceChecker<DDType>::postprocess() {
         postprocessTask(taskManager1);
-        if (done) { return; }
+        if (isDone()) { return; }
         postprocessTask(taskManager2);
     }
 

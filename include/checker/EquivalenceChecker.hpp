@@ -9,16 +9,16 @@
 #include "EquivalenceCriterion.hpp"
 #include "QuantumComputation.hpp"
 
+#include <atomic>
 #include <utility>
 
 namespace ec {
     class EquivalenceChecker {
     public:
-        EquivalenceChecker(const qc::QuantumComputation& qc1, const qc::QuantumComputation& qc2, Configuration configuration, bool& done) noexcept:
+        EquivalenceChecker(const qc::QuantumComputation& qc1, const qc::QuantumComputation& qc2, Configuration configuration) noexcept:
             qc1(qc1), qc2(qc2),
             nqubits(std::max(qc1.getNqubits(), qc2.getNqubits())),
-            configuration(std::move(configuration)),
-            done(done){};
+            configuration(std::move(configuration)){};
 
         virtual ~EquivalenceChecker() = default;
 
@@ -39,6 +39,11 @@ namespace ec {
             j["runtime"]     = runtime;
         }
 
+        void signalDone() {
+            done.store(true, std::memory_order_relaxed);
+        }
+        inline auto isDone() { return done.load(std::memory_order_relaxed); }
+
     protected:
         const qc::QuantumComputation& qc1;
         const qc::QuantumComputation& qc2;
@@ -47,7 +52,7 @@ namespace ec {
 
         Configuration configuration;
 
-        bool& done;
+        std::atomic<bool> done{false};
 
         EquivalenceCriterion equivalence = EquivalenceCriterion::NoInformation;
         double               runtime{};

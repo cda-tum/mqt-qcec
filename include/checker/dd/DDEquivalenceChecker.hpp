@@ -28,7 +28,7 @@ namespace ec {
     template<class DDType>
     class DDEquivalenceChecker: public EquivalenceChecker {
     public:
-        DDEquivalenceChecker(const qc::QuantumComputation& qc1, const qc::QuantumComputation& qc2, Configuration configuration, bool& done) noexcept;
+        DDEquivalenceChecker(const qc::QuantumComputation& qc1, const qc::QuantumComputation& qc2, Configuration configuration) noexcept;
 
         EquivalenceCriterion run() override;
 

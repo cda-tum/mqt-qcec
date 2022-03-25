@@ -55,13 +55,13 @@ namespace ec {
     }
 
     void DDAlternatingChecker::execute() {
-        while (!taskManager1.finished() && !taskManager2.finished() && !done) {
+        while (!taskManager1.finished() && !taskManager2.finished() && !isDone()) {
             // skip over any SWAP operations
             taskManager1.applySwapOperations(functionality);
             taskManager2.applySwapOperations(functionality);
 
             if (!taskManager1.finished() && !taskManager2.finished()) {
-                if (done) { return; }
+                if (isDone()) { return; }
 
                 // whenever the current functionality resembles the identity, identical gates on both sides cancel
                 if (functionality.p->ident && configuration.application.alternatingScheme != ApplicationSchemeType::Lookahead && gatesAreIdentical()) {
@@ -74,9 +74,9 @@ namespace ec {
                 const auto [apply1, apply2] = (*applicationScheme)();
 
                 // advance both tasks correspondingly
-                if (done) { return; }
+                if (isDone()) { return; }
                 taskManager1.advance(functionality, apply1);
-                if (done) { return; }
+                if (isDone()) { return; }
                 taskManager2.advance(functionality, apply2);
             }
         }
@@ -84,28 +84,28 @@ namespace ec {
 
     void DDAlternatingChecker::finish() {
         taskManager1.finish(functionality);
-        if (done) { return; }
+        if (isDone()) { return; }
         taskManager2.finish(functionality);
     }
 
     void DDAlternatingChecker::postprocess() {
         // ensure that the permutations that were tracked throughout the circuit match the expected output permutations
         taskManager1.changePermutation(functionality);
-        if (done) { return; }
+        if (isDone()) { return; }
         taskManager2.changePermutation(functionality);
         if (done) { return; }
 
         // sum up the contributions of garbage qubits
         taskManager1.reduceGarbage(functionality);
-        if (done) { return; }
+        if (isDone()) { return; }
         taskManager2.reduceGarbage(functionality);
-        if (done) { return; }
+        if (isDone()) { return; }
 
         // TODO: check whether reducing ancillaries here is theoretically sound
         taskManager1.reduceAncillae(functionality);
-        if (done) { return; }
+        if (isDone()) { return; }
         taskManager2.reduceAncillae(functionality);
-        if (done) { return; }
+        if (isDone()) { return; }
     }
 
     EquivalenceCriterion DDAlternatingChecker::checkEquivalence() {

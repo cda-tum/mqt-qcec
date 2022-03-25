@@ -10,8 +10,8 @@
 namespace ec {
     class DDConstructionChecker: public DDEquivalenceChecker<qc::MatrixDD> {
     public:
-        DDConstructionChecker(const qc::QuantumComputation& qc1, const qc::QuantumComputation& qc2, const ec::Configuration& configuration, bool& done):
-            DDEquivalenceChecker(qc1, qc2, configuration, done) {
+        DDConstructionChecker(const qc::QuantumComputation& qc1, const qc::QuantumComputation& qc2, const ec::Configuration& configuration):
+            DDEquivalenceChecker(qc1, qc2, configuration) {
             if (this->configuration.application.constructionScheme == ApplicationSchemeType::Lookahead) {
                 throw std::invalid_argument("Lookahead application scheme must not be used with DD construction checker.");
             }

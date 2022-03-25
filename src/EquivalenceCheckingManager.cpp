@@ -257,7 +257,7 @@ namespace ec {
         }
 
         if (configuration.execution.runSimulationChecker) {
-            checkers.emplace_back(std::make_unique<DDSimulationChecker>(qc1, qc2, configuration, done));
+            checkers.emplace_back(std::make_unique<DDSimulationChecker>(qc1, qc2, configuration));
             auto* simulationChecker = dynamic_cast<DDSimulationChecker*>(checkers.back().get());
             while (results.startedSimulations < configuration.simulation.maxSims && !done) {
                 // configure simulation based checker
@@ -311,7 +311,7 @@ namespace ec {
         }
 
         if (configuration.execution.runAlternatingChecker && !done) {
-            checkers.emplace_back(std::make_unique<DDAlternatingChecker>(qc1, qc2, configuration, done));
+            checkers.emplace_back(std::make_unique<DDAlternatingChecker>(qc1, qc2, configuration));
             auto&      alternatingChecker = checkers.back();
             const auto result             = alternatingChecker->run();
 
@@ -326,7 +326,7 @@ namespace ec {
         }
 
         if (configuration.execution.runConstructionChecker && !done) {
-            checkers.emplace_back(std::make_unique<DDConstructionChecker>(qc1, qc2, configuration, done));
+            checkers.emplace_back(std::make_unique<DDConstructionChecker>(qc1, qc2, configuration));
             auto&      constructionChecker = checkers.back();
             const auto result              = constructionChecker->run();
 
@@ -387,7 +387,7 @@ namespace ec {
         if (runAlternating) {
             // start a new thread that constructs and runs the alternating check
             threads.emplace_back([&, id] {
-                checkers[id] = std::make_unique<DDAlternatingChecker>(qc1, qc2, configuration, done);
+                checkers[id] = std::make_unique<DDAlternatingChecker>(qc1, qc2, configuration);
                 checkers[id]->run();
                 queue.push(id);
             });
@@ -397,7 +397,7 @@ namespace ec {
         if (runConstruction && !done) {
             // start a new thread that constructs and runs the construction check
             threads.emplace_back([&, id] {
-                checkers[id] = std::make_unique<DDConstructionChecker>(qc1, qc2, configuration, done);
+                checkers[id] = std::make_unique<DDConstructionChecker>(qc1, qc2, configuration);
                 if (!done)
                     checkers[id]->run();
                 queue.push(id);
@@ -410,7 +410,7 @@ namespace ec {
             // launch as many simulations as possible
             for (std::size_t i = 0; i < effectiveThreadsLeft && !done; ++i) {
                 threads.emplace_back([&, id] {
-                    checkers[id]  = std::make_unique<DDSimulationChecker>(qc1, qc2, configuration, done);
+                    checkers[id]  = std::make_unique<DDSimulationChecker>(qc1, qc2, configuration);
                     auto* checker = dynamic_cast<DDSimulationChecker*>(checkers[id].get());
                     {
                         std::lock_guard stateGeneratorLock(stateGeneratorMutex);
@@ -436,7 +436,7 @@ namespace ec {
 
             // in case no completed ID has been returned this indicates a timeout and the computation should stop
             if (!completedID) {
-                done = true;
+                setAndSignalDone();
                 break;
             }
 
@@ -453,7 +453,7 @@ namespace ec {
             }
 
             if (result == EquivalenceCriterion::NotEquivalent) {
-                done                = true;
+                setAndSignalDone();
                 results.equivalence = result;
 
                 // some special handling in case non-equivalence has been shown by a simulation run
@@ -474,7 +474,7 @@ namespace ec {
 
             // the alternating and the construction checker provide definitive answers once they finish
             if (dynamic_cast<DDAlternatingChecker*>(checker) || dynamic_cast<DDConstructionChecker*>(checker)) {
-                done                = true;
+                setAndSignalDone();
                 results.equivalence = result;
                 break;
             }
@@ -501,7 +501,7 @@ namespace ec {
                 } else {
                     // in case only simulations are performed and every single one is done, everything is done
                     if (!runAlternating && !runConstruction && results.performedSimulations == configuration.simulation.maxSims) {
-                        done = true;
+                        setAndSignalDone();
                         break;
                     }
                 }
