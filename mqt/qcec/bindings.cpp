@@ -148,7 +148,9 @@ namespace ec {
                        "Looks whether an application from the first circuit or the second circuit yields the smaller decision diagram. Only works for the :attr:`alternating checker <.Configuration.Execution.run_alternating_checker>`.")
                 .value("gate_cost", ApplicationSchemeType::GateCost,
                        "Each gate of the first circuit is associated with a corresponding cost according to some cost function *f(...)*. Whenever a gate *g* from the first circuit is applied *f(g)* gates are applied from the second circuit.")
-                .def(py::init([](const std::string& str) -> ApplicationSchemeType { return applicationSchemeFromString(str); }));
+                .def(py::init([](const std::string& str) -> ApplicationSchemeType { return applicationSchemeFromString(str); }))
+                .def(
+                        "__str__", [](ApplicationSchemeType scheme) { return toString(scheme); }, py::prepend());
         py::implicitly_convertible<std::string, ApplicationSchemeType>();
 
         py::enum_<StateType>(m, "StateType")
@@ -158,7 +160,9 @@ namespace ec {
                        "Randomly choose a single-qubit basis state for each qubit from the six-tuple *(|0>, |1>, |+>, |->, |L>, |R>)*.")
                 .value("stabilizer", StateType::Stabilizer,
                        "Randomly choose a stabilizer state by creating a random Clifford circuit.")
-                .def(py::init([](const std::string& str) -> StateType { return stateTypeFromString(str); }));
+                .def(py::init([](const std::string& str) -> StateType { return stateTypeFromString(str); }))
+                .def(
+                        "__str__", [](StateType type) { return toString(type); }, py::prepend());
         py::implicitly_convertible<std::string, StateType>();
 
         py::enum_<EquivalenceCriterion>(m, "EquivalenceCriterion")
@@ -174,7 +178,9 @@ namespace ec {
                        "Circuits are equivalent up to a global phase factor.")
                 .value("probably_equivalent", EquivalenceCriterion::ProbablyEquivalent,
                        "Circuits are probably equivalent. A result that is obtained whenever a couple of simulations did not show the non-equivalence.")
-                .def(py::init([](const std::string& str) -> EquivalenceCriterion { return fromString(str); }));
+                .def(py::init([](const std::string& str) -> EquivalenceCriterion { return fromString(str); }))
+                .def(
+                        "__str__", [](EquivalenceCriterion crit) { return toString(crit); }, py::prepend());
         py::implicitly_convertible<std::string, EquivalenceCriterion>();
 
         // Class definitions
