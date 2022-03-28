@@ -15,7 +15,6 @@ using namespace dd::literals;
 
 class EqualityTest: public testing::Test {
     void SetUp() override {
-        dd                                        = std::make_unique<dd::Package>(nqubits);
         qc1                                       = qc::QuantumComputation(nqubits);
         qc2                                       = qc::QuantumComputation(nqubits);
         config.optimizations.fuseSingleQubitGates = false;
@@ -31,7 +30,6 @@ class EqualityTest: public testing::Test {
 
 protected:
     dd::QubitCount               nqubits = 1U;
-    std::unique_ptr<dd::Package> dd;
     qc::QuantumComputation       qc1;
     qc::QuantumComputation       qc2;
     ec::Configuration            config{};

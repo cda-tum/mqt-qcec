@@ -8,11 +8,11 @@
 #include "ApplicationScheme.hpp"
 
 namespace ec {
-    template<class DDType>
-    class SequentialApplicationScheme final: public ApplicationScheme<DDType> {
+    template<class DDType, class DDPackage = dd::Package<>>
+    class SequentialApplicationScheme final: public ApplicationScheme<DDType, DDPackage> {
     public:
-        SequentialApplicationScheme(TaskManager<DDType>& taskManager1, TaskManager<DDType>& taskManager2) noexcept:
-            ApplicationScheme<DDType>(taskManager1, taskManager2),
+        SequentialApplicationScheme(TaskManager<DDType, DDPackage>& taskManager1, TaskManager<DDType, DDPackage>& taskManager2) noexcept:
+            ApplicationScheme<DDType, DDPackage>(taskManager1, taskManager2),
             gates1(taskManager1.getCircuit()->getNops()),
             gates2(taskManager2.getCircuit()->getNops()) {}
 

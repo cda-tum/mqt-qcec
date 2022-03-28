@@ -17,6 +17,7 @@
 #include "applicationscheme/ProportionalApplicationScheme.hpp"
 #include "applicationscheme/SequentialApplicationScheme.hpp"
 #include "checker/EquivalenceChecker.hpp"
+#include "checker/dd/DDPackageConfigs.hpp"
 
 #include <chrono>
 #include <map>
@@ -25,7 +26,7 @@
 #include <utility>
 
 namespace ec {
-    template<class DDType>
+    template<class DDType, class DDPackage>
     class DDEquivalenceChecker: public EquivalenceChecker {
     public:
         DDEquivalenceChecker(const qc::QuantumComputation& qc1, const qc::QuantumComputation& qc2, Configuration configuration) noexcept;
@@ -38,12 +39,12 @@ namespace ec {
         }
 
     protected:
-        std::unique_ptr<dd::Package> dd;
+        std::unique_ptr<DDPackage> dd;
 
-        TaskManager<DDType> taskManager1;
-        TaskManager<DDType> taskManager2;
+        TaskManager<DDType, DDPackage> taskManager1;
+        TaskManager<DDType, DDPackage> taskManager2;
 
-        std::unique_ptr<ApplicationScheme<DDType>> applicationScheme;
+        std::unique_ptr<ApplicationScheme<DDType, DDPackage>> applicationScheme;
 
         std::size_t maxActiveNodes{};
 
@@ -52,11 +53,11 @@ namespace ec {
         // at some point this routine should probably make its way into the DD package in some form
         EquivalenceCriterion equals(const DDType& e, const DDType& f);
 
-        virtual void                 initializeTask(TaskManager<DDType>&) = 0;
+        virtual void                 initializeTask(TaskManager<DDType, DDPackage>&) = 0;
         virtual void                 initialize();
         virtual void                 execute();
         virtual void                 finish();
-        virtual void                 postprocessTask(TaskManager<DDType>& task);
+        virtual void                 postprocessTask(TaskManager<DDType, DDPackage>& task);
         virtual void                 postprocess();
         virtual EquivalenceCriterion checkEquivalence();
     };

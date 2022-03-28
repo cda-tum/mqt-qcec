@@ -8,11 +8,11 @@
 #include "ApplicationScheme.hpp"
 
 namespace ec {
-    template<class DDType>
-    class ProportionalApplicationScheme final: public ApplicationScheme<DDType> {
+    template<class DDType, class DDPackage = dd::Package<>>
+    class ProportionalApplicationScheme final: public ApplicationScheme<DDType, DDPackage> {
     public:
-        ProportionalApplicationScheme(TaskManager<DDType>& taskManager1, TaskManager<DDType>& taskManager2):
-            ApplicationScheme<DDType>(taskManager1, taskManager2),
+        ProportionalApplicationScheme(TaskManager<DDType, DDPackage>& taskManager1, TaskManager<DDType, DDPackage>& taskManager2):
+            ApplicationScheme<DDType, DDPackage>(taskManager1, taskManager2),
             gateRatio(computeGateRatio()) {}
 
         std::pair<size_t, size_t> operator()() noexcept final {

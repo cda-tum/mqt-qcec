@@ -8,7 +8,7 @@
 #include "DDEquivalenceChecker.hpp"
 
 namespace ec {
-    class DDSimulationChecker: public DDEquivalenceChecker<qc::VectorDD> {
+    class DDSimulationChecker: public DDEquivalenceChecker<qc::VectorDD, SimulationDDPackage> {
     public:
         DDSimulationChecker(const qc::QuantumComputation& qc1, const qc::QuantumComputation& qc2, const ec::Configuration& configuration) noexcept;
 
@@ -27,7 +27,7 @@ namespace ec {
         // the initial state used for simulation. defaults to the all-zero state |0...0>
         qc::VectorDD initialState{};
 
-        void                 initializeTask(TaskManager<qc::VectorDD>& task) override;
+        void                 initializeTask(TaskManager<qc::VectorDD, SimulationDDPackage>& task) override;
         EquivalenceCriterion checkEquivalence() override;
     };
 } // namespace ec

@@ -6,25 +6,25 @@
 #pragma once
 
 #include "QuantumComputation.hpp"
-#include "dd/Package.hpp"
+#include "dd/Operations.hpp"
 
 namespace ec {
     enum Direction : bool { Left  = true,
                             Right = false };
 
-    template<class DDType>
+    template<class DDType, class DDPackage = dd::Package<>>
     class TaskManager {
     protected:
         const qc::QuantumComputation* qc;
         qc::Permutation               permutation{};
         decltype(qc->begin())         iterator;
         decltype(qc->end())           end;
-        std::unique_ptr<dd::Package>& package;
+        std::unique_ptr<DDPackage>& package;
         DDType                        internalState{};
         ec::Direction                 direction = Left;
 
     public:
-        explicit TaskManager(const qc::QuantumComputation& qc, std::unique_ptr<dd::Package>& package, const ec::Direction& direction = Left) noexcept:
+        explicit TaskManager(const qc::QuantumComputation& qc, std::unique_ptr<DDPackage>& package, const ec::Direction& direction = Left) noexcept:
             qc(&qc), package(package), direction(direction) {
             permutation = qc.initialLayout;
             iterator    = qc.begin();
@@ -43,8 +43,8 @@ namespace ec {
         }
         void flipDirection() noexcept { direction = (direction == Left) ? Right : Left; }
 
-        [[nodiscard]] inline qc::MatrixDD getDD() { return (*iterator)->getDD(package, permutation); }
-        [[nodiscard]] inline qc::MatrixDD getInverseDD() { return (*iterator)->getInverseDD(package, permutation); }
+        [[nodiscard]] inline qc::MatrixDD getDD() { return dd::getDD((*iterator).get(), package, permutation); }
+        [[nodiscard]] inline qc::MatrixDD getInverseDD() { return dd::getInverseDD((*iterator).get(), package, permutation); }
 
         [[nodiscard]] const qc::QuantumComputation* getCircuit() const noexcept { return qc; }
 
@@ -94,7 +94,7 @@ namespace ec {
         void finish() { finish(internalState); }
 
         void changePermutation(DDType& state) {
-            qc::QuantumComputation::changePermutation(state, permutation, qc->outputPermutation, package, direction);
+            dd::changePermutation(state, permutation, qc->outputPermutation, package, direction);
         }
         void changePermutation() { changePermutation(internalState); }
 

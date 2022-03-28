@@ -9,7 +9,7 @@
 #include "applicationscheme/LookaheadApplicationScheme.hpp"
 
 namespace ec {
-    class DDAlternatingChecker: public DDEquivalenceChecker<qc::MatrixDD> {
+    class DDAlternatingChecker: public DDEquivalenceChecker<qc::MatrixDD, AlternatingDDPackage> {
     public:
         DDAlternatingChecker(const qc::QuantumComputation& qc1, const qc::QuantumComputation& qc2, const ec::Configuration& configuration):
             DDEquivalenceChecker(qc1, qc2, configuration) {
@@ -19,7 +19,7 @@ namespace ec {
             initializeApplicationScheme(this->configuration.application.alternatingScheme);
 
             // special treatment for the lookahead application scheme
-            if (auto lookahead = dynamic_cast<LookaheadApplicationScheme*>(applicationScheme.get())) {
+            if (auto lookahead = dynamic_cast<LookaheadApplicationScheme<AlternatingDDPackage>*>(applicationScheme.get())) {
                 // initialize links for the internal state and the package of the lookahead scheme
                 lookahead->setInternalState(functionality);
                 lookahead->setPackage(dd.get());
@@ -34,7 +34,7 @@ namespace ec {
     protected:
         qc::MatrixDD functionality{};
 
-        void                 initializeTask(TaskManager<qc::MatrixDD>&) override{};
+        void                 initializeTask(TaskManager<qc::MatrixDD, AlternatingDDPackage>&) override{};
         void                 initialize() override;
         void                 execute() override;
         void                 finish() override;

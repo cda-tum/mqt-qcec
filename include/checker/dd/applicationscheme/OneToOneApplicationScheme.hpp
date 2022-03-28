@@ -8,11 +8,11 @@
 #include "ApplicationScheme.hpp"
 
 namespace ec {
-    template<class DDType>
-    class OneToOneApplicationScheme final: public ApplicationScheme<DDType> {
+    template<class DDType, class DDPackage = dd::Package<>>
+    class OneToOneApplicationScheme final: public ApplicationScheme<DDType, DDPackage> {
     public:
-        OneToOneApplicationScheme(TaskManager<DDType>& taskManager1, TaskManager<DDType>& taskManager2) noexcept:
-            ApplicationScheme<DDType>(taskManager1, taskManager2) {}
+        OneToOneApplicationScheme(TaskManager<DDType, DDPackage>& taskManager1, TaskManager<DDType, DDPackage>& taskManager2) noexcept:
+            ApplicationScheme<DDType, DDPackage>(taskManager1, taskManager2) {}
 
         std::pair<size_t, size_t> operator()() final {
             return {1U, 1U};

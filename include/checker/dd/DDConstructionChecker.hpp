@@ -8,7 +8,7 @@
 #include "DDEquivalenceChecker.hpp"
 
 namespace ec {
-    class DDConstructionChecker: public DDEquivalenceChecker<qc::MatrixDD> {
+    class DDConstructionChecker: public DDEquivalenceChecker<qc::MatrixDD, ConstructionDDPackage> {
     public:
         DDConstructionChecker(const qc::QuantumComputation& qc1, const qc::QuantumComputation& qc2, const ec::Configuration& configuration):
             DDEquivalenceChecker(qc1, qc2, configuration) {
@@ -24,6 +24,11 @@ namespace ec {
         }
 
     protected:
-        void initializeTask(TaskManager<qc::MatrixDD>& task) override;
+        void initializeTask(TaskManager<qc::MatrixDD, ConstructionDDPackage>& task) override {
+            const auto initial = dd->makeIdent(nqubits);
+            task.setInternalState(initial);
+            task.incRef();
+            task.reduceAncillae();
+        }
     };
 } // namespace ec

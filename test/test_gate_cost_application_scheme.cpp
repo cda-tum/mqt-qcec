@@ -15,7 +15,7 @@ using namespace dd::literals;
 
 class GateCostApplicationSchemeTest: public testing::Test {
     void SetUp() override {
-        dd = std::make_unique<dd::Package>(nqubits);
+        dd = std::make_unique<dd::Package<>>(nqubits);
         qc = qc::QuantumComputation(nqubits);
     }
 
@@ -23,7 +23,7 @@ class GateCostApplicationSchemeTest: public testing::Test {
 
 protected:
     dd::QubitCount               nqubits = 3U;
-    std::unique_ptr<dd::Package> dd;
+    std::unique_ptr<dd::Package<>> dd;
     qc::QuantumComputation       qc;
 };
 

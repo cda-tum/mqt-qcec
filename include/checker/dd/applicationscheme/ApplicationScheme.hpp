@@ -73,10 +73,10 @@ namespace ec {
     // Interface for describing an application scheme
     // Given the current state of the check (tracked by two task managers), an application scheme describes how to
     // proceed with the check, i.e., how many operations to apply from either circuit.
-    template<class DDType>
+    template<class DDType, class DDPackage = dd::Package<>>
     class ApplicationScheme {
     public:
-        ApplicationScheme(TaskManager<DDType>& taskManager1, TaskManager<DDType>& taskManager2) noexcept:
+        ApplicationScheme(TaskManager<DDType, DDPackage>& taskManager1, TaskManager<DDType, DDPackage>& taskManager2) noexcept:
             taskManager1(taskManager1), taskManager2(taskManager2){};
 
         virtual ~ApplicationScheme() = default;
@@ -85,8 +85,8 @@ namespace ec {
         virtual std::pair<std::size_t, std::size_t> operator()() = 0;
 
     protected:
-        TaskManager<DDType>& taskManager1;
-        TaskManager<DDType>& taskManager2;
+        TaskManager<DDType, DDPackage>& taskManager1;
+        TaskManager<DDType, DDPackage>& taskManager2;
     };
 
 } // namespace ec
