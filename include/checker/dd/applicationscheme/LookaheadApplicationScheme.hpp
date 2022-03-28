@@ -50,13 +50,13 @@ namespace ec {
 
             // greedily chose the smaller resulting decision diagram
             if (size1 <= size2) {
-                assert(!taskManager1.finished());
+                assert(!this->taskManager1.finished());
                 *internalState = dd1;
                 package->decRef(op1);
                 cached1 = false;
                 this->taskManager1.advanceIterator();
             } else {
-                assert(!taskManager2.finished());
+                assert(!this->taskManager2.finished());
                 *internalState = dd2;
                 package->decRef(op2);
                 cached2 = false;
