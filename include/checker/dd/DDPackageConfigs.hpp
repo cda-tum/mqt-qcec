@@ -9,8 +9,11 @@
 
 namespace ec {
     struct SimulationDDPackageConfig: public dd::DDPackageConfig {
-        // packages for simulation are frequently allocated. Hence, reduce the initial allocation size.
-        static constexpr std::size_t UT_VEC_INITIAL_ALLOCATION_SIZE = 128U;
+        // simulation requires more resources for vectors.
+        static constexpr std::size_t UT_VEC_NBUCKET            = 65536U;
+        static constexpr std::size_t CT_VEC_ADD_NBUCKET        = 65536U;
+        static constexpr std::size_t CT_MAT_VEC_MULT_NBUCKET   = 65536U;
+        static constexpr std::size_t CT_VEC_INNER_PROD_NBUCKET = 32768U;
 
         // simulation only needs matrices for representing operations. Hence, very little is needed here.
         static constexpr std::size_t UT_MAT_NBUCKET                 = 128U;
@@ -22,9 +25,6 @@ namespace ec {
         static constexpr std::size_t CT_MAT_MAT_MULT_NBUCKET   = 1U;
         static constexpr std::size_t CT_VEC_KRON_NBUCKET       = 1U;
         static constexpr std::size_t CT_MAT_KRON_NBUCKET       = 1U;
-
-        // simulation needs quite a few resources for computing the fidelity between two states.
-        static constexpr std::size_t CT_VEC_INNER_PROD_NBUCKET = 32768U;
     };
 
     using SimulationDDPackage = dd::Package<SimulationDDPackageConfig::UT_VEC_NBUCKET, SimulationDDPackageConfig::UT_VEC_INITIAL_ALLOCATION_SIZE,
@@ -36,19 +36,22 @@ namespace ec {
                                             SimulationDDPackageConfig::CT_VEC_INNER_PROD_NBUCKET>;
 
     struct ConstructionDDPackageConfig: public dd::DDPackageConfig {
-        // Construction does not need any vector nodes
+        // construction requires more resources for matrices.
+        static constexpr std::size_t UT_MAT_NBUCKET            = 65536U;
+        static constexpr std::size_t CT_MAT_ADD_NBUCKET        = 65536U;
+        static constexpr std::size_t CT_MAT_MAT_MULT_NBUCKET   = 65536U;
+        static constexpr std::size_t CT_MAT_CONJ_TRANS_NBUCKET = 32768U;
+
+        // construction does not need any vector nodes
         static constexpr std::size_t UT_VEC_NBUCKET                 = 1U;
         static constexpr std::size_t UT_VEC_INITIAL_ALLOCATION_SIZE = 1U;
 
-        // Construction needs no vector addition, matrix-vector multiplication, kronecker products, or inner products.
+        // construction needs no vector addition, matrix-vector multiplication, kronecker products, or inner products.
         static constexpr std::size_t CT_VEC_ADD_NBUCKET        = 1U;
         static constexpr std::size_t CT_MAT_VEC_MULT_NBUCKET   = 1U;
         static constexpr std::size_t CT_VEC_KRON_NBUCKET       = 1U;
         static constexpr std::size_t CT_MAT_KRON_NBUCKET       = 1U;
         static constexpr std::size_t CT_VEC_INNER_PROD_NBUCKET = 1U;
-
-        // Construction needs some resources for determining the conjugate transpose of resulting decision diagrams in case of non-equivalence.
-        static constexpr std::size_t CT_MAT_CONJ_TRANS_NBUCKET = 32768U;
     };
 
     using ConstructionDDPackage = dd::Package<ConstructionDDPackageConfig::UT_VEC_NBUCKET, ConstructionDDPackageConfig::UT_VEC_INITIAL_ALLOCATION_SIZE,
@@ -61,6 +64,11 @@ namespace ec {
 } // namespace ec
 
 struct AlternatingDDPackageConfig: public dd::DDPackageConfig {
+    // The alternating checker requires more resources for matrices.
+    static constexpr std::size_t UT_MAT_NBUCKET          = 65536U;
+    static constexpr std::size_t CT_MAT_ADD_NBUCKET      = 65536U;
+    static constexpr std::size_t CT_MAT_MAT_MULT_NBUCKET = 65536U;
+
     // The alternating checker does not need any vector nodes
     static constexpr std::size_t UT_VEC_NBUCKET                 = 1U;
     static constexpr std::size_t UT_VEC_INITIAL_ALLOCATION_SIZE = 1U;
