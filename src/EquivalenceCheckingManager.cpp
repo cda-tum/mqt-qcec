@@ -250,9 +250,7 @@ namespace ec {
                 std::unique_lock doneLock(doneMutex);
                 auto             finished = doneCond.wait_for(doneLock, timeout, [&] { return done; });
                 // if the thread has already finished within the timeout, nothing has to be done
-                if (!finished) {
-                    done = true;
-                }
+                if (!finished) { done = true; }
             });
         }
 
