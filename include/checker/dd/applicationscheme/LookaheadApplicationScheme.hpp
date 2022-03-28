@@ -81,6 +81,6 @@ namespace ec {
 
         // the lookahead application scheme maintains links to an internal state to manipulate and a package to use
         qc::MatrixDD* internalState{};
-        DDPackage*  package{};
+        DDPackage*    package{};
     };
 } // namespace ec

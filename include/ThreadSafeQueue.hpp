@@ -64,7 +64,7 @@ private:
 public:
     ThreadSafeQueue():
         head(std::make_unique<Node>()), tail(head.get()) {}
-    ThreadSafeQueue(const ThreadSafeQueue& other) = delete;
+    ThreadSafeQueue(const ThreadSafeQueue& other)            = delete;
     ThreadSafeQueue& operator=(const ThreadSafeQueue& other) = delete;
 
     std::shared_ptr<T> waitAndPop() {

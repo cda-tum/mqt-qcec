@@ -19,7 +19,7 @@ namespace ec {
         qc::Permutation               permutation{};
         decltype(qc->begin())         iterator;
         decltype(qc->end())           end;
-        std::unique_ptr<DDPackage>& package;
+        std::unique_ptr<DDPackage>&   package;
         DDType                        internalState{};
         ec::Direction                 direction = Left;
 

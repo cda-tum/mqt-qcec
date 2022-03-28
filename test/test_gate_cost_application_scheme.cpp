@@ -22,9 +22,9 @@ class GateCostApplicationSchemeTest: public testing::Test {
     void TearDown() override {}
 
 protected:
-    dd::QubitCount               nqubits = 3U;
+    dd::QubitCount                 nqubits = 3U;
     std::unique_ptr<dd::Package<>> dd;
-    qc::QuantumComputation       qc;
+    qc::QuantumComputation         qc;
 };
 
 TEST_F(GateCostApplicationSchemeTest, SchemeFromProfile) {

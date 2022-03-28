@@ -12,8 +12,8 @@ if (NOT TARGET gtest OR NOT TARGET gmock)
 		# adjust visibility settings for building Python bindings
 		target_compile_options(gtest PUBLIC -fvisibility=hidden)
 		target_compile_options(gmock PUBLIC -fvisibility=hidden)
-	endif()
-endif()
+	endif ()
+endif ()
 
 macro(package_add_test TESTNAME)
 	# create an exectuable in which the tests will be stored

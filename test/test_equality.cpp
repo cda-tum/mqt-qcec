@@ -29,10 +29,10 @@ class EqualityTest: public testing::Test {
     void TearDown() override {}
 
 protected:
-    dd::QubitCount               nqubits = 1U;
-    qc::QuantumComputation       qc1;
-    qc::QuantumComputation       qc2;
-    ec::Configuration            config{};
+    dd::QubitCount         nqubits = 1U;
+    qc::QuantumComputation qc1;
+    qc::QuantumComputation qc2;
+    ec::Configuration      config{};
 };
 
 TEST_F(EqualityTest, GlobalPhase) {
