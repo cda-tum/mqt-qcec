@@ -9,9 +9,12 @@
 
 namespace ec {
     struct SimulationDDPackageConfig: public dd::DDPackageConfig {
+        // packages for simulation are frequently allocated. Hence, reduce the initial allocation size.
+        static constexpr std::size_t UT_VEC_INITIAL_ALLOCATION_SIZE = 128U;
+
         // simulation only needs matrices for representing operations. Hence, very little is needed here.
         static constexpr std::size_t UT_MAT_NBUCKET                 = 128U;
-        static constexpr std::size_t UT_MAT_INITIAL_ALLOCATION_SIZE = 128U;
+        static constexpr std::size_t UT_MAT_INITIAL_ALLOCATION_SIZE = 32U;
 
         // simulation needs no matrix addition, conjugate transposition, matrix-matrix multiplication, or kronecker products.
         static constexpr std::size_t CT_MAT_ADD_NBUCKET        = 1U;
@@ -21,7 +24,7 @@ namespace ec {
         static constexpr std::size_t CT_MAT_KRON_NBUCKET       = 1U;
 
         // simulation needs quite a few resources for computing the fidelity between two states.
-        static constexpr std::size_t CT_VEC_INNER_PROD_NBUCKET = 16384U;
+        static constexpr std::size_t CT_VEC_INNER_PROD_NBUCKET = 32768U;
     };
 
     using SimulationDDPackage = dd::Package<SimulationDDPackageConfig::UT_VEC_NBUCKET, SimulationDDPackageConfig::UT_VEC_INITIAL_ALLOCATION_SIZE,
@@ -45,7 +48,7 @@ namespace ec {
         static constexpr std::size_t CT_VEC_INNER_PROD_NBUCKET = 1U;
 
         // Construction needs some resources for determining the conjugate transpose of resulting decision diagrams in case of non-equivalence.
-        static constexpr std::size_t CT_MAT_CONJ_TRANS_NBUCKET = 16384U;
+        static constexpr std::size_t CT_MAT_CONJ_TRANS_NBUCKET = 32768U;
     };
 
     using ConstructionDDPackage = dd::Package<ConstructionDDPackageConfig::UT_VEC_NBUCKET, ConstructionDDPackageConfig::UT_VEC_INITIAL_ALLOCATION_SIZE,
