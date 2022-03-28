@@ -386,9 +386,9 @@ namespace ec {
 
         if (runAlternating) {
             // start a new thread that constructs and runs the alternating check
-            threads.emplace_back([&, &checker = checkers[id], id] {
-                checker = std::make_unique<DDAlternatingChecker>(qc1, qc2, configuration);
-                checker->run();
+            threads.emplace_back([&, id] {
+                checkers[id] = std::make_unique<DDAlternatingChecker>(qc1, qc2, configuration);
+                checkers[id]->run();
                 queue.push(id);
             });
             ++id;
@@ -396,11 +396,10 @@ namespace ec {
 
         if (runConstruction && !done) {
             // start a new thread that constructs and runs the construction check
-            threads.emplace_back([&, &checker = checkers[id], id] {
-                checker = std::make_unique<DDConstructionChecker>(qc1, qc2, configuration);
-                if (!done) {
-                    checker->run();
-                }
+            threads.emplace_back([&, id] {
+                checkers[id] = std::make_unique<DDConstructionChecker>(qc1, qc2, configuration);
+                if (!done)
+                    checkers[id]->run();
                 queue.push(id);
             });
             ++id;
@@ -410,16 +409,15 @@ namespace ec {
             const auto effectiveThreadsLeft = effectiveThreads - threads.size();
             // launch as many simulations as possible
             for (std::size_t i = 0; i < effectiveThreadsLeft && !done; ++i) {
-                threads.emplace_back([&, &checker = checkers[id], id] {
-                    checker          = std::make_unique<DDSimulationChecker>(qc1, qc2, configuration);
-                    auto* simChecker = dynamic_cast<DDSimulationChecker*>(checker.get());
+                threads.emplace_back([&, id] {
+                    checkers[id]  = std::make_unique<DDSimulationChecker>(qc1, qc2, configuration);
+                    auto* checker = dynamic_cast<DDSimulationChecker*>(checkers[id].get());
                     {
                         std::lock_guard stateGeneratorLock(stateGeneratorMutex);
-                        simChecker->setRandomInitialState(stateGenerator);
+                        checker->setRandomInitialState(stateGenerator);
                     }
-                    if (!done) {
-                        checker->run();
-                    }
+                    if (!done)
+                        checkers[id]->run();
                     queue.push(id);
                 });
                 ++id;
@@ -489,15 +487,14 @@ namespace ec {
 
                 // it has to be checked, whether further simulations shall be conducted
                 if (results.startedSimulations < configuration.simulation.maxSims) {
-                    threads[*completedID] = std::thread([&, &checker = checkers[id], id = *completedID] {
+                    threads[*completedID] = std::thread([&, id = *completedID] {
                         {
-                            auto*           simChecker = dynamic_cast<DDSimulationChecker*>(checker.get());
+                            auto*           checker = dynamic_cast<DDSimulationChecker*>(checkers[id].get());
                             std::lock_guard stateGeneratorLock(stateGeneratorMutex);
-                            simChecker->setRandomInitialState(stateGenerator);
+                            checker->setRandomInitialState(stateGenerator);
                         }
-                        if (!done) {
-                            checker->run();
-                        }
+                        if (!done)
+                            checkers[id]->run();
                         queue.push(id);
                     });
                     ++results.startedSimulations;
