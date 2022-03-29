@@ -77,6 +77,7 @@ namespace ec {
 
         [[nodiscard]] nlohmann::json json() const;
         [[nodiscard]] std::string    toString() const { return json().dump(2); }
+        friend std::ostream&         operator<<(std::ostream& os, const EquivalenceCheckingManager& ecm) { return os << ecm.toString(); }
 
         [[nodiscard]] EquivalenceCriterion equivalence() const {
             return results.equivalence;
