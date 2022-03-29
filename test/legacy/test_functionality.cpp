@@ -50,7 +50,7 @@ TEST_P(FunctionalityTest, Reference) {
 
     ec::EquivalenceCheckingManager ecm(qc_original, qc_alternative, config);
     ecm.run();
-    std::cout << ecm.toString() << std::endl;
+    std::cout << ecm << std::endl;
     EXPECT_TRUE(ecm.getResults().consideredEquivalent());
 }
 
@@ -62,7 +62,7 @@ TEST_P(FunctionalityTest, Proportional) {
 
     ec::EquivalenceCheckingManager ecm(qc_original, qc_alternative, config);
     ecm.run();
-    std::cout << ecm.toString() << std::endl;
+    std::cout << ecm << std::endl;
     EXPECT_TRUE(ecm.getResults().consideredEquivalent());
 }
 
@@ -74,7 +74,7 @@ TEST_P(FunctionalityTest, Lookahead) {
 
     ec::EquivalenceCheckingManager ecm(qc_original, qc_alternative, config);
     ecm.run();
-    std::cout << ecm.toString() << std::endl;
+    std::cout << ecm << std::endl;
     EXPECT_TRUE(ecm.getResults().consideredEquivalent());
 }
 
@@ -86,7 +86,7 @@ TEST_P(FunctionalityTest, Naive) {
 
     ec::EquivalenceCheckingManager ecm(qc_original, qc_alternative, config);
     ecm.run();
-    std::cout << ecm.toString() << std::endl;
+    std::cout << ecm << std::endl;
     EXPECT_TRUE(ecm.getResults().consideredEquivalent());
 }
 
@@ -99,7 +99,7 @@ TEST_P(FunctionalityTest, CompilationFlow) {
 
     ec::EquivalenceCheckingManager ecm(qc_original, qc_alternative, config);
     ecm.run();
-    std::cout << ecm.toString() << std::endl;
+    std::cout << ecm << std::endl;
     EXPECT_TRUE(ecm.getResults().consideredEquivalent());
 }
 
@@ -110,7 +110,7 @@ TEST_P(FunctionalityTest, Simulation) {
 
     ec::EquivalenceCheckingManager ecm(qc_original, qc_alternative, config);
     ecm.run();
-    std::cout << ecm.toString() << std::endl;
+    std::cout << ecm << std::endl;
     EXPECT_TRUE(ecm.getResults().consideredEquivalent());
 }
 
@@ -122,7 +122,7 @@ TEST_P(FunctionalityTest, SimulationRandom1QBasis) {
 
     ec::EquivalenceCheckingManager ecm(qc_original, qc_alternative, config);
     ecm.run();
-    std::cout << ecm.toString() << std::endl;
+    std::cout << ecm << std::endl;
     EXPECT_TRUE(ecm.getResults().consideredEquivalent());
 }
 
@@ -134,7 +134,21 @@ TEST_P(FunctionalityTest, SimulationStabilizer) {
 
     ec::EquivalenceCheckingManager ecm(qc_original, qc_alternative, config);
     ecm.run();
-    std::cout << ecm.toString() << std::endl;
+    std::cout << ecm << std::endl;
+    EXPECT_TRUE(ecm.getResults().consideredEquivalent());
+}
+
+TEST_P(FunctionalityTest, SimulationParallel) {
+    qc_alternative.import(test_alternative_dir + "test_" + GetParam() + ".qasm");
+
+    config.execution.runSimulationChecker = true;
+    config.execution.parallel             = true;
+    config.execution.nthreads             = std::thread::hardware_concurrency() + 1U;
+    config.simulation.maxSims             = std::thread::hardware_concurrency() + 1U;
+
+    ec::EquivalenceCheckingManager ecm(qc_original, qc_alternative, config);
+    ecm.run();
+    std::cout << ecm << std::endl;
     EXPECT_TRUE(ecm.getResults().consideredEquivalent());
 }
 
@@ -147,7 +161,7 @@ TEST_F(FunctionalityTest, test2) {
 
     ec::EquivalenceCheckingManager ecm(qc_original, qc_alternative, config);
     ecm.run();
-    std::cout << ecm.toString() << std::endl;
+    std::cout << ecm << std::endl;
     EXPECT_TRUE(ecm.getResults().consideredEquivalent());
 
     config.execution.runConstructionChecker = false;

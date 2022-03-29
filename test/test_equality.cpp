@@ -61,7 +61,7 @@ TEST_F(EqualityTest, CloseButNotEqualAlternating) {
     config.execution.runAlternatingChecker = true;
     ec::EquivalenceCheckingManager ecm(qc1, qc2, config);
     ecm.run();
-    std::cout << ecm.toString() << std::endl;
+    std::cout << ecm << std::endl;
     EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::Equivalent);
 }
 
@@ -75,7 +75,7 @@ TEST_F(EqualityTest, CloseButNotEqualConstruction) {
     config.execution.runConstructionChecker = true;
     ec::EquivalenceCheckingManager ecm(qc1, qc2, config);
     ecm.run();
-    std::cout << ecm.toString() << std::endl;
+    std::cout << ecm << std::endl;
     EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::Equivalent);
 }
 
@@ -94,6 +94,20 @@ TEST_F(EqualityTest, CloseButNotEqualAlternatingGlobalPhase) {
     config.execution.runAlternatingChecker = true;
     ec::EquivalenceCheckingManager ecm(qc1, qc2, config);
     ecm.run();
-    std::cout << ecm.toString() << std::endl;
+    std::cout << ecm << std::endl;
     EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::EquivalentUpToGlobalPhase);
+}
+
+TEST_F(EqualityTest, CloseButNotEqualSimulation) {
+    qc1.h(0);
+
+    qc2.h(0);
+    qc2.phase(0, dd::PI / 1024.);
+
+    config.simulation.fidelityThreshold   = 1e-2;
+    config.execution.runSimulationChecker = true;
+    ec::EquivalenceCheckingManager ecm(qc1, qc2, config);
+    ecm.run();
+    std::cout << ecm << std::endl;
+    EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::ProbablyEquivalent);
 }
