@@ -58,20 +58,38 @@ jobs:
       - name: Install dependencies
         run: pip install -q build
       - name: Build sdist
-        run: python -m build --sdist
+        run:  python -m build --sdist
       - name: Test sdist
-        run: pip install --verbose dist/*.tar.gz
+        run:  pip install --verbose dist/*.tar.gz
         env:
-          CC: "gcc-10"
+          CC:  "gcc-10"
           CXX: "g++-10"
       - uses: actions/upload-artifact@v2
         with:
           path: dist/*.tar.gz
 
-  upload_pypi:
-    needs: [ build_wheels, build_sdist, build_m1_wheels ]
+  test_bindings:
+    name:    Test Python bindings
     runs-on: ubuntu-latest
-    if: github.event_name == 'release' && github.event.action == 'published'
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+      - uses: actions/setup-python@v2
+        name: Install Python
+        with:
+          python-version: '3.9'
+      - name: Install package
+        run:  pip install .
+      - name: Install test requirements
+        run:  pip install -r test/python/requirements-test.txt
+      - name: Test package
+        run: cd test/python && pytest .
+
+  upload_pypi:
+    needs: [ build_wheels, build_m1_wheels, build_sdist, test_bindings ]
+    runs-on: ubuntu-latest
+    if:      github.event_name == 'release' && github.event.action == 'published'
     steps:
       - uses: actions/download-artifact@v2
         with:

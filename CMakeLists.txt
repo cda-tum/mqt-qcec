@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.14...3.22)
 
 project(qcec
         LANGUAGES CXX
-        VERSION 1.10.5
+        VERSION 2.0.0
         DESCRIPTION "MQT QCEC - A tool for Quantum Circuit Equivalence Checking"
         )
 
@@ -52,11 +52,6 @@ if (BUILD_QCEC_TESTS)
 	include(GoogleTest)
 	add_subdirectory(test)
 endif ()
-
-# add apps if this is the main project
-if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
-	add_subdirectory(apps)
-endif()
 
 # add Python binding code
 if(BINDINGS)

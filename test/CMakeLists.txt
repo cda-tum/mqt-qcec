@@ -12,8 +12,8 @@ if (NOT TARGET gtest OR NOT TARGET gmock)
 		# adjust visibility settings for building Python bindings
 		target_compile_options(gtest PUBLIC -fvisibility=hidden)
 		target_compile_options(gmock PUBLIC -fvisibility=hidden)
-	endif()
-endif()
+	endif ()
+endif ()
 
 macro(package_add_test TESTNAME)
 	# create an exectuable in which the tests will be stored
@@ -26,11 +26,14 @@ macro(package_add_test TESTNAME)
 endmacro()
 
 package_add_test(${PROJECT_NAME}_test
-                 ${CMAKE_CURRENT_SOURCE_DIR}/test_general.cpp
-                 ${CMAKE_CURRENT_SOURCE_DIR}/test_functionality.cpp
-                 ${CMAKE_CURRENT_SOURCE_DIR}/test_journal.cpp
-                 ${CMAKE_CURRENT_SOURCE_DIR}/test_compilationflow.cpp
-                 ${CMAKE_CURRENT_SOURCE_DIR}/test_simulation.cpp)
+                 legacy/test_functionality.cpp
+                 legacy/test_journal.cpp
+                 legacy/test_compilationflow.cpp
+                 legacy/test_general.cpp
+                 legacy/test_simulation.cpp
+                 test_simple_circuit_identities.cpp
+                 test_gate_cost_application_scheme.cpp
+                 test_equality.cpp)
 
 add_custom_command(TARGET ${PROJECT_NAME}_test
                    POST_BUILD

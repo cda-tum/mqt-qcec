@@ -1,14 +1,15 @@
 add_library(${PROJECT_NAME}
-            ${${PROJECT_NAME}_SOURCE_DIR}/include/EquivalenceChecker.hpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/EquivalenceChecker.cpp
-            ${${PROJECT_NAME}_SOURCE_DIR}/include/EquivalenceCheckingResults.hpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/EquivalenceCheckingResults.cpp
-            ${${PROJECT_NAME}_SOURCE_DIR}/include/ImprovedDDEquivalenceChecker.hpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/ImprovedDDEquivalenceChecker.cpp
-            ${${PROJECT_NAME}_SOURCE_DIR}/include/CompilationFlowEquivalenceChecker.hpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/CompilationFlowEquivalenceChecker.cpp
-            ${${PROJECT_NAME}_SOURCE_DIR}/include/SimulationBasedEquivalenceChecker.hpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/SimulationBasedEquivalenceChecker.cpp
+            ${${PROJECT_NAME}_SOURCE_DIR}/include/checker
+            ${${PROJECT_NAME}_SOURCE_DIR}/include/Configuration.hpp
+            ${${PROJECT_NAME}_SOURCE_DIR}/include/EquivalenceCriterion.hpp
+            ${${PROJECT_NAME}_SOURCE_DIR}/include/EquivalenceCheckingManager.hpp
+            ${${PROJECT_NAME}_SOURCE_DIR}/include/ThreadSafeQueue.hpp
+
+            ${CMAKE_CURRENT_SOURCE_DIR}/EquivalenceCheckingManager.cpp
+
+            ${CMAKE_CURRENT_SOURCE_DIR}/checker/dd/DDEquivalenceChecker.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/checker/dd/DDSimulationChecker.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/checker/dd/DDAlternatingChecker.cpp
             )
 # set include directories
 target_include_directories(${PROJECT_NAME} PUBLIC $<BUILD_INTERFACE:${${PROJECT_NAME}_SOURCE_DIR}/include>)
@@ -24,20 +25,20 @@ target_link_libraries(${PROJECT_NAME} PUBLIC MQT::qfr)
 # enable interprocedural optimization if it is supported
 include(CheckIPOSupported)
 check_ipo_supported(RESULT ipo_supported)
-if(ipo_supported)
+if (ipo_supported)
 	set_target_properties(${PROJECT_NAME} PROPERTIES INTERPROCEDURAL_OPTIMIZATION TRUE)
-endif()
+endif ()
 
 # set compiler flags depending on compiler
-if(MSVC)
+if (MSVC)
 	target_compile_options(${PROJECT_NAME} PUBLIC /utf-8)
-else()
+else ()
 	target_compile_options(${PROJECT_NAME} PUBLIC -Wall -Wextra $<$<CONFIG:DEBUG>:-Og>)
 	if (BINDINGS)
 		# adjust visibility settings for building Python bindings
 		target_compile_options(${PROJECT_NAME} PUBLIC -fvisibility=hidden)
-	endif()
-	if(NOT DEPLOY)
+	endif ()
+	if (NOT DEPLOY)
 		# only include machine-specific optimizations when building for the host machine
 		target_compile_options(${PROJECT_NAME} PUBLIC -mtune=native)
 		include(CheckCXXCompilerFlag)
@@ -46,9 +47,9 @@ else()
 			target_compile_options(${PROJECT_NAME} PUBLIC -march=native)
 		endif ()
 	endif ()
-endif()
+endif ()
 
-if(GENERATE_POSITION_INDEPENDENT_CODE OR BINDINGS)
+if (GENERATE_POSITION_INDEPENDENT_CODE OR BINDINGS)
 	include(CheckPIESupported)
 	check_pie_supported()
 	set_target_properties(${PROJECT_NAME} PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
