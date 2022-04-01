@@ -1,2 +1,2 @@
 pytest~=7.1.1
-qiskit-terra~=0.19.2
+qiskit-terra~=0.20.0
