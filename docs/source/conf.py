@@ -1,10 +1,11 @@
+from importlib.metadata import version
+
 # -- Project information -----------------------------------------------------
 project = 'QCEC'
-copyright = '2022, Lukas Burgholzer'
 author = 'Lukas Burgholzer'
 
-# The full version, including alpha/beta/rc tags
-release = '2.0.0'
+release = version('mqt.qcec')
+version = '.'.join(release.split('.')[:3])
 
 # -- General configuration ---------------------------------------------------
 extensions = [

@@ -14,6 +14,9 @@
 #include <exception>
 #include <memory>
 
+#define STRINGIFY(x) #x
+#define MACRO_STRINGIFY(x) STRINGIFY(x)
+
 namespace py = pybind11;
 namespace nl = nlohmann;
 using namespace pybind11::literals;
@@ -369,7 +372,7 @@ namespace ec {
                 .def_readwrite("store_cex_output", &Configuration::Simulation::storeCEXoutput, "Whether to store the resulting states that prove the non-equivalence of both circuits. Since the memory required to store a full representation of a quantum state increases exponentially, this is only recommended for a small number of qubits and defaults to :code:`False`.");
 
 #ifdef VERSION_INFO
-        m.attr("__version__") = VERSION_INFO;
+        m.attr("__version__") = MACRO_STRINGIFY(VERSION_INFO);
 #else
         m.attr("__version__") = "dev";
 #endif
