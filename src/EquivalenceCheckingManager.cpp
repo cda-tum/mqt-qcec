@@ -43,10 +43,10 @@ namespace ec {
         auto& smallerCircuit = qc1.getNqubits() > qc2.getNqubits() ? qc2 : qc1;
         auto& largerCircuit  = qc1.getNqubits() > qc2.getNqubits() ? qc1 : qc2;
 
-        auto& smallerInitial   = smallerCircuit.initialLayout;
-        auto& smallerOutput    = smallerCircuit.outputPermutation;
-        auto& smallerAncillary = smallerCircuit.ancillary;
-        auto& smallerGarbage   = smallerCircuit.garbage;
+        [[maybe_unused]] auto& smallerInitial   = smallerCircuit.initialLayout;
+        auto&                  smallerOutput    = smallerCircuit.outputPermutation;
+        [[maybe_unused]] auto& smallerAncillary = smallerCircuit.ancillary;
+        auto&                  smallerGarbage   = smallerCircuit.garbage;
 
         auto& largerOutput  = largerCircuit.outputPermutation;
         auto& largerGarbage = largerCircuit.garbage;
@@ -80,7 +80,7 @@ namespace ec {
                 continue;
 
             // std::cout << "This is logical qubit " << static_cast<std::size_t>(outputQubitInSmallerCircuit) << " in the smaller circuit";
-            dd::Qubit physicalQubitInSmallerCircuit = 0;
+            [[maybe_unused]] dd::Qubit physicalQubitInSmallerCircuit = 0;
             for (const auto& out: smallerOutput) {
                 if (out.second == outputQubitInSmallerCircuit) {
                     physicalQubitInSmallerCircuit = out.first;
