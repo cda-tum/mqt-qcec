@@ -19,6 +19,7 @@ test-command = "cd {project}/test/python && pytest ."
 environment = { DEPLOY = "ON" }
 build-frontend = "build"
 build-verbosity = 3
+dependency-versions = "latest"
 
 [tool.cibuildwheel.linux]
 
