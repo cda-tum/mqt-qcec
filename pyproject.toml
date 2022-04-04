@@ -1,6 +1,6 @@
 [build-system]
 requires = [
-    "setuptools>=62",
+    "setuptools>=45",
     "setuptools_scm>=6.4",
     "wheel>=0.37",
     "ninja>=1.10; sys_platform != 'win32'",
@@ -13,13 +13,12 @@ build-backend = "setuptools.build_meta"
 [tool.cibuildwheel]
 build = "cp3*"
 archs = "auto64"
-test-skip = "*-macosx_arm64"
+test-skip = "*-macosx_arm64 *-musllinux*"
 test-extras = ["tests"]
 test-command = "cd {project}/test/python && pytest ."
 environment = { DEPLOY = "ON" }
 build-frontend = "build"
 build-verbosity = 3
-dependency-versions = "latest"
 
 [tool.cibuildwheel.linux]
 
