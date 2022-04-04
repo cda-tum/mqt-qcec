@@ -1,6 +1,6 @@
 [build-system]
 requires = [
-    "setuptools>=45",
+    "setuptools<=60",
     "setuptools_scm[toml]>=6.4",
     "wheel",
     "ninja; sys_platform != 'win32'",
