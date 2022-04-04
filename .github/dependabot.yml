@@ -19,24 +19,6 @@ updates:
       - "burgholzer"
 
   - package-ecosystem: "pip"
-    directory:         "/docs"
-    schedule:
-      interval: "weekly"
-      day:      "friday"
-      time:     "06:00"
-    assignees:
-      - "burgholzer"
-
-  - package-ecosystem: "pip"
-    directory:         "/test/python"
-    schedule:
-      interval: "weekly"
-      day:      "friday"
-      time:     "06:00"
-    assignees:
-      - "burgholzer"
-
-  - package-ecosystem: "pip"
     directory:         "/"
     schedule:
       interval: "weekly"

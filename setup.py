@@ -82,12 +82,17 @@ setup(
     description='MQT QCEC - A tool for Quantum Circuit Equivalence Checking',
     long_description=README,
     long_description_content_type="text/markdown",
+    python_requires='>=3.7',
     license="MIT",
     url="https://iic.jku.at/eda/research/quantum_verification",
     ext_modules=[CMakeExtension('pyqcec', namespace='mqt.qcec.')],
     cmdclass=dict(build_ext=CMakeBuild),
     zip_safe=False,
     packages=find_namespace_packages(include=['mqt.*']),
+    extras_require={
+        "tests": ["pytest~=7.1.1", "qiskit-terra~=0.19.2"],
+        "docs": ["sphinx==4.4.0", "sphinx-rtd-theme==1.0.0", "sphinxcontrib-bibtex==2.4.1", "sphinx-copybutton==0.4.0"]
+    },
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         "Programming Language :: Python :: 3",
