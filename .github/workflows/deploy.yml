@@ -17,10 +17,13 @@ jobs:
       fail-fast: false
       matrix:
         os: [ ubuntu-latest, windows-latest, macos-latest ]
-      arch: [ x86_64 ]
-      include:
-        - arch: arm64
-          os:   macos-latest
+        arch: [ x86_64 ]
+        include:
+          - arch: arm64
+            os:   macos-latest
+          - arch: aarch64
+            os:   ubuntu-latest
+            qemu: true
 
     steps:
       - uses: actions/checkout@v3
