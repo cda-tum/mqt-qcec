@@ -111,3 +111,17 @@ TEST_F(EqualityTest, CloseButNotEqualSimulation) {
     std::cout << ecm << std::endl;
     EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::ProbablyEquivalent);
 }
+
+TEST_F(EqualityTest, SimulationMoreThan64Qubits) {
+    qc1 = qc::QuantumComputation(65U);
+    qc1.h(0);
+    for (auto i = 0U; i < 64U; ++i) {
+        qc1.x(static_cast<dd::Qubit>(i + 1), 0_pc);
+    }
+    qc2                                   = qc1.clone();
+    config.execution.runSimulationChecker = true;
+    ec::EquivalenceCheckingManager ecm(qc1, qc2, config);
+    ecm.run();
+    std::cout << ecm << std::endl;
+    EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::ProbablyEquivalent);
+}

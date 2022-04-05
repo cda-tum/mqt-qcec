@@ -41,29 +41,39 @@ namespace ec {
         template<class DDPackage = dd::Package<>>
         qc::VectorDD generateRandomComputationalBasisState(std::unique_ptr<DDPackage>& dd, dd::QubitCount totalQubits, dd::QubitCount ancillaryQubits = 0U) {
             // determine how many qubits truly are random
-            const auto randomQubits = totalQubits - ancillaryQubits;
-            if (randomQubits > static_cast<dd::QubitCount>(std::mt19937_64::word_size) - 1) {
-                throw std::runtime_error("Generation of computational basis states currently only supports up to 63 qubits.");
-            }
+            const auto        randomQubits = totalQubits - ancillaryQubits;
+            std::vector<bool> stimulusBits(totalQubits, false);
 
             // check if there still is a unique computational basis state
-            const std::uint_least64_t maxStates = (static_cast<std::uint_least64_t>(1U) << randomQubits);
-            if (generatedComputationalBasisStates.size() == maxStates) {
-                throw std::runtime_error("No more unique basis states available.");
-            }
+            if (randomQubits <= 63) {
+                const std::uint_least64_t maxStates = (static_cast<std::uint_least64_t>(1U) << randomQubits);
+                assert(generatedComputationalBasisStates.size() != maxStates);
+                // generate a unique computational basis state
+                std::uniform_int_distribution<std::uint_least64_t> distribution(0, maxStates - 1);
+                auto [randomState, success] = generatedComputationalBasisStates.insert(distribution(mt));
+                while (!success) {
+                    std::tie(randomState, success) = generatedComputationalBasisStates.insert(distribution(mt));
+                }
 
-            // generate a unique computational basis state
-            std::uniform_int_distribution<std::uint_least64_t> distribution(0, maxStates - 1);
-            auto [randomState, success] = generatedComputationalBasisStates.insert(distribution(mt));
-            while (!success) {
-                std::tie(randomState, success) = generatedComputationalBasisStates.insert(distribution(mt));
-            }
-
-            // generate the bitvector corresponding to the random state
-            std::vector<bool> stimulusBits(totalQubits, false);
-            for (dd::QubitCount i = 0; i < randomQubits; ++i) {
-                if (*randomState & (static_cast<std::uint_least64_t>(1U) << i)) {
-                    stimulusBits[i] = true;
+                // generate the bitvector corresponding to the random state
+                for (dd::QubitCount i = 0; i < randomQubits; ++i) {
+                    if (*randomState & (static_cast<std::uint_least64_t>(1U) << i)) {
+                        stimulusBits[i] = true;
+                    }
+                }
+            } else {
+                // check how many 64bit numbers are needed for each random state
+                const auto nr = static_cast<std::size_t>(std::ceil(randomQubits / 64.));
+                // generate enough random numbers
+                std::vector<std::mt19937_64::result_type> randomNumbers(nr, 0U);
+                for (auto i = 0U; i < nr; ++i) {
+                    randomNumbers[i] = mt();
+                }
+                // generate the corresponding bitvector
+                for (dd::QubitCount i = 0U; i < randomQubits; ++i) {
+                    if (randomNumbers[i / 64U] & (static_cast<std::uint_least64_t>(1U) << (i % 64U))) {
+                        stimulusBits[i] = true;
+                    }
                 }
             }
 
