@@ -15,7 +15,7 @@ build = "cp3*"
 archs = "auto64"
 test-skip = "*-macosx_arm64 *-musllinux*"
 test-extras = ["tests"]
-test-command = "cd {project}/test/python && python -m pytest ."
+test-command = "python -m pytest {project}/test/python"
 environment = { DEPLOY = "ON" }
 build-frontend = "build"
 build-verbosity = 3
@@ -26,4 +26,3 @@ build-verbosity = 3
 environment = { MACOSX_DEPLOYMENT_TARGET = "10.15", DEPLOY = "ON" }
 
 [tool.cibuildwheel.windows]
-test-command = "cd {project}\\test\\python && python -m pytest ."
