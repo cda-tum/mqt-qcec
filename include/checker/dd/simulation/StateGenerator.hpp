@@ -47,9 +47,7 @@ namespace ec {
             // check if there still is a unique computational basis state
             if (randomQubits <= 63) {
                 const std::uint_least64_t maxStates = (static_cast<std::uint_least64_t>(1U) << randomQubits);
-                if (generatedComputationalBasisStates.size() == maxStates) {
-                    throw std::runtime_error("No more unique basis states available.");
-                }
+                assert(generatedComputationalBasisStates.size() != maxStates);
                 // generate a unique computational basis state
                 std::uniform_int_distribution<std::uint_least64_t> distribution(0, maxStates - 1);
                 auto [randomState, success] = generatedComputationalBasisStates.insert(distribution(mt));
