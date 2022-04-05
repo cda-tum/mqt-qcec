@@ -11,7 +11,7 @@ on:
 
 jobs:
   build_wheels:
-    name: Build ${{ matrix.os }}-${{ matrix.arch }}-${{ matrix.glibc }} wheels
+    name: Build ${{ matrix.os }}-${{ matrix.arch }}-${{ matrix.libc }} wheels
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
