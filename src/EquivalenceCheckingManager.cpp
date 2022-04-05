@@ -231,7 +231,7 @@ namespace ec {
         if (configuration.execution.runSimulationChecker && configuration.simulation.stateType == StateType::ComputationalBasis) {
             const auto        nq           = this->qc1.getNqubitsWithoutAncillae();
             const std::size_t uniqueStates = 1ULL << nq;
-            if (configuration.simulation.maxSims > uniqueStates) {
+            if (nq <= 63U && configuration.simulation.maxSims > uniqueStates) {
                 this->configuration.simulation.maxSims = uniqueStates;
             }
         }
