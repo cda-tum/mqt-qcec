@@ -11,30 +11,34 @@ on:
 
 jobs:
   build_wheels:
-    name: Build ${{ matrix.os }}-${{ matrix.arch }}-${{ matrix.libc }} wheels
+    name: Build ${{ matrix.os }}${{ matrix.archname }}${{ matrix.libc }} wheels
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         os: [ ubuntu-latest, windows-latest, macos-latest ]
         arch: [ x86_64 ]
+        archname: [ "" ]
         skip: [ "*-musllinux_*" ]
-        libc: [ glibc ]
+        libc: [ "" ]
         include:
           - arch: arm64
+            archname: "-arm64"
             os:   macos-latest
           - arch: aarch64
+            archname: "-arm64"
             os:   ubuntu-latest
             qemu: true
           - arch: aarch64
+            archname: "-arm64"
             os:   ubuntu-latest
             qemu: true
             skip: "*-manylinux_*"
-            libc: musl
+            libc:     "-musl"
           - arch: x86_64
             os:   ubuntu-latest
             skip: "*-manylinux_*"
-            libc: musl
+            libc: "-musl"
 
     steps:
       - uses: actions/checkout@v3
