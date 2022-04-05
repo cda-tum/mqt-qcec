@@ -11,35 +11,51 @@ on:
 
 jobs:
   build_wheels:
-    name: Build wheels on ${{ matrix.os }}
+    name: Build ${{ matrix.os }}${{ matrix.archname }}${{ matrix.libc }} wheels
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-          os: [ubuntu-latest, windows-latest, macos-latest]
+        os: [ ubuntu-latest, windows-latest, macos-latest ]
+        arch: [ x86_64 ]
+        archname: [ "" ]
+        skip: [ "*-musllinux_*" ]
+        libc: [ "" ]
+        include:
+          - arch:     arm64
+            archname: "-arm64"
+            os:       macos-latest
+          - arch: x86_64
+            os:   ubuntu-latest
+            skip: "*-manylinux_*"
+            libc: "-musl"
+    #          - arch:     aarch64
+    #            archname: "-arm64"
+    #            os:       ubuntu-latest
+    #            qemu:     true
+    #          - arch:     aarch64
+    #            archname: "-arm64"
+    #            os:       ubuntu-latest
+    #            qemu:     true
+    #            skip:     "*-manylinux_*"
+    #            libc:     "-musl"
 
     steps:
       - uses: actions/checkout@v3
         with:
           submodules: recursive
       - uses: ilammy/msvc-dev-cmd@v1
+      #      - name: Install QEMU
+      #        uses: docker/setup-qemu-action@v1
+      #        if:   matrix.qemu
+      #        with:
+      #          platforms: arm64
       - name: Build wheels
-        uses: pypa/cibuildwheel@v2.3.1
-      - uses: actions/upload-artifact@v2
-        with:
-          path: ./wheelhouse/*.whl
-
-  build_m1_wheels:
-    name:    Build wheels for Apple Silicon
-    runs-on: macos-11
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          submodules: recursive
-      - name: Build wheels
-        uses: pypa/cibuildwheel@v2.3.1
+        uses: pypa/cibuildwheel@v2.4.0
         env:
-          CIBW_ARCHS_MACOS: arm64
+          CIBW_ARCHS_MACOS: ${{ matrix.arch }}
+          CIBW_ARCHS_LINUX: ${{ matrix.arch }}
+          CIBW_SKIP:        ${{ matrix.skip }}
       - uses: actions/upload-artifact@v2
         with:
           path: ./wheelhouse/*.whl
@@ -53,41 +69,18 @@ jobs:
           submodules: recursive
       - uses: actions/setup-python@v3
         name: Install Python
-        with:
-          python-version: '3.9'
       - name: Install dependencies
-        run: pip install -q build
+        run: python -m pip install build
       - name: Build sdist
         run:  python -m build --sdist
-      - name: Test sdist
-        run:  pip install --verbose dist/*.tar.gz
-        env:
-          CC:  "gcc-10"
-          CXX: "g++-10"
+      - name: Install sdist
+        run: python -m pip install --verbose dist/*.tar.gz
       - uses: actions/upload-artifact@v2
         with:
           path: dist/*.tar.gz
 
-  test_bindings:
-    name:    Test Python bindings
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          submodules: recursive
-      - uses: actions/setup-python@v2
-        name: Install Python
-        with:
-          python-version: '3.9'
-      - name: Install package
-        run:  pip install .
-      - name: Install test requirements
-        run:  pip install -r test/python/requirements-test.txt
-      - name: Test package
-        run: cd test/python && pytest .
-
   upload_pypi:
-    needs: [ build_wheels, build_m1_wheels, build_sdist, test_bindings ]
+    needs: [ build_wheels, build_sdist ]
     runs-on: ubuntu-latest
     if:      github.event_name == 'release' && github.event.action == 'published'
     steps:

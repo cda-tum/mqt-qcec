@@ -1,28 +1,15 @@
-include README.md LICENSE CMakeLists.txt
-graft src
-graft include
-graft mqt/qcec
-graft jkq
-include extern/qfr/CMakeLists.txt
-graft extern/qfr/src
-graft extern/qfr/include
-graft extern/qfr/mqt/qfr
-graft extern/qfr/jkq
-include extern/qfr/extern/dd_package/CMakeLists.txt
-graft extern/qfr/extern/dd_package/include
+prune docs
+prune test
 
-graft extern/qfr/extern/json
-prune extern/qfr/extern/json/benchmarks
-prune extern/qfr/extern/json/doc
-prune extern/qfr/extern/json/include
-prune extern/qfr/extern/json/test
-prune extern/qfr/extern/json/third_party
-
-graft extern/qfr/extern/pybind11
-prune extern/qfr/extern/pybind11/docs
-prune extern/qfr/extern/pybind11/tests
-
-graft extern/qfr/extern/pybind11_json
-prune extern/qfr/extern/pybind11_json/test
-
+graft extern/qfr
+prune **/test
+prune **/tests
+prune **/doc
+prune **/docs
+prune **/apps
 prune **/.github
+
+prune extern/qfr/extern/json/benchmarks
+prune extern/qfr/extern/json/include
+prune extern/qfr/extern/json/third_party
+prune extern/qfr/extern/dd_package/extern
