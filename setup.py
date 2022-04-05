@@ -106,6 +106,7 @@ setup(
     },
     classifiers=[
         'Development Status :: 5 - Production/Stable',
+        'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
@@ -119,11 +120,11 @@ setup(
         "Natural Language :: English",
         "Topic :: Scientific/Engineering :: Electronic Design Automation (EDA)",
     ],
-    keywords="mqt quantum verification",
+    keywords="MQT quantum verification",
     project_urls={
         'Source': 'https://github.com/cda-tum/qcec/',
         'Tracker': 'https://github.com/cda-tum/qcec/issues',
         'Research': 'https://www.cda.cit.tum.de/research/quantum_verification/',
-        'documentation': 'https://qcec.readthedocs.io'
+        'Documentation': 'https://qcec.readthedocs.io'
     }
 )
