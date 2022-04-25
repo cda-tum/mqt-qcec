@@ -102,6 +102,8 @@ setup(
     cmdclass={"build_ext": CMakeBuild},
     zip_safe=False,
     packages=find_namespace_packages(include=['mqt.*']),
+    include_package_data=True,
+    package_data={'': ['profiles/*.profile']},
     extras_require={
         "tests": ["pytest~=7.1.1", "qiskit-terra>=0.19.2,<0.21.0"],
         "docs": ["sphinx==4.4.0", "sphinx-rtd-theme==1.0.0", "sphinxcontrib-bibtex==2.4.2", "sphinx-copybutton==0.4.0"]
