@@ -1,6 +1,7 @@
 from typing import List, Optional, Any, Tuple, Set, Dict
 from enum import Enum
 from qiskit import QuantumCircuit
+from mqt.qcec import EquivalenceCheckingManager
 
 import numpy as np
 from pathlib import Path
@@ -292,6 +293,15 @@ def find_continuation(profile_data: Dict[Tuple[str, int], int], gate: str, cutof
             break
         sequence.append(next_term)
         profile_data[(gate, max_controls + i + 1)] = next_term
+
+
+def setup_compilation_flow_verification(ecm: EquivalenceCheckingManager, optimization_level: int = 1, ancilla_mode: AncillaMode = AncillaMode.NO_ANCILLA) -> None:
+    import pkg_resources
+
+    ecm.set_application_scheme("gate_cost")
+    profile = pkg_resources.resource_filename(__name__, 'profiles/' + generate_profile_name(optimization_level=optimization_level, mode=ancilla_mode))
+
+    ecm.set_gate_cost_profile(str(Path(__file__).resolve().parent.joinpath(profile)))
 
 
 if __name__ == "__main__":

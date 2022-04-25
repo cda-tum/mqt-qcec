@@ -4,5 +4,6 @@
 #
 
 from mqt.qcec.pyqcec import ApplicationScheme, StateType, EquivalenceCriterion, EquivalenceCheckingManager, Configuration
+from mqt.qcec.compilation_flow_profiles import setup_compilation_flow_verification
 
-__all__ = ["ApplicationScheme", "StateType", "EquivalenceCriterion", "EquivalenceCheckingManager", "Configuration"]
+__all__ = ["ApplicationScheme", "StateType", "EquivalenceCriterion", "EquivalenceCheckingManager", "Configuration", "setup_compilation_flow_verification"]
