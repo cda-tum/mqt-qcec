@@ -5,6 +5,13 @@ from qiskit import QuantumCircuit
 import numpy as np
 from pathlib import Path
 
+
+class AncillaMode(str, Enum):
+    NO_ANCILLA = "noancilla"
+    RECURSION = "recursion"
+    V_CHAIN = "v-chain"
+
+
 single_qubit_gates_no_params = {
     "qubits": 1,
     "params": 0,
@@ -70,7 +77,7 @@ mcx_no_ancilla = {
     "qubits": 1,
     "params": 0,
     "controls": control_range,
-    "mode": "noancilla",
+    "mode": AncillaMode.NO_ANCILLA,
     "ancilla_qubits": 0,
     "gates": ["x"]
 }
@@ -78,7 +85,7 @@ mcx_recursion = {
     "qubits": 1,
     "params": 0,
     "controls": control_range,
-    "mode": "recursion",
+    "mode": AncillaMode.RECURSION,
     "ancilla_qubits": 1,
     "gates": ["x"]
 }
@@ -86,7 +93,7 @@ mcx_v_chain = {
     "qubits": 1,
     "params": 0,
     "controls": control_range,
-    "mode": "v-chain",
+    "mode": AncillaMode.V_CHAIN,
     "ancilla_qubits": None,
     "gates": ["x"]
 }
@@ -130,7 +137,7 @@ def create_general_gate(qubits: int, params: int, controls: int, identifier: str
     return qc
 
 
-def create_multi_controlled_gate(qubits: int, params: int, controls: int, mode: Optional[str], ancilla_qubits: Optional[int], identifier: str) -> QuantumCircuit:
+def create_multi_controlled_gate(qubits: int, params: int, controls: int, mode: Optional[AncillaMode], ancilla_qubits: Optional[int], identifier: str) -> QuantumCircuit:
     import random
 
     required_qubits = qubits + controls
@@ -219,7 +226,7 @@ def add_special_case_data(profile_data: Dict[Tuple[str, int], int], special_case
                 profile_data.setdefault((gate, nc), cost)
 
 
-def generate_profile_name(optimization_level: int = 1, mode: str = "noancilla") -> str:
+def generate_profile_name(optimization_level: int = 1, mode: AncillaMode = AncillaMode.NO_ANCILLA) -> str:
     return "qiskit_O" + str(optimization_level) + "_" + mode + ".profile"
 
 
@@ -290,9 +297,9 @@ def find_continuation(profile_data: Dict[Tuple[str, int], int], gate: str, cutof
 if __name__ == "__main__":
     optimization_levels = [0, 1, 2, 3]
     modes = {
-        "noancilla": multi_controlled_gates_no_ancilla,
-        "recursion": multi_controlled_gates_recursion,
-        "v-chain": multi_controlled_gates_v_chain
+        AncillaMode.NO_ANCILLA: multi_controlled_gates_no_ancilla,
+        AncillaMode.RECURSION: multi_controlled_gates_recursion,
+        AncillaMode.V_CHAIN: multi_controlled_gates_v_chain
     }
 
     for optimization_level in optimization_levels:
