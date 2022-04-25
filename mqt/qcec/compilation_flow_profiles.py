@@ -334,6 +334,6 @@ if __name__ == "__main__":
             # write profile data to file
             filename = generate_profile_name(optimization_level=optimization_level, mode=mode)
 
-            filename = Path(filename).resolve().parent.joinpath("profiles/" + filename)
+            filename = Path(__file__).resolve().parent.joinpath("profiles/" + filename)
             write_profile_data_to_file(specific_profile, filename)
             print(f'Wrote profile data to {filename}')
