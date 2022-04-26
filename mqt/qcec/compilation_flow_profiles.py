@@ -1,4 +1,4 @@
-from typing import List, Optional, Any, Tuple, Set, Dict
+from typing import List, Optional, Any, Tuple, Dict
 from enum import Enum
 from qiskit import QuantumCircuit
 from mqt.qcec import EquivalenceCheckingManager
