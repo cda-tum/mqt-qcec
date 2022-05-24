@@ -10,9 +10,9 @@ If you have any questions, feel free to contact us via `quantum.cda@xcit.tum.de 
 
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
 
+   Applications
    Installation
    Library
-   Applications
    Publications
