@@ -1,4 +1,7 @@
 from importlib.metadata import version
+import pybtex.plugin
+from pybtex.style.formatting.unsrt import Style as UnsrtStyle
+from pybtex.style.template import field, href
 
 # -- Project information -----------------------------------------------------
 project = 'QCEC'
@@ -20,8 +23,18 @@ extensions = [
     "sphinx_copybutton"
 ]
 
+
+class CDAStyle(UnsrtStyle):
+    def format_url(self, e):
+        url = field('url', raw=True)
+        return href()[url, '[PDF]']
+
+
+pybtex.plugin.register_plugin(
+    'pybtex.style.formatting', 'cda_style', CDAStyle)
+
 bibtex_bibfiles = ['refs.bib']
-bibtex_reference_style = 'author_year'
+bibtex_default_style = 'cda_style'
 
 copybutton_prompt_text = r"(?:\(venv\) )?\$ "
 copybutton_prompt_is_regexp = True
