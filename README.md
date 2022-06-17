@@ -30,14 +30,11 @@ The following code gives an example on the usage:
 ```python3
 from mqt import qcec
 
-# initialize the equivalence checker
-ecm = qcec.EquivalenceCheckingManager("circ1.qasm", "circ2.qasm")
+# verify the equivalence of two circuits provided as qasm files
+result = qcec.verify("circ1.qasm", "circ2.qasm")
 
-# execute the check
-ecm.run()
-
-# obtain the result
-print(ecm.equivalence())
+# print the result
+print(result.equivalence)
 ```
 
 ## System Requirements and Building
