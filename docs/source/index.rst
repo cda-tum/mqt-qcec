@@ -12,7 +12,8 @@ If you have any questions, feel free to contact us via `quantum.cda@xcit.tum.de 
 .. toctree::
    :maxdepth: 3
 
-   Applications
+   EquivalenceChecking
+   CompilationFlowVerification
    Installation
    Library
    Publications

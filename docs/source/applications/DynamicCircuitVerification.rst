@@ -1,2 +1,0 @@
-Verifying Dynamic Quantum Circuits
-==================================

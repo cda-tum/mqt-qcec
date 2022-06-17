@@ -1,2 +1,0 @@
-Random Stimuli Generation
-=========================
