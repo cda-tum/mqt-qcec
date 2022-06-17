@@ -16,12 +16,8 @@ if __name__ == "__main__":
     circ_comp = transpile(circ, backend=FakeAthens(), optimization_level=optimization_level)
     print(circ_comp.draw(fold=-1))
 
-    # initialize the equivalence checker
-    ecm = qcec.EquivalenceCheckingManager(circ, circ_comp)
-    qcec.setup_compilation_flow_verification(ecm, optimization_level=optimization_level)
-
-    # execute the check
-    ecm.run()
+    # verify the compilation
+    result = qcec.verify_compilation(circ, circ_comp, optimization_level=optimization_level)
 
     # obtain the result
-    print(ecm.equivalence())
+    print(result.equivalence)
