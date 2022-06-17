@@ -1,9 +1,9 @@
 from qiskit import QuantumCircuit, transpile
-from qiskit.test.mock import FakeLondon
+from qiskit.test.mock import FakeAthens
 from mqt import qcec
 
 if __name__ == "__main__":
-    # create your quantum circuit
+    # create quantum circuit for GHZ state
     circ = QuantumCircuit(3)
     circ.h(0)
     circ.cx(0, 1)
@@ -11,15 +11,13 @@ if __name__ == "__main__":
     circ.measure_all()
     print(circ.draw(fold=-1))
 
-    # compile circuit to 5 qubit London Architecture
-    circ_comp = transpile(circ, backend=FakeLondon())
+    # compile the circuit to the 5-qubit IBMQ Athens architecture
+    optimization_level = 1
+    circ_comp = transpile(circ, backend=FakeAthens(), optimization_level=optimization_level)
     print(circ_comp.draw(fold=-1))
 
-    # initialize the equivalence checker
-    ecm = qcec.EquivalenceCheckingManager(circ, circ_comp)
-
-    # execute the check
-    ecm.run()
+    # verify the compilation
+    result = qcec.verify_compilation(circ, circ_comp, optimization_level=optimization_level)
 
     # obtain the result
-    print(ecm.equivalence())
+    print(result.equivalence)

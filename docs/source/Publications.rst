@@ -1,7 +1,7 @@
 Publications
 ============
 
-*QCEC* is academic software. Thus, many of its built-in algorithms have been published as scientific papers
+*QCEC* is academic software. Thus, many of its built-in algorithms have been published as scientific papers.
 
 If you use *QCEC* in your work, we would appreciate if you cited :cite:labelpar:`burgholzer2021advanced`.
 

@@ -31,18 +31,15 @@ First, save the following lines as :code:`ghz_3.py` in a folder where you want t
         circ.measure_all()
         print(circ.draw(fold=-1))
 
-        # compile circuit to 5 qubit London Architecture
+        # compile circuit to 5-qubit London Architecture
         circ_comp = transpile(circ, backend=FakeLondon())
         print(circ_comp.draw(fold=-1))
 
-        # initialize the equivalence checker
-        ecm = qcec.EquivalenceCheckingManager(circ, circ_comp)
+        # verify the equivalence of both circuits
+        result = qcec.verify(circ, circ_comp)
 
-        # execute the check
-        ecm.run()
-
-        # obtain the result
-        print(ecm.equivalence())
+        # print the result
+        print(result.equivalence)
 
 Then, the following snippet shows the installation process from setting up the virtual environment to running a small example program.
 

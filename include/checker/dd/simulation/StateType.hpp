@@ -28,11 +28,11 @@ namespace ec {
     }
 
     inline StateType stateTypeFromString(const std::string& type) {
-        if (type == "computational_basis" || type == "0") {
+        if (type == "computational_basis" || type == "0" || type == "classical") {
             return StateType::ComputationalBasis;
-        } else if (type == "random_1Q_basis" || type == "1") {
+        } else if (type == "random_1Q_basis" || type == "1" || type == "local_quantum") {
             return StateType::Random1QBasis;
-        } else if (type == "stabilizer" || type == "2") {
+        } else if (type == "stabilizer" || type == "2" || type == "global_quantum") {
             return StateType::Stabilizer;
         } else {
             throw std::runtime_error("Unknown quantum state type: " + type);

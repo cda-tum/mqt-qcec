@@ -37,13 +37,13 @@ namespace ec {
     }
 
     inline ApplicationSchemeType applicationSchemeFromString(const std::string& applicationScheme) {
-        if (applicationScheme == "sequential" || applicationScheme == "0") {
+        if (applicationScheme == "sequential" || applicationScheme == "0" || applicationScheme == "reference") {
             return ApplicationSchemeType::Sequential;
-        } else if (applicationScheme == "one_to_one" || applicationScheme == "1") {
+        } else if (applicationScheme == "one_to_one" || applicationScheme == "1" || applicationScheme == "naive") {
             return ApplicationSchemeType::OneToOne;
         } else if (applicationScheme == "lookahead" || applicationScheme == "2") {
             return ApplicationSchemeType::Lookahead;
-        } else if (applicationScheme == "gate_cost" || applicationScheme == "3") {
+        } else if (applicationScheme == "gate_cost" || applicationScheme == "3" || applicationScheme == "compilation_flow") {
             return ApplicationSchemeType::GateCost;
         } else if (applicationScheme == "proportional" || applicationScheme == "4") {
             return ApplicationSchemeType::Proportional;

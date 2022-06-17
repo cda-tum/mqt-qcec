@@ -137,20 +137,26 @@ namespace ec {
         return createManagerFromConfiguration(circ1, circ2, configuration);
     }
 
+    ec::EquivalenceCheckingManager::Results verify(const py::object& circ1, const py::object& circ2, const Configuration& configuration) {
+        auto ecm = createManagerFromConfiguration(circ1, circ2, configuration);
+        ecm->run();
+        return ecm->getResults();
+    }
+
     PYBIND11_MODULE(pyqcec, m) {
         m.doc() = "Python interface for the MQT QCEC quantum circuit equivalence checking tool";
 
         py::enum_<ApplicationSchemeType>(m, "ApplicationScheme")
                 .value("sequential", ApplicationSchemeType::Sequential,
-                       "Applies all gates from the first circuit, before proceeding with the second circuit.")
+                       "Applies all gates from the first circuit, before proceeding with the second circuit. Referred to as *reference* in :cite:p:`burgholzer2021advanced`.")
                 .value("one_to_one", ApplicationSchemeType::OneToOne,
-                       "Alternates between applications from the first and the second circuit.")
+                       "Alternates between applications from the first and the second circuit. Referred to as *naive* in :cite:p:`burgholzer2021advanced`.")
                 .value("proportional", ApplicationSchemeType::Proportional,
                        "For every gate of the first circuit, proportionally many are applied from the second circuit according to the difference in the number of gates.")
                 .value("lookahead", ApplicationSchemeType::Lookahead,
                        "Looks whether an application from the first circuit or the second circuit yields the smaller decision diagram. Only works for the :attr:`alternating checker <.Configuration.Execution.run_alternating_checker>`.")
                 .value("gate_cost", ApplicationSchemeType::GateCost,
-                       "Each gate of the first circuit is associated with a corresponding cost according to some cost function *f(...)*. Whenever a gate *g* from the first circuit is applied *f(g)* gates are applied from the second circuit.")
+                       "Each gate of the first circuit is associated with a corresponding cost according to some cost function *f(...)*. Whenever a gate *g* from the first circuit is applied *f(g)* gates are applied from the second circuit. Referred to as *compilation_flow* in :cite:p:`burgholzer2020verifyingResultsIBM`.")
                 .def(py::init([](const std::string& str) -> ApplicationSchemeType { return applicationSchemeFromString(str); }))
                 .def(
                         "__str__", [](ApplicationSchemeType scheme) { return toString(scheme); }, py::prepend());
@@ -158,11 +164,11 @@ namespace ec {
 
         py::enum_<StateType>(m, "StateType")
                 .value("computational_basis", StateType::ComputationalBasis,
-                       "Randomly choose computational basis states.")
+                       "Randomly choose computational basis states. Also referred to as *classical*.")
                 .value("random_1Q_basis", StateType::Random1QBasis,
-                       "Randomly choose a single-qubit basis state for each qubit from the six-tuple *(|0>, |1>, |+>, |->, |L>, |R>)*.")
+                       "Randomly choose a single-qubit basis state for each qubit from the six-tuple *(|0>, |1>, |+>, |->, |L>, |R>)*. Also referred to as *local_random*.")
                 .value("stabilizer", StateType::Stabilizer,
-                       "Randomly choose a stabilizer state by creating a random Clifford circuit.")
+                       "Randomly choose a stabilizer state by creating a random Clifford circuit. Also referred to as *global_random*.")
                 .def(py::init([](const std::string& str) -> StateType { return stateTypeFromString(str); }))
                 .def(
                         "__str__", [](StateType type) { return toString(type); }, py::prepend());
@@ -370,6 +376,11 @@ namespace ec {
                 .def_readwrite("seed", &Configuration::Simulation::seed, "The seed used in the quantum state generator. Defaults to :code:`0`, which means that the seed is chosen non-deterministically for each program run.")
                 .def_readwrite("store_cex_input", &Configuration::Simulation::storeCEXinput, "Whether to store the input state that has lead to the determination of a counterexample. Since the memory required to store a full representation of a quantum state increases exponentially, this is only recommended for a small number of qubits and defaults to :code:`False`.")
                 .def_readwrite("store_cex_output", &Configuration::Simulation::storeCEXoutput, "Whether to store the resulting states that prove the non-equivalence of both circuits. Since the memory required to store a full representation of a quantum state increases exponentially, this is only recommended for a small number of qubits and defaults to :code:`False`.");
+
+        m.def("verify", &verify,
+              "circ1"_a, "circ2"_a,
+              "config"_a = ec::Configuration{},
+              "Convenience function for verifying the equivalence of two circuits. Wraps creating an instance of :class:`EquivalenceCheckingManager <.EquivalenceCheckingManager>`, calling :meth:`EquivalenceCheckingManager.run` and calling :meth:`EquivalenceCheckingManager.get_result`.");
 
 #ifdef VERSION_INFO
         m.attr("__version__") = MACRO_STRINGIFY(VERSION_INFO);
