@@ -9,7 +9,7 @@ namespace ec {
 
     template<class DDType, class DDPackage>
     DDEquivalenceChecker<DDType, DDPackage>::DDEquivalenceChecker(const qc::QuantumComputation& qc1, const qc::QuantumComputation& qc2, Configuration configuration) noexcept:
-        EquivalenceChecker(qc1, qc2, configuration),
+        EquivalenceChecker(qc1, qc2, std::move(configuration)),
         dd(std::make_unique<DDPackage>(nqubits)),
         taskManager1(TaskManager<DDType, DDPackage>(qc1, dd)),
         taskManager2(TaskManager<DDType, DDPackage>(qc2, dd)) {

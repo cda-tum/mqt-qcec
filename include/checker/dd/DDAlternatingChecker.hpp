@@ -11,8 +11,8 @@
 namespace ec {
     class DDAlternatingChecker: public DDEquivalenceChecker<qc::MatrixDD, AlternatingDDPackage> {
     public:
-        DDAlternatingChecker(const qc::QuantumComputation& qc1, const qc::QuantumComputation& qc2, const ec::Configuration& configuration):
-            DDEquivalenceChecker(qc1, qc2, configuration) {
+        DDAlternatingChecker(const qc::QuantumComputation& qc1, const qc::QuantumComputation& qc2, ec::Configuration configuration):
+            DDEquivalenceChecker(qc1, qc2, std::move(configuration)) {
             // gates from the second circuit shall be applied "from the right"
             taskManager2.flipDirection();
 
