@@ -15,7 +15,8 @@ namespace ec {
         NoInformation             = 2,
         ProbablyEquivalent        = 3,
         EquivalentUpToGlobalPhase = 4,
-        EquivalentUpToPhase       = 5
+        EquivalentUpToPhase       = 5,
+        ProbablyNotEquivalent
     };
 
     inline std::string toString(const EquivalenceCriterion& criterion) noexcept {

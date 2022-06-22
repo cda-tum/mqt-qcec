@@ -5,6 +5,9 @@
 
 #include "EquivalenceCheckingManager.hpp"
 
+#include <iostream>
+#include <memory>
+
 namespace ec {
     void EquivalenceCheckingManager::setupAncillariesAndGarbage() {
         auto&          largerCircuit   = qc1.getNqubits() > qc2.getNqubits() ? this->qc1 : this->qc2;
@@ -340,6 +343,21 @@ namespace ec {
             }
         }
 
+        if (configuration.execution.runZXChecker && !done) {
+            checkers.emplace_back(std::make_unique<ZXEquivalenceChecker>(qc1, qc2, configuration));
+            auto&      zxChecker = checkers.back();
+            const auto result    = zxChecker->run();
+
+            // if the construction check produces a result, this is final
+            if (result != EquivalenceCriterion::NoInformation) {
+                results.equivalence = result;
+
+                // everything is done
+                done = true;
+                doneCond.notify_one();
+            }
+        }
+
         const auto end    = std::chrono::steady_clock::now();
         results.checkTime = std::chrono::duration<double>(end - start).count();
 
@@ -365,6 +383,7 @@ namespace ec {
         const auto maxThreads      = configuration.execution.nthreads;
         const auto runAlternating  = configuration.execution.runAlternatingChecker;
         const auto runConstruction = configuration.execution.runConstructionChecker;
+        const auto runZX           = configuration.execution.runZXChecker;
         const auto runSimulation   = configuration.execution.runSimulationChecker && configuration.simulation.maxSims > 0;
 
         const std::size_t tasksToExecute = configuration.simulation.maxSims +
@@ -400,6 +419,16 @@ namespace ec {
                 checkers[id] = std::make_unique<DDConstructionChecker>(qc1, qc2, configuration);
                 if (!done)
                     checkers[id]->run();
+                queue.push(id);
+            });
+            ++id;
+        }
+
+        if (runZX) {
+            // start a new thread that constructs and runs the ZX checker
+            threads.emplace_back([&, id] {
+                checkers[id] = std::make_unique<ZXEquivalenceChecker>(qc1, qc2, configuration);
+                checkers[id]->run();
                 queue.push(id);
             });
             ++id;
@@ -447,6 +476,7 @@ namespace ec {
             // in case non-equivalence has been shown, the execution can be stopped
             auto*      checker = checkers.at(*completedID).get();
             const auto result  = checker->getEquivalence();
+
             if (result == EquivalenceCriterion::NoInformation) {
                 std::clog << "Finished equivalence check provides no information. Something probably went wrong. Exiting." << std::endl;
                 break;
@@ -477,6 +507,16 @@ namespace ec {
                 setAndSignalDone();
                 results.equivalence = result;
                 break;
+            }
+
+            if (dynamic_cast<ZXEquivalenceChecker*>(checker)) {
+                results.equivalence = result;
+                if (result == EquivalenceCriterion::EquivalentUpToGlobalPhase) {
+                    setAndSignalDone();
+                    break;
+                }
+                results.equivalence = result;
+                // The ZX checker cannot conclude non-equivalence so we do not stop the run
             }
 
             // at this point, the only option is that this is a simulation checker
