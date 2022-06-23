@@ -112,7 +112,6 @@ TEST_P(SimpleCircuitIdentitiesTest, DefaultOptionsOnlyZX) {
 
     EXPECT_NO_THROW(ecm->run(););
     EXPECT_TRUE(ecm->getResults().consideredEquivalent());
-    std::cout << ecm->toString() << std::endl;
 }
 
 TEST_P(SimpleCircuitIdentitiesTest, GateCostApplicationScheme) {
