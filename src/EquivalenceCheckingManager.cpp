@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <memory>
+#include <string>
 
 namespace ec {
     void EquivalenceCheckingManager::setupAncillariesAndGarbage() {
@@ -386,9 +387,10 @@ namespace ec {
         const auto runZX           = configuration.execution.runZXChecker;
         const auto runSimulation   = configuration.execution.runSimulationChecker && configuration.simulation.maxSims > 0;
 
-        const std::size_t tasksToExecute = configuration.simulation.maxSims +
+        const std::size_t tasksToExecute = configuration.simulation.maxSims * (static_cast<int>(runSimulation)) +
                                            (runAlternating ? 1U : 0U) +
-                                           (runConstruction ? 1U : 0U);
+                                           (runConstruction ? 1U : 0U) +
+                                           (runZX ? 1U : 0U);
 
         const auto effectiveThreads = std::min(maxThreads, tasksToExecute);
 
@@ -424,11 +426,12 @@ namespace ec {
             ++id;
         }
 
-        if (runZX) {
+        if (runZX && !done) {
             // start a new thread that constructs and runs the ZX checker
             threads.emplace_back([&, id] {
                 checkers[id] = std::make_unique<ZXEquivalenceChecker>(qc1, qc2, configuration);
-                checkers[id]->run();
+                if (!done)
+                    checkers[id]->run();
                 queue.push(id);
             });
             ++id;
@@ -511,12 +514,11 @@ namespace ec {
 
             if (dynamic_cast<ZXEquivalenceChecker*>(checker)) {
                 results.equivalence = result;
-                if (result == EquivalenceCriterion::EquivalentUpToGlobalPhase) {
+                if (result == EquivalenceCriterion::EquivalentUpToGlobalPhase || (result == EquivalenceCriterion::ProbablyNotEquivalent && !(runAlternating || runConstruction || runSimulation))) {
                     setAndSignalDone();
                     break;
                 }
-                results.equivalence = result;
-                // The ZX checker cannot conclude non-equivalence so we do not stop the run
+                // The ZX checker cannot conclude non-equivalence so the run is not stopped
             }
 
             // at this point, the only option is that this is a simulation checker
@@ -540,7 +542,7 @@ namespace ec {
                     ++results.startedSimulations;
                 } else {
                     // in case only simulations are performed and every single one is done, everything is done
-                    if (!runAlternating && !runConstruction && results.performedSimulations == configuration.simulation.maxSims) {
+                    if (!runAlternating && !runConstruction && !runZX && results.performedSimulations == configuration.simulation.maxSims) {
                         setAndSignalDone();
                         break;
                     }

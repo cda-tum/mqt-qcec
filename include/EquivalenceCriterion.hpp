@@ -31,6 +31,8 @@ namespace ec {
                 return "equivalent_up_to_global_phase";
             case EquivalenceCriterion::EquivalentUpToPhase:
                 return "equivalent_up_to_phase";
+            case EquivalenceCriterion::ProbablyNotEquivalent:
+                return "probably_not_equivalent";
             case EquivalenceCriterion::NoInformation:
             default:
                 return "no_information";

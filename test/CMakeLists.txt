@@ -26,14 +26,14 @@ macro(package_add_test TESTNAME)
 endmacro()
 
 package_add_test(${PROJECT_NAME}_test
-                 # legacy/test_functionality.cpp
-                 # legacy/test_journal.cpp
-                 # legacy/test_compilationflow.cpp
-                 # legacy/test_general.cpp
-                 # legacy/test_simulation.cpp
+                 legacy/test_functionality.cpp
+                 legacy/test_journal.cpp
+                 legacy/test_compilationflow.cpp
+                 legacy/test_general.cpp
+                 legacy/test_simulation.cpp
                  test_simple_circuit_identities.cpp
-                 # test_gate_cost_application_scheme.cpp
-                 # test_equality.cpp
+                 test_gate_cost_application_scheme.cpp
+                 test_equality.cpp
                )
 
 add_custom_command(TARGET ${PROJECT_NAME}_test
