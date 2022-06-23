@@ -5,10 +5,11 @@
 #include "zx/FunctionalityConstruction.hpp"
 
 #include <chrono>
+#include <iostream>
 
 namespace ec {
     ZXEquivalenceChecker::ZXEquivalenceChecker(const qc::QuantumComputation& qc1, const qc::QuantumComputation& qc2, Configuration configuration) noexcept:
-        EquivalenceChecker(qc1, qc2, std::move(configuration)), miter(zx::FunctionalityConstruction::buildFunctionality(&qc1)) {
+        EquivalenceChecker(qc1, qc2, std::move(configuration)), miter(zx::FunctionalityConstruction::buildFunctionality(&qc1)), tolerance(configuration.functionality.traceThreshold) {
         zx::ZXDiagram dPrime = zx::FunctionalityConstruction::buildFunctionality(&qc2);
         miter.invert();
         miter.concat(dPrime);
@@ -16,9 +17,8 @@ namespace ec {
 
     EquivalenceCriterion ZXEquivalenceChecker::run() {
         const auto start = std::chrono::steady_clock::now();
-        zx::fullReduce(miter);
+        zx::fullReduceApproximate(miter, tolerance);
         bool equivalent = true;
-
         if (miter.getNEdges() == miter.getNQubits()) {
             // check if permutation of miter matches output permutations of input circuits
             const qc::Permutation& p1 = qc1.outputPermutation;
@@ -41,7 +41,6 @@ namespace ec {
 
         const auto end = std::chrono::steady_clock::now();
         runtime += std::chrono::duration<double>(end - start).count();
-
         equivalence = equivalent ? EquivalenceCriterion::EquivalentUpToGlobalPhase : EquivalenceCriterion::ProbablyNotEquivalent;
         return equivalence;
     }

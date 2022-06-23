@@ -29,6 +29,7 @@ protected:
         config.optimizations.reconstructSWAPs     = false;
         config.optimizations.fuseSingleQubitGates = false;
         config.optimizations.reorderOperations    = false;
+        config.execution.runZXChecker             = true;
         EXPECT_NO_THROW(ecm = std::make_unique<ec::EquivalenceCheckingManager>(qcOriginal, qcAlternative, config););
     }
 
@@ -108,11 +109,9 @@ TEST_P(SimpleCircuitIdentitiesTest, DefaultOptionsOnlyZX) {
     ecm->setSimulationChecker(false);
     ecm->setConstructionChecker(false);
     ecm->setZXChecker(true);
-    // ecm->setParallel(false);
 
     EXPECT_NO_THROW(ecm->run(););
     EXPECT_TRUE(ecm->getResults().consideredEquivalent());
-    std::cout << "blah" << std::endl;
     std::cout << ecm->toString() << std::endl;
 }
 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Configuration.hpp"
+#include "Definitions.hpp"
 #include "EquivalenceCriterion.hpp"
 #include "QuantumComputation.hpp"
 #include "ZXDiagram.hpp"
@@ -20,5 +21,6 @@ namespace ec {
 
     private:
         zx::ZXDiagram miter;
+        zx::fp        tolerance = zx::TOLERANCE;
     };
 } // namespace ec

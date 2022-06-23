@@ -79,6 +79,20 @@ TEST_F(EqualityTest, CloseButNotEqualConstruction) {
     EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::Equivalent);
 }
 
+TEST_F(EqualityTest, CloseButNotEqualZX) {
+    qc1.x(0);
+
+    qc2.x(0);
+    qc2.phase(0, dd::PI / 1024.);
+
+    config.functionality.traceThreshold = 1e-2;
+    config.execution.runZXChecker       = true;
+    ec::EquivalenceCheckingManager ecm(qc1, qc2, config);
+    ecm.run();
+    std::cout << ecm << std::endl;
+    EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::EquivalentUpToGlobalPhase);
+}
+
 TEST_F(EqualityTest, CloseButNotEqualAlternatingGlobalPhase) {
     qc1.x(0);
 
