@@ -43,9 +43,10 @@ There are two ways of configuring the manager at construction time, e.g., in ord
 
         ecm = EquivalenceCheckingManager(circ1=qc1, circ2=qc2, timeout=60.)
 
-  Every keyword argument that takes an enum value can either be conveniently specified as a string (e.g., :code:`state_type="stabilizer"`) or by providing the respective enum value (e.g., :code:`state_type=qcec.StateType.stabilizer`).
+.. note::
+    Every keyword argument that takes an enum value can either be conveniently specified as a string (e.g., :code:`state_type="stabilizer"`) or by providing the respective enum value (e.g., :code:`state_type=qcec.StateType.stabilizer`).
 
-    .. automethod:: EquivalenceCheckingManager.__init__
+.. automethod:: EquivalenceCheckingManager.__init__
 
 Configuration after instantiation
 #################################
