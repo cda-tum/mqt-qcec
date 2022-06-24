@@ -1,6 +1,9 @@
 /build*
 /cmake-build-*
-.idea/
+/.idea/*
+!/.idea/runConfigurations
+!/.idea/cmake.xml
+.cache/
 
 __pycache__/
 *.so
@@ -20,3 +23,11 @@ var/
 .installed.cfg
 *.egg
 .pytest_cache/
+
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
