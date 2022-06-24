@@ -24,6 +24,7 @@ class EqualityTest: public testing::Test {
         config.execution.runSimulationChecker   = false;
         config.execution.runAlternatingChecker  = false;
         config.execution.runConstructionChecker = false;
+        config.execution.runZXChecker           = false;
     }
 
     void TearDown() override {}

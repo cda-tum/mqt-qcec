@@ -76,6 +76,7 @@ namespace ec {
                                                                          bool                 runConstructionChecker = false,
                                                                          bool                 runSimulationChecker   = true,
                                                                          bool                 runAlternatingChecker  = true,
+                                                                         bool                 runZXChecker           = false,
                                                                          // Optimization
                                                                          bool fixOutputPermutationMismatch     = false,
                                                                          bool fuseSingleQubitGates             = true,
@@ -106,6 +107,7 @@ namespace ec {
         configuration.execution.runConstructionChecker = runConstructionChecker;
         configuration.execution.runSimulationChecker   = runSimulationChecker;
         configuration.execution.runAlternatingChecker  = runAlternatingChecker;
+        configuration.execution.runZXChecker           = runZXChecker;
         // Optimization
         configuration.optimizations.fixOutputPermutationMismatch     = fixOutputPermutationMismatch;
         configuration.optimizations.fuseSingleQubitGates             = fuseSingleQubitGates;
@@ -207,6 +209,7 @@ namespace ec {
                 "run_construction_checker"_a             = false,
                 "run_simulation_checker"_a               = true,
                 "run_alternating_checker"_a              = true,
+                "run_zx_checker"_a                       = false,
                 "fix_output_permutation_mismatch"_a      = false,
                 "fuse_single_qubit_gates"_a              = true,
                 "reconstruct_swaps"_a                    = true,
@@ -246,6 +249,8 @@ namespace ec {
                      "Set whether the :attr:`simulation checker <.Configuration.Execution.run_simulation_checker>` should be executed.")
                 .def("set_alternating_checker", &EquivalenceCheckingManager::setAlternatingChecker, "enable"_a = true,
                      "Set whether the :attr:`alternating checker <.Configuration.Execution.run_alternating_checker>` should be executed.")
+                .def("set_zx_checker", &EquivalenceCheckingManager::setZXChecker, "enable"_a = true,
+                     "Set whether the :attr:`zx checker <.Configuration.Execution.run_alternating_checker>` should be executed.")
                 // Optimization
                 .def("fix_output_permutation_mismatch", &EquivalenceCheckingManager::runFixOutputPermutationMismatch,
                      "Try to :attr:`fix potential mismatches in output permutations <.Configuration.Optimizations.fix_output_permutation_mismatch>`. This is experimental.")
@@ -350,6 +355,7 @@ namespace ec {
                 .def_readwrite("run_construction_checker", &Configuration::Execution::runConstructionChecker, "Set whether the construction checker should be executed. Defaults to :code:`False` since the alternating checker is to be preferred in most cases.")
                 .def_readwrite("run_simulation_checker", &Configuration::Execution::runSimulationChecker, "Set whether the simulation checker should be executed. Defaults to :code:`True` since simulations can quickly show the non-equivalence of circuits in many cases.")
                 .def_readwrite("run_alternating_checker", &Configuration::Execution::runAlternatingChecker, "Set whether the alternating checker should be executed. Defaults to :code:`True` since staying close to the identity can quickly show the equivalence of circuits in many cases.")
+                .def_readwrite("run_zx_checker", &Configuration::Execution::runZXChecker, "Set whether the zx checker should be executed. Defaults to :code:`False` since arbitrary multicontrolled operations are only partially supported.")
                 .def_readwrite("numerical_tolerance", &Configuration::Execution::numericalTolerance, "Set the numerical tolerance of the underlying decision diagram package. Defaults to :code:`~2e-13` and should only be changed by users who know what they are doing.");
 
         optimizations.def(py::init<>())

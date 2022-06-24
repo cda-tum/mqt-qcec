@@ -64,7 +64,7 @@ TEST_F(ZXTest, NonEquivalent) {
 
 TEST_F(ZXTest, Timeout) {
     // construct large circuit
-    constexpr auto numLayers = 5000;
+    constexpr auto numLayers = 10000;
     qcOriginal               = qc::QuantumComputation(2);
     qcAlternative            = qc::QuantumComputation(2);
     for (auto i = 0; i < numLayers; ++i) {

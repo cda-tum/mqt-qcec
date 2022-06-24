@@ -17,6 +17,7 @@ namespace ec {
 
         void json(nlohmann::json& j) const noexcept override {
             EquivalenceChecker::json(j);
+            j["checker"] = "zx";
         }
 
     private:
