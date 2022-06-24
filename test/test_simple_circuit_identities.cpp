@@ -114,6 +114,17 @@ TEST_P(SimpleCircuitIdentitiesTest, DefaultOptionsOnlyZX) {
     EXPECT_TRUE(ecm->getResults().consideredEquivalent());
 }
 
+TEST_P(SimpleCircuitIdentitiesTest, SequentialZX) {
+    ecm->setAlternatingChecker(false);
+    ecm->setSimulationChecker(false);
+    ecm->setConstructionChecker(false);
+    ecm->setZXChecker(true);
+    ecm->setParallel(false);
+
+    EXPECT_NO_THROW(ecm->run(););
+    EXPECT_TRUE(ecm->getResults().consideredEquivalent());
+}
+
 TEST_P(SimpleCircuitIdentitiesTest, GateCostApplicationScheme) {
     ecm->setSimulationChecker(false);
     ecm->setAlternatingApplicationScheme(ec::ApplicationSchemeType::GateCost);
