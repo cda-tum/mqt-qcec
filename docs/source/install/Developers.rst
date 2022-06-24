@@ -11,6 +11,10 @@ Note the :code:`--recurse-submodules` flag. It is required to also clone all the
 
 A C++ compiler supporting *C++17* and a minimum CMake version of *3.14* is required to build the project.
 
+.. note::
+    We noticed some issues when compiling with Microsoft's *MSCV* compiler toolchain. If you want to start development on this project under Windows, consider using the *clang* compiler toolchain. A detailed description of how to set this up can be found `here <https://docs.microsoft.com/en-us/cpp/build/clang-support-msbuild?view=msvc-160>`_.
+
+
 Working on the core C++ library
 ###############################
 
