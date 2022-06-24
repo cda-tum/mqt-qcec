@@ -47,9 +47,11 @@ The :code:`mqt.qcec` Python module can be conveniently built locally by calling
 
     .. code-block:: console
 
-        (venv) $ pip install --editable .
+        (venv) $ pip install --editable .[dev]
 
-The :code:`--editable` flag ensures that changes in the Python code are instantly available without re-running the command.
+The :code:`--editable` flag ensures that changes in the Python code are instantly available without re-running the command. The :code:`[dev]` extra makes sure that all dependencies for running the Python tests and building the documentation are available.
+
+**Disclaimer**: When using the :code:`zsh` shell it might be necessary to add double quotes around the :code:`.[dev]` part of the command.
 
 `Pybind11 <https://pybind11.readthedocs.io/>`_ is used for providing bindings of the C++ core library to Python (see `bindings.cpp <https://github.com/cda-tum/qcec/tree/master/mqt/qcec/bindings.cpp>`_).
 If parts of the C++ code have been changed, the above command has to be run again to make the changes visible in Python.
