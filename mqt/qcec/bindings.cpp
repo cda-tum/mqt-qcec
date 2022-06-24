@@ -139,7 +139,7 @@ namespace ec {
         return createManagerFromConfiguration(circ1, circ2, configuration);
     }
 
-    ec::EquivalenceCheckingManager::Results verify(const py::object& circ1, const py::object& circ2, const Configuration& configuration) {
+    ec::EquivalenceCheckingManager::Results verify(const py::object& circ1, const py::object& circ2, const Configuration& configuration = Configuration()) {
         auto ecm = createManagerFromConfiguration(circ1, circ2, configuration);
         ecm->run();
         return ecm->getResults();
