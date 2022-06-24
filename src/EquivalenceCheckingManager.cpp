@@ -349,13 +349,6 @@ namespace ec {
             auto&      zxChecker = checkers.back();
             const auto result    = zxChecker->run();
 
-            // if the run completed but has not yielded any information this indicates a timeout
-            if (result == EquivalenceCriterion::NoInformation) {
-                if (!done) {
-                    std::clog << "ZX run returned without any information. Something probably went wrong. Exiting!" << std::endl;
-                }
-                return;
-            }
             results.equivalence = result;
             // break if equivalence has been shown
             if (result == EquivalenceCriterion::EquivalentUpToGlobalPhase) {

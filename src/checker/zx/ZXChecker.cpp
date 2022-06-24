@@ -23,7 +23,8 @@ namespace ec {
             // check if permutation of miter matches output permutations of input circuits
             const qc::Permutation& p1 = qc1.outputPermutation;
             const qc::Permutation& p2 = qc2.outputPermutation;
-            qc::Permutation        p;
+
+            qc::Permutation p;
             for (auto& [from_0, to_0]: p1) {
                 auto to   = to_0; //the standard is weird here regarding capturing structure bound variables
                 auto k_v  = std::find_if(p2.begin(), p2.end(), [&](auto& k_v) { return k_v.second == to; });
@@ -42,6 +43,7 @@ namespace ec {
         const auto end = std::chrono::steady_clock::now();
         runtime += std::chrono::duration<double>(end - start).count();
         equivalence = equivalent ? EquivalenceCriterion::EquivalentUpToGlobalPhase : EquivalenceCriterion::ProbablyNotEquivalent;
+
         return equivalence;
     }
 } // namespace ec
