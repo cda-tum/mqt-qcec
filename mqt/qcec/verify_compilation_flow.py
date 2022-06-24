@@ -1,10 +1,13 @@
 import pkg_resources
 from pathlib import Path
+from qiskit import QuantumCircuit
+from typing import Union
+
 from mqt.qcec import EquivalenceCheckingManager, Configuration
 from mqt.qcec.compilation_flow_profiles import AncillaMode, generate_profile_name
 
 
-def verify_compilation(original_circuit, compiled_circuit,
+def verify_compilation(original_circuit: Union[QuantumCircuit, str], compiled_circuit: Union[QuantumCircuit, str],
                        optimization_level: int = 1, ancilla_mode: AncillaMode = AncillaMode.NO_ANCILLA,
                        configuration: Configuration = Configuration()) -> EquivalenceCheckingManager.Results:
     # create the equivalence checker
