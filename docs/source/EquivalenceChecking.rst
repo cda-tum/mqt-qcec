@@ -71,6 +71,26 @@ In :cite:p:`burgholzer2021randomStimuliGenerationQuantum`, several types of stat
 
 **Drawback:** Decision diagrams for state vectors might still be exponentially large in the worst case.
 
+ZX-calculus Equivalence Checker
+###############################
+
+Kissinger and van de Wetering proposed an algorithm for optimizing quantum circuits based on ZX-calculus rewriting.
+In their initial article they also show that this rewriting approach can be used to prove the equivalence of quantum circuits.
+The idea is to construct the ZX-diagram of :math:`G^{\prime -1} G`  and reduce this ZX-diagram using the rules of the ZX-calculus until no further rewrites can be made.
+If the resulting diagram consists only of wires (the identity ZX-diagram) then :math:`G^{\prime} = G`.
+
+In :cite:p:`pehamEquivalenceCheckingParadigms2022` it has been shown that equivalence checking with the ZX-calculus is naturally complementary to equivalence checking with Decision Diagrams.
+Because the size of the ZX-diagram during rewriting is bounded by the size of the initial diagram it can be easily executed in parallel to the aforementioned approaches based on Decision Diagrams.
+In cases where the size of the Decision Diagrams explodes, the rewriting approach can often prove equivalence much more efficiently.
+
+Due to the incompleteness of the rewriting rules this equivalence checker cannot prove non-equivalence.
+
+**Most effective for:** proving equivalence of two circuits involving many rotation gates with rotations of :math:`\frac{\pi}{k}, k\in\mathbb{N}`.
+
+**Capable of showing:** equivalence
+
+**Drawback:** Has to decompose multi-controlled gates which can quickly lead to large ZX-diagrams and slow runtimes.
+
 Resulting Equivalence Checking Flow
 ###################################
 
