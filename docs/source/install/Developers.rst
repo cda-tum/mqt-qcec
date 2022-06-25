@@ -11,6 +11,10 @@ Note the :code:`--recurse-submodules` flag. It is required to also clone all the
 
 A C++ compiler supporting *C++17* and a minimum CMake version of *3.14* is required to build the project.
 
+.. note::
+    We noticed some issues when compiling with Microsoft's *MSCV* compiler toolchain. If you want to start development on this project under Windows, consider using the *clang* compiler toolchain. A detailed description of how to set this up can be found `here <https://docs.microsoft.com/en-us/cpp/build/clang-support-msbuild?view=msvc-160>`_.
+
+
 Working on the core C++ library
 ###############################
 
@@ -47,9 +51,73 @@ The :code:`mqt.qcec` Python module can be conveniently built locally by calling
 
     .. code-block:: console
 
-        (venv) $ pip install --editable .
+        (venv) $ pip install --editable .[dev]
 
-The :code:`--editable` flag ensures that changes in the Python code are instantly available without re-running the command.
+The :code:`--editable` flag ensures that changes in the Python code are instantly available without re-running the command. The :code:`[dev]` extra makes sure that all dependencies for running the Python tests and building the documentation are available.
 
-`Pybind11 <https://pybind11.readthedocs.io/>`_ is used for providing bindings of the C++ core library to Python (see `bindings.cpp <https://github.com/cda-tum/qcec/tree/master/mqt/qcec/bindings.cpp>`_).
+.. note::
+    When using the :code:`zsh` shell it might be necessary to add double quotes around the :code:`.[dev]` part of the command.
+
+`Pybind11 <https://pybind11.readthedocs.io/>`_ is used for providing bindings of the C++ core library to Python (see `bindings.cpp <https://github.com/cda-tum/qcec/tree/main/mqt/qcec/bindings.cpp>`_).
 If parts of the C++ code have been changed, the above command has to be run again to make the changes visible in Python.
+
+Running tests
+#############
+
+C++ core library
+----------------
+
+The C++ part of the code base is tested by unit tests using the `googletest <https://google.github.io/googletest/primer.html>`_ framework.
+The corresponding test files can be found in the :code:`test` directory. In order to build the tests, CMake first has to be configured with the :code:`-DBUILD_QCEC_TESTS=ON` flag, i.e.,
+
+    .. code-block:: console
+
+        $ cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DBUILD_QCEC_TESTS=ON
+
+Then, the test executable :code:`qcec_test` is built in the :code:`build/test` directory by calling
+
+    .. code-block:: console
+
+        $ cmake --build build --config Release --target qcec_test
+
+From there, the tests can be started by simply calling
+
+    .. code-block:: console
+
+        [.../build/test] $ ./qcec_test
+
+Python interface and functionality
+----------------------------------
+
+The Python part of the code base is tested by unit tests using the `pytest <https://docs.pytest.org/en/latest/>`_ framework.
+The corresponding test files can be found in the :code:`test/python` directory.
+To start the tests, simply call
+
+    .. code-block:: console
+
+        (venv) $ python -m pytest ./test/python
+
+.. note::
+    If you haven't already installed the package with the :code:`[dev]` extra as demonstrated above, the necessary dependencies for running the Python tests can be installed by calling
+
+        .. code-block:: console
+
+            (venv) $ pip install --editable .[test]
+
+Building the documentation
+##########################
+
+Building this documentation locally is as easy as calling
+
+    .. code-block:: console
+
+        (venv) [.../docs] $ make clean && make html
+
+The resulting HTML documentation (:code:`index.html`) can be found in the :code:`docs/build/html` directory.
+
+.. note::
+    If you haven't already installed the package with the :code:`[dev]` extra as demonstrated above, the necessary dependencies for building the documentation can be installed by calling
+
+        .. code-block:: console
+
+            (venv) $ pip install --editable .[docs]

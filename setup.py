@@ -106,8 +106,9 @@ setup(
     include_package_data=True,
     package_data={'': ['profiles/*.profile']},
     extras_require={
-        "tests": ["pytest~=7.1.1", "qiskit-terra>=0.19.2,<0.21.0"],
-        "docs": ["sphinx==5.0.2", "sphinx-rtd-theme==1.0.0", "sphinxcontrib-bibtex==2.4.2", "sphinx-copybutton==0.4.0"]
+        "test": ["pytest~=7.1.1", "qiskit-terra>=0.19.2,<0.21.0"],
+        "docs": ["sphinx==5.0.2", "sphinx-rtd-theme==1.0.0", "sphinxcontrib-bibtex==2.4.2", "sphinx-copybutton==0.4.0"],
+        "dev": ["mqt.qcec[test, docs]"]  # requires Pip 21.2 or newer
     },
     classifiers=[
         'Development Status :: 5 - Production/Stable',
