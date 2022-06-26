@@ -64,7 +64,7 @@ In addition, the :class:`~.Configuration` of the manager can be altered after it
         .. automethod:: EquivalenceCheckingManager.set_zx_checker
         .. automethod:: EquivalenceCheckingManager.set_tolerance
 
-* :class:`Optimizations <Configuration.Optimization>`
+* :class:`Optimizations <Configuration.Optimizations>`
     These functions allow to apply specific circuit optimizations that might not have been performed during initialization. Note that already performed optimizations cannot be reverted since they are applied at construction time.
 
         .. automethod:: EquivalenceCheckingManager.fuse_single_qubit_gates
