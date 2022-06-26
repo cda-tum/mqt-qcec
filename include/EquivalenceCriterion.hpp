@@ -16,7 +16,7 @@ namespace ec {
         ProbablyEquivalent        = 3,
         EquivalentUpToGlobalPhase = 4,
         EquivalentUpToPhase       = 5,
-        ProbablyNotEquivalent
+        ProbablyNotEquivalent     = 6
     };
 
     inline std::string toString(const EquivalenceCriterion& criterion) noexcept {
@@ -52,6 +52,8 @@ namespace ec {
             return EquivalenceCriterion::EquivalentUpToPhase;
         } else if (criterion == "no_information" || criterion == "5") {
             return EquivalenceCriterion::NoInformation;
+        } else if (criterion == "probably_not_equivalent" || criterion == "6") {
+            return EquivalenceCriterion::ProbablyNotEquivalent;
         } else {
             throw std::runtime_error("Unknown equivalence criterion: " + criterion);
         }
