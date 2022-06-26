@@ -13,6 +13,7 @@ version = '.'.join(release.split('.')[:3])
 # -- General configuration ---------------------------------------------------
 extensions = [
     "sphinx.ext.autodoc",
+    "sphinx.ext.autosectionlabel",
     "sphinx.ext.intersphinx",
     "sphinx.ext.autosummary",
     "sphinx.ext.mathjax",
@@ -20,8 +21,26 @@ extensions = [
     "sphinx.ext.viewcode",
     "sphinx.ext.githubpages",
     "sphinxcontrib.bibtex",
-    "sphinx_copybutton"
+    "sphinx_copybutton",
+    'hoverxref.extension',
 ]
+
+autosectionlabel_prefix_document = True
+
+hoverxref_auto_ref = True
+hoverxref_domains = ['cite', 'py']
+hoverxref_roles = []
+hoverxref_mathjax = True
+hoverxref_role_types = {
+    'ref': 'tooltip',
+    'p': 'tooltip',
+    'labelpar': 'tooltip',
+    'class': 'tooltip',
+    'meth': 'tooltip',
+    'func': 'tooltip',
+    'attr': 'tooltip',
+    'property': 'tooltip',
+}
 
 
 class CDAStyle(UnsrtStyle):

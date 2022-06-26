@@ -1,7 +1,7 @@
 State Types for Simulation
 ==========================
 
-The type of states that is used in the :attr:`simulation checker <mqt.qcec.Configuration.Execution.run_simulation_checker>` allows to trade off efficiency versus performance.
+The type of states that is used in the :ref:`simulation checker <EquivalenceChecking:Simulation Equivalence Checker (using Decision Diagrams)>` allows to trade off efficiency versus performance.
 
 * Classical stimuli (i.e., random *computational basis states*) already offer extremely high error detection rates in general and are comparatively fast to simulate, which makes them the default.
 

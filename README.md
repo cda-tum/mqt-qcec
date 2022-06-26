@@ -9,8 +9,8 @@
 # MQT QCEC - A tool for Quantum Circuit Equivalence Checking
 
 A tool for quantum circuit equivalence checking developed as part of the *Munich Quantum Toolkit* (*MQT*)[^1] by the [Chair for Design Automation](https://www.cda.cit.tum.de/) at the [Technical University of Munich](https://www.tum.de/).
-It builds upon [our quantum functionality representation (QFR)](https://github.com/cda-tum/qfr)
-and [our decision diagram (DD) package](https://github.com/cda-tum/dd_package.git).
+It builds upon [our quantum functionality representation (QFR)](https://github.com/cda-tum/qfr), [our decision diagram (DD) package](https://github.com/cda-tum/dd_package.git), and [our ZX-diagram package](https://github.com/cda-tum/zx.git)
+.
 
 **Detailed documentation on all available methods, options, and input formats is available at [ReadTheDocs](https://qcec.readthedocs.io/en/latest/).**
 
