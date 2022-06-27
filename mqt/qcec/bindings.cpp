@@ -76,7 +76,7 @@ namespace ec {
                                                                          bool                 runConstructionChecker = false,
                                                                          bool                 runSimulationChecker   = true,
                                                                          bool                 runAlternatingChecker  = true,
-                                                                         bool                 runZXChecker           = false,
+                                                                         bool                 runZXChecker           = true,
                                                                          // Optimization
                                                                          bool fixOutputPermutationMismatch     = false,
                                                                          bool fuseSingleQubitGates             = true,
@@ -211,7 +211,7 @@ namespace ec {
                 "run_construction_checker"_a             = false,
                 "run_simulation_checker"_a               = true,
                 "run_alternating_checker"_a              = true,
-                "run_zx_checker"_a                       = false,
+                "run_zx_checker"_a                       = true,
                 "fix_output_permutation_mismatch"_a      = false,
                 "fuse_single_qubit_gates"_a              = true,
                 "reconstruct_swaps"_a                    = true,
@@ -357,7 +357,7 @@ namespace ec {
                 .def_readwrite("run_construction_checker", &Configuration::Execution::runConstructionChecker, "Set whether the :ref:`construction checker <EquivalenceChecking:Construction Equivalence Checker (using Decision Diagrams)>` should be executed. Defaults to :code:`False` since the :ref:`alternating checker <EquivalenceChecking:Alternating Equivalence Checker (using Decision Diagrams)>` is to be preferred in most cases.")
                 .def_readwrite("run_simulation_checker", &Configuration::Execution::runSimulationChecker, "Set whether the :ref:`simulation checker <EquivalenceChecking:Simulation Equivalence Checker (using Decision Diagrams)>` should be executed. Defaults to :code:`True` since simulations can quickly show the non-equivalence of circuits in many cases.")
                 .def_readwrite("run_alternating_checker", &Configuration::Execution::runAlternatingChecker, "Set whether the :ref:`alternating checker <EquivalenceChecking:Alternating Equivalence Checker (using Decision Diagrams)>` should be executed. Defaults to :code:`True` since staying close to the identity can quickly show the equivalence of circuits in many cases.")
-                .def_readwrite("run_zx_checker", &Configuration::Execution::runZXChecker, "Set whether the :ref:`ZX-calculus checker <EquivalenceChecking:ZX-Calculus Equivalence Checker>` should be executed. Defaults to :code:`False` since arbitrary multi-controlled operations are only partially supported.")
+                .def_readwrite("run_zx_checker", &Configuration::Execution::runZXChecker, "Set whether the :ref:`ZX-calculus checker <EquivalenceChecking:ZX-Calculus Equivalence Checker>` should be executed. Defaults to :code:`True` but arbitrary multi-controlled operations are only partially supported.")
                 .def_readwrite("numerical_tolerance", &Configuration::Execution::numericalTolerance, "Set the numerical tolerance of the underlying decision diagram package. Defaults to :code:`~2e-13` and should only be changed by users who know what they are doing.");
 
         optimizations.def(py::init<>())

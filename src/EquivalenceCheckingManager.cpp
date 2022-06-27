@@ -5,6 +5,8 @@
 
 #include "EquivalenceCheckingManager.hpp"
 
+#include "zx/FunctionalityConstruction.hpp"
+
 #include <iostream>
 #include <memory>
 #include <string>
@@ -345,15 +347,21 @@ namespace ec {
         }
 
         if (configuration.execution.runZXChecker && !done) {
-            checkers.emplace_back(std::make_unique<ZXEquivalenceChecker>(qc1, qc2, configuration));
-            auto&      zxChecker = checkers.back();
-            const auto result    = zxChecker->run();
+            if (zx::FunctionalityConstruction::transformableToZX(&qc1) && zx::FunctionalityConstruction::transformableToZX(&qc1)) {
+                checkers.emplace_back(std::make_unique<ZXEquivalenceChecker>(qc1, qc2, configuration));
+                auto&      zxChecker = checkers.back();
+                const auto result    = zxChecker->run();
 
-            results.equivalence = result;
-            // break if equivalence has been shown
-            if (result == EquivalenceCriterion::EquivalentUpToGlobalPhase) {
-                done = true;
-                doneCond.notify_one();
+                results.equivalence = result;
+                // break if equivalence has been shown
+                if (result == EquivalenceCriterion::EquivalentUpToGlobalPhase) {
+                    done = true;
+                    doneCond.notify_one();
+                }
+            } else if (!configuration.execution.runAlternatingChecker &&
+                       !configuration.execution.runConstructionChecker &&
+                       !configuration.execution.runSimulationChecker) {
+                std::clog << "Only ZX checker specified but Circuit contains operations not supported by this checker!" << std::endl;
             }
         }
 
@@ -425,14 +433,20 @@ namespace ec {
         }
 
         if (runZX && !done) {
-            // start a new thread that constructs and runs the ZX checker
-            threads.emplace_back([&, id] {
-                checkers[id] = std::make_unique<ZXEquivalenceChecker>(qc1, qc2, configuration);
-                if (!done)
-                    checkers[id]->run();
-                queue.push(id);
-            });
-            ++id;
+            if (zx::FunctionalityConstruction::transformableToZX(&qc1) && zx::FunctionalityConstruction::transformableToZX(&qc1)) {
+                // start a new thread that constructs and runs the ZX checker
+                threads.emplace_back([&, id] {
+                    checkers[id] = std::make_unique<ZXEquivalenceChecker>(qc1, qc2, configuration);
+                    if (!done)
+                        checkers[id]->run();
+                    queue.push(id);
+                });
+                ++id;
+            } else if (!runAlternating &&
+                       !runConstruction &&
+                       !runSimulation) {
+                std::clog << "Only ZX checker specified but Circuit contains operations not supported by this checker!" << std::endl;
+            }
         }
 
         if (runSimulation) {

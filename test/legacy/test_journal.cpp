@@ -179,6 +179,7 @@ TEST_P(JournalTestNonEQ, PowerOfSimulation) {
 TEST_P(JournalTestNonEQ, PowerOfSimulationParallel) {
     config.execution.runAlternatingChecker  = false;
     config.execution.runConstructionChecker = false;
+    config.execution.runZXChecker           = false;
     config.execution.runSimulationChecker   = true;
     config.execution.parallel               = true;
     config.execution.timeout                = 60s;
@@ -241,6 +242,7 @@ protected:
         config.execution.parallel               = false;
         config.execution.runConstructionChecker = false;
         config.execution.runAlternatingChecker  = false;
+        config.execution.runZXChecker           = false;
         config.execution.runSimulationChecker   = false;
         config.simulation.maxSims               = 16;
         config.application.simulationScheme     = ec::ApplicationSchemeType::OneToOne;

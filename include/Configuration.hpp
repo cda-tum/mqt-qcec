@@ -30,7 +30,7 @@ namespace ec {
             bool runConstructionChecker = false;
             bool runSimulationChecker   = true;
             bool runAlternatingChecker  = true;
-            bool runZXChecker           = false;
+            bool runZXChecker           = true;
         };
 
         // configuration options for pre-check optimizations
