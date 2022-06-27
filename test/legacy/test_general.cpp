@@ -67,7 +67,7 @@ TEST_F(GeneralTest, FixOutputPermutationMismatch) {
     auto config                   = ec::Configuration{};
     config.execution.runZXChecker = false;
 
-    config.optimizations.fixOutputPermutationMismatch = false;
+    config.optimizations.fixOutputPermutationMismatch = true;
     ec::EquivalenceCheckingManager ecm(qc1, qc2, config);
     ecm.run();
     EXPECT_TRUE(ecm.getResults().consideredEquivalent());
