@@ -9,6 +9,7 @@
 #include "checker/dd/TaskManager.hpp"
 
 #include <iostream>
+#include <stdexcept>
 
 namespace ec {
     // A list of application schemes that implement the below interface
@@ -30,7 +31,6 @@ namespace ec {
                 return "lookahead";
             case ApplicationSchemeType::GateCost:
                 return "gate_cost";
-            case ApplicationSchemeType::Proportional:
             default:
                 return "proportional";
         }
@@ -48,7 +48,7 @@ namespace ec {
         } else if (applicationScheme == "proportional" || applicationScheme == "4") {
             return ApplicationSchemeType::Proportional;
         } else {
-            throw std::runtime_error("Unknown application scheme: " + applicationScheme);
+            throw std::invalid_argument("Unknown application scheme: " + applicationScheme);
         }
     }
 
@@ -65,7 +65,7 @@ namespace ec {
         return in;
     }
 
-    inline std::ostream& operator<<(std::ostream& out, ApplicationSchemeType& applicationScheme) {
+    inline std::ostream& operator<<(std::ostream& out, const ApplicationSchemeType& applicationScheme) {
         out << toString(applicationScheme);
         return out;
     }

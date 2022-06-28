@@ -10,6 +10,7 @@
 #include "operations/OpType.hpp"
 
 #include <functional>
+#include <stdexcept>
 #include <unordered_map>
 #include <utility>
 
@@ -30,7 +31,7 @@ namespace ec {
     using CostFunction       = std::function<std::size_t(const GateCostLUTKeyType&)>;
 
     template<class DDType, class DDPackage = dd::Package<>>
-    class GateCostApplicationScheme: public ApplicationScheme<DDType, DDPackage> {
+    class GateCostApplicationScheme final: public ApplicationScheme<DDType, DDPackage> {
     public:
         GateCostApplicationScheme(TaskManager<DDType, DDPackage>& taskManager1, TaskManager<DDType, DDPackage>& taskManager2, const CostFunction& costFunction):
             ApplicationScheme<DDType, DDPackage>(taskManager1, taskManager2) {
@@ -57,7 +58,7 @@ namespace ec {
             return {1U, cost};
         }
 
-    protected:
+    private:
         GateCostLUT gateCostLUT{};
 
         void populateLUT(const CostFunction& costFunction, const qc::QuantumComputation* qc) {
@@ -79,7 +80,7 @@ namespace ec {
         void populateLUT(const std::string& filename) {
             std::ifstream ifs(filename);
             if (!ifs.good()) {
-                throw std::runtime_error("Error opening LUT file: " + filename);
+                throw std::invalid_argument("Error opening LUT file: " + filename);
             }
             populateLUT(ifs);
         }

@@ -15,11 +15,11 @@ namespace ec {
             ApplicationScheme<DDType, DDPackage>(taskManager1, taskManager2),
             gateRatio(computeGateRatio()) {}
 
-        std::pair<size_t, size_t> operator()() noexcept final {
+        std::pair<size_t, size_t> operator()() noexcept override {
             return {1U, gateRatio};
         }
 
-    protected:
+    private:
         [[nodiscard]] std::size_t computeGateRatio() const noexcept {
             const std::size_t size1 = this->taskManager1.getCircuit()->size();
             const std::size_t size2 = this->taskManager2.getCircuit()->size();

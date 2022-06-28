@@ -16,7 +16,7 @@ namespace ec {
             gates1(taskManager1.getCircuit()->getNops()),
             gates2(taskManager2.getCircuit()->getNops()) {}
 
-        std::pair<size_t, size_t> operator()() noexcept final {
+        std::pair<size_t, size_t> operator()() noexcept override {
             return {gates1, gates2};
         }
 

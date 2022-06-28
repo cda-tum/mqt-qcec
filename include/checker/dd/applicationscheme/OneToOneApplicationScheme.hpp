@@ -14,7 +14,7 @@ namespace ec {
         OneToOneApplicationScheme(TaskManager<DDType, DDPackage>& taskManager1, TaskManager<DDType, DDPackage>& taskManager2) noexcept:
             ApplicationScheme<DDType, DDPackage>(taskManager1, taskManager2) {}
 
-        std::pair<size_t, size_t> operator()() final {
+        std::pair<size_t, size_t> operator()() noexcept override {
             return {1U, 1U};
         }
     };
