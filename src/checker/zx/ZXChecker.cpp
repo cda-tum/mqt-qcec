@@ -42,8 +42,8 @@ namespace ec {
         bool equivalent = true;
 
         if (miter.getNEdges() == miter.getNQubits()) {
-            const qc::Permutation  p1 = invert(invertPermutations(qc1));
-            const qc::Permutation& p2 = invert(invertPermutations(qc2));
+            const auto&  p1 = invert(invertPermutations(qc1));
+            const auto& p2 = invert(invertPermutations(qc2));
 
             for (std::size_t i = 0; i < miter.getNQubits(); ++i) {
                 auto& in  = miter.getInputs()[i];
