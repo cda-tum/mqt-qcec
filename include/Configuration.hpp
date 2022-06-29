@@ -92,6 +92,20 @@ namespace ec {
             return false;
         }
 
+        [[nodiscard]] bool onlyZXCheckerConfigured() const noexcept {
+            return !execution.runConstructionChecker &&
+                   !execution.runSimulationChecker &&
+                   !execution.runAlternatingChecker &&
+                   execution.runZXChecker;
+        }
+
+        [[nodiscard]] bool onlySimulationCheckerConfigured() const noexcept {
+            return !execution.runConstructionChecker &&
+                   execution.runSimulationChecker &&
+                   !execution.runAlternatingChecker &&
+                   !execution.runZXChecker;
+        }
+
         [[nodiscard]] nlohmann::json json() const noexcept {
             nlohmann::json config{};
             auto&          exe              = config["execution"];

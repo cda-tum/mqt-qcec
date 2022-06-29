@@ -23,5 +23,11 @@ namespace ec {
     private:
         zx::ZXDiagram miter;
         zx::fp        tolerance = zx::TOLERANCE;
+        bool          ancilla   = false;
     };
+
+    qc::Permutation complete(const qc::Permutation& p, dd::Qubit n);
+    qc::Permutation concat(const qc::Permutation& p1, const qc::Permutation& p2);
+    qc::Permutation invert(const qc::Permutation& p);
+    qc::Permutation invertPermutations(const qc::QuantumComputation& qc);
 } // namespace ec

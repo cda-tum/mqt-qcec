@@ -62,11 +62,10 @@ TEST_F(GeneralTest, FixOutputPermutationMismatch) {
     qc2.outputPermutation.erase(1);
     qc2.setLogicalQubitAncillary(1);
     qc2.setLogicalQubitGarbage(1);
+    std::cout << static_cast<int>(qc2.getNqubits()) << std::endl;
     std::cout << qc2 << std::endl;
 
-    auto config                   = ec::Configuration{};
-    config.execution.runZXChecker = false;
-
+    auto config                                       = ec::Configuration{};
     config.optimizations.fixOutputPermutationMismatch = true;
     ec::EquivalenceCheckingManager ecm(qc1, qc2, config);
     ecm.run();

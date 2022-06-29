@@ -2,10 +2,12 @@
 #include "EquivalenceCheckingManager.hpp"
 #include "QuantumComputation.hpp"
 #include "dd/Control.hpp"
+#include "zx/FunctionalityConstruction.hpp"
 
 #include "gtest/gtest.h"
 #include <functional>
 #include <iostream>
+#include <memory>
 #include <sstream>
 #include <string>
 
@@ -127,4 +129,117 @@ TEST_F(ZXTest, PermutationMismatch) {
     ecm->run();
 
     EXPECT_FALSE(ecm->getResults().consideredEquivalent());
+}
+
+TEST_F(ZXTest, Permutation) {
+    auto qc1 = qc::QuantumComputation(2);
+    auto qc2 = qc::QuantumComputation(2);
+    qc1.x(0);
+    qc1.x(1);
+    qc2.x(0);
+    qc2.x(1);
+    qc::Permutation p;
+    p[0]                  = 1;
+    p[1]                  = 0;
+    qc1.initialLayout     = p;
+    qc1.outputPermutation = p;
+    // qc2.initialLayout     = p;
+    // qc2.outputPermutation = p;
+
+    ecm = std::make_unique<ec::EquivalenceCheckingManager>(qc1, qc2, config);
+    ecm->run();
+
+    EXPECT_TRUE(ecm->getResults().consideredEquivalent());
+}
+
+TEST_F(ZXTest, Ancilla) {
+    auto qc1 = qc::QuantumComputation(1);
+    auto qc2 = qc::QuantumComputation(2);
+
+    qc1.i(0);
+    qc2.x(0, dd::Control{1, dd::Control::Type::pos});
+    qc2.setLogicalQubitAncillary(1);
+
+    ecm = std::make_unique<ec::EquivalenceCheckingManager>(qc1, qc2, config);
+    ecm->run();
+
+    EXPECT_TRUE(ecm->getResults().consideredEquivalent());
+}
+
+TEST_F(ZXTest, ZXWrongAncilla) {
+    auto            qc1 = qc::QuantumComputation(1);
+    auto            qc2 = qc::QuantumComputation(2);
+    qc::Permutation p1{};
+    p1[0] = 0;
+    qc1.x(0);
+    qc2.x(0, dd::Control{1, dd::Control::Type::neg});
+    qc2.setLogicalQubitAncillary(1);
+
+    ecm = std::make_unique<ec::EquivalenceCheckingManager>(qc1, qc2, config);
+    ecm->run();
+
+    EXPECT_EQ(ecm->getResults().equivalence, ec::EquivalenceCriterion::NoInformation);
+}
+
+TEST_F(ZXTest, ZXConfiguredForInvalidCircuitParallel) {
+    auto qc = qc::QuantumComputation(4);
+    qc.x(0, {dd::Control{1, dd::Control::Type::pos}, dd::Control{2, dd::Control::Type::pos}, dd::Control{3, dd::Control::Type::pos}});
+
+    ecm = std::make_unique<ec::EquivalenceCheckingManager>(qc, qc, config);
+    ecm->run();
+
+    EXPECT_EQ(ecm->getResults().equivalence, ec::EquivalenceCriterion::NoInformation);
+}
+
+TEST_F(ZXTest, ZXConfiguredForInvalidCircuitSequential) {
+    auto qc = qc::QuantumComputation(4);
+    qc.x(0, {dd::Control{1, dd::Control::Type::pos}, dd::Control{2, dd::Control::Type::pos}, dd::Control{3, dd::Control::Type::pos}});
+
+    config.execution.parallel = false;
+    ecm                       = std::make_unique<ec::EquivalenceCheckingManager>(qc, qc, config);
+    ecm->run();
+
+    EXPECT_EQ(ecm->getResults().equivalence, ec::EquivalenceCriterion::NoInformation);
+}
+
+class ZXTestCompFlow: public testing::TestWithParam<std::string> {
+protected:
+    qc::QuantumComputation qcOriginal;
+    qc::QuantumComputation qcTranspiled;
+    ec::Configuration      config{};
+
+    std::unique_ptr<ec::EquivalenceCheckingManager> ecm{};
+
+    std::string test_original_dir   = "./circuits/original/";
+    std::string test_transpiled_dir = "./circuits/transpiled/";
+
+    void SetUp() override {
+        config.execution.parallel               = false;
+        config.execution.runConstructionChecker = false;
+        config.execution.runAlternatingChecker  = false;
+        config.execution.runSimulationChecker   = false;
+        config.execution.runZXChecker           = true;
+
+        qcOriginal.import(test_original_dir + GetParam() + ".real");
+        qcTranspiled.import(test_transpiled_dir + GetParam() + "_transpiled.qasm");
+    }
+};
+
+INSTANTIATE_TEST_SUITE_P(ZXTestCompFlow, ZXTestCompFlow,
+                         testing::Values(
+                                 "c2_181",
+                                 "rd73_312",
+                                 "sym9_317",
+                                 "mod5adder_306",
+                                 "rd84_313"),
+                         [](const testing::TestParamInfo<ZXTestCompFlow::ParamType>& info) {
+							 auto s = info.param;
+							 std::replace( s.begin(), s.end(), '-', '_');
+	                         return s; });
+
+TEST_P(ZXTestCompFlow, EquivalenceCompilationFlow) {
+    ecm = std::make_unique<ec::EquivalenceCheckingManager>(qcOriginal, qcTranspiled, config);
+    ecm->run();
+    std::cout << ecm->toString() << std::endl;
+    EXPECT_TRUE(ecm->getResults().consideredEquivalent());
 }
