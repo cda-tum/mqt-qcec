@@ -22,8 +22,8 @@ namespace ec {
         if (qc1.getNancillae() != 0 || qc2.getNancillae() != 0)
             ancilla = true;
 
-        auto p1 = invertPermutations(qc1);
-        auto p2 = invertPermutations(qc2);
+        const auto& p1 = invertPermutations(qc1);
+        const auto& p2 = invertPermutations(qc2);
 
         // fix ancillaries to |0>
         for (auto anc = static_cast<dd::Qubit>(qc1.getNqubits() - 1); anc >= qc1.getNqubitsWithoutAncillae(); --anc) {
