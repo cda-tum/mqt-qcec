@@ -14,6 +14,7 @@
 #include "checker/dd/DDConstructionChecker.hpp"
 #include "checker/dd/DDSimulationChecker.hpp"
 #include "checker/dd/simulation/StateGenerator.hpp"
+#include "checker/zx/ZXChecker.hpp"
 
 #include <atomic>
 #include <chrono>
@@ -97,6 +98,7 @@ namespace ec {
         void setConstructionChecker(bool run) { configuration.execution.runConstructionChecker = run; }
         void setSimulationChecker(bool run) { configuration.execution.runSimulationChecker = run; }
         void setAlternatingChecker(bool run) { configuration.execution.runAlternatingChecker = run; }
+        void setZXChecker(bool run) { configuration.execution.runZXChecker = run; }
 
         // Optimization: Optimizations are applied during initialization. Already configured and applied optimizations cannot be reverted
         void runFixOutputPermutationMismatch();

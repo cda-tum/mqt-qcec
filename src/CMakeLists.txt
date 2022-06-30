@@ -10,6 +10,8 @@ add_library(${PROJECT_NAME}
             ${CMAKE_CURRENT_SOURCE_DIR}/checker/dd/DDEquivalenceChecker.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/checker/dd/DDSimulationChecker.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/checker/dd/DDAlternatingChecker.cpp
+
+            ${CMAKE_CURRENT_SOURCE_DIR}/checker/zx/ZXChecker.cpp
             )
 # set include directories
 target_include_directories(${PROJECT_NAME} PUBLIC $<BUILD_INTERFACE:${${PROJECT_NAME}_SOURCE_DIR}/include>)

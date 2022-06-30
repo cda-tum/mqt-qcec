@@ -61,9 +61,10 @@ In addition, the :class:`~.Configuration` of the manager can be altered after it
         .. automethod:: EquivalenceCheckingManager.set_construction_checker
         .. automethod:: EquivalenceCheckingManager.set_simulation_checker
         .. automethod:: EquivalenceCheckingManager.set_alternating_checker
+        .. automethod:: EquivalenceCheckingManager.set_zx_checker
         .. automethod:: EquivalenceCheckingManager.set_tolerance
 
-* :class:`Optimizations <Configuration.Optimization>`
+* :class:`Optimizations <Configuration.Optimizations>`
     These functions allow to apply specific circuit optimizations that might not have been performed during initialization. Note that already performed optimizations cannot be reverted since they are applied at construction time.
 
         .. automethod:: EquivalenceCheckingManager.fuse_single_qubit_gates
@@ -72,7 +73,7 @@ In addition, the :class:`~.Configuration` of the manager can be altered after it
         .. automethod:: EquivalenceCheckingManager.fix_output_permutation_mismatch
 
 * :class:`Application Options <Configuration.Application>`
-    These options describe the :class:`Application Scheme <ApplicationScheme>` that is used for the individual equivalence checkers. The scheme can either be set collectively for all checkers at once or individually.
+    These options describe the :class:`Application Scheme <ApplicationScheme>` that is used for the individual equivalence checkers (based on decision diagrams). The scheme can either be set collectively for all checkers at once or individually.
 
         .. automethod:: EquivalenceCheckingManager.set_application_scheme
         .. automethod:: EquivalenceCheckingManager.set_construction_application_scheme
@@ -92,7 +93,7 @@ In addition, the :class:`~.Configuration` of the manager can be altered after it
         .. automethod:: EquivalenceCheckingManager.set_trace_threshold
 
 * :class:`Simulation Options <Configuration.Simulation>`
-    These options influence the simulation-based equivalence checker.
+    These options influence the :ref:`simulation checker <EquivalenceChecking:Simulation Equivalence Checker (using Decision Diagrams)>`.
 
         .. automethod:: EquivalenceCheckingManager.set_fidelity_threshold
         .. automethod:: EquivalenceCheckingManager.set_max_sims

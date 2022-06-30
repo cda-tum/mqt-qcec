@@ -58,9 +58,11 @@ TEST_F(GeneralTest, FixOutputPermutationMismatch) {
     qc2.x(0);
     qc2.i(1);
     qc2.x(2);
+
     qc2.outputPermutation.erase(1);
     qc2.setLogicalQubitAncillary(1);
     qc2.setLogicalQubitGarbage(1);
+    std::cout << static_cast<int>(qc2.getNqubits()) << std::endl;
     std::cout << qc2 << std::endl;
 
     auto config                                       = ec::Configuration{};
@@ -101,6 +103,7 @@ TEST_F(GeneralTest, RemoveDiagonalGatesBeforeMeasure) {
     // simulations should suggest both circuits to be equivalent
     ecm.reset();
     ecm.setAlternatingChecker(false);
+    ecm.setZXChecker(false);
     ecm.run();
     EXPECT_TRUE(ecm.getResults().consideredEquivalent());
     std::cout << ecm.toString() << std::endl;
@@ -124,6 +127,7 @@ TEST_F(GeneralTest, NothingToDo) {
     config.execution.runAlternatingChecker  = false;
     config.execution.runSimulationChecker   = false;
     config.execution.runConstructionChecker = false;
+    config.execution.runZXChecker           = false;
 
     auto ecm = ec::EquivalenceCheckingManager(qc1, qc2, config);
     ecm.run();

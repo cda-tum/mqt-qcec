@@ -108,7 +108,7 @@ setup(
     install_requires=["qiskit-terra~=0.20.2"],
     extras_require={
         "test": ["pytest~=7.1.1"],
-        "docs": ["sphinx==5.0.2", "sphinx-rtd-theme==1.0.0", "sphinxcontrib-bibtex==2.4.2", "sphinx-copybutton==0.4.0"],
+        "docs": ["sphinx==5.0.2", "sphinx-rtd-theme==1.0.0", "sphinxcontrib-bibtex==2.4.2", "sphinx-copybutton==0.4.0", "sphinx-hoverxref==1.1.1"],
         "dev": ["mqt.qcec[test, docs]"]  # requires Pip 21.2 or newer
     },
     classifiers=[

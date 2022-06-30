@@ -76,6 +76,7 @@ namespace ec {
                                                                          bool                 runConstructionChecker = false,
                                                                          bool                 runSimulationChecker   = true,
                                                                          bool                 runAlternatingChecker  = true,
+                                                                         bool                 runZXChecker           = true,
                                                                          // Optimization
                                                                          bool fixOutputPermutationMismatch     = false,
                                                                          bool fuseSingleQubitGates             = true,
@@ -106,6 +107,7 @@ namespace ec {
         configuration.execution.runConstructionChecker = runConstructionChecker;
         configuration.execution.runSimulationChecker   = runSimulationChecker;
         configuration.execution.runAlternatingChecker  = runAlternatingChecker;
+        configuration.execution.runZXChecker           = runZXChecker;
         // Optimization
         configuration.optimizations.fixOutputPermutationMismatch     = fixOutputPermutationMismatch;
         configuration.optimizations.fuseSingleQubitGates             = fuseSingleQubitGates;
@@ -154,7 +156,7 @@ namespace ec {
                 .value("proportional", ApplicationSchemeType::Proportional,
                        "For every gate of the first circuit, proportionally many are applied from the second circuit according to the difference in the number of gates.")
                 .value("lookahead", ApplicationSchemeType::Lookahead,
-                       "Looks whether an application from the first circuit or the second circuit yields the smaller decision diagram. Only works for the :attr:`alternating checker <.Configuration.Execution.run_alternating_checker>`.")
+                       "Looks whether an application from the first circuit or the second circuit yields the smaller decision diagram. Only works for the :ref:`alternating checker <EquivalenceChecking:Alternating Equivalence Checker (using Decision Diagrams)>`.")
                 .value("gate_cost", ApplicationSchemeType::GateCost,
                        "Each gate of the first circuit is associated with a corresponding cost according to some cost function *f(...)*. Whenever a gate *g* from the first circuit is applied *f(g)* gates are applied from the second circuit. Referred to as *compilation_flow* in :cite:p:`burgholzer2020verifyingResultsIBM`.")
                 .def(py::init([](const std::string& str) -> ApplicationSchemeType { return applicationSchemeFromString(str); }))
@@ -186,7 +188,9 @@ namespace ec {
                 .value("equivalent_up_to_global_phase", EquivalenceCriterion::EquivalentUpToGlobalPhase,
                        "Circuits are equivalent up to a global phase factor.")
                 .value("probably_equivalent", EquivalenceCriterion::ProbablyEquivalent,
-                       "Circuits are probably equivalent. A result that is obtained whenever a couple of simulations did not show the non-equivalence.")
+                       "Circuits are probably equivalent. A result that is obtained whenever a couple of simulations did not show the non-equivalence in the :ref:`simulation checker <EquivalenceChecking:Simulation Equivalence Checker (using Decision Diagrams)>`.")
+                .value("probably_not_equivalent", EquivalenceCriterion::ProbablyNotEquivalent,
+                       "Circuits are probably not equivalent. A result that is obtained whenever the :ref:`ZX-calculus checker <EquivalenceChecking:ZX-Calculus Equivalence Checker>` could not reduce the combined circuit to the identity.")
                 .def(py::init([](const std::string& str) -> EquivalenceCriterion { return fromString(str); }))
                 .def(
                         "__str__", [](EquivalenceCriterion crit) { return toString(crit); }, py::prepend());
@@ -207,6 +211,7 @@ namespace ec {
                 "run_construction_checker"_a             = false,
                 "run_simulation_checker"_a               = true,
                 "run_alternating_checker"_a              = true,
+                "run_zx_checker"_a                       = true,
                 "fix_output_permutation_mismatch"_a      = false,
                 "fuse_single_qubit_gates"_a              = true,
                 "reconstruct_swaps"_a                    = true,
@@ -241,11 +246,13 @@ namespace ec {
                 .def("set_timeout", &EquivalenceCheckingManager::setTimeout, "timeout"_a = 0.0,
                      "Set a :attr:`timeout <.Configuration.Execution.timeout>` (in seconds) for :func:`~EquivalenceCheckingManager.run`. The timeout can also be specified by a :class:`float`.")
                 .def("set_construction_checker", &EquivalenceCheckingManager::setConstructionChecker, "enable"_a = false,
-                     "Set whether the :attr:`construction checker <.Configuration.Execution.run_construction_checker>` should be executed.")
+                     "Set whether the :ref:`construction checker <EquivalenceChecking:Construction Equivalence Checker (using Decision Diagrams)>` should be executed.")
                 .def("set_simulation_checker", &EquivalenceCheckingManager::setSimulationChecker, "enable"_a = true,
-                     "Set whether the :attr:`simulation checker <.Configuration.Execution.run_simulation_checker>` should be executed.")
+                     "Set whether the :ref:`simulation checker <EquivalenceChecking:Simulation Equivalence Checker (using Decision Diagrams)>` should be executed.")
                 .def("set_alternating_checker", &EquivalenceCheckingManager::setAlternatingChecker, "enable"_a = true,
-                     "Set whether the :attr:`alternating checker <.Configuration.Execution.run_alternating_checker>` should be executed.")
+                     "Set whether the :ref:`alternating checker <EquivalenceChecking:Alternating Equivalence Checker (using Decision Diagrams)>` should be executed.")
+                .def("set_zx_checker", &EquivalenceCheckingManager::setZXChecker, "enable"_a = true,
+                     "Set whether the :ref:`ZX-calculus checker <EquivalenceChecking:ZX-Calculus Equivalence Checker>` should be executed.")
                 // Optimization
                 .def("fix_output_permutation_mismatch", &EquivalenceCheckingManager::runFixOutputPermutationMismatch,
                      "Try to :attr:`fix potential mismatches in output permutations <.Configuration.Optimizations.fix_output_permutation_mismatch>`. This is experimental.")
@@ -257,21 +264,21 @@ namespace ec {
                      ":attr:`Reorder operations <.Configuration.Optimizations.reorder_operations>` to establish canonical ordering.")
                 // Application
                 .def("set_application_scheme", &EquivalenceCheckingManager::setApplicationScheme, "scheme"_a = "proportional",
-                     "Set the :class:`Application Scheme <.ApplicationScheme>` that is used for all checkers.")
+                     "Set the :class:`Application Scheme <.ApplicationScheme>` that is used for all checkers (based on decision diagrams).")
                 .def("set_construction_application_scheme", &EquivalenceCheckingManager::setConstructionApplicationScheme, "scheme"_a = "proportional",
-                     "Set the :class:`Application Scheme <.ApplicationScheme>` that is used for the construction checker.")
+                     "Set the :class:`Application Scheme <.ApplicationScheme>` that is used for the :ref:`construction checker <EquivalenceChecking:Construction Equivalence Checker (using Decision Diagrams)>`.")
                 .def("set_simulation_application_scheme", &EquivalenceCheckingManager::setSimulationApplicationScheme, "scheme"_a = "proportional",
-                     "Set the :class:`Application Scheme <.ApplicationScheme>` that is used for the simulation checker.")
+                     "Set the :class:`Application Scheme <.ApplicationScheme>` that is used for the :ref:`simulation checker <EquivalenceChecking:Simulation Equivalence Checker (using Decision Diagrams)>`.")
                 .def("set_alternating_application_scheme", &EquivalenceCheckingManager::setAlternatingApplicationScheme, "scheme"_a = "proportional",
-                     "Set the :class:`Application Scheme <.ApplicationScheme>` that is used for the alternating checker.")
+                     "Set the :class:`Application Scheme <.ApplicationScheme>` that is used for the :ref:`alternating checker <EquivalenceChecking:Alternating Equivalence Checker (using Decision Diagrams)>`.")
                 .def("set_gate_cost_profile", &EquivalenceCheckingManager::setGateCostProfile, "profile"_a = "",
-                     "Set the :attr:`profile <.Configuration.Application.profile>` used in the :attr:`Gate Cost <.ApplicationScheme.gate_cost>` application scheme for all checkers.")
+                     "Set the :attr:`profile <.Configuration.Application.profile>` used in the :attr:`Gate Cost <.ApplicationScheme.gate_cost>` application scheme for all checkers (based on decision diagrams).")
                 .def("set_construction_gate_cost_profile", &EquivalenceCheckingManager::setConstructionGateCostProfile, "profile"_a = "",
-                     "Set the :attr:`profile <.Configuration.Application.profile>` used in the :attr:`Gate Cost <.ApplicationScheme.gate_cost>` application scheme for the construction checker.")
+                     "Set the :attr:`profile <.Configuration.Application.profile>` used in the :attr:`Gate Cost <.ApplicationScheme.gate_cost>` application scheme for the :ref:`construction checker <EquivalenceChecking:Construction Equivalence Checker (using Decision Diagrams)>`.")
                 .def("set_simulation_gate_cost_profile", &EquivalenceCheckingManager::setSimulationGateCostProfile, "profile"_a = "",
-                     "Set the :attr:`profile <.Configuration.Application.profile>` used in the :attr:`Gate Cost <.ApplicationScheme.gate_cost>` application scheme for the simulation checker.")
+                     "Set the :attr:`profile <.Configuration.Application.profile>` used in the :attr:`Gate Cost <.ApplicationScheme.gate_cost>` application scheme for the :ref:`simulation checker <EquivalenceChecking:Simulation Equivalence Checker (using Decision Diagrams)>`.")
                 .def("set_alternating_gate_cost_profile", &EquivalenceCheckingManager::setAlternatingGateCostProfile, "profile"_a = "",
-                     "Set the :attr:`profile <.Configuration.Application.profile>` used in the :attr:`Gate Cost <.ApplicationScheme.gate_cost>` application scheme for the alternating checker.")
+                     "Set the :attr:`profile <.Configuration.Application.profile>` used in the :attr:`Gate Cost <.ApplicationScheme.gate_cost>` application scheme for the :ref:`alternating checker <EquivalenceChecking:Alternating Equivalence Checker (using Decision Diagrams)>`.")
                 // Functionality
                 .def("set_trace_threshold", &EquivalenceCheckingManager::setTraceThreshold, "threshold"_a = 1e-8,
                      "Set the :attr:`trace threshold <.Configuration.Functionality.trace_threshold>` used for comparing two unitaries or functionality matrices.")
@@ -279,11 +286,11 @@ namespace ec {
                 .def("set_fidelity_threshold", &EquivalenceCheckingManager::setFidelityThreshold, "threshold"_a = 1e-8,
                      "Set the :attr:`fidelity threshold <.Configuration.Simulation.fidelity_threshold>` used for comparing two states or state vectors.")
                 .def("set_max_sims", &EquivalenceCheckingManager::setMaxSims, "sims"_a = std::max(16U, std::thread::hardware_concurrency() - 2U),
-                     "Set the :attr:`maximum number of simulations <.Configuration.Simulation.max_sims>` to be started for the simulation checker.")
+                     "Set the :attr:`maximum number of simulations <.Configuration.Simulation.max_sims>` to be started for the :ref:`simulation checker <EquivalenceChecking:Simulation Equivalence Checker (using Decision Diagrams)>`.")
                 .def("set_state_type", &EquivalenceCheckingManager::setStateType, "type"_a = "computational_basis",
-                     "Set the :attr:`type of states <.Configuration.Simulation.state_type>` used for the simulations in the simulation checker.")
+                     "Set the :attr:`type of states <.Configuration.Simulation.state_type>` used for the simulations in the :ref:`simulation checker <EquivalenceChecking:Simulation Equivalence Checker (using Decision Diagrams)>`.")
                 .def("set_seed", &EquivalenceCheckingManager::setSeed, "seed"_a = 0U,
-                     "Set the :attr:`seed <.Configuration.Simulation.seed>` for the state generator in the simulation checker.")
+                     "Set the :attr:`seed <.Configuration.Simulation.seed>` for the state generator in the :ref:`simulation checker <EquivalenceChecking:Simulation Equivalence Checker (using Decision Diagrams)>`.")
                 .def("store_cex_input", &EquivalenceCheckingManager::storeCEXinput, "enable"_a = false,
                      "Set whether to :attr:`store the input state <.Configuration.Simulation.store_cex_input>` if a counterexample is obtained.")
                 .def("store_cex_output", &EquivalenceCheckingManager::storeCEXoutput, "enable"_a = false,
@@ -331,7 +338,7 @@ namespace ec {
         py::class_<Configuration::Optimizations> optimizations(configuration, "Optimizations", "Options that influence which circuit optimizations are applied during pre-processing.");
         py::class_<Configuration::Application>   application(configuration, "Application", "Options that describe the :class:`Application Scheme <.ApplicationScheme>` that is used for the individual equivalence checkers.");
         py::class_<Configuration::Functionality> functionality(configuration, "Functionality", "Options for all checkers that consider the whole functionality of a circuit.");
-        py::class_<Configuration::Simulation>    simulation(configuration, "Simulation", "Options that influence the simulation-based equivalence checker.");
+        py::class_<Configuration::Simulation>    simulation(configuration, "Simulation", "Options that influence the :ref:`simulation checker <EquivalenceChecking:Simulation Equivalence Checker (using Decision Diagrams)>`.");
 
         // Configuration
         configuration.def(py::init<>())
@@ -347,9 +354,10 @@ namespace ec {
                 .def_readwrite("parallel", &Configuration::Execution::parallel, "Set whether execution should happen in parallel. Defaults to :code:`True`.")
                 .def_readwrite("nthreads", &Configuration::Execution::nthreads, "Set the maximum number of threads to use. Defaults to the maximum number of available threads reported by the OS.")
                 .def_readwrite("timeout", &Configuration::Execution::timeout, "Set a timeout for :meth:`~.EquivalenceCheckingManager.run` (in seconds). Either a :class:`datetime.timedelta` or :class:`float`. Defaults to :code:`0.`, which means no timeout.")
-                .def_readwrite("run_construction_checker", &Configuration::Execution::runConstructionChecker, "Set whether the construction checker should be executed. Defaults to :code:`False` since the alternating checker is to be preferred in most cases.")
-                .def_readwrite("run_simulation_checker", &Configuration::Execution::runSimulationChecker, "Set whether the simulation checker should be executed. Defaults to :code:`True` since simulations can quickly show the non-equivalence of circuits in many cases.")
-                .def_readwrite("run_alternating_checker", &Configuration::Execution::runAlternatingChecker, "Set whether the alternating checker should be executed. Defaults to :code:`True` since staying close to the identity can quickly show the equivalence of circuits in many cases.")
+                .def_readwrite("run_construction_checker", &Configuration::Execution::runConstructionChecker, "Set whether the :ref:`construction checker <EquivalenceChecking:Construction Equivalence Checker (using Decision Diagrams)>` should be executed. Defaults to :code:`False` since the :ref:`alternating checker <EquivalenceChecking:Alternating Equivalence Checker (using Decision Diagrams)>` is to be preferred in most cases.")
+                .def_readwrite("run_simulation_checker", &Configuration::Execution::runSimulationChecker, "Set whether the :ref:`simulation checker <EquivalenceChecking:Simulation Equivalence Checker (using Decision Diagrams)>` should be executed. Defaults to :code:`True` since simulations can quickly show the non-equivalence of circuits in many cases.")
+                .def_readwrite("run_alternating_checker", &Configuration::Execution::runAlternatingChecker, "Set whether the :ref:`alternating checker <EquivalenceChecking:Alternating Equivalence Checker (using Decision Diagrams)>` should be executed. Defaults to :code:`True` since staying close to the identity can quickly show the equivalence of circuits in many cases.")
+                .def_readwrite("run_zx_checker", &Configuration::Execution::runZXChecker, "Set whether the :ref:`ZX-calculus checker <EquivalenceChecking:ZX-Calculus Equivalence Checker>` should be executed. Defaults to :code:`True` but arbitrary multi-controlled operations are only partially supported.")
                 .def_readwrite("numerical_tolerance", &Configuration::Execution::numericalTolerance, "Set the numerical tolerance of the underlying decision diagram package. Defaults to :code:`~2e-13` and should only be changed by users who know what they are doing.");
 
         optimizations.def(py::init<>())
@@ -361,18 +369,18 @@ namespace ec {
                 .def_readwrite("reorder_operations", &Configuration::Optimizations::reorderOperations, "The operations of a circuit are stored in a sequential container. This introduces some dependencies in the order of operations that are not naturally present in the quantum circuit. As a consequence, two quantum circuits that contain exactly the same operations, list their operations in different ways, also apply there operations in a different order. This optimization pass established a canonical ordering of operations by, first, constructing a directed, acyclic graph for the operations and, then, traversing it in a breadth-first fashion. Defaults to :code:`True`.");
 
         application.def(py::init<>())
-                .def_readwrite("construction_scheme", &Configuration::Application::constructionScheme, "The :class:`Application Scheme <.ApplicationScheme>` used for the construction checker.")
-                .def_readwrite("simulation_scheme", &Configuration::Application::simulationScheme, "The :class:`Application Scheme <.ApplicationScheme>` used for the simulation checker.")
-                .def_readwrite("alternating_scheme", &Configuration::Application::alternatingScheme, "The :class:`Application Scheme <.ApplicationScheme>` used for the alternating checker.")
+                .def_readwrite("construction_scheme", &Configuration::Application::constructionScheme, "The :class:`Application Scheme <.ApplicationScheme>` used for the :ref:`construction checker <EquivalenceChecking:Construction Equivalence Checker (using Decision Diagrams)>`.")
+                .def_readwrite("simulation_scheme", &Configuration::Application::simulationScheme, "The :class:`Application Scheme <.ApplicationScheme>` used for the :ref:`simulation checker <EquivalenceChecking:Simulation Equivalence Checker (using Decision Diagrams)>`.")
+                .def_readwrite("alternating_scheme", &Configuration::Application::alternatingScheme, "The :class:`Application Scheme <.ApplicationScheme>` used for the :ref:`alternating checker <EquivalenceChecking:Alternating Equivalence Checker (using Decision Diagrams)>`.")
                 .def_readwrite("profile", &Configuration::Application::profile, "The :attr:`Gate Cost <.ApplicationScheme.gate_cost>` application scheme can be configured with a profile that specifies the cost of gates. At the moment, this profile can be set via a file that is constructed similar to a lookup table. Every line :code:`<GATE_ID> <N_CONTROLS> <COST>` specified the cost for a given gate type and with a certain number of controls, e.g., :code:`X 0 1` denotes that a single-qubit X gate has a cost of :code:`1`, while :code:`X 2 15` denotes that a Toffoli gate has a cost of :code:`15`.");
 
         functionality.def(py::init<>())
                 .def_readwrite("trace_threshold", &Configuration::Functionality::traceThreshold, "While decision diagrams are canonical in theory, i.e., equivalent circuits produce equivalent decision diagrams, numerical inaccuracies and approximations can harm this property. This can result in a scenario where two decision diagrams are really close to one another, but cannot be identified as such by standard methods (i.e., comparing their root pointers). Instead, for two decision diagrams :code:`U` and :code:`U'` representing the functionalities of two circuits :code:`G` and :code:`G'`, the trace of the product of one decision diagram with the inverse of the other can be computed and compared to the trace of the identity. Alternatively, it can be checked, whether :code:`U*U`^-1` is \"close enough\" to the identity by recursively checking that each decision diagram node is close enough to the identity structure (i.e., the first and last successor have weights close to one, while the second and third successor have weights close to zero). Whenever any decision diagram node differs from this structure by more than the configured threshold, the circuits are concluded to be non-equivalent. Defaults to :code:`1e-8`.");
 
         simulation.def(py::init<>())
-                .def_readwrite("fidelity_threshold", &Configuration::Simulation::fidelityThreshold, "Similar to :attr:`trace threshold <.Configuration.Functionality.trace_threshold>`, this setting is here to tackle numerical inaccuracies and approximations for the simulation checker. Instead of computing a trace, the fidelity between the states resulting from the simulation is computed. Whenever the fidelity differs from :code:`1.` by more than the configured threshold, the circuits are concluded to be non-equivalent. Defaults to :code:`1e-8`.")
-                .def_readwrite("max_sims", &Configuration::Simulation::maxSims, "The maximum number of simulations to be started for the simulation checker. In practice, just a couple of simulations suffice in most cases to detect a potential non-equivalence. Either defaults to :code:`16` or the maximum number of available threads minus 2, whichever is more.")
-                .def_readwrite("state_type", &Configuration::Simulation::stateType, "The :class:`type of states <.StateType>` used for the simulations in the simulation checker.")
+                .def_readwrite("fidelity_threshold", &Configuration::Simulation::fidelityThreshold, "Similar to :attr:`trace threshold <.Configuration.Functionality.trace_threshold>`, this setting is here to tackle numerical inaccuracies and approximations for the :ref:`simulation checker <EquivalenceChecking:Simulation Equivalence Checker (using Decision Diagrams)>`. Instead of computing a trace, the fidelity between the states resulting from the simulation is computed. Whenever the fidelity differs from :code:`1.` by more than the configured threshold, the circuits are concluded to be non-equivalent. Defaults to :code:`1e-8`.")
+                .def_readwrite("max_sims", &Configuration::Simulation::maxSims, "The maximum number of simulations to be started for the :ref:`simulation checker <EquivalenceChecking:Simulation Equivalence Checker (using Decision Diagrams)>`. In practice, just a couple of simulations suffice in most cases to detect a potential non-equivalence. Either defaults to :code:`16` or the maximum number of available threads minus 2, whichever is more.")
+                .def_readwrite("state_type", &Configuration::Simulation::stateType, "The :class:`type of states <.StateType>` used for the simulations in the :ref:`simulation checker <EquivalenceChecking:Simulation Equivalence Checker (using Decision Diagrams)>`.")
                 .def_readwrite("seed", &Configuration::Simulation::seed, "The seed used in the quantum state generator. Defaults to :code:`0`, which means that the seed is chosen non-deterministically for each program run.")
                 .def_readwrite("store_cex_input", &Configuration::Simulation::storeCEXinput, "Whether to store the input state that has lead to the determination of a counterexample. Since the memory required to store a full representation of a quantum state increases exponentially, this is only recommended for a small number of qubits and defaults to :code:`False`.")
                 .def_readwrite("store_cex_output", &Configuration::Simulation::storeCEXoutput, "Whether to store the resulting states that prove the non-equivalence of both circuits. Since the memory required to store a full representation of a quantum state increases exponentially, this is only recommended for a small number of qubits and defaults to :code:`False`.");

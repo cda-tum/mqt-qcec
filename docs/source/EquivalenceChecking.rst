@@ -21,7 +21,7 @@ Construction Equivalence Checker (using Decision Diagrams)
 
 While the underlying matrices are exponentially large with respect to the number of qubits, they frequently are sparse or contain inherent redundancies.
 Decision diagrams have been proposed as a means to exploit these redundancies.
-For a detailed intro to this topic, see :cite:p:`willeToolsQuantumDecisionDiagrams2021` and the references therein.
+For a detailed intro to this topic, see :cite:p:`wille2021ToolsQuantumDecisionDiagrams` and the references therein.
 In many cases, using decision diagrams allows to obtain polynomially-sized representations for the otherwise exponentially large system matrices---in the best case even linear.
 
 The functionality of both circuits is constructed by subsequently multiplying the decision diagrams representing the individual gates of :math:`G` and :math:`G'`---until, eventually, decision diagram representations for the system matrices :math:`U` and :math:`U'` are obtained.
@@ -71,6 +71,24 @@ In :cite:p:`burgholzer2021randomStimuliGenerationQuantum`, several types of stat
 
 **Drawback:** Decision diagrams for state vectors might still be exponentially large in the worst case.
 
+ZX-Calculus Equivalence Checker
+###############################
+
+In :cite:p:`kissinger2019PyZXLargeScale`, Kissinger and van de Wetering proposed an algorithm for optimizing quantum circuits based on ZX-calculus rewriting.
+In their initial article they also show that this rewriting approach can be used to prove the equivalence of quantum circuits.
+The idea is to construct the ZX-diagram of :math:`G^{\prime -1} G`  and reduce this ZX-diagram using the rules of the ZX-calculus until no further rewrites can be made.
+If the resulting diagram consists only of wires (the identity ZX-diagram) then :math:`G = G^{\prime}`.
+
+In :cite:p:`peham2022EquivalenceCheckingParadigms`, it has been shown that equivalence checking with the ZX-calculus naturally complements equivalence checking with decision diagrams.
+Since the size of the ZX-diagram during rewriting is bounded by the size of the initial diagram, this checker can be easily executed in parallel to the aforementioned approaches based on decision diagrams.
+In cases where the size of the decision diagrams explodes, the rewriting approach can often prove equivalence much more efficiently.
+
+**Most effective for:** proving equivalence of two circuits involving many rotation gates with angles of the form :math:`\frac{\pi}{k}` for :math:`k\in\mathbb{N}`.
+
+**Capable of showing:** equivalence
+
+**Drawback:** Due to the incompleteness of the rewriting rules, this equivalence checker cannot prove non-equivalence. Furthermore, multi-controlled gates have to be decomposed prior to the equivalence check, which can quickly lead to large ZX-diagrams and slow runtimes.
+
 Resulting Equivalence Checking Flow
 ###################################
 
@@ -85,3 +103,4 @@ In general, the following steps are performed:
 
 - First, a couple of simulation runs with random computational basis states are started. Should any of these simulations show a difference in the resulting states, the check is finished.
 - In parallel, the alternating equivalence checker is started. In case the check finishes, i.e., it does not run into a timeout, a definitive result is returned. Otherwise, if none of the simulations have shown a difference, this strongly indicates that both circuits are probably equivalent.
+- In addition to the above, the ZX-calculus equivalence checker is started. In case it finishes with an affirmative answer, the check is finished. In case it finishes and was not able to reduce the ZX-diagram to the identity, this indicates that the circuits are probably not equivalent.

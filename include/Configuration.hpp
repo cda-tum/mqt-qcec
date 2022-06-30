@@ -30,6 +30,7 @@ namespace ec {
             bool runConstructionChecker = false;
             bool runSimulationChecker   = true;
             bool runAlternatingChecker  = true;
+            bool runZXChecker           = true;
         };
 
         // configuration options for pre-check optimizations
@@ -74,7 +75,7 @@ namespace ec {
         Simulation    simulation{};
 
         [[nodiscard]] bool anythingToExecute() const noexcept {
-            return (execution.runSimulationChecker && simulation.maxSims > 0U) || execution.runAlternatingChecker || execution.runConstructionChecker;
+            return (execution.runSimulationChecker && simulation.maxSims > 0U) || execution.runAlternatingChecker || execution.runConstructionChecker || execution.runZXChecker;
         }
 
         [[nodiscard]] bool onlySingleTask() const noexcept {
@@ -91,6 +92,20 @@ namespace ec {
             return false;
         }
 
+        [[nodiscard]] bool onlyZXCheckerConfigured() const noexcept {
+            return !execution.runConstructionChecker &&
+                   !execution.runSimulationChecker &&
+                   !execution.runAlternatingChecker &&
+                   execution.runZXChecker;
+        }
+
+        [[nodiscard]] bool onlySimulationCheckerConfigured() const noexcept {
+            return !execution.runConstructionChecker &&
+                   execution.runSimulationChecker &&
+                   !execution.runAlternatingChecker &&
+                   !execution.runZXChecker;
+        }
+
         [[nodiscard]] nlohmann::json json() const noexcept {
             nlohmann::json config{};
             auto&          exe              = config["execution"];
@@ -100,6 +115,7 @@ namespace ec {
             exe["run_construction_checker"] = execution.runConstructionChecker;
             exe["run_simulation_checker"]   = execution.runSimulationChecker;
             exe["run_alternating_checker"]  = execution.runAlternatingChecker;
+            exe["run_zx_checker"]           = execution.runZXChecker;
             if (execution.timeout > 0s) {
                 exe["timeout"] = execution.timeout.count();
             }
