@@ -42,12 +42,12 @@ namespace ec {
         bool equivalent = true;
 
         if (miter.getNEdges() == miter.getNQubits()) {
-            const auto&  p1 = invert(invertPermutations(qc1));
+            const auto& p1 = invert(invertPermutations(qc1));
             const auto& p2 = invert(invertPermutations(qc2));
 
             for (std::size_t i = 0; i < miter.getNQubits(); ++i) {
-                auto& in  = miter.getInputs()[i];
-                auto& out = miter.incidentEdges(in)[0].to;
+                const auto& in  = miter.getInput(i);
+                const auto& out = miter.incidentEdge(in, 0).to;
 
                 if (p1.at(static_cast<dd::Qubit>(miter.getVData(in).value().qubit)) != p2.at(static_cast<dd::Qubit>(miter.getVData(out).value().qubit))) {
                     equivalent = false;
@@ -88,14 +88,13 @@ namespace ec {
     }
 
     qc::Permutation complete(const qc::Permutation& p, dd::Qubit n) {
-        qc::Permutation pComp{};
+        qc::Permutation pComp = p;
 
         std::vector<bool> mappedTo(n, false);
         std::vector<bool> mappedFrom(n, false);
         for (auto [k, v]: p) {
             mappedFrom[k] = true;
             mappedTo[v]   = true;
-            pComp[k]      = v;
         }
 
         //Try to map identity

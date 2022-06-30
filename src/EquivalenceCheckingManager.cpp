@@ -529,7 +529,7 @@ namespace ec {
 
             if (dynamic_cast<ZXEquivalenceChecker*>(checker)) {
                 results.equivalence = result;
-                if (result == EquivalenceCriterion::EquivalentUpToGlobalPhase || (result == EquivalenceCriterion::ProbablyNotEquivalent && !(runAlternating || runConstruction || runSimulation))) {
+                if (result == EquivalenceCriterion::EquivalentUpToGlobalPhase || (result == EquivalenceCriterion::ProbablyNotEquivalent && configuration.onlyZXCheckerConfigured())) {
                     setAndSignalDone();
                     break;
                 }

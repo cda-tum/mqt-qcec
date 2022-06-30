@@ -22,8 +22,8 @@ namespace ec {
 
     private:
         zx::ZXDiagram miter;
-        zx::fp        tolerance = zx::TOLERANCE;
-        bool          ancilla   = false;
+        zx::fp        tolerance;
+        bool          ancilla = false;
     };
 
     qc::Permutation complete(const qc::Permutation& p, dd::Qubit n);
