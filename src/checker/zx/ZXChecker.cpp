@@ -37,7 +37,7 @@ namespace ec {
     EquivalenceCriterion ZXEquivalenceChecker::run() {
         const auto start = std::chrono::steady_clock::now();
 
-        zx::fullReduceApproximate(miter, tolerance);
+        fullReduceApproximate();
 
         bool equivalent = true;
 
@@ -61,8 +61,8 @@ namespace ec {
         const auto end = std::chrono::steady_clock::now();
         runtime += std::chrono::duration<double>(end - start).count();
 
-        // non-equivalence might be due to incorrect assumption about the state of ancillaries, so no information can be given
-        if (!equivalent && ancilla)
+        // non-equivalence might be due to incorrect assumption about the state of ancillaries or the check was aborted prematurely, so no information can be given
+        if ((!equivalent && ancilla) || isDone())
             equivalence = EquivalenceCriterion::NoInformation;
         else
             equivalence = equivalent ? EquivalenceCriterion::EquivalentUpToGlobalPhase : EquivalenceCriterion::ProbablyNotEquivalent;
@@ -141,6 +141,97 @@ namespace ec {
     }
 
     qc::Permutation invertPermutations(const qc::QuantumComputation& qc) {
-        return concat(invert(complete(qc.outputPermutation, qc.getNqubits())), complete(qc.initialLayout, qc.getNqubits()));
+        return concat(
+                invert(complete(qc.outputPermutation, static_cast<dd::Qubit>(qc.getNqubits()))),
+                complete(qc.initialLayout, static_cast<dd::Qubit>(qc.getNqubits())));
     }
+
+    std::size_t ZXEquivalenceChecker::fullReduceApproximate() {
+        auto        nSimplifications = fullReduce();
+        std::size_t newSimps;
+        do {
+            miter.approximateCliffords(tolerance);
+            newSimps = fullReduce();
+            nSimplifications += newSimps;
+        } while (!isDone() && (newSimps > 0));
+        return nSimplifications;
+    }
+
+    std::size_t ZXEquivalenceChecker::fullReduce() {
+        if (!isDone()) {
+            miter.toGraphlike();
+        }
+        interiorCliffordSimp();
+
+        std::size_t nSimplifications = 0;
+        while (!isDone()) {
+            cliffordSimp();
+            const auto nGadget = gadgetSimp();
+            interiorCliffordSimp();
+            const auto nPivot = pivotGadgetSimp();
+            if (nGadget + nPivot == 0)
+                break;
+            nSimplifications += nGadget + nPivot;
+        }
+        if (!isDone()) {
+            miter.removeDisconnectedSpiders();
+        }
+
+        return nSimplifications;
+    }
+
+    std::size_t ZXEquivalenceChecker::gadgetSimp() {
+        std::size_t nSimplifications = 0;
+        bool        new_matches      = true;
+
+        while (!isDone() && new_matches) {
+            new_matches = false;
+            for (const auto& [v, _]: miter.getVertices()) {
+                if (miter.isDeleted(v))
+                    continue;
+
+                if (!isDone() && checkAndFuseGadget(miter, v)) {
+                    new_matches = true;
+                    nSimplifications++;
+                }
+            }
+        }
+        return nSimplifications;
+    }
+
+    std::size_t ZXEquivalenceChecker::interiorCliffordSimp() {
+        spiderSimp();
+
+        bool        newMatches       = true;
+        std::size_t nSimplifications = 0;
+        while (!isDone() && newMatches) {
+            newMatches            = false;
+            const auto nId        = idSimp();
+            const auto nSpider    = spiderSimp();
+            const auto nPivot     = pivotPauliSimp();
+            const auto nLocalComp = localCompSimp();
+
+            if (nId + nSpider + nPivot + nLocalComp != 0) {
+                newMatches = true;
+                nSimplifications++;
+            }
+        }
+        return nSimplifications;
+    }
+
+    std::size_t ZXEquivalenceChecker::cliffordSimp() {
+        bool        newMatches       = true;
+        std::size_t nSimplifications = 0;
+        while (!isDone() && newMatches) {
+            newMatches           = false;
+            const auto nClifford = interiorCliffordSimp();
+            const auto nPivot    = pivotSimp();
+            if (nClifford + nPivot != 0) {
+                newMatches = true;
+                nSimplifications++;
+            }
+        }
+        return nSimplifications;
+    }
+
 } // namespace ec
