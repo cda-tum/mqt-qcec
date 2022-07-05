@@ -34,6 +34,7 @@ namespace ec {
             return StateType::Stabilizer;
         } else {
             std::cerr << "Unknown state type: " << type << ". Defaulting to computational basis states.\n";
+            return StateType::ComputationalBasis;
         }
     }
 

@@ -55,6 +55,7 @@ namespace ec {
             return EquivalenceCriterion::ProbablyNotEquivalent;
         } else {
             std::cerr << "Unknown equivalence criterion: " << criterion << ". Defaulting to `no_information`.\n";
+            return EquivalenceCriterion::NoInformation;
         }
     }
 
