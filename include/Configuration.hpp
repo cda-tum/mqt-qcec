@@ -18,7 +18,8 @@
 using namespace std::chrono_literals;
 
 namespace ec {
-    struct Configuration {
+    class Configuration {
+    public:
         // configuration options for execution
         struct Execution {
             dd::fp numericalTolerance = dd::ComplexTable<>::tolerance();
@@ -80,7 +81,7 @@ namespace ec {
 
         [[nodiscard]] bool onlySingleTask() const noexcept {
             // only a single simulation shall be performed
-            if (execution.runSimulationChecker && simulation.maxSims == 1U && !execution.runAlternatingChecker && !execution.runConstructionChecker) {
+            if (execution.runSimulationChecker && (simulation.maxSims == 1U) && !execution.runAlternatingChecker && !execution.runConstructionChecker) {
                 return true;
             }
 
@@ -108,10 +109,14 @@ namespace ec {
 
         [[nodiscard]] nlohmann::json json() const noexcept {
             nlohmann::json config{};
-            auto&          exe              = config["execution"];
-            exe["tolerance"]                = execution.numericalTolerance;
-            exe["parallel"]                 = execution.parallel;
-            exe["nthreads"]                 = execution.parallel ? execution.nthreads : 1U;
+            auto&          exe = config["execution"];
+            exe["tolerance"]   = execution.numericalTolerance;
+            exe["parallel"]    = execution.parallel;
+            if (execution.parallel) {
+                exe["nthreads"] = execution.nthreads;
+            } else {
+                exe["nthreads"] = 1U;
+            }
             exe["run_construction_checker"] = execution.runConstructionChecker;
             exe["run_simulation_checker"]   = execution.runSimulationChecker;
             exe["run_alternating_checker"]  = execution.runAlternatingChecker;
@@ -137,9 +142,9 @@ namespace ec {
             if (execution.runAlternatingChecker) {
                 app["alternating"] = ec::toString(application.alternatingScheme);
             }
-            if (application.constructionScheme == ApplicationSchemeType::GateCost ||
-                application.simulationScheme == ApplicationSchemeType::GateCost ||
-                application.alternatingScheme == ApplicationSchemeType::GateCost) {
+            if ((application.constructionScheme == ApplicationSchemeType::GateCost) ||
+                (application.simulationScheme == ApplicationSchemeType::GateCost) ||
+                (application.alternatingScheme == ApplicationSchemeType::GateCost)) {
                 if (!application.profile.empty()) {
                     app["profile"] = application.profile;
                 } else {
@@ -166,7 +171,8 @@ namespace ec {
         }
 
         [[nodiscard]] std::string toString() const noexcept {
-            return json().dump(2);
+            constexpr auto indent = 2U;
+            return json().dump(indent);
         }
     };
 } // namespace ec
