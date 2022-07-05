@@ -1,7 +1,7 @@
-/*
-* This file is part of MQT QCEC library which is released under the MIT license.
-* See file README.md or go to https://www.cda.cit.tum.de/research/quantum_verification/ for more information.
-*/
+//
+// This file is part of MQT QCEC library which is released under the MIT license.
+// See file README.md or go to https://www.cda.cit.tum.de/research/quantum_verification/ for more information.
+//
 
 #pragma once
 
@@ -17,36 +17,34 @@
 namespace ec {
     class StateGenerator {
     public:
-        explicit StateGenerator(std::size_t seed = 0U):
+        explicit StateGenerator(const std::size_t seed):
             seed(seed) {
             seedGenerator(seed);
-
-            // this generator produces random bases from the set { |0>, |1>, |+>, |->, |L>, |R> }
-            random1QBasisDistribution = std::uniform_int_distribution<std::size_t>(0U, 5U);
         }
+        StateGenerator():
+            StateGenerator(0U) {}
 
         template<class DDPackage = dd::Package<>>
-        qc::VectorDD generateRandomState(std::unique_ptr<DDPackage>& dd, dd::QubitCount totalQubits, dd::QubitCount ancillaryQubits = 0U, StateType type = StateType::ComputationalBasis) {
+        qc::VectorDD generateRandomState(std::unique_ptr<DDPackage>& dd, const dd::QubitCount totalQubits, const dd::QubitCount ancillaryQubits = 0U, const StateType type = StateType::ComputationalBasis) {
             switch (type) {
                 case ec::StateType::Random1QBasis:
                     return generateRandom1QBasisState(dd, totalQubits, ancillaryQubits);
                 case ec::StateType::Stabilizer:
                     return generateRandomStabilizerState(dd, totalQubits, ancillaryQubits);
-                case ec::StateType::ComputationalBasis:
                 default:
                     return generateRandomComputationalBasisState(dd, totalQubits, ancillaryQubits);
             }
         }
 
         template<class DDPackage = dd::Package<>>
-        qc::VectorDD generateRandomComputationalBasisState(std::unique_ptr<DDPackage>& dd, dd::QubitCount totalQubits, dd::QubitCount ancillaryQubits = 0U) {
+        qc::VectorDD generateRandomComputationalBasisState(std::unique_ptr<DDPackage>& dd, const dd::QubitCount totalQubits, const dd::QubitCount ancillaryQubits = 0U) {
             // determine how many qubits truly are random
-            const auto        randomQubits = totalQubits - ancillaryQubits;
+            const std::size_t randomQubits = totalQubits - ancillaryQubits;
             std::vector<bool> stimulusBits(totalQubits, false);
 
             // check if there still is a unique computational basis state
-            if (randomQubits <= 63) {
-                const std::uint_least64_t maxStates = (static_cast<std::uint_least64_t>(1U) << randomQubits);
+            if (constexpr auto bitwidth = std::numeric_limits<std::uint_least64_t>::digits; randomQubits <= (bitwidth - 1U)) {
+                const auto maxStates = static_cast<std::uint_least64_t>(1U) << randomQubits;
                 assert(generatedComputationalBasisStates.size() != maxStates);
                 // generate a unique computational basis state
                 std::uniform_int_distribution<std::uint_least64_t> distribution(0, maxStates - 1);
@@ -57,13 +55,13 @@ namespace ec {
 
                 // generate the bitvector corresponding to the random state
                 for (dd::QubitCount i = 0; i < randomQubits; ++i) {
-                    if (*randomState & (static_cast<std::uint_least64_t>(1U) << i)) {
+                    if ((*randomState & (static_cast<std::uint_least64_t>(1U) << i)) != 0U) {
                         stimulusBits[i] = true;
                     }
                 }
             } else {
-                // check how many 64bit numbers are needed for each random state
-                const auto nr = static_cast<std::size_t>(std::ceil(randomQubits / 64.));
+                // check how many numbers are needed for each random state
+                const auto nr = static_cast<std::size_t>(std::ceil(static_cast<double>(randomQubits) / bitwidth));
                 // generate enough random numbers
                 std::vector<std::mt19937_64::result_type> randomNumbers(nr, 0U);
                 for (auto i = 0U; i < nr; ++i) {
@@ -71,7 +69,7 @@ namespace ec {
                 }
                 // generate the corresponding bitvector
                 for (dd::QubitCount i = 0U; i < randomQubits; ++i) {
-                    if (randomNumbers[i / 64U] & (static_cast<std::uint_least64_t>(1U) << (i % 64U))) {
+                    if ((randomNumbers[i / bitwidth] & (static_cast<std::uint_least64_t>(1U) << (i % bitwidth))) != 0U) {
                         stimulusBits[i] = true;
                     }
                 }
@@ -82,7 +80,7 @@ namespace ec {
         }
 
         template<class DDPackage = dd::Package<>>
-        qc::VectorDD generateRandom1QBasisState(std::unique_ptr<DDPackage>& dd, dd::QubitCount totalQubits, dd::QubitCount ancillaryQubits = 0U) {
+        qc::VectorDD generateRandom1QBasisState(std::unique_ptr<DDPackage>& dd, const dd::QubitCount totalQubits, const dd::QubitCount ancillaryQubits = 0U) {
             // determine how many qubits truly are random
             const auto randomQubits = totalQubits - ancillaryQubits;
 
@@ -118,9 +116,9 @@ namespace ec {
         }
 
         template<class DDPackage = dd::Package<>>
-        qc::VectorDD generateRandomStabilizerState(std::unique_ptr<DDPackage>& dd, dd::QubitCount totalQubits, dd::QubitCount ancillaryQubits = 0U) {
+        qc::VectorDD generateRandomStabilizerState(std::unique_ptr<DDPackage>& dd, const dd::QubitCount totalQubits, const dd::QubitCount ancillaryQubits = 0U) {
             // determine how many qubits truly are random
-            const auto randomQubits = totalQubits - ancillaryQubits;
+            const dd::QubitCount randomQubits = totalQubits - ancillaryQubits;
 
             // generate a random Clifford circuit with appropriate depth
             auto rcs = qc::RandomCliffordCircuit(randomQubits, static_cast<std::size_t>(std::round(std::log2(randomQubits))), mt());
@@ -133,7 +131,7 @@ namespace ec {
 
             // add |0> edges for all the ancillary qubits
             auto initial = stabilizer;
-            for (dd::QubitCount p = randomQubits; p < totalQubits; p++) {
+            for (dd::QubitCount p = randomQubits; p < totalQubits; ++p) {
                 initial = dd->makeDDNode(static_cast<dd::Qubit>(p), std::array{initial, qc::VectorDD::zero});
             }
 
@@ -141,13 +139,13 @@ namespace ec {
             return initial;
         }
 
-        void seedGenerator(std::size_t s) {
+        void seedGenerator(const std::size_t s) {
             seed = s;
             if (seed == 0U) {
-                std::array<std::mt19937_64::result_type, std::mt19937_64::state_size> random_data{};
+                std::array<std::mt19937_64::result_type, std::mt19937_64::state_size> randomData{};
                 std::random_device                                                    rd;
-                std::generate(std::begin(random_data), std::end(random_data), std::ref(rd));
-                std::seed_seq seeds(std::begin(random_data), std::end(random_data));
+                std::generate(std::begin(randomData), std::end(randomData), std::ref(rd));
+                std::seed_seq seeds(std::begin(randomData), std::end(randomData));
                 mt.seed(seeds);
             } else {
                 mt.seed(seed);
@@ -156,11 +154,12 @@ namespace ec {
 
         void clear() { generatedComputationalBasisStates.clear(); }
 
-    protected:
+    private:
         std::size_t     seed = 0U;
         std::mt19937_64 mt;
 
-        std::unordered_set<std::size_t>            generatedComputationalBasisStates{};
-        std::uniform_int_distribution<std::size_t> random1QBasisDistribution;
+        std::unordered_set<std::size_t> generatedComputationalBasisStates{};
+        // this generator produces random bases from the set { |0>, |1>, |+>, |->, |L>, |R> }
+        std::uniform_int_distribution<std::size_t> random1QBasisDistribution = std::uniform_int_distribution<std::size_t>(0U, 5U);
     };
 } // namespace ec
