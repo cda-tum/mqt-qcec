@@ -36,19 +36,20 @@ namespace ec {
         }
     }
 
-    inline ApplicationSchemeType applicationSchemeFromString(const std::string& applicationScheme) {
-        if (applicationScheme == "sequential" || applicationScheme == "0" || applicationScheme == "reference") {
+    inline ApplicationSchemeType applicationSchemeFromString(const std::string& applicationScheme) noexcept {
+        if ((applicationScheme == "sequential") || (applicationScheme == "0") || (applicationScheme == "reference")) {
             return ApplicationSchemeType::Sequential;
-        } else if (applicationScheme == "one_to_one" || applicationScheme == "1" || applicationScheme == "naive") {
+        } else if ((applicationScheme == "one_to_one") || (applicationScheme == "1") || (applicationScheme == "naive")) {
             return ApplicationSchemeType::OneToOne;
-        } else if (applicationScheme == "lookahead" || applicationScheme == "2") {
+        } else if ((applicationScheme == "lookahead") || (applicationScheme == "2")) {
             return ApplicationSchemeType::Lookahead;
-        } else if (applicationScheme == "gate_cost" || applicationScheme == "3" || applicationScheme == "compilation_flow") {
+        } else if ((applicationScheme == "gate_cost") || (applicationScheme == "3") || (applicationScheme == "compilation_flow")) {
             return ApplicationSchemeType::GateCost;
-        } else if (applicationScheme == "proportional" || applicationScheme == "4") {
+        } else if ((applicationScheme == "proportional") || (applicationScheme == "4")) {
             return ApplicationSchemeType::Proportional;
         } else {
-            throw std::invalid_argument("Unknown application scheme: " + applicationScheme);
+            std::cerr << "Unknown application scheme: " << applicationScheme << ". Defaulting to proportional!\n";
+            return ApplicationSchemeType::Proportional;
         }
     }
 
