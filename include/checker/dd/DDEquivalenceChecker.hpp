@@ -1,28 +1,18 @@
-/*
- * This file is part of MQT QCEC library which is released under the MIT license.
- * See file README.md or go to https://www.cda.cit.tum.de/research/quantum_verification/ for more information.
- */
+//
+// This file is part of MQT QCEC library which is released under the MIT license.
+// See file README.md or go to https://www.cda.cit.tum.de/research/quantum_verification/ for more information.
+//
 
 #pragma once
 
-#include "CircuitOptimizer.hpp"
 #include "Configuration.hpp"
 #include "EquivalenceCriterion.hpp"
 #include "QuantumComputation.hpp"
 #include "TaskManager.hpp"
 #include "applicationscheme/ApplicationScheme.hpp"
-#include "applicationscheme/GateCostApplicationScheme.hpp"
-#include "applicationscheme/LookaheadApplicationScheme.hpp"
-#include "applicationscheme/OneToOneApplicationScheme.hpp"
-#include "applicationscheme/ProportionalApplicationScheme.hpp"
-#include "applicationscheme/SequentialApplicationScheme.hpp"
 #include "checker/EquivalenceChecker.hpp"
-#include "checker/dd/DDPackageConfigs.hpp"
 
-#include <chrono>
-#include <map>
 #include <memory>
-#include <string>
 #include <utility>
 
 namespace ec {
@@ -53,7 +43,7 @@ namespace ec {
         // at some point this routine should probably make its way into the DD package in some form
         EquivalenceCriterion equals(const DDType& e, const DDType& f);
 
-        virtual void                 initializeTask(TaskManager<DDType, DDPackage>&) = 0;
+        virtual void                 initializeTask(TaskManager<DDType, DDPackage>& taskManager) = 0;
         virtual void                 initialize();
         virtual void                 execute();
         virtual void                 finish();

@@ -12,9 +12,9 @@ namespace ec {
         initializeApplicationScheme(this->configuration.application.simulationScheme);
     }
 
-    void DDSimulationChecker::initializeTask(TaskManager<qc::VectorDD, SimulationDDPackage>& task) {
-        task.setInternalState(initialState);
-        task.incRef();
+    void DDSimulationChecker::initializeTask(TaskManager<qc::VectorDD, SimulationDDPackage>& taskManager) {
+        taskManager.setInternalState(initialState);
+        taskManager.incRef();
     }
 
     EquivalenceCriterion DDSimulationChecker::checkEquivalence() {
@@ -28,8 +28,8 @@ namespace ec {
     }
 
     void DDSimulationChecker::setRandomInitialState(StateGenerator& generator) {
-        const auto nancillary = nqubits - qc1.getNqubitsWithoutAncillae();
-        initialState          = generator.generateRandomState(dd, nqubits, nancillary, configuration.simulation.stateType);
+        const dd::QubitCount nancillary = nqubits - qc1.getNqubitsWithoutAncillae();
+        initialState                    = generator.generateRandomState(dd, nqubits, nancillary, configuration.simulation.stateType);
     }
 
 } // namespace ec

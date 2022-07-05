@@ -6,10 +6,11 @@
 #pragma once
 
 #include "DDEquivalenceChecker.hpp"
+#include "DDPackageConfigs.hpp"
 #include "applicationscheme/LookaheadApplicationScheme.hpp"
 
 namespace ec {
-    class DDAlternatingChecker: public DDEquivalenceChecker<qc::MatrixDD, AlternatingDDPackage> {
+    class DDAlternatingChecker final: public DDEquivalenceChecker<qc::MatrixDD, AlternatingDDPackage> {
     public:
         DDAlternatingChecker(const qc::QuantumComputation& qc1, const qc::QuantumComputation& qc2, ec::Configuration configuration):
             DDEquivalenceChecker(qc1, qc2, std::move(configuration)) {
@@ -19,7 +20,7 @@ namespace ec {
             initializeApplicationScheme(this->configuration.application.alternatingScheme);
 
             // special treatment for the lookahead application scheme
-            if (auto lookahead = dynamic_cast<LookaheadApplicationScheme<AlternatingDDPackage>*>(applicationScheme.get())) {
+            if (auto* lookahead = dynamic_cast<LookaheadApplicationScheme<AlternatingDDPackage>*>(applicationScheme.get())) {
                 // initialize links for the internal state and the package of the lookahead scheme
                 lookahead->setInternalState(functionality);
                 lookahead->setPackage(dd.get());
@@ -31,7 +32,7 @@ namespace ec {
             j["checker"] = "decision_diagram_alternating";
         }
 
-    protected:
+    private:
         qc::MatrixDD functionality{};
 
         void                 initializeTask(TaskManager<qc::MatrixDD, AlternatingDDPackage>&) override{};
@@ -42,6 +43,6 @@ namespace ec {
         EquivalenceCriterion checkEquivalence() override;
 
         // at some point this routine should probably make its way into the QFR library
-        bool gatesAreIdentical();
+        [[nodiscard]] bool gatesAreIdentical() const;
     };
 } // namespace ec
