@@ -93,7 +93,9 @@ namespace ec {
         taskManager1.changePermutation(functionality);
         if (isDone()) { return; }
         taskManager2.changePermutation(functionality);
-        if (done) { return; }
+        if (isDone()) {
+            return;
+        }
 
         // sum up the contributions of garbage qubits
         taskManager1.reduceGarbage(functionality);
