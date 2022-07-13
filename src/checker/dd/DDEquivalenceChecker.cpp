@@ -37,9 +37,9 @@ namespace ec {
             // for matrices this can be resolved by calculating their Frobenius inner product trace(U V^-1) and comparing it to some threshold.
             // in a similar fashion, we can simply compare U V^-1 with the identity, which results in a much simpler check that is not prone to overflow.
             bool isClose;
-            if (e.p->ident) {
+            if (e.p->isIdentity()) {
                 isClose = dd->isCloseToIdentity(f, configuration.functionality.traceThreshold);
-            } else if (f.p->ident) {
+            } else if (f.p->isIdentity()) {
                 isClose = dd->isCloseToIdentity(e, configuration.functionality.traceThreshold);
             } else {
                 auto g  = dd->multiply(e, dd->conjugateTranspose(f));
