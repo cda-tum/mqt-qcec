@@ -64,7 +64,7 @@ namespace ec {
                 if (isDone()) { return; }
 
                 // whenever the current functionality resembles the identity, identical gates on both sides cancel
-                if (functionality.p->ident && configuration.application.alternatingScheme != ApplicationSchemeType::Lookahead && gatesAreIdentical()) {
+                if (functionality.p->isIdentity() && configuration.application.alternatingScheme != ApplicationSchemeType::Lookahead && gatesAreIdentical()) {
                     taskManager1.advanceIterator();
                     taskManager2.advanceIterator();
                     continue;
