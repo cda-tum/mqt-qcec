@@ -19,8 +19,6 @@ class GateCostApplicationSchemeTest: public testing::Test {
         qc = qc::QuantumComputation(nqubits);
     }
 
-    void TearDown() override {}
-
 protected:
     dd::QubitCount                 nqubits = 3U;
     std::unique_ptr<dd::Package<>> dd;
