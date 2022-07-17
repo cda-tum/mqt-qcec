@@ -229,8 +229,8 @@ namespace ec {
                 "seed"_a                                 = 0U,
                 "store_cex_input"_a                      = false,
                 "store_cex_output"_a                     = false)
-                .def(py::init([](const py::object& circ1, const py::object& circ2, const Configuration& configuration) {
-                         return createManagerFromConfiguration(circ1, circ2, configuration);
+                .def(py::init([](const py::object& circ1, const py::object& circ2, const Configuration& config) {
+                         return createManagerFromConfiguration(circ1, circ2, config);
                      }),
                      "circ1"_a, "circ2"_a, "config"_a)
                 .def("get_configuration", &EquivalenceCheckingManager::getConfiguration)

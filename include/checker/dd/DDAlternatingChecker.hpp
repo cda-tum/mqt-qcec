@@ -35,7 +35,9 @@ namespace ec {
     private:
         qc::MatrixDD functionality{};
 
-        void                 initializeTask(TaskManager<qc::MatrixDD, AlternatingDDPackage>&) override{};
+        void initializeTask(TaskManager<qc::MatrixDD, AlternatingDDPackage>&) override{
+                // task initialization is conducted separately for this checker
+        };
         void                 initialize() override;
         void                 execute() override;
         void                 finish() override;

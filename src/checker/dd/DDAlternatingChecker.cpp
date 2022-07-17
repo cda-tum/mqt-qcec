@@ -67,20 +67,20 @@ namespace ec {
                 if (functionality.p->isIdentity() && (configuration.application.alternatingScheme != ApplicationSchemeType::Lookahead) && gatesAreIdentical()) {
                     taskManager1.advanceIterator();
                     taskManager2.advanceIterator();
-                } else {
-                    // query application scheme on how to proceed
-                    const auto [apply1, apply2] = (*applicationScheme)();
-
-                    // advance both tasks correspondingly
-                    if (isDone()) {
-                        return;
-                    }
-                    taskManager1.advance(functionality, apply1);
-                    if (isDone()) {
-                        return;
-                    }
-                    taskManager2.advance(functionality, apply2);
+                    continue;
                 }
+                // query application scheme on how to proceed
+                const auto [apply1, apply2] = (*applicationScheme)();
+
+                // advance both tasks correspondingly
+                if (isDone()) {
+                    return;
+                }
+                taskManager1.advance(functionality, apply1);
+                if (isDone()) {
+                    return;
+                }
+                taskManager2.advance(functionality, apply2);
             }
         }
     }

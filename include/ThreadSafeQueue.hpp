@@ -77,14 +77,14 @@ namespace ec {
 
         auto waitForData() {
             std::unique_lock headLock(headMutex);
-            dataCond.wait(headLock, [&] { return head.get() != getTail(); });
+            dataCond.wait(headLock, [this] { return head.get() != getTail(); });
             return headLock;
         }
 
         template<typename Clock, typename Dur>
         auto waitForDataUntil(const std::chrono::time_point<Clock, Dur>& timepoint) {
             std::unique_lock headLock(headMutex);
-            dataCond.wait_until(headLock, timepoint, [&] { return head.get() != getTail(); });
+            dataCond.wait_until(headLock, timepoint, [this] { return head.get() != getTail(); });
             return headLock;
         }
 

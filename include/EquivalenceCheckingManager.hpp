@@ -46,8 +46,6 @@ namespace ec {
                     case EquivalenceCriterion::EquivalentUpToGlobalPhase:
                     case EquivalenceCriterion::EquivalentUpToPhase:
                         return true;
-                    case EquivalenceCriterion::NotEquivalent:
-                    case EquivalenceCriterion::NoInformation:
                     default:
                         return false;
                 }
@@ -115,19 +113,19 @@ namespace ec {
             setSimulationApplicationScheme(applicationScheme);
             setAlternatingApplicationScheme(applicationScheme);
         }
-        void setConstructionGateCostProfile(const std::string& profileLocation) {
+        void setConstructionGateCostProfile(std::string_view profileLocation) {
             configuration.application.constructionScheme = ApplicationSchemeType::GateCost;
             configuration.application.profile            = profileLocation;
         }
-        void setSimulationGateCostProfile(const std::string& profileLocation) {
+        void setSimulationGateCostProfile(std::string_view profileLocation) {
             configuration.application.simulationScheme = ApplicationSchemeType::GateCost;
             configuration.application.profile          = profileLocation;
         }
-        void setAlternatingGateCostProfile(const std::string& profileLocation) {
+        void setAlternatingGateCostProfile(std::string_view profileLocation) {
             configuration.application.alternatingScheme = ApplicationSchemeType::GateCost;
             configuration.application.profile           = profileLocation;
         }
-        void setGateCostProfile(const std::string& profileLocation) {
+        void setGateCostProfile(std::string_view profileLocation) {
             setConstructionGateCostProfile(profileLocation);
             setSimulationGateCostProfile(profileLocation);
             setAlternatingGateCostProfile(profileLocation);
@@ -211,7 +209,7 @@ namespace ec {
         /// Signal all checker that they shall abort the computation as soon as possible since a result has been determined
         void setAndSignalDone() {
             done = true;
-            for (auto& checker: checkers) {
+            for (const auto& checker: checkers) {
                 if (checker) {
                     checker->signalDone();
                 }
