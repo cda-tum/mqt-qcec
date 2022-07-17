@@ -1,7 +1,7 @@
-/*
- * This file is part of MQT QCEC library which is released under the MIT license.
- * See file README.md or go to https://www.cda.cit.tum.de/research/quantum_verification/ for more information.
- */
+//
+// This file is part of MQT QCEC library which is released under the MIT license.
+// See file README.md or go to https://www.cda.cit.tum.de/research/quantum_verification/ for more information.
+//
 
 #include "EquivalenceCheckingManager.hpp"
 
@@ -22,12 +22,12 @@ protected:
 
     unsigned short tries = 10U;
 
-    double         min_time = 0.;
-    double         max_time = 0.;
-    double         avg_time = 0.;
-    unsigned short min_sims = 0U;
-    unsigned short max_sims = 0U;
-    double         avg_sims = 0.;
+    double      min_time = 0.;
+    double      max_time = 0.;
+    double      avg_time = 0.;
+    std::size_t min_sims = 0U;
+    std::size_t max_sims = 0U;
+    double      avg_sims = 0.;
 
     std::string transpiled_file{};
 
@@ -40,9 +40,11 @@ protected:
 
     unsigned short successes = 0U;
 
-    static bool setExists(std::set<std::set<unsigned long long>>& all, std::set<unsigned long long>& test) {
+    static bool setExists(const std::set<std::set<unsigned long long>>& all, const std::set<unsigned long long>& test) {
         // first entry
-        if (all.empty()) return false;
+        if (all.empty()) {
+            return false;
+        }
 
         for (const auto& set: all) {
             bool equals = true;
@@ -52,7 +54,9 @@ protected:
                     break;
                 }
             }
-            if (equals) return true;
+            if (equals) {
+                return true;
+            }
         }
         return false;
     }
@@ -68,26 +72,32 @@ protected:
         std::seed_seq seeds(begin(random_data), end(random_data));
         mt.seed(seeds);
         distribution = decltype(distribution)(0U, qc_transpiled.getNops() - 1U);
-        rng          = [&]() { return distribution(mt); };
+        rng          = [this]() { return distribution(mt); };
 
         gates_to_remove = std::get<1>(GetParam());
 
-        min_time = max_time = avg_time = 0.;
-        min_sims = max_sims = 0U;
-        avg_sims            = 0.;
+        min_time = 0.;
+        max_time = 0.;
+        avg_time = 0.;
+        min_sims = 0U;
+        max_sims = 0U;
+        avg_sims = 0.;
     }
 
-    void addToStatistics(unsigned short try_count, double time, unsigned short nsims) {
+    void addToStatistics(unsigned short try_count, double time, std::size_t nsims) {
         if (try_count == 0U) {
-            min_time = max_time = avg_time = time;
-            min_sims = max_sims = nsims;
-            avg_sims            = nsims;
+            min_time = time;
+            max_time = time;
+            avg_time = time;
+            min_sims = nsims;
+            max_sims = nsims;
+            avg_sims = static_cast<double>(nsims);
         } else {
             min_time = std::min(min_time, time);
             min_sims = std::min(min_sims, nsims);
             max_time = std::max(max_time, time);
             max_sims = std::max(max_sims, nsims);
-            avg_time = (avg_time * try_count + static_cast<double>(time)) / static_cast<double>(try_count + 1U);
+            avg_time = (avg_time * try_count + time) / static_cast<double>(try_count + 1U);
             avg_sims = (avg_sims * try_count + static_cast<double>(nsims)) / static_cast<double>(try_count + 1U);
         }
     }

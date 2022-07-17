@@ -1,7 +1,7 @@
-/*
-* This file is part of MQT QCEC library which is released under the MIT license.
-* See file README.md or go to https://www.cda.cit.tum.de/research/quantum_verification/ for more information.
-*/
+//
+// This file is part of MQT QCEC library which is released under the MIT license.
+// See file README.md or go to https://www.cda.cit.tum.de/research/quantum_verification/ for more information.
+//
 
 #pragma once
 
@@ -9,27 +9,16 @@
 #include "dd/Operations.hpp"
 
 namespace ec {
-    enum Direction : bool { Left  = true,
-                            Right = false };
+    enum class Direction : bool { Left  = true,
+                                  Right = false };
 
     template<class DDType, class DDPackage = dd::Package<>>
     class TaskManager {
-    protected:
-        const qc::QuantumComputation* qc;
-        qc::Permutation               permutation{};
-        decltype(qc->begin())         iterator;
-        decltype(qc->end())           end;
-        std::unique_ptr<DDPackage>&   package;
-        DDType                        internalState{};
-        ec::Direction                 direction = Left;
-
     public:
-        explicit TaskManager(const qc::QuantumComputation& qc, std::unique_ptr<DDPackage>& package, const ec::Direction& direction = Left) noexcept:
-            qc(&qc), package(package), direction(direction) {
-            permutation = qc.initialLayout;
-            iterator    = qc.begin();
-            end         = qc.end();
-        }
+        TaskManager(const qc::QuantumComputation& qc, std::unique_ptr<DDPackage>& package, const ec::Direction& direction) noexcept:
+            qc(&qc), package(package), direction(direction), permutation(qc.initialLayout), iterator(qc.begin()), end(qc.end()) {}
+        TaskManager(const qc::QuantumComputation& qc, std::unique_ptr<DDPackage>& package) noexcept:
+            TaskManager(qc, package, Direction::Left) {}
 
         [[nodiscard]] bool finished() const noexcept { return iterator == end; }
 
@@ -41,10 +30,16 @@ namespace ec {
         void setInternalState(const DDType& state) noexcept {
             internalState = state;
         }
-        void flipDirection() noexcept { direction = (direction == Left) ? Right : Left; }
+        void flipDirection() noexcept {
+            if (direction == Direction::Left) {
+                direction = Direction::Right;
+            } else {
+                direction = Direction::Left;
+            }
+        }
 
-        [[nodiscard]] inline qc::MatrixDD getDD() { return dd::getDD((*iterator).get(), package, permutation); }
-        [[nodiscard]] inline qc::MatrixDD getInverseDD() { return dd::getInverseDD((*iterator).get(), package, permutation); }
+        [[nodiscard]] qc::MatrixDD getDD() { return dd::getDD((*iterator).get(), package, permutation); }
+        [[nodiscard]] qc::MatrixDD getInverseDD() { return dd::getInverseDD((*iterator).get(), package, permutation); }
 
         [[nodiscard]] const qc::QuantumComputation* getCircuit() const noexcept { return qc; }
 
@@ -58,7 +53,7 @@ namespace ec {
                 // direction has no effect on state vector DDs
                 to = package->multiply(getDD(), to);
             } else {
-                if (direction == Left) {
+                if (direction == Direction::Left) {
                     to = package->multiply(getDD(), to);
                 } else {
                     to = package->multiply(to, getInverseDD());
@@ -77,14 +72,15 @@ namespace ec {
         }
         void applySwapOperations() { applySwapOperations(internalState); }
 
-        void advance(DDType& state, std::size_t steps = 1U) {
-            // TODO: it might make sense to explore whether gate fusion improves performance
+        void advance(DDType& state, const std::size_t steps) {
             for (std::size_t i = 0U; i < steps && !finished(); ++i) {
                 applyGate(state);
                 applySwapOperations(state);
             }
         }
-        void advance(std::size_t steps = 1U) { advance(internalState, steps); }
+        void advance(DDType& state) { advance(state, 1U); }
+        void advance(std::size_t steps) { advance(internalState, steps); }
+        void advance() { advance(1U); }
 
         void finish(DDType& state) {
             while (!finished()) {
@@ -94,13 +90,13 @@ namespace ec {
         void finish() { finish(internalState); }
 
         void changePermutation(DDType& state) {
-            dd::changePermutation(state, permutation, qc->outputPermutation, package, direction);
+            dd::changePermutation(state, permutation, qc->outputPermutation, package, static_cast<bool>(direction));
         }
         void changePermutation() { changePermutation(internalState); }
 
         void reduceAncillae(DDType& state) {
             if constexpr (std::is_same_v<DDType, qc::MatrixDD>) {
-                state = package->reduceAncillae(state, qc->ancillary, direction);
+                state = package->reduceAncillae(state, qc->ancillary, static_cast<bool>(direction));
             }
         }
         void reduceAncillae() { reduceAncillae(internalState); }
@@ -109,7 +105,7 @@ namespace ec {
             if constexpr (std::is_same_v<DDType, qc::VectorDD>) {
                 state = package->reduceGarbage(state, qc->garbage);
             } else if constexpr (std::is_same_v<DDType, qc::MatrixDD>) {
-                state = package->reduceGarbage(state, qc->garbage, direction);
+                state = package->reduceGarbage(state, qc->garbage, static_cast<bool>(direction));
             }
         }
         void reduceGarbage() { reduceGarbage(internalState); }
@@ -123,5 +119,14 @@ namespace ec {
             package->decRef(state);
         }
         void decRef() { decRef(internalState); }
+
+    private:
+        const qc::QuantumComputation* qc{};
+        std::unique_ptr<DDPackage>&   package;
+        ec::Direction                 direction = Direction::Left;
+        qc::Permutation               permutation{};
+        decltype(qc->begin())         iterator;
+        decltype(qc->end())           end;
+        DDType                        internalState{};
     };
 } // namespace ec

@@ -1,7 +1,7 @@
-/*
-* This file is part of MQT QCEC library which is released under the MIT license.
-* See file README.md or go to https://www.cda.cit.tum.de/research/quantum_verification/ for more information.
-*/
+//
+// This file is part of MQT QCEC library which is released under the MIT license.
+// See file README.md or go to https://www.cda.cit.tum.de/research/quantum_verification/ for more information.
+//
 
 #pragma once
 
@@ -10,15 +10,16 @@
 #include "operations/OpType.hpp"
 
 #include <functional>
+#include <stdexcept>
 #include <unordered_map>
 #include <utility>
 
 namespace std {
     template<>
     struct hash<std::pair<qc::OpType, dd::QubitCount>> {
-        size_t operator()(pair<qc::OpType, dd::QubitCount> const& key) const noexcept {
-            size_t h1 = hash<decltype(key.first)>{}(key.first);
-            size_t h2 = hash<decltype(key.second)>{}(key.second);
+        std::size_t operator()(pair<qc::OpType, dd::QubitCount> const& key) const noexcept {
+            const std::size_t h1 = hash<decltype(key.first)>{}(key.first);
+            const std::size_t h2 = hash<decltype(key.second)>{}(key.second);
             return h1 ^ (h2 << 1);
         }
     };
@@ -30,7 +31,7 @@ namespace ec {
     using CostFunction       = std::function<std::size_t(const GateCostLUTKeyType&)>;
 
     template<class DDType, class DDPackage = dd::Package<>>
-    class GateCostApplicationScheme: public ApplicationScheme<DDType, DDPackage> {
+    class GateCostApplicationScheme final: public ApplicationScheme<DDType, DDPackage> {
     public:
         GateCostApplicationScheme(TaskManager<DDType, DDPackage>& taskManager1, TaskManager<DDType, DDPackage>& taskManager2, const CostFunction& costFunction):
             ApplicationScheme<DDType, DDPackage>(taskManager1, taskManager2) {
@@ -57,10 +58,11 @@ namespace ec {
             return {1U, cost};
         }
 
-    protected:
+    private:
         GateCostLUT gateCostLUT{};
 
-        void populateLUT(const CostFunction& costFunction, const qc::QuantumComputation* qc) {
+        template<class CostFun>
+        void populateLUT(CostFun costFunction, const qc::QuantumComputation* qc) {
             for (const auto& op: *qc) {
                 const auto type      = op->getType();
                 const auto nControls = op->getNcontrols();
@@ -79,7 +81,7 @@ namespace ec {
         void populateLUT(const std::string& filename) {
             std::ifstream ifs(filename);
             if (!ifs.good()) {
-                throw std::runtime_error("Error opening LUT file: " + filename);
+                throw std::invalid_argument("Error opening LUT file: " + filename);
             }
             populateLUT(ifs);
         }
@@ -93,7 +95,7 @@ namespace ec {
         }
     };
 
-    static std::size_t LegacyIBMCostFunction(const GateCostLUTKeyType& key) noexcept {
+    [[nodiscard]] static std::size_t LegacyIBMCostFunction(const GateCostLUTKeyType& key) noexcept {
         const auto [gate, nc] = key;
 
         if (nc == 0U) {
@@ -132,13 +134,13 @@ namespace ec {
         }
 
         // special treatment for CNOT
-        if (gate == qc::X && nc == 1U) {
+        if ((gate == qc::X) && (nc == 1U)) {
             return 1U;
         }
 
         switch (gate) {
             case qc::X:
-                return 2U * (nc - 2U) * (2U * LegacyIBMCostFunction({qc::Phase, 0}) + 2 * LegacyIBMCostFunction({qc::U2, 0}) + 3U * LegacyIBMCostFunction({qc::X, 1})) + 6U * LegacyIBMCostFunction({qc::X, 1}) + 8U * LegacyIBMCostFunction({qc::U3, 0});
+                return 2U * (nc - 2U) * ((2U * LegacyIBMCostFunction({qc::Phase, 0})) + (2 * LegacyIBMCostFunction({qc::U2, 0})) + (3U * LegacyIBMCostFunction({qc::X, 1}))) + (6U * LegacyIBMCostFunction({qc::X, 1})) + (8U * LegacyIBMCostFunction({qc::U3, 0}));
             case qc::U3:
             case qc::U2:
             case qc::V:
@@ -148,21 +150,23 @@ namespace ec {
             case qc::H:
             case qc::SX:
             case qc::SXdag:
-                return 2U * LegacyIBMCostFunction({qc::X, nc}) + 4U * LegacyIBMCostFunction({qc::U3, 0}); // heuristic
+                // heuristic
+                return (2U * LegacyIBMCostFunction({qc::X, nc})) + (4U * LegacyIBMCostFunction({qc::U3, 0}));
             case qc::Phase:
             case qc::S:
             case qc::Sdag:
             case qc::T:
             case qc::Tdag:
             case qc::RZ:
-                return 2U * LegacyIBMCostFunction({qc::X, nc}) + 3U * LegacyIBMCostFunction({qc::Phase, 0}); // heuristic
+                // heuristic
+                return (2U * LegacyIBMCostFunction({qc::X, nc})) + (3U * LegacyIBMCostFunction({qc::Phase, 0}));
             case qc::Y:
             case qc::Z:
-                return LegacyIBMCostFunction({qc::X, nc}) + 2U * LegacyIBMCostFunction({qc::U3, 0});
+                return LegacyIBMCostFunction({qc::X, nc}) + (2U * LegacyIBMCostFunction({qc::U3, 0}));
             case qc::SWAP:
-                return LegacyIBMCostFunction({qc::X, nc}) + 2U * LegacyIBMCostFunction({qc::X, 1});
+                return LegacyIBMCostFunction({qc::X, nc}) + (2U * LegacyIBMCostFunction({qc::X, 1}));
             case qc::iSWAP:
-                return 2U * LegacyIBMCostFunction({qc::X, nc + 1U}) + 2U * LegacyIBMCostFunction({qc::S, nc}) + 2U * LegacyIBMCostFunction({qc::H, nc});
+                return (2U * LegacyIBMCostFunction({qc::X, nc + 1U})) + (2U * LegacyIBMCostFunction({qc::S, nc})) + (2U * LegacyIBMCostFunction({qc::H, nc}));
             case qc::Peres:
             case qc::Peresdag:
                 return LegacyIBMCostFunction({qc::X, nc + 1U}) + LegacyIBMCostFunction({qc::X, nc});

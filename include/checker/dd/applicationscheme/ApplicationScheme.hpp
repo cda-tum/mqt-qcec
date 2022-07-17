@@ -1,7 +1,7 @@
-/*
-* This file is part of MQT QCEC library which is released under the MIT license.
-* See file README.md or go to https://www.cda.cit.tum.de/research/quantum_verification/ for more information.
-*/
+//
+// This file is part of MQT QCEC library which is released under the MIT license.
+// See file README.md or go to https://www.cda.cit.tum.de/research/quantum_verification/ for more information.
+//
 
 #pragma once
 
@@ -9,6 +9,7 @@
 #include "checker/dd/TaskManager.hpp"
 
 #include <iostream>
+#include <stdexcept>
 
 namespace ec {
     // A list of application schemes that implement the below interface
@@ -30,25 +31,25 @@ namespace ec {
                 return "lookahead";
             case ApplicationSchemeType::GateCost:
                 return "gate_cost";
-            case ApplicationSchemeType::Proportional:
             default:
                 return "proportional";
         }
     }
 
-    inline ApplicationSchemeType applicationSchemeFromString(const std::string& applicationScheme) {
-        if (applicationScheme == "sequential" || applicationScheme == "0" || applicationScheme == "reference") {
+    inline ApplicationSchemeType applicationSchemeFromString(const std::string& applicationScheme) noexcept {
+        if ((applicationScheme == "sequential") || (applicationScheme == "0") || (applicationScheme == "reference")) {
             return ApplicationSchemeType::Sequential;
-        } else if (applicationScheme == "one_to_one" || applicationScheme == "1" || applicationScheme == "naive") {
+        } else if ((applicationScheme == "one_to_one") || (applicationScheme == "1") || (applicationScheme == "naive")) {
             return ApplicationSchemeType::OneToOne;
-        } else if (applicationScheme == "lookahead" || applicationScheme == "2") {
+        } else if ((applicationScheme == "lookahead") || (applicationScheme == "2")) {
             return ApplicationSchemeType::Lookahead;
-        } else if (applicationScheme == "gate_cost" || applicationScheme == "3" || applicationScheme == "compilation_flow") {
+        } else if ((applicationScheme == "gate_cost") || (applicationScheme == "3") || (applicationScheme == "compilation_flow")) {
             return ApplicationSchemeType::GateCost;
-        } else if (applicationScheme == "proportional" || applicationScheme == "4") {
+        } else if ((applicationScheme == "proportional") || (applicationScheme == "4")) {
             return ApplicationSchemeType::Proportional;
         } else {
-            throw std::runtime_error("Unknown application scheme: " + applicationScheme);
+            std::cerr << "Unknown application scheme: " << applicationScheme << ". Defaulting to proportional!\n";
+            return ApplicationSchemeType::Proportional;
         }
     }
 
@@ -65,7 +66,7 @@ namespace ec {
         return in;
     }
 
-    inline std::ostream& operator<<(std::ostream& out, ApplicationSchemeType& applicationScheme) {
+    inline std::ostream& operator<<(std::ostream& out, const ApplicationSchemeType& applicationScheme) {
         out << toString(applicationScheme);
         return out;
     }

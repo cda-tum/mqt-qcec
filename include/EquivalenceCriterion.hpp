@@ -1,7 +1,7 @@
-/*
-* This file is part of MQT QCEC library which is released under the MIT license.
-* See file README.md or go to https://www.cda.cit.tum.de/research/quantum_verification/ for more information.
-*/
+//
+// This file is part of MQT QCEC library which is released under the MIT license.
+// See file README.md or go to https://www.cda.cit.tum.de/research/quantum_verification/ for more information.
+//
 
 #pragma once
 
@@ -33,29 +33,29 @@ namespace ec {
                 return "equivalent_up_to_phase";
             case EquivalenceCriterion::ProbablyNotEquivalent:
                 return "probably_not_equivalent";
-            case EquivalenceCriterion::NoInformation:
             default:
                 return "no_information";
         }
     }
 
-    inline EquivalenceCriterion fromString(const std::string& criterion) {
-        if (criterion == "not_equivalent" || criterion == "0") {
+    inline EquivalenceCriterion fromString(const std::string& criterion) noexcept {
+        if ((criterion == "not_equivalent") || (criterion == "0")) {
             return EquivalenceCriterion::NotEquivalent;
-        } else if (criterion == "equivalent" || criterion == "1") {
+        } else if ((criterion == "equivalent") || (criterion == "1")) {
             return EquivalenceCriterion::Equivalent;
-        } else if (criterion == "probably_equivalent" || criterion == "2") {
+        } else if ((criterion == "probably_equivalent") || (criterion == "2")) {
             return EquivalenceCriterion::ProbablyEquivalent;
-        } else if (criterion == "equivalent_up_to_global_phase" || criterion == "3") {
+        } else if ((criterion == "equivalent_up_to_global_phase") || (criterion == "3")) {
             return EquivalenceCriterion::EquivalentUpToGlobalPhase;
-        } else if (criterion == "equivalent_up_to_phase" || criterion == "4") {
+        } else if ((criterion == "equivalent_up_to_phase") || (criterion == "4")) {
             return EquivalenceCriterion::EquivalentUpToPhase;
-        } else if (criterion == "no_information" || criterion == "5") {
+        } else if ((criterion == "no_information") || (criterion == "5")) {
             return EquivalenceCriterion::NoInformation;
-        } else if (criterion == "probably_not_equivalent" || criterion == "6") {
+        } else if ((criterion == "probably_not_equivalent") || (criterion == "6")) {
             return EquivalenceCriterion::ProbablyNotEquivalent;
         } else {
-            throw std::runtime_error("Unknown equivalence criterion: " + criterion);
+            std::cerr << "Unknown equivalence criterion: " << criterion << ". Defaulting to `no_information`.\n";
+            return EquivalenceCriterion::NoInformation;
         }
     }
 
@@ -72,7 +72,7 @@ namespace ec {
         return in;
     }
 
-    inline std::ostream& operator<<(std::ostream& out, EquivalenceCriterion& criterion) {
+    inline std::ostream& operator<<(std::ostream& out, const EquivalenceCriterion& criterion) {
         out << toString(criterion);
         return out;
     }

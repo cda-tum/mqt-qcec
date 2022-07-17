@@ -1,7 +1,7 @@
-/*
-* This file is part of MQT QCEC library which is released under the MIT license.
-* See file README.md or go to https://www.cda.cit.tum.de/research/quantum_verification/ for more information.
-*/
+//
+// This file is part of MQT QCEC library which is released under the MIT license.
+// See file README.md or go to https://www.cda.cit.tum.de/research/quantum_verification/ for more information.
+//
 
 #pragma once
 
@@ -42,7 +42,7 @@ namespace ec {
         void signalDone() {
             done.store(true, std::memory_order_relaxed);
         }
-        inline auto isDone() { return done.load(std::memory_order_relaxed); }
+        [[nodiscard]] auto isDone() const { return done.load(std::memory_order_relaxed); }
 
     protected:
         const qc::QuantumComputation& qc1;
@@ -52,10 +52,11 @@ namespace ec {
 
         Configuration configuration;
 
-        std::atomic<bool> done{false};
-
         EquivalenceCriterion equivalence = EquivalenceCriterion::NoInformation;
         double               runtime{};
+
+    private:
+        std::atomic<bool> done{false};
     };
 
 } // namespace ec

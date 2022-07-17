@@ -1,9 +1,17 @@
-/*
-* This file is part of MQT QCEC library which is released under the MIT license.
-* See file README.md or go to https://www.cda.cit.tum.de/research/quantum_verification/ for more information.
-*/
+//
+// This file is part of MQT QCEC library which is released under the MIT license.
+// See file README.md or go to https://www.cda.cit.tum.de/research/quantum_verification/ for more information.
+//
 
 #include "checker/dd/DDEquivalenceChecker.hpp"
+
+#include "CircuitOptimizer.hpp"
+#include "checker/dd/DDPackageConfigs.hpp"
+#include "checker/dd/applicationscheme/GateCostApplicationScheme.hpp"
+#include "checker/dd/applicationscheme/LookaheadApplicationScheme.hpp"
+#include "checker/dd/applicationscheme/OneToOneApplicationScheme.hpp"
+#include "checker/dd/applicationscheme/ProportionalApplicationScheme.hpp"
+#include "checker/dd/applicationscheme/SequentialApplicationScheme.hpp"
 
 namespace ec {
 
@@ -36,7 +44,7 @@ namespace ec {
         if constexpr (std::is_same_v<DDType, qc::MatrixDD>) {
             // for matrices this can be resolved by calculating their Frobenius inner product trace(U V^-1) and comparing it to some threshold.
             // in a similar fashion, we can simply compare U V^-1 with the identity, which results in a much simpler check that is not prone to overflow.
-            bool isClose;
+            bool isClose{};
             if (e.p->isIdentity()) {
                 isClose = dd->isCloseToIdentity(f, configuration.functionality.traceThreshold);
             } else if (f.p->isIdentity()) {
@@ -64,7 +72,7 @@ namespace ec {
             }
 
             // whenever |<e,f>|^2 ≃ 1, both decision diagrams should be considered equivalent up to a phase
-            const auto fidelity = innerProduct.r * innerProduct.r + innerProduct.i * innerProduct.i;
+            const auto fidelity = (innerProduct.r * innerProduct.r) + (innerProduct.i * innerProduct.i);
             if (std::abs(fidelity - 1.0) < configuration.simulation.fidelityThreshold) {
                 return EquivalenceCriterion::EquivalentUpToPhase;
             }
@@ -80,22 +88,30 @@ namespace ec {
         // initialize the internal representation (initial state, initial matrix, etc.)
         initialize();
 
-        if (isDone()) { return equivalence; }
+        if (isDone()) {
+            return equivalence;
+        }
 
         // execute the equivalence checking scheme
         execute();
 
-        if (isDone()) { return equivalence; }
+        if (isDone()) {
+            return equivalence;
+        }
 
         // finish off both circuits
         finish();
 
-        if (isDone()) { return equivalence; }
+        if (isDone()) {
+            return equivalence;
+        }
 
         // postprocess the result
         postprocess();
 
-        if (isDone()) { return equivalence; }
+        if (isDone()) {
+            return equivalence;
+        }
 
         // check the equivalence
         equivalence = checkEquivalence();
@@ -103,7 +119,9 @@ namespace ec {
         // determine maximum number of nodes used
         if constexpr (std::is_same_v<DDType, qc::MatrixDD>) {
             maxActiveNodes = dd->mUniqueTable.getMaxActiveNodes();
-        } else if constexpr (std::is_same_v<DDType, qc::VectorDD>) {
+        }
+
+        if constexpr (std::is_same_v<DDType, qc::VectorDD>) {
             maxActiveNodes = dd->vUniqueTable.getMaxActiveNodes();
         }
 
@@ -131,9 +149,13 @@ namespace ec {
                 const auto [apply1, apply2] = (*applicationScheme)();
 
                 // advance both tasks correspondingly
-                if (isDone()) { return; }
+                if (isDone()) {
+                    return;
+                }
                 taskManager1.advance(apply1);
-                if (isDone()) { return; }
+                if (isDone()) {
+                    return;
+                }
                 taskManager2.advance(apply2);
             }
         }
@@ -142,7 +164,9 @@ namespace ec {
     template<class DDType, class DDPackage>
     void DDEquivalenceChecker<DDType, DDPackage>::finish() {
         taskManager1.finish();
-        if (isDone()) { return; }
+        if (isDone()) {
+            return;
+        }
         taskManager2.finish();
     }
 
@@ -150,10 +174,14 @@ namespace ec {
     void DDEquivalenceChecker<DDType, DDPackage>::postprocessTask(TaskManager<DDType, DDPackage>& task) {
         // ensure that the permutation that was tracked throughout the circuit matches the expected output permutation
         task.changePermutation();
-        if (isDone()) { return; }
+        if (isDone()) {
+            return;
+        }
         // eliminate the superfluous contributions of ancillary qubits (this only has an effect on matrices)
         task.reduceAncillae();
-        if (isDone()) { return; }
+        if (isDone()) {
+            return;
+        }
         // sum up the contributions of garbage qubits
         task.reduceGarbage();
     }
@@ -161,7 +189,9 @@ namespace ec {
     template<class DDType, class DDPackage>
     void DDEquivalenceChecker<DDType, DDPackage>::postprocess() {
         postprocessTask(taskManager1);
-        if (isDone()) { return; }
+        if (isDone()) {
+            return;
+        }
         postprocessTask(taskManager2);
     }
 
@@ -171,7 +201,7 @@ namespace ec {
     }
 
     template<class DDType, class DDPackage>
-    void DDEquivalenceChecker<DDType, DDPackage>::initializeApplicationScheme(ApplicationSchemeType scheme) {
+    void DDEquivalenceChecker<DDType, DDPackage>::initializeApplicationScheme(const ApplicationSchemeType scheme) {
         switch (scheme) {
             case ApplicationSchemeType::Sequential:
                 applicationScheme = std::make_unique<SequentialApplicationScheme<DDType, DDPackage>>(taskManager1, taskManager2);
@@ -179,14 +209,11 @@ namespace ec {
             case ApplicationSchemeType::OneToOne:
                 applicationScheme = std::make_unique<OneToOneApplicationScheme<DDType, DDPackage>>(taskManager1, taskManager2);
                 break;
-            case ApplicationSchemeType::Proportional:
-                applicationScheme = std::make_unique<ProportionalApplicationScheme<DDType, DDPackage>>(taskManager1, taskManager2);
-                break;
             case ApplicationSchemeType::Lookahead:
                 if constexpr (std::is_same_v<DDType, qc::MatrixDD>) {
                     applicationScheme = std::make_unique<LookaheadApplicationScheme<DDPackage>>(taskManager1, taskManager2);
                 } else {
-                    throw std::runtime_error("Lookahead application scheme can only be used for matrices.");
+                    throw std::invalid_argument("Lookahead application scheme can only be used for matrices.");
                 }
                 break;
             case ApplicationSchemeType::GateCost:
@@ -195,6 +222,9 @@ namespace ec {
                 } else {
                     applicationScheme = std::make_unique<GateCostApplicationScheme<DDType, DDPackage>>(taskManager1, taskManager2, configuration.application.costFunction);
                 }
+                break;
+            default:
+                applicationScheme = std::make_unique<ProportionalApplicationScheme<DDType, DDPackage>>(taskManager1, taskManager2);
                 break;
         }
     }

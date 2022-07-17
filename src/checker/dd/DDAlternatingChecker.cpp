@@ -1,7 +1,7 @@
-/*
-* This file is part of MQT QCEC library which is released under the MIT license.
-* See file README.md or go to https://www.cda.cit.tum.de/research/quantum_verification/ for more information.
-*/
+//
+// This file is part of MQT QCEC library which is released under the MIT license.
+// See file README.md or go to https://www.cda.cit.tum.de/research/quantum_verification/ for more information.
+//
 
 #include "checker/dd/DDAlternatingChecker.hpp"
 
@@ -21,26 +21,24 @@ namespace ec {
             if (qc1.logicalQubitIsAncillary(q) && qc2.logicalQubitIsAncillary(q)) {
                 bool found1  = false;
                 bool isIdle1 = false;
-                for (const auto& in1: qc1.initialLayout) {
-                    if (in1.second == q) {
-                        found1  = true;
-                        isIdle1 = qc1.isIdleQubit(in1.first);
-                        break;
-                    }
+                if (const auto it = std::find_if(qc1.initialLayout.cbegin(), qc1.initialLayout.cend(),
+                                                 [q](const auto& mapping) { return mapping.second == q; });
+                    it != qc1.initialLayout.cend()) {
+                    found1  = true;
+                    isIdle1 = qc1.isIdleQubit(it->first);
                 }
                 bool found2  = false;
                 bool isIdle2 = false;
-                for (const auto& in2: qc2.initialLayout) {
-                    if (in2.second == q) {
-                        found2  = true;
-                        isIdle2 = qc2.isIdleQubit(in2.first);
-                        break;
-                    }
+                if (const auto it = std::find_if(qc2.initialLayout.cbegin(), qc2.initialLayout.cend(),
+                                                 [q](const auto& mapping) { return mapping.second == q; });
+                    it != qc2.initialLayout.cend()) {
+                    found2  = true;
+                    isIdle2 = qc2.isIdleQubit(it->first);
                 }
 
                 // qubit only really exists or is acted on in one of the circuits
                 if ((found1 != found2) || (isIdle1 != isIdle2)) {
-                    ancillary[q] = true;
+                    ancillary[static_cast<std::size_t>(q)] = true;
                 }
             }
         }
@@ -61,22 +59,27 @@ namespace ec {
             taskManager2.applySwapOperations(functionality);
 
             if (!taskManager1.finished() && !taskManager2.finished()) {
-                if (isDone()) { return; }
+                if (isDone()) {
+                    return;
+                }
 
                 // whenever the current functionality resembles the identity, identical gates on both sides cancel
-                if (functionality.p->isIdentity() && configuration.application.alternatingScheme != ApplicationSchemeType::Lookahead && gatesAreIdentical()) {
+                if (functionality.p->isIdentity() && (configuration.application.alternatingScheme != ApplicationSchemeType::Lookahead) && gatesAreIdentical()) {
                     taskManager1.advanceIterator();
                     taskManager2.advanceIterator();
                     continue;
                 }
-
                 // query application scheme on how to proceed
                 const auto [apply1, apply2] = (*applicationScheme)();
 
                 // advance both tasks correspondingly
-                if (isDone()) { return; }
+                if (isDone()) {
+                    return;
+                }
                 taskManager1.advance(functionality, apply1);
-                if (isDone()) { return; }
+                if (isDone()) {
+                    return;
+                }
                 taskManager2.advance(functionality, apply2);
             }
         }
@@ -84,28 +87,42 @@ namespace ec {
 
     void DDAlternatingChecker::finish() {
         taskManager1.finish(functionality);
-        if (isDone()) { return; }
+        if (isDone()) {
+            return;
+        }
         taskManager2.finish(functionality);
     }
 
     void DDAlternatingChecker::postprocess() {
         // ensure that the permutations that were tracked throughout the circuit match the expected output permutations
         taskManager1.changePermutation(functionality);
-        if (isDone()) { return; }
+        if (isDone()) {
+            return;
+        }
         taskManager2.changePermutation(functionality);
-        if (done) { return; }
+        if (isDone()) {
+            return;
+        }
 
         // sum up the contributions of garbage qubits
         taskManager1.reduceGarbage(functionality);
-        if (isDone()) { return; }
+        if (isDone()) {
+            return;
+        }
         taskManager2.reduceGarbage(functionality);
-        if (isDone()) { return; }
+        if (isDone()) {
+            return;
+        }
 
         // TODO: check whether reducing ancillaries here is theoretically sound
         taskManager1.reduceAncillae(functionality);
-        if (isDone()) { return; }
+        if (isDone()) {
+            return;
+        }
         taskManager2.reduceAncillae(functionality);
-        if (isDone()) { return; }
+        if (isDone()) {
+            return;
+        }
     }
 
     EquivalenceCriterion DDAlternatingChecker::checkEquivalence() {
@@ -132,7 +149,7 @@ namespace ec {
         return equals(functionality, goalMatrix);
     }
 
-    bool DDAlternatingChecker::gatesAreIdentical() {
+    [[nodiscard]] bool DDAlternatingChecker::gatesAreIdentical() const {
         if (taskManager1.finished() || taskManager2.finished()) {
             return false;
         }

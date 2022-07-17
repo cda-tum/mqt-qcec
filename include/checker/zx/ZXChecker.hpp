@@ -72,7 +72,7 @@ namespace ec {
                     }
                     rule(miter, v);
                     newMatches = true;
-                    nSimplifications++;
+                    ++nSimplifications;
                 }
             }
             return nSimplifications;
@@ -91,14 +91,14 @@ namespace ec {
                     }
                     rule(miter, v0, v1);
                     newMatches = true;
-                    nSimplifications++;
+                    ++nSimplifications;
                 }
             }
             return nSimplifications;
         }
     };
 
-    qc::Permutation complete(const qc::Permutation& p, dd::Qubit n);
+    qc::Permutation complete(const qc::Permutation& p, dd::QubitCount n);
     qc::Permutation concat(const qc::Permutation& p1, const qc::Permutation& p2);
     qc::Permutation invert(const qc::Permutation& p);
     qc::Permutation invertPermutations(const qc::QuantumComputation& qc);

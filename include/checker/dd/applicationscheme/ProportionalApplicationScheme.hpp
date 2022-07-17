@@ -1,7 +1,7 @@
-/*
-* This file is part of MQT QCEC library which is released under the MIT license.
-* See file README.md or go to https://www.cda.cit.tum.de/research/quantum_verification/ for more information.
-*/
+//
+// This file is part of MQT QCEC library which is released under the MIT license.
+// See file README.md or go to https://www.cda.cit.tum.de/research/quantum_verification/ for more information.
+//
 
 #pragma once
 
@@ -15,15 +15,15 @@ namespace ec {
             ApplicationScheme<DDType, DDPackage>(taskManager1, taskManager2),
             gateRatio(computeGateRatio()) {}
 
-        std::pair<size_t, size_t> operator()() noexcept final {
+        std::pair<size_t, size_t> operator()() noexcept override {
             return {1U, gateRatio};
         }
 
-    protected:
+    private:
         [[nodiscard]] std::size_t computeGateRatio() const noexcept {
             const std::size_t size1 = this->taskManager1.getCircuit()->size();
             const std::size_t size2 = this->taskManager2.getCircuit()->size();
-            return std::max((size2 + size1 / 2U) / size1, static_cast<std::size_t>(1U));
+            return std::max((size2 + (size1 / 2U)) / size1, static_cast<std::size_t>(1U));
         }
 
         const std::size_t gateRatio;

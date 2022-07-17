@@ -1,7 +1,7 @@
-/*
-* This file is part of MQT QCEC library which is released under the MIT license.
-* See file README.md or go to https://www.cda.cit.tum.de/research/quantum_verification/ for more information.
-*/
+//
+// This file is part of MQT QCEC library which is released under the MIT license.
+// See file README.md or go to https://www.cda.cit.tum.de/research/quantum_verification/ for more information.
+//
 
 #include "EquivalenceCheckingManager.hpp"
 
@@ -10,7 +10,6 @@
 
 #include <iostream>
 #include <memory>
-#include <string>
 
 namespace ec {
     void EquivalenceCheckingManager::setupAncillariesAndGarbage() {
@@ -50,35 +49,27 @@ namespace ec {
         auto& smallerCircuit = qc1.getNqubits() > qc2.getNqubits() ? qc2 : qc1;
         auto& largerCircuit  = qc1.getNqubits() > qc2.getNqubits() ? qc1 : qc2;
 
-        [[maybe_unused]] auto& smallerInitial   = smallerCircuit.initialLayout;
-        auto&                  smallerOutput    = smallerCircuit.outputPermutation;
-        [[maybe_unused]] auto& smallerAncillary = smallerCircuit.ancillary;
-        auto&                  smallerGarbage   = smallerCircuit.garbage;
+        auto& smallerGarbage = smallerCircuit.garbage;
 
-        auto& largerOutput  = largerCircuit.outputPermutation;
-        auto& largerGarbage = largerCircuit.garbage;
+        const auto& largerOutput  = largerCircuit.outputPermutation;
+        auto&       largerGarbage = largerCircuit.garbage;
 
-        for (const auto& o: largerOutput) {
-            dd::Qubit outputQubitInLargerCircuit = o.second;
-            //             dd::Qubit physicalQubitInLargerCircuit = o.first;
-            //             std::cout << "Output logical qubit " << static_cast<std::size_t>(outputQubitInLargerCircuit) << " at physical qubit " << static_cast<std::size_t>(physicalQubitInLargerCircuit);
-            dd::Qubit nout = 1;
+        for (const auto& [lPhysical, lLogical]: largerOutput) {
+            dd::Qubit outputQubitInLargerCircuit = lLogical;
+            dd::Qubit nout                       = 1;
             for (dd::Qubit i = 0; i < outputQubitInLargerCircuit; ++i) {
                 if (!largerGarbage[i])
                     ++nout;
             }
-            // std::cout << " which is logical output qubit number " << static_cast<std::size_t>(nout) << std::endl;
 
-            dd::QubitCount outcount                    = nout;
-            dd::Qubit      outputQubitInSmallerCircuit = 0;
-            bool           existsInSmaller             = false;
+            dd::QubitCount outcount        = nout;
+            bool           existsInSmaller = false;
             for (dd::QubitCount i = 0; i < smallerCircuit.getNqubits(); ++i) {
                 if (!smallerGarbage[i]) {
                     --outcount;
                 }
                 if (outcount == 0) {
-                    outputQubitInSmallerCircuit = static_cast<dd::Qubit>(i);
-                    existsInSmaller             = true;
+                    existsInSmaller = true;
                     break;
                 }
             }
@@ -86,54 +77,7 @@ namespace ec {
             if (!existsInSmaller)
                 continue;
 
-            // std::cout << "This is logical qubit " << static_cast<std::size_t>(outputQubitInSmallerCircuit) << " in the smaller circuit";
-            [[maybe_unused]] dd::Qubit physicalQubitInSmallerCircuit = 0;
-            for (const auto& out: smallerOutput) {
-                if (out.second == outputQubitInSmallerCircuit) {
-                    physicalQubitInSmallerCircuit = out.first;
-                    break;
-                }
-            }
-            // std::cout << " which is assigned to physical qubit " << static_cast<std::size_t>(physicalQubitInSmallerCircuit) << " at the end of the circuit" << std::endl;
-
-            //            if (outputQubitInLargerCircuit != outputQubitInSmallerCircuit) {
-            //                std::cout << "Mismatch in the logical output qubits" << std::endl;
-            //                if (smallerAncillary[outputQubitInLargerCircuit] && smallerGarbage[outputQubitInLargerCircuit]) {
-            //                    bool      found                          = false;
-            //                    dd::Qubit physicalIndexOfLargerInSmaller = 0;
-            //                    for (const auto& in: smallerInitial) {
-            //                        if (in.second == outputQubitInLargerCircuit) {
-            //                            found                          = true;
-            //                            physicalIndexOfLargerInSmaller = in.first;
-            //                            break;
-            //                        }
-            //                    }
-            // if (found) {
-            //  std::cout << "Found logical qubit " << static_cast<std::size_t>(outputQubitInLargerCircuit) << " in smaller circuit at physical qubit " << static_cast<std::size_t>(physicalIndexOfLargerInSmaller) << std::endl;
-            //  std::cout << "This qubit is idle: " << circuit.isIdleQubit(physicalIndexOfLargerInSmaller) << std::endl;
-            // }
-            //                    if (!found || smallerCircuit.isIdleQubit(physicalIndexOfLargerInSmaller)) {
-            // std::cout << "Logical qubit " << static_cast<std::size_t>(outputQubitInSmallerCircuit) << " can be moved to logical qubit " << static_cast<std::size_t>(outputQubitInLargerCircuit) << std::endl;
-            //                        for (auto& in: smallerInitial) {
-            //                            if (in.second == outputQubitInSmallerCircuit) {
-            //                                in.second = outputQubitInLargerCircuit;
-            // std::cout << "Physical qubit " << static_cast<std::size_t>(in.first) << " has been assigned logical qubit " << static_cast<std::size_t>(in.second) << " as input" << std::endl;
-            //                                break;
-            //                            }
-            //                        }
-            //                        smallerOutput[physicalQubitInSmallerCircuit] = outputQubitInLargerCircuit;
-            // std::cout << "Physical qubit " << static_cast<std::size_t>(physicalQubitInSmallerCircuit) << " has been assigned logical qubit " << static_cast<std::size_t>(outputQubitInLargerCircuit) << " as output" << std::endl;
-            //                        smallerAncillary[outputQubitInLargerCircuit]  = smallerAncillary[outputQubitInSmallerCircuit];
-            //                        smallerAncillary[outputQubitInSmallerCircuit] = true;
-            // std::cout << "Logical qubit " << static_cast<std::size_t>(outputQubitInLargerCircuit) << " was assigned the ancillary status of qubit " << static_cast<std::size_t>(outputQubitInSmallerCircuit) << " (i.e., " << smallerAncillary[outputQubitInLargerCircuit] << ")" << std::endl;
-            //                        smallerGarbage[outputQubitInLargerCircuit]  = false;
-            //                        smallerGarbage[outputQubitInSmallerCircuit] = true;
-            // std::cout << "Logical qubit " << static_cast<std::size_t>(outputQubitInLargerCircuit) << " has been removed from the garbage outputs" << std::endl;
-            //                    }
-            //                } else {
             std::cerr << "Uncorrected mismatch in output qubits!" << std::endl;
-            //                }
-            //        }
         }
     }
 
@@ -201,12 +145,12 @@ namespace ec {
     }
 
     EquivalenceCheckingManager::EquivalenceCheckingManager(const qc::QuantumComputation& qc1, const qc::QuantumComputation& qc2, const Configuration& configuration):
+        qc1(qc1.size() > qc2.size() ? qc2.clone() : qc1.clone()),
+        qc2(qc1.size() > qc2.size() ? qc1.clone() : qc2.clone()),
         configuration(configuration) {
-        const auto start = std::chrono::steady_clock::now();
+        // clones both circuits (the circuit with fewer gates always gets to be qc1)
 
-        // clone both circuits (the circuit with fewer gates always gets to be qc1)
-        this->qc1 = qc1.size() > qc2.size() ? qc2.clone() : qc1.clone();
-        this->qc2 = qc1.size() > qc2.size() ? qc1.clone() : qc2.clone();
+        const auto start = std::chrono::steady_clock::now();
 
         // set numeric tolerance used throughout the check
         setTolerance(configuration.execution.numericalTolerance);
@@ -253,9 +197,9 @@ namespace ec {
         // in case a timeout is configured, a separate thread is started that sets the `done` flag after the timeout has passed
         std::thread timeoutThread{};
         if (configuration.execution.timeout > 0s) {
-            timeoutThread = std::thread([&, timeout = configuration.execution.timeout] {
+            timeoutThread = std::thread([this, timeout = configuration.execution.timeout] {
                 std::unique_lock doneLock(doneMutex);
-                auto             finished = doneCond.wait_for(doneLock, timeout, [&] { return done; });
+                auto             finished = doneCond.wait_for(doneLock, timeout, [this] { return done; });
                 // if the thread has already finished within the timeout, nothing has to be done
                 if (!finished) {
                     done = true;
@@ -319,8 +263,8 @@ namespace ec {
 
         if (configuration.execution.runAlternatingChecker && !done) {
             checkers.emplace_back(std::make_unique<DDAlternatingChecker>(qc1, qc2, configuration));
-            auto&      alternatingChecker = checkers.back();
-            const auto result             = alternatingChecker->run();
+            const auto& alternatingChecker = checkers.back();
+            const auto  result             = alternatingChecker->run();
 
             // if the alternating check produces a result, this is final
             if (result != EquivalenceCriterion::NoInformation) {
@@ -334,8 +278,8 @@ namespace ec {
 
         if (configuration.execution.runConstructionChecker && !done) {
             checkers.emplace_back(std::make_unique<DDConstructionChecker>(qc1, qc2, configuration));
-            auto&      constructionChecker = checkers.back();
-            const auto result              = constructionChecker->run();
+            const auto& constructionChecker = checkers.back();
+            const auto  result              = constructionChecker->run();
 
             // if the construction check produces a result, this is final
             if (result != EquivalenceCriterion::NoInformation) {
@@ -350,8 +294,8 @@ namespace ec {
         if (configuration.execution.runZXChecker && !done) {
             if (zx::FunctionalityConstruction::transformableToZX(&qc1) && zx::FunctionalityConstruction::transformableToZX(&qc2)) {
                 checkers.emplace_back(std::make_unique<ZXEquivalenceChecker>(qc1, qc2, configuration));
-                auto&      zxChecker = checkers.back();
-                const auto result    = zxChecker->run();
+                const auto& zxChecker = checkers.back();
+                const auto  result    = zxChecker->run();
 
                 results.equivalence = result;
                 // break if equivalence has been shown
@@ -384,8 +328,7 @@ namespace ec {
             deadline = start + configuration.execution.timeout;
         }
 
-        const auto threadLimit = std::thread::hardware_concurrency();
-        if (threadLimit != 0 && configuration.execution.nthreads > threadLimit) {
+        if (const auto threadLimit = std::thread::hardware_concurrency(); threadLimit != 0U && configuration.execution.nthreads > threadLimit) {
             std::clog << "Trying to use more threads than the underlying architecture claims to support. Over-subscription might impact performance!" << std::endl;
         }
 
@@ -415,7 +358,7 @@ namespace ec {
 
         if (runAlternating) {
             // start a new thread that constructs and runs the alternating check
-            threads.emplace_back([&, id] {
+            threads.emplace_back([this, &queue, id] {
                 checkers[id] = std::make_unique<DDAlternatingChecker>(qc1, qc2, configuration);
                 checkers[id]->run();
                 queue.push(id);
@@ -425,7 +368,7 @@ namespace ec {
 
         if (runConstruction && !done) {
             // start a new thread that constructs and runs the construction check
-            threads.emplace_back([&, id] {
+            threads.emplace_back([this, &queue, id] {
                 checkers[id] = std::make_unique<DDConstructionChecker>(qc1, qc2, configuration);
                 if (!done)
                     checkers[id]->run();
@@ -437,7 +380,7 @@ namespace ec {
         if (runZX && !done) {
             if (zx::FunctionalityConstruction::transformableToZX(&qc1) && zx::FunctionalityConstruction::transformableToZX(&qc2)) {
                 // start a new thread that constructs and runs the ZX checker
-                threads.emplace_back([&, id] {
+                threads.emplace_back([this, &queue, id] {
                     checkers[id] = std::make_unique<ZXEquivalenceChecker>(qc1, qc2, configuration);
                     if (!done)
                         checkers[id]->run();
@@ -456,7 +399,7 @@ namespace ec {
             const auto effectiveThreadsLeft = effectiveThreads - threads.size();
             // launch as many simulations as possible
             for (std::size_t i = 0; i < effectiveThreadsLeft && !done; ++i) {
-                threads.emplace_back([&, id] {
+                threads.emplace_back([this, &queue, id] {
                     checkers[id]  = std::make_unique<DDSimulationChecker>(qc1, qc2, configuration);
                     auto* checker = dynamic_cast<DDSimulationChecker*>(checkers[id].get());
                     {
@@ -544,23 +487,22 @@ namespace ec {
 
                 // it has to be checked, whether further simulations shall be conducted
                 if (results.startedSimulations < configuration.simulation.maxSims) {
-                    threads[*completedID] = std::thread([&, id = *completedID] {
+                    threads[*completedID] = std::thread([&, this, id = *completedID] {
+                        auto* simChecker = dynamic_cast<DDSimulationChecker*>(checkers[id].get());
                         {
-                            auto*           checker = dynamic_cast<DDSimulationChecker*>(checkers[id].get());
                             std::lock_guard stateGeneratorLock(stateGeneratorMutex);
-                            checker->setRandomInitialState(stateGenerator);
+                            simChecker->setRandomInitialState(stateGenerator);
                         }
-                        if (!done)
+                        if (!done) {
                             checkers[id]->run();
+                        }
                         queue.push(id);
                     });
                     ++results.startedSimulations;
-                } else {
+                } else if (configuration.onlySimulationCheckerConfigured() && results.performedSimulations == configuration.simulation.maxSims) {
                     // in case only simulations are performed and every single one is done, everything is done
-                    if (configuration.onlySimulationCheckerConfigured() && results.performedSimulations == configuration.simulation.maxSims) {
-                        setAndSignalDone();
-                        break;
-                    }
+                    setAndSignalDone();
+                    break;
                 }
             }
         }
