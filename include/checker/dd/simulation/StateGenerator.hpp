@@ -54,7 +54,7 @@ namespace ec {
                 }
 
                 // generate the bitvector corresponding to the random state
-                for (dd::QubitCount i = 0; i < randomQubits; ++i) {
+                for (std::size_t i = 0U; i < randomQubits; ++i) {
                     if ((*randomState & (static_cast<std::uint_least64_t>(1U) << i)) != 0U) {
                         stimulusBits[i] = true;
                     }
@@ -68,7 +68,7 @@ namespace ec {
                     randomNumbers[i] = mt();
                 }
                 // generate the corresponding bitvector
-                for (dd::QubitCount i = 0U; i < randomQubits; ++i) {
+                for (std::size_t i = 0U; i < randomQubits; ++i) {
                     if ((randomNumbers[i / bitwidth] & (static_cast<std::uint_least64_t>(1U) << (i % bitwidth))) != 0U) {
                         stimulusBits[i] = true;
                     }
