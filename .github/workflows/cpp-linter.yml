@@ -13,7 +13,7 @@ jobs:
         with:
           submodules: recursive
       - name: Generate compilation database
-        run:  cmake -DBINDINGS=ON -DBULID_QCEC_TESTS=ON -DCMAKE_EXPORT_COMPILE_COMMANDS=ON .
+        run: cmake -DBINDINGS=ON -DBUILD_QCEC_TESTS=ON -DCMAKE_EXPORT_COMPILE_COMMANDS=ON .
       - uses: cpp-linter/cpp-linter-action@v1
         id:   linter
         env:
