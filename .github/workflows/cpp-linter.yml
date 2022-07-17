@@ -6,7 +6,7 @@ on:
   push:
 
 jobs:
-  codestyle:
+  cpp-linter:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
