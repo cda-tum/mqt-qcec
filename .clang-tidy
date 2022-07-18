@@ -1,10 +1,9 @@
 ---
-Checks:                'clang-diagnostic-*,clang-analyzer-*,-*,boost-*,bugprone-*,-bugprone-easily-swappable-parameters,clang-analyzer-*,cppcoreguidelines-*,-cppcoreguidelines-non-private-member-variables-in-classes,-cppcoreguidelines-special-member-functions,-cppcoreguidelines-avoid-magic-numbers,modernize-*,-modernize-use-trailing-return-type,performance-*,portability-*,readability-*,-readability-identifier-length,-readability-magic-numbers,-readability-function-cognitive-complexity'
+Checks:                'clang-diagnostic-*,clang-analyzer-*,-*,boost-*,bugprone-*,-bugprone-easily-swappable-parameters,clang-analyzer-*,cppcoreguidelines-*,-cppcoreguidelines-non-private-member-variables-in-classes,-cppcoreguidelines-special-member-functions,-cppcoreguidelines-avoid-magic-numbers,-cppcoreguidelines-macro-usage,modernize-*,-modernize-use-trailing-return-type,performance-*,portability-*,readability-*,-readability-identifier-length,-readability-magic-numbers,-readability-function-cognitive-complexity'
 WarningsAsErrors:      ''
 HeaderFilterRegex:     ''
 AnalyzeTemporaryDtors: false
 FormatStyle:           file
-#UseColor:              true
 CheckOptions:
   - key:   readability-suspicious-call-argument.PrefixSimilarAbove
     value: '30'
