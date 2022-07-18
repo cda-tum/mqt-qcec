@@ -28,12 +28,10 @@ namespace ec {
 
         template<typename Clock, typename Dur>
         std::shared_ptr<T> waitAndPopUntil(const std::chrono::time_point<Clock, Dur>& timepoint) {
-            auto const oldHead = waitPopHeadUntil(timepoint);
-            if (oldHead) {
+            if (const auto oldHead = waitPopHeadUntil(timepoint)) {
                 return oldHead->data;
-            } else {
-                return nullptr;
             }
+            return nullptr;
         }
 
         void push(T value) {
@@ -89,13 +87,13 @@ namespace ec {
         }
 
         auto waitPopHead() {
-            auto headLock(waitForData());
+            [[maybe_unused]] auto headLock(waitForData());
             return popHead();
         }
 
         template<typename Clock, typename Dur>
         auto waitPopHeadUntil(const std::chrono::time_point<Clock, Dur>& timepoint) {
-            auto headLock(waitForDataUntil(timepoint));
+            [[maybe_unused]] auto headLock(waitForDataUntil(timepoint));
             if (head.get() == getTail()) {
                 return std::unique_ptr<Node>();
             }

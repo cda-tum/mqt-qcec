@@ -36,7 +36,7 @@ namespace ec {
 
         virtual void json(nlohmann::json& j) const noexcept {
             j["equivalence"] = toString(equivalence);
-            j["runtime"]     = runtime;
+            j["runtime"]     = getRuntime();
         }
 
         void signalDone() {

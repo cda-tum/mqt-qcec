@@ -7,7 +7,6 @@
 #include "EquivalenceCheckingManager.hpp"
 #include "QuantumComputation.hpp"
 #include "dd/Control.hpp"
-#include "zx/FunctionalityConstruction.hpp"
 
 #include "gtest/gtest.h"
 #include <functional>
@@ -25,8 +24,8 @@ protected:
 
     std::unique_ptr<ec::EquivalenceCheckingManager> ecm{};
 
-    std::string test_original        = "./circuits/test/test.real";
-    std::string test_alternative_dir = "./circuits/test/";
+    std::string testOriginal       = "./circuits/test/test.real";
+    std::string testAlternativeDir = "./circuits/test/";
 
     void SetUp() override {
         config.execution.parallel               = true;
@@ -43,18 +42,18 @@ protected:
 
 INSTANTIATE_TEST_SUITE_P(TestCircuits, ZXTest,
                          testing::Values(
-                                 "inputperm", "ancilla", "ancilla_inputperm", "swap",
-                                 "outputperm", "ancilla_inputperm_outputperm",
-                                 "optimizedswap", "ancilla_inputperm_outputperm_optimizedswap",
-                                 "ancilla_inputperm_outputperm_optimizedswap2"),
+                             "inputperm", "ancilla", "ancilla_inputperm", "swap",
+                             "outputperm", "ancilla_inputperm_outputperm",
+                             "optimizedswap", "ancilla_inputperm_outputperm_optimizedswap",
+                             "ancilla_inputperm_outputperm_optimizedswap2"),
                          [](const testing::TestParamInfo<ZXTest::ParamType>& info) {
 			                 std::stringstream ss{};
 			                 ss << info.param;
 			                 return ss.str(); });
 
 TEST_P(ZXTest, TestCircuits) {
-    qcOriginal.import(test_original);
-    qcAlternative.import(test_alternative_dir + "test_" + GetParam() + ".qasm");
+    qcOriginal.import(testOriginal);
+    qcAlternative.import(testAlternativeDir + "test_" + GetParam() + ".qasm");
     ecm = std::make_unique<ec::EquivalenceCheckingManager>(qcOriginal, qcAlternative, config);
 
     ecm->run();
@@ -231,11 +230,11 @@ protected:
 
 INSTANTIATE_TEST_SUITE_P(ZXTestCompFlow, ZXTestCompFlow,
                          testing::Values(
-                                 "c2_181",
-                                 "rd73_312",
-                                 "sym9_317",
-                                 "mod5adder_306",
-                                 "rd84_313"),
+                             "c2_181",
+                             "rd73_312",
+                             "sym9_317",
+                             "mod5adder_306",
+                             "rd84_313"),
                          [](const testing::TestParamInfo<ZXTestCompFlow::ParamType>& info) {
 							 auto s = info.param;
 							 std::replace( s.begin(), s.end(), '-', '_');

@@ -39,18 +39,21 @@ namespace ec {
     inline ApplicationSchemeType applicationSchemeFromString(const std::string& applicationScheme) noexcept {
         if ((applicationScheme == "sequential") || (applicationScheme == "0") || (applicationScheme == "reference")) {
             return ApplicationSchemeType::Sequential;
-        } else if ((applicationScheme == "one_to_one") || (applicationScheme == "1") || (applicationScheme == "naive")) {
+        }
+        if ((applicationScheme == "one_to_one") || (applicationScheme == "1") || (applicationScheme == "naive")) {
             return ApplicationSchemeType::OneToOne;
-        } else if ((applicationScheme == "lookahead") || (applicationScheme == "2")) {
+        }
+        if ((applicationScheme == "lookahead") || (applicationScheme == "2")) {
             return ApplicationSchemeType::Lookahead;
-        } else if ((applicationScheme == "gate_cost") || (applicationScheme == "3") || (applicationScheme == "compilation_flow")) {
+        }
+        if ((applicationScheme == "gate_cost") || (applicationScheme == "3") || (applicationScheme == "compilation_flow")) {
             return ApplicationSchemeType::GateCost;
-        } else if ((applicationScheme == "proportional") || (applicationScheme == "4")) {
-            return ApplicationSchemeType::Proportional;
-        } else {
-            std::cerr << "Unknown application scheme: " << applicationScheme << ". Defaulting to proportional!\n";
+        }
+        if ((applicationScheme == "proportional") || (applicationScheme == "4")) {
             return ApplicationSchemeType::Proportional;
         }
+        std::cerr << "Unknown application scheme: " << applicationScheme << ". Defaulting to proportional!\n";
+        return ApplicationSchemeType::Proportional;
     }
 
     inline std::istream& operator>>(std::istream& in, ApplicationSchemeType& applicationScheme) {

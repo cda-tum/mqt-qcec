@@ -9,8 +9,8 @@
 
 class SimulationTest: public ::testing::Test {
 protected:
-    qc::QuantumComputation qc_original;
-    qc::QuantumComputation qc_alternative;
+    qc::QuantumComputation qcOriginal;
+    qc::QuantumComputation qcAlternative;
     ec::Configuration      config{};
 
     void SetUp() override {
@@ -27,64 +27,64 @@ protected:
 };
 
 TEST_F(SimulationTest, Consistency) {
-    qc_original.import("./circuits/test/test_original.real");
-    qc_alternative.import("./circuits/test/test_erroneous.real");
+    qcOriginal.import("./circuits/test/test_original.real");
+    qcAlternative.import("./circuits/test/test_erroneous.real");
 
-    ec::EquivalenceCheckingManager ecm(qc_original, qc_alternative, config);
+    ec::EquivalenceCheckingManager ecm(qcOriginal, qcAlternative, config);
     ecm.run();
 
-    ec::EquivalenceCheckingManager ecm2(qc_original, qc_alternative, config);
+    ec::EquivalenceCheckingManager ecm2(qcOriginal, qcAlternative, config);
     ecm2.run();
 
     EXPECT_EQ(ecm.getResults().performedSimulations, ecm2.getResults().performedSimulations);
 }
 
 TEST_F(SimulationTest, ClassicalStimuli) {
-    qc_original.import("./circuits/test/test_original.real");
-    qc_alternative.import("./circuits/test/test_alternative.real");
+    qcOriginal.import("./circuits/test/test_original.real");
+    qcAlternative.import("./circuits/test/test_alternative.real");
 
     config.simulation.stateType = ec::StateType::ComputationalBasis;
-    ec::EquivalenceCheckingManager ecm(qc_original, qc_alternative, config);
+    ec::EquivalenceCheckingManager ecm(qcOriginal, qcAlternative, config);
     ecm.run();
     std::cout << ecm.toString() << std::endl;
     EXPECT_TRUE(ecm.getResults().consideredEquivalent());
 
-    qc_alternative.import("./circuits/test/test_erroneous.real");
-    ec::EquivalenceCheckingManager ecm2(qc_original, qc_alternative, config);
+    qcAlternative.import("./circuits/test/test_erroneous.real");
+    ec::EquivalenceCheckingManager ecm2(qcOriginal, qcAlternative, config);
     ecm2.run();
     std::cout << ecm2.toString() << std::endl;
     EXPECT_FALSE(ecm2.getResults().consideredEquivalent());
 }
 
 TEST_F(SimulationTest, LocalStimuli) {
-    qc_original.import("./circuits/test/test_original.real");
-    qc_alternative.import("./circuits/test/test_alternative.real");
+    qcOriginal.import("./circuits/test/test_original.real");
+    qcAlternative.import("./circuits/test/test_alternative.real");
 
     config.simulation.stateType = ec::StateType::Random1QBasis;
-    ec::EquivalenceCheckingManager ecm(qc_original, qc_alternative, config);
+    ec::EquivalenceCheckingManager ecm(qcOriginal, qcAlternative, config);
     ecm.run();
     std::cout << ecm.toString() << std::endl;
     EXPECT_TRUE(ecm.getResults().consideredEquivalent());
 
-    qc_alternative.import("./circuits/test/test_erroneous.real");
-    ec::EquivalenceCheckingManager ecm2(qc_original, qc_alternative, config);
+    qcAlternative.import("./circuits/test/test_erroneous.real");
+    ec::EquivalenceCheckingManager ecm2(qcOriginal, qcAlternative, config);
     ecm2.run();
     std::cout << ecm2.toString() << std::endl;
     EXPECT_FALSE(ecm2.getResults().consideredEquivalent());
 }
 
 TEST_F(SimulationTest, GlobalStimuli) {
-    qc_original.import("./circuits/test/test_original.real");
-    qc_alternative.import("./circuits/test/test_alternative.real");
+    qcOriginal.import("./circuits/test/test_original.real");
+    qcAlternative.import("./circuits/test/test_alternative.real");
 
     config.simulation.stateType = ec::StateType::Stabilizer;
-    ec::EquivalenceCheckingManager ecm(qc_original, qc_alternative, config);
+    ec::EquivalenceCheckingManager ecm(qcOriginal, qcAlternative, config);
     ecm.run();
     std::cout << ecm.toString() << std::endl;
     EXPECT_TRUE(ecm.getResults().consideredEquivalent());
 
-    qc_alternative.import("./circuits/test/test_erroneous.real");
-    ec::EquivalenceCheckingManager ecm2(qc_original, qc_alternative, config);
+    qcAlternative.import("./circuits/test/test_erroneous.real");
+    ec::EquivalenceCheckingManager ecm2(qcOriginal, qcAlternative, config);
     ecm2.run();
     std::cout << ecm2.toString() << std::endl;
     EXPECT_FALSE(ecm2.getResults().consideredEquivalent());
@@ -92,17 +92,17 @@ TEST_F(SimulationTest, GlobalStimuli) {
 
 TEST_F(SimulationTest, ClassicalStimuliParallel) {
     config.execution.parallel = true;
-    qc_original.import("./circuits/test/test_original.real");
-    qc_alternative.import("./circuits/test/test_alternative.real");
+    qcOriginal.import("./circuits/test/test_original.real");
+    qcAlternative.import("./circuits/test/test_alternative.real");
 
     config.simulation.stateType = ec::StateType::ComputationalBasis;
-    ec::EquivalenceCheckingManager ecm(qc_original, qc_alternative, config);
+    ec::EquivalenceCheckingManager ecm(qcOriginal, qcAlternative, config);
     ecm.run();
     std::cout << ecm.toString() << std::endl;
     EXPECT_TRUE(ecm.getResults().consideredEquivalent());
 
-    qc_alternative.import("./circuits/test/test_erroneous.real");
-    ec::EquivalenceCheckingManager ecm2(qc_original, qc_alternative, config);
+    qcAlternative.import("./circuits/test/test_erroneous.real");
+    ec::EquivalenceCheckingManager ecm2(qcOriginal, qcAlternative, config);
     ecm2.run();
     std::cout << ecm2.toString() << std::endl;
     EXPECT_FALSE(ecm2.getResults().consideredEquivalent());
@@ -110,17 +110,17 @@ TEST_F(SimulationTest, ClassicalStimuliParallel) {
 
 TEST_F(SimulationTest, LocalStimuliParallel) {
     config.execution.parallel = true;
-    qc_original.import("./circuits/test/test_original.real");
-    qc_alternative.import("./circuits/test/test_alternative.real");
+    qcOriginal.import("./circuits/test/test_original.real");
+    qcAlternative.import("./circuits/test/test_alternative.real");
 
     config.simulation.stateType = ec::StateType::Random1QBasis;
-    ec::EquivalenceCheckingManager ecm(qc_original, qc_alternative, config);
+    ec::EquivalenceCheckingManager ecm(qcOriginal, qcAlternative, config);
     ecm.run();
     std::cout << ecm.toString() << std::endl;
     EXPECT_TRUE(ecm.getResults().consideredEquivalent());
 
-    qc_alternative.import("./circuits/test/test_erroneous.real");
-    ec::EquivalenceCheckingManager ecm2(qc_original, qc_alternative, config);
+    qcAlternative.import("./circuits/test/test_erroneous.real");
+    ec::EquivalenceCheckingManager ecm2(qcOriginal, qcAlternative, config);
     ecm2.run();
     std::cout << ecm2.toString() << std::endl;
     EXPECT_FALSE(ecm2.getResults().consideredEquivalent());
@@ -128,17 +128,17 @@ TEST_F(SimulationTest, LocalStimuliParallel) {
 
 TEST_F(SimulationTest, GlobalStimuliParallel) {
     config.execution.parallel = true;
-    qc_original.import("./circuits/test/test_original.real");
-    qc_alternative.import("./circuits/test/test_alternative.real");
+    qcOriginal.import("./circuits/test/test_original.real");
+    qcAlternative.import("./circuits/test/test_alternative.real");
 
     config.simulation.stateType = ec::StateType::Stabilizer;
-    ec::EquivalenceCheckingManager ecm(qc_original, qc_alternative, config);
+    ec::EquivalenceCheckingManager ecm(qcOriginal, qcAlternative, config);
     ecm.run();
     std::cout << ecm.toString() << std::endl;
     EXPECT_TRUE(ecm.getResults().consideredEquivalent());
 
-    qc_alternative.import("./circuits/test/test_erroneous.real");
-    ec::EquivalenceCheckingManager ecm2(qc_original, qc_alternative, config);
+    qcAlternative.import("./circuits/test/test_erroneous.real");
+    ec::EquivalenceCheckingManager ecm2(qcOriginal, qcAlternative, config);
     ecm2.run();
     std::cout << ecm2.toString() << std::endl;
     EXPECT_FALSE(ecm2.getResults().consideredEquivalent());

@@ -9,7 +9,6 @@
 #include "gtest/gtest.h"
 #include <functional>
 #include <sstream>
-#include <string>
 
 using namespace dd::literals;
 
@@ -26,8 +25,6 @@ class EqualityTest: public testing::Test {
         config.execution.runConstructionChecker = false;
         config.execution.runZXChecker           = false;
     }
-
-    void TearDown() override {}
 
 protected:
     dd::QubitCount         nqubits = 1U;

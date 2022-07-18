@@ -1,0 +1,4 @@
+---
+Checks:      'clang-diagnostic-*,clang-analyzer-*,-*,boost-*,bugprone-*,-bugprone-easily-swappable-parameters,clang-analyzer-*,cppcoreguidelines-*,-cppcoreguidelines-non-private-member-variables-in-classes,-cppcoreguidelines-special-member-functions,-cppcoreguidelines-avoid-magic-numbers,-cppcoreguidelines-macro-usage,modernize-*,-modernize-use-trailing-return-type,performance-*,portability-*,readability-*,-readability-identifier-length,-readability-magic-numbers,-readability-function-cognitive-complexity'
+FormatStyle: file
+...
