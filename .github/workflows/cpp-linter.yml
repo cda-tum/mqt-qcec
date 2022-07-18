@@ -3,7 +3,6 @@ name: cpp-linter
 on:
   pull_request:
     types: [ opened, reopened ]
-  push:
 
 jobs:
   cpp-linter:
@@ -13,7 +12,7 @@ jobs:
         with:
           submodules: recursive
       - name: Generate compilation database
-        run: cmake -DBINDINGS=ON -DBUILD_QCEC_TESTS=ON -DCMAKE_EXPORT_COMPILE_COMMANDS=ON .
+        run: cmake -S . -B build -DBINDINGS=ON -DBUILD_QCEC_TESTS=ON -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
       - uses: cpp-linter/cpp-linter-action@v1
         id:   linter
         env:
@@ -24,6 +23,8 @@ jobs:
           lines-changed-only: false # only for testing
           files-changed-only: false # only for testing
           thread-comments:    true
+          database:           'build'
+          ignore:             '.github|build'
       - name: Check failures
         if:   steps.linter.outputs.checks-failed > 0
         run:  exit 1
