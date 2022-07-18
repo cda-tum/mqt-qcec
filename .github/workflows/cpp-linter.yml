@@ -18,13 +18,13 @@ jobs:
         with:
           python-version: '3.9'
       - name: Install linter python package
-        run:  python3 -m pip install git+https://github.com/cpp-linter/cpp-linter-action@v1
+        run: python3 -m pip install git+https://github.com/cpp-linter/cpp-linter-action@v1
       - name: Run linter
         run: |
               cpp-linter \
               --version=14 \
               --style=file \
-             --tidy-checks='' \
+              --tidy-checks='' \
               --lines-changed-only=false \
               --files-changed-only=false \
               --thread-comments=true \
