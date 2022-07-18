@@ -14,8 +14,8 @@ protected:
     qc::QuantumComputation qcOriginal;
     qc::QuantumComputation qcTranspiled;
 
-    std::string testOriginalDir     = "./circuits/original/";
-    std::string testTranspiledDir   = "./circuits/transpiled/";
+    std::string testOriginalDir   = "./circuits/original/";
+    std::string testTranspiledDir = "./circuits/transpiled/";
 
     ec::Configuration configuration{};
 

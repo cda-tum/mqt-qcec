@@ -15,8 +15,8 @@ protected:
     qc::QuantumComputation qcAlternative;
     ec::Configuration      config{};
 
-    std::string testOriginal         = "./circuits/test/test.real";
-    std::string testAlternativeDir   = "./circuits/test/";
+    std::string testOriginal       = "./circuits/test/test.real";
+    std::string testAlternativeDir = "./circuits/test/";
 
     void SetUp() override {
         qcOriginal.import(testOriginal);

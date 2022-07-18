@@ -17,17 +17,17 @@ protected:
     qc::QuantumComputation qcTranspiled;
     ec::Configuration      config;
 
-    std::string testOriginalDir     = "./circuits/original/";
-    std::string testTranspiledDir   = "./circuits/transpiled/";
+    std::string testOriginalDir   = "./circuits/original/";
+    std::string testTranspiledDir = "./circuits/transpiled/";
 
     unsigned short tries = 10U;
 
-    double      minTime  = 0.;
-    double      maxTime  = 0.;
-    double      avgTime  = 0.;
-    std::size_t minSims  = 0U;
-    std::size_t maxSims  = 0U;
-    double      avgSims  = 0.;
+    double      minTime = 0.;
+    double      maxTime = 0.;
+    double      avgTime = 0.;
+    std::size_t minSims = 0U;
+    std::size_t maxSims = 0U;
+    double      avgSims = 0.;
 
     std::string transpiledFile{};
 
@@ -76,29 +76,29 @@ protected:
 
         gatesToRemove = std::get<1>(GetParam());
 
-        minTime  = 0.;
-        maxTime  = 0.;
-        avgTime  = 0.;
-        minSims  = 0U;
-        maxSims  = 0U;
-        avgSims  = 0.;
+        minTime = 0.;
+        maxTime = 0.;
+        avgTime = 0.;
+        minSims = 0U;
+        maxSims = 0U;
+        avgSims = 0.;
     }
 
     void addToStatistics(unsigned short try_count, double time, std::size_t nsims) {
         if (try_count == 0U) {
-            minTime  = time;
-            maxTime  = time;
-            avgTime  = time;
-            minSims  = nsims;
-            maxSims  = nsims;
-            avgSims  = static_cast<double>(nsims);
+            minTime = time;
+            maxTime = time;
+            avgTime = time;
+            minSims = nsims;
+            maxSims = nsims;
+            avgSims = static_cast<double>(nsims);
         } else {
-            minTime  = std::min(minTime, time);
-            minSims  = std::min(minSims, nsims);
-            maxTime  = std::max(maxTime, time);
-            maxSims  = std::max(maxSims, nsims);
-            avgTime  = (avgTime * try_count + time) / static_cast<double>(try_count + 1U);
-            avgSims  = (avgSims * try_count + static_cast<double>(nsims)) / static_cast<double>(try_count + 1U);
+            minTime = std::min(minTime, time);
+            minSims = std::min(minSims, nsims);
+            maxTime = std::max(maxTime, time);
+            maxSims = std::max(maxSims, nsims);
+            avgTime = (avgTime * try_count + time) / static_cast<double>(try_count + 1U);
+            avgSims = (avgSims * try_count + static_cast<double>(nsims)) / static_cast<double>(try_count + 1U);
         }
     }
 };
@@ -243,8 +243,8 @@ protected:
     qc::QuantumComputation qcTranspiled;
     ec::Configuration      config{};
 
-    std::string testOriginalDir     = "./circuits/original/";
-    std::string testTranspiledDir   = "./circuits/transpiled/";
+    std::string testOriginalDir   = "./circuits/original/";
+    std::string testTranspiledDir = "./circuits/transpiled/";
 
     std::string transpiledFile{};
 
