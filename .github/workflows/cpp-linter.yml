@@ -2,7 +2,8 @@ name: cpp-linter
 
 on:
   pull_request:
-#    types: [ opened, reopened ]
+    types: [ opened, reopened ]
+  push:
 
 jobs:
   cpp-linter:
@@ -26,8 +27,8 @@ jobs:
               --version=14 \
               --style=file \
               --tidy-checks='' \
-              --lines-changed-only=false \
-              --files-changed-only=false \
+              --lines-changed-only=true \
+              --files-changed-only=true \
               --thread-comments=true \
               --ignore=build \
               --database=${{ github.event.repository.name }}/build
