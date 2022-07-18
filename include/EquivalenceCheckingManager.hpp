@@ -175,9 +175,9 @@ namespace ec {
         StateGenerator stateGenerator;
         std::mutex     stateGeneratorMutex{};
 
-        bool                                             done{false};
-        std::condition_variable                          doneCond{};
-        std::mutex                                       doneMutex{};
+        bool done{false};
+        std::condition_variable doneCond{};
+        std::mutex doneMutex{};
         std::vector<std::unique_ptr<EquivalenceChecker>> checkers{};
 
         Results results{};
