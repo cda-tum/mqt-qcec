@@ -13,30 +13,30 @@
 
 class JournalTestNonEQ: public testing::TestWithParam<std::tuple<std::string, unsigned short>> {
 protected:
-    qc::QuantumComputation qc_original;
-    qc::QuantumComputation qc_transpiled;
+    qc::QuantumComputation qcOriginal;
+    qc::QuantumComputation qcTranspiled;
     ec::Configuration      config;
 
-    std::string test_original_dir   = "./circuits/original/";
-    std::string test_transpiled_dir = "./circuits/transpiled/";
+    std::string testOriginalDir     = "./circuits/original/";
+    std::string testTranspiledDir   = "./circuits/transpiled/";
 
     unsigned short tries = 10U;
 
-    double      min_time = 0.;
-    double      max_time = 0.;
-    double      avg_time = 0.;
-    std::size_t min_sims = 0U;
-    std::size_t max_sims = 0U;
-    double      avg_sims = 0.;
+    double      minTime  = 0.;
+    double      maxTime  = 0.;
+    double      avgTime  = 0.;
+    std::size_t minSims  = 0U;
+    std::size_t maxSims  = 0U;
+    double      avgSims  = 0.;
 
-    std::string transpiled_file{};
+    std::string transpiledFile{};
 
     std::mt19937_64                                   mt;
     std::uniform_int_distribution<unsigned long long> distribution;
     std::function<unsigned long long()>               rng;
 
-    unsigned short                         gates_to_remove = 0U;
-    std::set<std::set<unsigned long long>> already_removed{};
+    unsigned short                         gatesToRemove = 0U;
+    std::set<std::set<unsigned long long>> alreadyRemoved{};
 
     unsigned short successes = 0U;
 
@@ -63,42 +63,42 @@ protected:
 
     void SetUp() override {
         std::stringstream ss{};
-        ss << test_transpiled_dir << std::get<0>(GetParam()) << "_transpiled.qasm";
-        transpiled_file = ss.str();
+        ss << testTranspiledDir << std::get<0>(GetParam()) << "_transpiled.qasm";
+        transpiledFile = ss.str();
 
         std::array<std::mt19937_64::result_type, std::mt19937_64::state_size> random_data{};
         std::random_device                                                    rd;
         std::generate(begin(random_data), end(random_data), [&]() { return rd(); });
         std::seed_seq seeds(begin(random_data), end(random_data));
         mt.seed(seeds);
-        distribution = decltype(distribution)(0U, qc_transpiled.getNops() - 1U);
+        distribution = decltype(distribution)(0U, qcTranspiled.getNops() - 1U);
         rng          = [this]() { return distribution(mt); };
 
-        gates_to_remove = std::get<1>(GetParam());
+        gatesToRemove = std::get<1>(GetParam());
 
-        min_time = 0.;
-        max_time = 0.;
-        avg_time = 0.;
-        min_sims = 0U;
-        max_sims = 0U;
-        avg_sims = 0.;
+        minTime  = 0.;
+        maxTime  = 0.;
+        avgTime  = 0.;
+        minSims  = 0U;
+        maxSims  = 0U;
+        avgSims  = 0.;
     }
 
     void addToStatistics(unsigned short try_count, double time, std::size_t nsims) {
         if (try_count == 0U) {
-            min_time = time;
-            max_time = time;
-            avg_time = time;
-            min_sims = nsims;
-            max_sims = nsims;
-            avg_sims = static_cast<double>(nsims);
+            minTime  = time;
+            maxTime  = time;
+            avgTime  = time;
+            minSims  = nsims;
+            maxSims  = nsims;
+            avgSims  = static_cast<double>(nsims);
         } else {
-            min_time = std::min(min_time, time);
-            min_sims = std::min(min_sims, nsims);
-            max_time = std::max(max_time, time);
-            max_sims = std::max(max_sims, nsims);
-            avg_time = (avg_time * try_count + time) / static_cast<double>(try_count + 1U);
-            avg_sims = (avg_sims * try_count + static_cast<double>(nsims)) / static_cast<double>(try_count + 1U);
+            minTime  = std::min(minTime, time);
+            minSims  = std::min(minSims, nsims);
+            maxTime  = std::max(maxTime, time);
+            maxSims  = std::max(maxSims, nsims);
+            avgTime  = (avgTime * try_count + time) / static_cast<double>(try_count + 1U);
+            avgSims  = (avgSims * try_count + static_cast<double>(nsims)) / static_cast<double>(try_count + 1U);
         }
     }
 };
@@ -146,30 +146,30 @@ TEST_P(JournalTestNonEQ, PowerOfSimulation) {
     config.application.simulationScheme     = ec::ApplicationSchemeType::Sequential;
 
     for (unsigned short i = 0U; i < tries; ++i) {
-        qc_original.import(test_original_dir + std::get<0>(GetParam()) + ".real");
+        qcOriginal.import(testOriginalDir + std::get<0>(GetParam()) + ".real");
 
         // generate non-eq circuit
         std::set<unsigned long long> removed{};
         do {
-            qc_transpiled.import(transpiled_file);
+            qcTranspiled.import(transpiledFile);
             removed.clear();
-            for (unsigned short j = 0U; j < gates_to_remove; ++j) {
-                auto gate_to_remove = rng() % qc_transpiled.getNops();
+            for (unsigned short j = 0U; j < gatesToRemove; ++j) {
+                auto gate_to_remove = rng() % qcTranspiled.getNops();
                 while (removed.count(gate_to_remove) != 0U) {
-                    gate_to_remove = rng() % qc_transpiled.getNops();
+                    gate_to_remove = rng() % qcTranspiled.getNops();
                 }
                 removed.insert(gate_to_remove);
-                auto it = qc_transpiled.begin();
+                auto it = qcTranspiled.begin();
                 std::advance(it, gate_to_remove);
-                if (it == qc_transpiled.end()) {
+                if (it == qcTranspiled.end()) {
                     continue;
                 }
 
-                qc_transpiled.erase(it);
+                qcTranspiled.erase(it);
             }
-        } while (setExists(already_removed, removed));
-        already_removed.insert(removed);
-        ec::EquivalenceCheckingManager ecm(qc_original, qc_transpiled, config);
+        } while (setExists(alreadyRemoved, removed));
+        alreadyRemoved.insert(removed);
+        ec::EquivalenceCheckingManager ecm(qcOriginal, qcTranspiled, config);
         ecm.run();
         auto results = ecm.getResults();
         std::cout << "[" << i << "] ";
@@ -179,10 +179,10 @@ TEST_P(JournalTestNonEQ, PowerOfSimulation) {
             successes++;
         }
     }
-    std::cout << qc_original.getName() << ";" << qc_original.getNqubits() << ";" << qc_original.getNops() << ";" << qc_transpiled.getNops()
+    std::cout << qcOriginal.getName() << ";" << qcOriginal.getNqubits() << ";" << qcOriginal.getNops() << ";" << qcTranspiled.getNops()
               << ";" << tries << ";"
-              << min_sims << ";" << max_sims << ";" << avg_sims << ";"
-              << min_time << ";" << max_time << ";" << avg_time << ";"
+              << minSims << ";" << maxSims << ";" << avgSims << ";"
+              << minTime << ";" << maxTime << ";" << avgTime << ";"
               << static_cast<double>(successes) / static_cast<double>(tries) << ";" << std::endl;
 }
 
@@ -197,30 +197,30 @@ TEST_P(JournalTestNonEQ, PowerOfSimulationParallel) {
     config.application.simulationScheme     = ec::ApplicationSchemeType::Sequential;
 
     for (unsigned short i = 0; i < tries; ++i) {
-        qc_original.import(test_original_dir + std::get<0>(GetParam()) + ".real");
+        qcOriginal.import(testOriginalDir + std::get<0>(GetParam()) + ".real");
 
         // generate non-eq circuit
         std::set<unsigned long long> removed{};
         do {
-            qc_transpiled.import(transpiled_file);
+            qcTranspiled.import(transpiledFile);
             removed.clear();
-            for (unsigned short j = 0U; j < gates_to_remove; ++j) {
-                auto gate_to_remove = rng() % qc_transpiled.getNops();
+            for (unsigned short j = 0U; j < gatesToRemove; ++j) {
+                auto gate_to_remove = rng() % qcTranspiled.getNops();
                 while (removed.count(gate_to_remove) != 0U) {
-                    gate_to_remove = rng() % qc_transpiled.getNops();
+                    gate_to_remove = rng() % qcTranspiled.getNops();
                 }
                 removed.insert(gate_to_remove);
-                auto it = qc_transpiled.begin();
+                auto it = qcTranspiled.begin();
                 std::advance(it, gate_to_remove);
-                if (it == qc_transpiled.end()) {
+                if (it == qcTranspiled.end()) {
                     continue;
                 }
 
-                qc_transpiled.erase(it);
+                qcTranspiled.erase(it);
             }
-        } while (setExists(already_removed, removed));
-        already_removed.insert(removed);
-        ec::EquivalenceCheckingManager ecm(qc_original, qc_transpiled, config);
+        } while (setExists(alreadyRemoved, removed));
+        alreadyRemoved.insert(removed);
+        ec::EquivalenceCheckingManager ecm(qcOriginal, qcTranspiled, config);
         ecm.run();
         auto results = ecm.getResults();
         std::cout << "[" << i << "] ";
@@ -230,23 +230,23 @@ TEST_P(JournalTestNonEQ, PowerOfSimulationParallel) {
             successes++;
         }
     }
-    std::cout << qc_original.getName() << ";" << qc_original.getNqubits() << ";" << qc_original.getNops() << ";" << qc_transpiled.getNops()
+    std::cout << qcOriginal.getName() << ";" << qcOriginal.getNqubits() << ";" << qcOriginal.getNops() << ";" << qcTranspiled.getNops()
               << ";" << tries << ";"
-              << min_sims << ";" << max_sims << ";" << avg_sims << ";"
-              << min_time << ";" << max_time << ";" << avg_time << ";"
+              << minSims << ";" << maxSims << ";" << avgSims << ";"
+              << minTime << ";" << maxTime << ";" << avgTime << ";"
               << static_cast<double>(successes) / static_cast<double>(tries) << ";" << std::endl;
 }
 
 class JournalTestEQ: public testing::TestWithParam<std::string> {
 protected:
-    qc::QuantumComputation qc_original;
-    qc::QuantumComputation qc_transpiled;
+    qc::QuantumComputation qcOriginal;
+    qc::QuantumComputation qcTranspiled;
     ec::Configuration      config{};
 
-    std::string test_original_dir   = "./circuits/original/";
-    std::string test_transpiled_dir = "./circuits/transpiled/";
+    std::string testOriginalDir     = "./circuits/original/";
+    std::string testTranspiledDir   = "./circuits/transpiled/";
 
-    std::string transpiled_file{};
+    std::string transpiledFile{};
 
     void SetUp() override {
         config.execution.parallel               = false;
@@ -259,11 +259,11 @@ protected:
         config.execution.timeout                = 60s;
 
         std::stringstream ss{};
-        ss << test_transpiled_dir << GetParam() << "_transpiled.qasm";
-        transpiled_file = ss.str();
+        ss << testTranspiledDir << GetParam() << "_transpiled.qasm";
+        transpiledFile = ss.str();
 
-        qc_original.import(test_original_dir + GetParam() + ".real");
-        qc_transpiled.import(transpiled_file);
+        qcOriginal.import(testOriginalDir + GetParam() + ".real");
+        qcTranspiled.import(transpiledFile);
     }
 };
 
@@ -301,7 +301,7 @@ TEST_P(JournalTestEQ, EQReference) {
     config.execution.runConstructionChecker = true;
     config.application.constructionScheme   = ec::ApplicationSchemeType::OneToOne;
 
-    ec::EquivalenceCheckingManager ecm(qc_original, qc_transpiled, config);
+    ec::EquivalenceCheckingManager ecm(qcOriginal, qcTranspiled, config);
     ecm.run();
     std::cout << ecm.toString() << std::endl;
     EXPECT_TRUE(ecm.getResults().consideredEquivalent());
@@ -311,7 +311,7 @@ TEST_P(JournalTestEQ, EQNaive) {
     config.execution.runAlternatingChecker = true;
     config.application.alternatingScheme   = ec::ApplicationSchemeType::OneToOne;
 
-    ec::EquivalenceCheckingManager ecm(qc_original, qc_transpiled, config);
+    ec::EquivalenceCheckingManager ecm(qcOriginal, qcTranspiled, config);
     ecm.run();
     std::cout << ecm.toString() << std::endl;
     EXPECT_TRUE(ecm.getResults().consideredEquivalent());
@@ -321,7 +321,7 @@ TEST_P(JournalTestEQ, EQProportional) {
     config.execution.runAlternatingChecker = true;
     config.application.alternatingScheme   = ec::ApplicationSchemeType::Proportional;
 
-    ec::EquivalenceCheckingManager ecm(qc_original, qc_transpiled, config);
+    ec::EquivalenceCheckingManager ecm(qcOriginal, qcTranspiled, config);
     ecm.run();
     std::cout << ecm.toString() << std::endl;
     EXPECT_TRUE(ecm.getResults().consideredEquivalent());
@@ -331,7 +331,7 @@ TEST_P(JournalTestEQ, EQLookahead) {
     config.execution.runAlternatingChecker = true;
     config.application.alternatingScheme   = ec::ApplicationSchemeType::Lookahead;
 
-    ec::EquivalenceCheckingManager ecm(qc_original, qc_transpiled, config);
+    ec::EquivalenceCheckingManager ecm(qcOriginal, qcTranspiled, config);
     ecm.run();
     std::cout << ecm.toString() << std::endl;
     EXPECT_TRUE(ecm.getResults().consideredEquivalent());
@@ -340,7 +340,7 @@ TEST_P(JournalTestEQ, EQLookahead) {
 TEST_P(JournalTestEQ, EQPowerOfSimulation) {
     config.execution.runSimulationChecker = true;
 
-    ec::EquivalenceCheckingManager ecm(qc_original, qc_transpiled, config);
+    ec::EquivalenceCheckingManager ecm(qcOriginal, qcTranspiled, config);
     ecm.run();
     std::cout << ecm.toString() << std::endl;
     EXPECT_TRUE(ecm.getResults().consideredEquivalent());
@@ -352,7 +352,7 @@ TEST_P(JournalTestEQ, EQReferenceParallel) {
     config.execution.runSimulationChecker   = true; // additionally run simulations
     config.application.constructionScheme   = ec::ApplicationSchemeType::OneToOne;
 
-    ec::EquivalenceCheckingManager ecm(qc_original, qc_transpiled, config);
+    ec::EquivalenceCheckingManager ecm(qcOriginal, qcTranspiled, config);
     ecm.run();
     std::cout << ecm.toString() << std::endl;
     EXPECT_TRUE(ecm.getResults().consideredEquivalent());
@@ -363,7 +363,7 @@ TEST_P(JournalTestEQ, EQNaiveParallel) {
     config.execution.runAlternatingChecker = true;
     config.application.alternatingScheme   = ec::ApplicationSchemeType::OneToOne;
 
-    ec::EquivalenceCheckingManager ecm(qc_original, qc_transpiled, config);
+    ec::EquivalenceCheckingManager ecm(qcOriginal, qcTranspiled, config);
     ecm.run();
     std::cout << ecm.toString() << std::endl;
     EXPECT_TRUE(ecm.getResults().consideredEquivalent());
@@ -374,7 +374,7 @@ TEST_P(JournalTestEQ, EQProportionalParallel) {
     config.execution.runAlternatingChecker = true;
     config.application.alternatingScheme   = ec::ApplicationSchemeType::Proportional;
 
-    ec::EquivalenceCheckingManager ecm(qc_original, qc_transpiled, config);
+    ec::EquivalenceCheckingManager ecm(qcOriginal, qcTranspiled, config);
     ecm.run();
     std::cout << ecm.toString() << std::endl;
     EXPECT_TRUE(ecm.getResults().consideredEquivalent());
@@ -385,7 +385,7 @@ TEST_P(JournalTestEQ, EQLookaheadParallel) {
     config.execution.runAlternatingChecker = true;
     config.application.alternatingScheme   = ec::ApplicationSchemeType::Lookahead;
 
-    ec::EquivalenceCheckingManager ecm(qc_original, qc_transpiled, config);
+    ec::EquivalenceCheckingManager ecm(qcOriginal, qcTranspiled, config);
     ecm.run();
     std::cout << ecm.toString() << std::endl;
     EXPECT_TRUE(ecm.getResults().consideredEquivalent());
@@ -395,7 +395,7 @@ TEST_P(JournalTestEQ, EQPowerOfSimulationParallel) {
     config.execution.parallel             = true;
     config.execution.runSimulationChecker = true;
 
-    ec::EquivalenceCheckingManager ecm(qc_original, qc_transpiled, config);
+    ec::EquivalenceCheckingManager ecm(qcOriginal, qcTranspiled, config);
     ecm.run();
     std::cout << ecm.toString() << std::endl;
     EXPECT_TRUE(ecm.getResults().consideredEquivalent());

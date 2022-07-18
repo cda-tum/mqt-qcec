@@ -52,8 +52,8 @@ INSTANTIATE_TEST_SUITE_P(TestCircuits, ZXTest,
 			                 return ss.str(); });
 
 TEST_P(ZXTest, TestCircuits) {
-    qcOriginal.import(test_original);
-    qcAlternative.import(test_alternative_dir + "test_" + GetParam() + ".qasm");
+    qcOriginal.import(testOriginal);
+    qcAlternative.import(testAlternativeDir + "test_" + GetParam() + ".qasm");
     ecm = std::make_unique<ec::EquivalenceCheckingManager>(qcOriginal, qcAlternative, config);
 
     ecm->run();
