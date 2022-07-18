@@ -41,22 +41,27 @@ namespace ec {
     inline EquivalenceCriterion fromString(const std::string& criterion) noexcept {
         if ((criterion == "not_equivalent") || (criterion == "0")) {
             return EquivalenceCriterion::NotEquivalent;
-        } else if ((criterion == "equivalent") || (criterion == "1")) {
+        }
+        if ((criterion == "equivalent") || (criterion == "1")) {
             return EquivalenceCriterion::Equivalent;
-        } else if ((criterion == "probably_equivalent") || (criterion == "2")) {
+        }
+        if ((criterion == "probably_equivalent") || (criterion == "2")) {
             return EquivalenceCriterion::ProbablyEquivalent;
-        } else if ((criterion == "equivalent_up_to_global_phase") || (criterion == "3")) {
+        }
+        if ((criterion == "equivalent_up_to_global_phase") || (criterion == "3")) {
             return EquivalenceCriterion::EquivalentUpToGlobalPhase;
-        } else if ((criterion == "equivalent_up_to_phase") || (criterion == "4")) {
+        }
+        if ((criterion == "equivalent_up_to_phase") || (criterion == "4")) {
             return EquivalenceCriterion::EquivalentUpToPhase;
-        } else if ((criterion == "no_information") || (criterion == "5")) {
-            return EquivalenceCriterion::NoInformation;
-        } else if ((criterion == "probably_not_equivalent") || (criterion == "6")) {
-            return EquivalenceCriterion::ProbablyNotEquivalent;
-        } else {
-            std::cerr << "Unknown equivalence criterion: " << criterion << ". Defaulting to `no_information`.\n";
+        }
+        if ((criterion == "no_information") || (criterion == "5")) {
             return EquivalenceCriterion::NoInformation;
         }
+        if ((criterion == "probably_not_equivalent") || (criterion == "6")) {
+            return EquivalenceCriterion::ProbablyNotEquivalent;
+        }
+        std::cerr << "Unknown equivalence criterion: " << criterion << ". Defaulting to `no_information`.\n";
+        return EquivalenceCriterion::NoInformation;
     }
 
     inline std::istream& operator>>(std::istream& in, EquivalenceCriterion& criterion) {

@@ -58,8 +58,9 @@ namespace ec {
             dd::Qubit outputQubitInLargerCircuit = lLogical;
             dd::Qubit nout                       = 1;
             for (dd::Qubit i = 0; i < outputQubitInLargerCircuit; ++i) {
-                if (!largerGarbage[i])
+                if (!largerGarbage[i]) {
                     ++nout;
+                }
             }
 
             dd::QubitCount outcount        = nout;
@@ -74,16 +75,18 @@ namespace ec {
                 }
             }
             // algorithm has logical qubit that does not exist in the smaller circuit
-            if (!existsInSmaller)
+            if (!existsInSmaller) {
                 continue;
+            }
 
             std::cerr << "Uncorrected mismatch in output qubits!" << std::endl;
         }
     }
 
     void EquivalenceCheckingManager::runOptimizationPasses() {
-        if (qc1.empty() && qc2.empty())
+        if (qc1.empty() && qc2.empty()) {
             return;
+        }
 
         const auto isDynamicCircuit1 = qc::CircuitOptimizer::isDynamicCircuit(qc1);
         const auto isDynamicCircuit2 = qc::CircuitOptimizer::isDynamicCircuit(qc2);
@@ -370,8 +373,9 @@ namespace ec {
             // start a new thread that constructs and runs the construction check
             threads.emplace_back([this, &queue, id] {
                 checkers[id] = std::make_unique<DDConstructionChecker>(qc1, qc2, configuration);
-                if (!done)
+                if (!done) {
                     checkers[id]->run();
+                }
                 queue.push(id);
             });
             ++id;
@@ -382,8 +386,9 @@ namespace ec {
                 // start a new thread that constructs and runs the ZX checker
                 threads.emplace_back([this, &queue, id] {
                     checkers[id] = std::make_unique<ZXEquivalenceChecker>(qc1, qc2, configuration);
-                    if (!done)
+                    if (!done) {
                         checkers[id]->run();
+                    }
                     queue.push(id);
                 });
                 ++id;
@@ -406,8 +411,9 @@ namespace ec {
                         std::lock_guard stateGeneratorLock(stateGeneratorMutex);
                         checker->setRandomInitialState(stateGenerator);
                     }
-                    if (!done)
+                    if (!done) {
                         checkers[id]->run();
+                    }
                     queue.push(id);
                 });
                 ++id;
@@ -448,7 +454,7 @@ namespace ec {
                 results.equivalence = result;
 
                 // some special handling in case non-equivalence has been shown by a simulation run
-                if (auto simulationChecker = dynamic_cast<DDSimulationChecker*>(checker)) {
+                if (auto* simulationChecker = dynamic_cast<DDSimulationChecker*>(checker)) {
                     results.performedSimulations++;
 
                     if (configuration.simulation.storeCEXinput) {
@@ -464,13 +470,14 @@ namespace ec {
             }
 
             // the alternating and the construction checker provide definitive answers once they finish
-            if (dynamic_cast<DDAlternatingChecker*>(checker) || dynamic_cast<DDConstructionChecker*>(checker)) {
+            if ((dynamic_cast<DDAlternatingChecker*>(checker) != nullptr) ||
+                (dynamic_cast<DDConstructionChecker*>(checker) != nullptr)) {
                 setAndSignalDone();
                 results.equivalence = result;
                 break;
             }
 
-            if (dynamic_cast<ZXEquivalenceChecker*>(checker)) {
+            if (dynamic_cast<ZXEquivalenceChecker*>(checker) != nullptr) {
                 results.equivalence = result;
                 if (result == EquivalenceCriterion::EquivalentUpToGlobalPhase || (result == EquivalenceCriterion::ProbablyNotEquivalent && configuration.onlyZXCheckerConfigured())) {
                     setAndSignalDone();
@@ -480,7 +487,7 @@ namespace ec {
             }
 
             // at this point, the only option is that this is a simulation checker
-            if (dynamic_cast<DDSimulationChecker*>(checker)) {
+            if (dynamic_cast<DDSimulationChecker*>(checker) != nullptr) {
                 // if the simulation has not shown the non-equivalence, then both circuits are considered probably equivalent
                 results.equivalence = EquivalenceCriterion::ProbablyEquivalent;
                 ++results.performedSimulations;
@@ -542,7 +549,7 @@ namespace ec {
         if (!checkers.empty()) {
             res["checkers"]      = nlohmann::json::array();
             auto& checkerResults = res["checkers"];
-            for (auto& checker: checkers) {
+            for (const auto& checker: checkers) {
                 nlohmann::json j{};
                 checker->json(j);
                 checkerResults.push_back(j);

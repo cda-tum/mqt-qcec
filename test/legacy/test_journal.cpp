@@ -155,7 +155,7 @@ TEST_P(JournalTestNonEQ, PowerOfSimulation) {
             removed.clear();
             for (unsigned short j = 0U; j < gates_to_remove; ++j) {
                 auto gate_to_remove = rng() % qc_transpiled.getNops();
-                while (removed.count(gate_to_remove)) {
+                while (removed.count(gate_to_remove) != 0U) {
                     gate_to_remove = rng() % qc_transpiled.getNops();
                 }
                 removed.insert(gate_to_remove);
@@ -206,7 +206,7 @@ TEST_P(JournalTestNonEQ, PowerOfSimulationParallel) {
             removed.clear();
             for (unsigned short j = 0U; j < gates_to_remove; ++j) {
                 auto gate_to_remove = rng() % qc_transpiled.getNops();
-                while (removed.count(gate_to_remove)) {
+                while (removed.count(gate_to_remove) != 0U) {
                     gate_to_remove = rng() % qc_transpiled.getNops();
                 }
                 removed.insert(gate_to_remove);

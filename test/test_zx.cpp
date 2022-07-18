@@ -7,7 +7,6 @@
 #include "EquivalenceCheckingManager.hpp"
 #include "QuantumComputation.hpp"
 #include "dd/Control.hpp"
-#include "zx/FunctionalityConstruction.hpp"
 
 #include "gtest/gtest.h"
 #include <functional>

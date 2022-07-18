@@ -27,8 +27,6 @@ class EqualityTest: public testing::Test {
         config.execution.runZXChecker           = false;
     }
 
-    void TearDown() override {}
-
 protected:
     dd::QubitCount         nqubits = 1U;
     qc::QuantumComputation qc1;

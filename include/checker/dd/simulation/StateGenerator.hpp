@@ -86,24 +86,24 @@ namespace ec {
 
             // choose a random basis state for each qubit
             auto randomBasisState = std::vector<dd::BasisStates>(totalQubits, dd::BasisStates::zero);
-            for (dd::QubitCount i = 0; i < randomQubits; ++i) {
+            for (dd::QubitCount i = 0U; i < randomQubits; ++i) {
                 switch (random1QBasisDistribution(mt)) {
-                    case 0:
+                    case static_cast<std::size_t>(dd::BasisStates::zero):
                         randomBasisState[i] = dd::BasisStates::zero;
                         break;
-                    case 1:
+                    case static_cast<std::size_t>(dd::BasisStates::one):
                         randomBasisState[i] = dd::BasisStates::one;
                         break;
-                    case 2:
+                    case static_cast<std::size_t>(dd::BasisStates::plus):
                         randomBasisState[i] = dd::BasisStates::plus;
                         break;
-                    case 3:
+                    case static_cast<std::size_t>(dd::BasisStates::minus):
                         randomBasisState[i] = dd::BasisStates::minus;
                         break;
-                    case 4:
+                    case static_cast<std::size_t>(dd::BasisStates::right):
                         randomBasisState[i] = dd::BasisStates::right;
                         break;
-                    case 5:
+                    case static_cast<std::size_t>(dd::BasisStates::left):
                         randomBasisState[i] = dd::BasisStates::left;
                         break;
                     default:
@@ -159,7 +159,8 @@ namespace ec {
         std::mt19937_64 mt;
 
         std::unordered_set<std::size_t> generatedComputationalBasisStates{};
+        constexpr static std::size_t    OneQubitBaseElements = 6U;
         // this generator produces random bases from the set { |0>, |1>, |+>, |->, |L>, |R> }
-        std::uniform_int_distribution<std::size_t> random1QBasisDistribution = std::uniform_int_distribution<std::size_t>(0U, 5U);
+        std::uniform_int_distribution<std::size_t> random1QBasisDistribution = std::uniform_int_distribution<std::size_t>(0U, OneQubitBaseElements - 1U);
     };
 } // namespace ec

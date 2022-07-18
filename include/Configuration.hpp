@@ -107,7 +107,7 @@ namespace ec {
                    !execution.runZXChecker;
         }
 
-        [[nodiscard]] nlohmann::json json() const noexcept {
+        [[nodiscard]] nlohmann::json json() const {
             nlohmann::json config{};
             auto&          exe = config["execution"];
             exe["tolerance"]   = execution.numericalTolerance;
@@ -170,7 +170,7 @@ namespace ec {
             return config;
         }
 
-        [[nodiscard]] std::string toString() const noexcept {
+        [[nodiscard]] std::string toString() const {
             constexpr auto indent = 2U;
             return json().dump(indent);
         }

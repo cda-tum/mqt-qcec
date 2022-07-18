@@ -140,7 +140,7 @@ namespace ec {
 
         switch (gate) {
             case qc::X:
-                return 2U * (nc - 2U) * ((2U * LegacyIBMCostFunction({qc::Phase, 0})) + (2 * LegacyIBMCostFunction({qc::U2, 0})) + (3U * LegacyIBMCostFunction({qc::X, 1}))) + (6U * LegacyIBMCostFunction({qc::X, 1})) + (8U * LegacyIBMCostFunction({qc::U3, 0}));
+                return 2UL * (nc - 2UL) * ((2UL * LegacyIBMCostFunction({qc::Phase, 0})) + (2UL * LegacyIBMCostFunction({qc::U2, 0})) + (3UL * LegacyIBMCostFunction({qc::X, 1}))) + (6UL * LegacyIBMCostFunction({qc::X, 1})) + (8UL * LegacyIBMCostFunction({qc::U3, 0}));
             case qc::U3:
             case qc::U2:
             case qc::V:

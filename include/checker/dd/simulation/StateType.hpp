@@ -28,14 +28,15 @@ namespace ec {
     inline StateType stateTypeFromString(const std::string& type) noexcept {
         if ((type == "computational_basis") || (type == "0") || (type == "classical")) {
             return StateType::ComputationalBasis;
-        } else if ((type == "random_1Q_basis") || (type == "1") || (type == "local_quantum")) {
-            return StateType::Random1QBasis;
-        } else if ((type == "stabilizer") || (type == "2") || (type == "global_quantum")) {
-            return StateType::Stabilizer;
-        } else {
-            std::cerr << "Unknown state type: " << type << ". Defaulting to computational basis states.\n";
-            return StateType::ComputationalBasis;
         }
+        if ((type == "random_1Q_basis") || (type == "1") || (type == "local_quantum")) {
+            return StateType::Random1QBasis;
+        }
+        if ((type == "stabilizer") || (type == "2") || (type == "global_quantum")) {
+            return StateType::Stabilizer;
+        }
+        std::cerr << "Unknown state type: " << type << ". Defaulting to computational basis states.\n";
+        return StateType::ComputationalBasis;
     }
 
     inline std::istream& operator>>(std::istream& in, StateType& type) {
