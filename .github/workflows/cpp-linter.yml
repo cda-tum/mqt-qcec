@@ -12,19 +12,22 @@ jobs:
         with:
           submodules: recursive
       - name: Generate compilation database
-        run: cmake -S . -B build -DBINDINGS=ON -DBUILD_QCEC_TESTS=ON -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
-      - uses: cpp-linter/cpp-linter-action@v1
-        id:   linter
+        run:  cmake -S . -B build -DBINDINGS=ON -DBUILD_QCEC_TESTS=ON -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+      - uses: actions/setup-python@v4
+        name: Install Python
+        with:
+          python-version: '3.9'
+      - name: Install linter python package
+        run:  python3 -m pip install git+https://github.com/cpp-linter/cpp-linter-action@v1
+      - name: Run linter
+        run:  |
+              cpp-linter \
+              --version=14 \
+              --style=file \
+              --lines-changed-only=false \
+              --files-changed-only=false \
+              --thread-comments=true \
+              --ignore=build \
+              --database=${{ github.event.repository.name }}/build
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          style:              file
-          version:            '14'
-          lines-changed-only: false # only for testing
-          files-changed-only: false # only for testing
-          thread-comments:    true
-          database: 'qcec/build'
-          ignore:             '.github|build'
-      - name: Check failures
-        if:   steps.linter.outputs.checks-failed > 0
-        run: echo "Failed linting."
