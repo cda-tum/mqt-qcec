@@ -4,7 +4,7 @@ WarningsAsErrors:      ''
 HeaderFilterRegex:     ''
 AnalyzeTemporaryDtors: false
 FormatStyle:           file
-UseColor:              true
+#UseColor:              true
 CheckOptions:
   - key:   readability-suspicious-call-argument.PrefixSimilarAbove
     value: '30'
