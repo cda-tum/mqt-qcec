@@ -20,6 +20,7 @@ jobs:
       - name: Install linter python package
         run: python3 -m pip install git+https://github.com/cpp-linter/cpp-linter-action@v1
       - name: Run linter
+        id: linter
         run: |
               cpp-linter \
               --version=14 \
@@ -32,3 +33,6 @@ jobs:
               --database=${{ github.event.repository.name }}/build
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Fail if linter found errors
+        if: steps.linter.outputs.checks-failed > 0
+        run: echo "Linter found errors" && exit 1
