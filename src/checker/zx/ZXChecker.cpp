@@ -82,7 +82,7 @@ namespace ec {
         }
         return pInv;
     }
-    qc::Permutation concat(const qc::Permutation& p1, const qc::Permutation& p2) { //p2 after p1
+    qc::Permutation concat(const qc::Permutation& p1, const qc::Permutation& p2) { // p2 after p1
         qc::Permutation pComb{};
 
         for (const auto [v, w]: p1) {
@@ -103,7 +103,7 @@ namespace ec {
             mappedTo[v]   = true;
         }
 
-        //Try to map identity
+        // Try to map identity
         for (dd::Qubit i = 0; i < n; ++i) {
             if (mappedFrom[i] || mappedTo[i]) {
                 continue;
@@ -136,7 +136,7 @@ namespace ec {
             mappedTo[j.value()] = true;
         }
 
-        //Map rest greedily
+        // Map rest greedily
 
         for (dd::Qubit i = 0; i < n; ++i) {
             if (mappedFrom[i]) {
@@ -156,8 +156,8 @@ namespace ec {
 
     qc::Permutation invertPermutations(const qc::QuantumComputation& qc) {
         return concat(
-                invert(complete(qc.outputPermutation, qc.getNqubits())),
-                complete(qc.initialLayout, qc.getNqubits()));
+            invert(complete(qc.outputPermutation, qc.getNqubits())),
+            complete(qc.initialLayout, qc.getNqubits()));
     }
 
     std::size_t ZXEquivalenceChecker::fullReduceApproximate() {

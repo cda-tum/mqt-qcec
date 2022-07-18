@@ -105,29 +105,29 @@ protected:
 
 INSTANTIATE_TEST_SUITE_P(Journal, JournalTestNonEQ,
                          testing::Combine(
-                                 testing::Values(
-                                         "dk27_225",
-                                         "pcler8_248",
-                                         "5xp1_194",
-                                         "alu1_198",
-                                         //				                         "mlp4_245",
-                                         "dk17_224",
-                                         //				                         "add6_196",
-                                         //				                         "C7552_205",
-                                         "cu_219",
-                                         //				                         "example2_231",
-                                         "c2_181",
-                                         "rd73_312",
-                                         //				                         "cm150a_210",
-                                         "cm163a_213",
-                                         "c2_182",
-                                         "sym9_317",
-                                         "mod5adder_306",
-                                         "rd84_313"
-                                         //				                         "cm151a_211",
-                                         //				                         "apla_203"
-                                         ),
-                                 testing::Range(static_cast<unsigned short>(1U), static_cast<unsigned short>(4U), 2)),
+                             testing::Values(
+                                 "dk27_225",
+                                 "pcler8_248",
+                                 "5xp1_194",
+                                 "alu1_198",
+                                 //				                         "mlp4_245",
+                                 "dk17_224",
+                                 //				                         "add6_196",
+                                 //				                         "C7552_205",
+                                 "cu_219",
+                                 //				                         "example2_231",
+                                 "c2_181",
+                                 "rd73_312",
+                                 //				                         "cm150a_210",
+                                 "cm163a_213",
+                                 "c2_182",
+                                 "sym9_317",
+                                 "mod5adder_306",
+                                 "rd84_313"
+                                 //				                         "cm151a_211",
+                                 //				                         "apla_203"
+                                 ),
+                             testing::Range(static_cast<unsigned short>(1U), static_cast<unsigned short>(4U), 2)),
                          [](const testing::TestParamInfo<JournalTestNonEQ::ParamType>& info) {
 	                         std::string name = std::get<0>(info.param);
 	                         unsigned short gates_to_remove = std::get<1>(info.param);
@@ -269,27 +269,27 @@ protected:
 
 INSTANTIATE_TEST_SUITE_P(Journal, JournalTestEQ,
                          testing::Values(
-                                 "dk27_225",
-                                 "pcler8_248",
-                                 "5xp1_194",
-                                 "alu1_198"
-                                 //"mlp4_245"
-                                 //"dk17_224",
-                                 //"add6_196",
-                                 //"C7552_205",
-                                 //"cu_219",
-                                 //"example2_231",
-                                 //"c2_181",
-                                 //"rd73_312",
-                                 //"cm150a_210",
-                                 //"cm163a_213",
-                                 //"c2_182",
-                                 //"sym9_317",
-                                 //"mod5adder_306",
-                                 //"rd84_313",
-                                 //"cm151a_211",
-                                 //"apla_203"
-                                 ),
+                             "dk27_225",
+                             "pcler8_248",
+                             "5xp1_194",
+                             "alu1_198"
+                             //"mlp4_245"
+                             //"dk17_224",
+                             //"add6_196",
+                             //"C7552_205",
+                             //"cu_219",
+                             //"example2_231",
+                             //"c2_181",
+                             //"rd73_312",
+                             //"cm150a_210",
+                             //"cm163a_213",
+                             //"c2_182",
+                             //"sym9_317",
+                             //"mod5adder_306",
+                             //"rd84_313",
+                             //"cm151a_211",
+                             //"apla_203"
+                             ),
                          [](const testing::TestParamInfo<JournalTestEQ::ParamType>& info) {
 	                         std::string name = info.param;
 	                         std::replace( name.begin(), name.end(), '-', '_');

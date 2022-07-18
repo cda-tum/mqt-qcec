@@ -24,8 +24,8 @@ protected:
 
     std::unique_ptr<ec::EquivalenceCheckingManager> ecm{};
 
-    std::string test_original        = "./circuits/test/test.real";
-    std::string test_alternative_dir = "./circuits/test/";
+    std::string testOriginal       = "./circuits/test/test.real";
+    std::string testAlternativeDir = "./circuits/test/";
 
     void SetUp() override {
         config.execution.parallel               = true;
@@ -42,10 +42,10 @@ protected:
 
 INSTANTIATE_TEST_SUITE_P(TestCircuits, ZXTest,
                          testing::Values(
-                                 "inputperm", "ancilla", "ancilla_inputperm", "swap",
-                                 "outputperm", "ancilla_inputperm_outputperm",
-                                 "optimizedswap", "ancilla_inputperm_outputperm_optimizedswap",
-                                 "ancilla_inputperm_outputperm_optimizedswap2"),
+                             "inputperm", "ancilla", "ancilla_inputperm", "swap",
+                             "outputperm", "ancilla_inputperm_outputperm",
+                             "optimizedswap", "ancilla_inputperm_outputperm_optimizedswap",
+                             "ancilla_inputperm_outputperm_optimizedswap2"),
                          [](const testing::TestParamInfo<ZXTest::ParamType>& info) {
 			                 std::stringstream ss{};
 			                 ss << info.param;
@@ -230,11 +230,11 @@ protected:
 
 INSTANTIATE_TEST_SUITE_P(ZXTestCompFlow, ZXTestCompFlow,
                          testing::Values(
-                                 "c2_181",
-                                 "rd73_312",
-                                 "sym9_317",
-                                 "mod5adder_306",
-                                 "rd84_313"),
+                             "c2_181",
+                             "rd73_312",
+                             "sym9_317",
+                             "mod5adder_306",
+                             "rd84_313"),
                          [](const testing::TestParamInfo<ZXTestCompFlow::ParamType>& info) {
 							 auto s = info.param;
 							 std::replace( s.begin(), s.end(), '-', '_');

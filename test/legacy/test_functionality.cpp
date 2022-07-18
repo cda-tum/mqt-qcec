@@ -34,10 +34,10 @@ protected:
 
 INSTANTIATE_TEST_SUITE_P(TestCircuits, FunctionalityTest,
                          testing::Values(
-                                 "inputperm", "ancilla", "ancilla_inputperm", "swap",
-                                 "outputperm", "ancilla_inputperm_outputperm",
-                                 "optimizedswap", "ancilla_inputperm_outputperm_optimizedswap",
-                                 "ancilla_inputperm_outputperm_optimizedswap2"),
+                             "inputperm", "ancilla", "ancilla_inputperm", "swap",
+                             "outputperm", "ancilla_inputperm_outputperm",
+                             "optimizedswap", "ancilla_inputperm_outputperm_optimizedswap",
+                             "ancilla_inputperm_outputperm_optimizedswap2"),
                          [](const testing::TestParamInfo<FunctionalityTest::ParamType>& info) {
 			                 std::stringstream ss{};
 			                 ss << info.param;
