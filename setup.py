@@ -17,7 +17,7 @@ class CMakeExtension(Extension):
 class CMakeBuild(build_ext):
     def build_extension(self, ext):
         from setuptools_scm import get_version
-        version = get_version(root='.', relative_to=__file__)
+        version = get_version(relative_to=__file__)
 
         self.package = ext.namespace
         extdir = os.path.abspath(os.path.dirname(self.get_ext_fullpath(ext.name)))
