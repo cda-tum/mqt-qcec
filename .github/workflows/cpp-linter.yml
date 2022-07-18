@@ -6,13 +6,13 @@ on:
 
 jobs:
   cpp-linter:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
         with:
           submodules: recursive
       - name: Generate compilation database
-        run:  cmake -S . -B build -DBINDINGS=ON -DBUILD_QCEC_TESTS=ON -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+        run: CXX=clang++-14 cmake -S . -B build -DBINDINGS=ON -DBUILD_QCEC_TESTS=ON -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
       - uses: actions/setup-python@v4
         name: Install Python
         with:
