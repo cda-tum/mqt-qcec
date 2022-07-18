@@ -23,7 +23,7 @@ jobs:
           lines-changed-only: false # only for testing
           files-changed-only: false # only for testing
           thread-comments:    true
-          database:           'build'
+          database: 'qcec/build'
           ignore:             '.github|build'
       - name: Check failures
         if:   steps.linter.outputs.checks-failed > 0
