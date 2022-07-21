@@ -92,10 +92,8 @@ jobs:
       - name:              Test
         working-directory: ${{github.workspace}}/build/test
         run:               ./qcec_test
-      - name: Run gcov
-        run:  |
-              find . -type f -name '*.gcno' -exec gcov -p  {} +
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v3.1.0
         with:
-          fail_ci_if_error: true
+          gcov:        true
+          gcov_ignore: "extern/**/*"
