@@ -1,7 +1,7 @@
 Installation for Users
 ======================
 
-QCEC is mainly developed as a C++ library that builds upon `our decision diagram (DD) package <https://github.com/cda-tum/dd_package.git>`_ as well as `our quantum functionality representation (QFR) <https://github.com/cda-tum/qfr.git>`_.
+QCEC is mainly developed as a C++ library that builds upon `our quantum functionality representation (QFR) <https://github.com/cda-tum/qfr>`_, `our decision diagram (DD) package <https://github.com/cda-tum/dd_package.git>`_, and `our ZX-diagram package <https://github.com/cda-tum/zx.git>`_.
 In order to make the tool as accessible as possible, it comes with an easy-to-use Python interface.
 
 We encourage installing QCEC via pip (preferably in a `virtual environment <https://docs.python.org/3/library/venv.html>`_):
@@ -20,7 +20,7 @@ First, save the following lines as :code:`ghz_3.py` in a folder where you want t
     .. code-block:: python
 
         from qiskit import QuantumCircuit, transpile
-        from qiskit.test.mock import FakeLondon
+        from qiskit.providers.fake_provider import FakeLondon
         from mqt import qcec
 
         # create your quantum circuit
@@ -48,7 +48,7 @@ Then, the following snippet shows the installation process from setting up the v
         $ python3 -m venv venv
         $ . venv/bin/activate
         (venv) $ pip install -U pip setuptools wheel
-        (venv) $ pip install mqt.qcec qiskit-terra
+        (venv) $ pip install mqt.qcec
         (venv) $ python3 ghz_3.py
                 ┌───┐           ░ ┌─┐
            q_0: ┤ H ├──■────■───░─┤M├──────
