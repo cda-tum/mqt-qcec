@@ -57,7 +57,7 @@ Then, compile the circuit to the desired target architecture.
 .. code-block:: python
 
     from qiskit import transpile
-    from qiskit.test.mock import FakeLondon
+    from qiskit.providers.fake_provider import FakeLondon
 
     # compile circuit to 5-qubit London Architecture
     optimization_level = 1
