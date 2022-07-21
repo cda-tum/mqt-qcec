@@ -1,4 +1,7 @@
-from importlib.metadata import version
+try:
+    from importlib import metadata
+except ImportError:
+    import importlib_metadata as metadata
 import pybtex.plugin
 from pybtex.style.formatting.unsrt import Style as UnsrtStyle
 from pybtex.style.template import field, href
@@ -7,7 +10,7 @@ from pybtex.style.template import field, href
 project = 'QCEC'
 author = 'Lukas Burgholzer'
 
-release = version('mqt.qcec')
+release = metadata.version('mqt.qcec')
 version = '.'.join(release.split('.')[:3])
 
 # -- General configuration ---------------------------------------------------
