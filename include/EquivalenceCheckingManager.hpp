@@ -208,6 +208,8 @@ namespace ec {
         /// The parallel flow makes use of the available processing power by orchestrating all configured checks in a parallel fashion
         void checkParallel();
 
+        void checkSymbolic();
+
         /// Signal all checker that they shall abort the computation as soon as possible since a result has been determined
         void setAndSignalDone() {
             done = true;

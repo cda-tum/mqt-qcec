@@ -35,6 +35,7 @@ package_add_test(${PROJECT_NAME}_test
                  test_gate_cost_application_scheme.cpp
                  test_equality.cpp
                  test_zx.cpp
+                 test_symbolic.cpp
                )
 
 add_custom_command(TARGET ${PROJECT_NAME}_test

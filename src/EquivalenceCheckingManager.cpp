@@ -6,6 +6,7 @@
 #include "EquivalenceCheckingManager.hpp"
 
 #include "EquivalenceCriterion.hpp"
+#include "Expression.hpp"
 #include "zx/FunctionalityConstruction.hpp"
 
 #include <iostream>
@@ -193,10 +194,14 @@ namespace ec {
             return;
         }
 
-        if (!configuration.execution.parallel || configuration.execution.nthreads <= 1 || configuration.onlySingleTask()) {
-            checkSequential();
+        if (qc1.isVariableFree() && qc2.isVariableFree()) {
+            if (!configuration.execution.parallel || configuration.execution.nthreads <= 1 || configuration.onlySingleTask()) {
+                checkSequential();
+            } else {
+                checkParallel();
+            }
         } else {
-            checkParallel();
+            checkSymbolic();
         }
     }
 
@@ -211,9 +216,10 @@ namespace ec {
         // set numeric tolerance used throughout the check
         setTolerance(configuration.execution.numericalTolerance);
 
-        // run all configured optimization passes
-        runOptimizationPasses();
-
+        if (qc1.isVariableFree() && qc2.isVariableFree()) {
+            // run all configured optimization passes
+            runOptimizationPasses();
+        }
         // strip away qubits that are not acted upon
         this->qc1.stripIdleQubits();
         this->qc2.stripIdleQubits();
@@ -586,6 +592,145 @@ namespace ec {
             if (thread.joinable()) {
                 thread.join();
             }
+        }
+    }
+
+    void EquivalenceCheckingManager::checkSymbolic() {
+        const auto start = std::chrono::steady_clock::now();
+        // in case a timeout is configured, a separate thread is started that sets the `done` flag after the timeout has passed
+        std::thread timeoutThread{};
+        if (configuration.execution.timeout > 0s) {
+            timeoutThread = std::thread([&, timeout = configuration.execution.timeout] {
+                std::unique_lock doneLock(doneMutex);
+                auto             finished = doneCond.wait_for(doneLock, timeout, [&] { return done; });
+                // if the thread has already finished within the timeout, nothing has to be done
+                if (!finished) {
+                    done = true;
+                }
+            });
+        }
+
+        // if (configuration.execution.runSimulationChecker) {
+        //     checkers.emplace_back(std::make_unique<DDSimulationChecker>(qc1, qc2, configuration));
+        //     auto* simulationChecker = dynamic_cast<DDSimulationChecker*>(checkers.back().get());
+        //     while (results.startedSimulations < configuration.simulation.maxSims && !done) {
+        //         // configure simulation based checker
+        //         simulationChecker->setRandomInitialState(stateGenerator);
+
+        //         // run the simulation
+        //         ++results.startedSimulations;
+        //         const auto result = simulationChecker->run();
+        //         ++results.performedSimulations;
+
+        //         // if the run completed but has not yielded any information this indicates a timeout
+        //         if (result == EquivalenceCriterion::NoInformation) {
+        //             if (!done) {
+        //                 std::clog << "Simulation run returned without any information. Something probably went wrong. Exiting!" << std::endl;
+        //             }
+        //             return;
+        //         }
+
+        //         // break if non-equivalence has been shown
+        //         if (result == EquivalenceCriterion::NotEquivalent) {
+        //             results.equivalence = EquivalenceCriterion::NotEquivalent;
+        //             break;
+        //         }
+
+        //         // Otherwise, circuits are probably equivalent and execution can continue
+        //         results.equivalence = EquivalenceCriterion::ProbablyEquivalent;
+        //     }
+
+        //     // Circuits have been shown to be non-equivalent
+        //     if (results.equivalence == EquivalenceCriterion::NotEquivalent) {
+        //         if (configuration.simulation.storeCEXinput) {
+        //             results.cexInput = simulationChecker->getInitialVector();
+        //         }
+        //         if (configuration.simulation.storeCEXoutput) {
+        //             results.cexOutput1 = simulationChecker->getInternalVector1();
+        //             results.cexOutput2 = simulationChecker->getInternalVector2();
+        //         }
+
+        //         // everything is done
+        //         done = true;
+        //         doneCond.notify_one();
+        //     }
+
+        //     // in case only simulations are performed and every single one is done, everything is done
+        //     if (!configuration.execution.runAlternatingChecker &&
+        //         !configuration.execution.runConstructionChecker &&
+        //         results.performedSimulations == configuration.simulation.maxSims) {
+        //         done = true;
+        //         doneCond.notify_one();
+        //     }
+        // }
+
+        // if (configuration.execution.runAlternatingChecker && !done) {
+        //     checkers.emplace_back(std::make_unique<DDAlternatingChecker>(qc1, qc2, configuration));
+        //     auto&      alternatingChecker = checkers.back();
+        //     const auto result             = alternatingChecker->run();
+
+        //     // if the alternating check produces a result, this is final
+        //     if (result != EquivalenceCriterion::NoInformation) {
+        //         results.equivalence = result;
+
+        //         // everything is done
+        //         done = true;
+        //         doneCond.notify_one();
+        //     }
+        // }
+
+        // if (configuration.execution.runConstructionChecker && !done) {
+        //     checkers.emplace_back(std::make_unique<DDConstructionChecker>(qc1, qc2, configuration));
+        //     auto&      constructionChecker = checkers.back();
+        //     const auto result              = constructionChecker->run();
+
+        //     // if the construction check produces a result, this is final
+        //     if (result != EquivalenceCriterion::NoInformation) {
+        //         results.equivalence = result;
+
+        //         // everything is done
+        //         done = true;
+        //         doneCond.notify_one();
+        //     }
+        // }
+
+        if (!done) {
+            if (zx::FunctionalityConstruction::transformableToZX(&qc1) && zx::FunctionalityConstruction::transformableToZX(&qc2)) {
+                checkers.emplace_back(std::make_unique<ZXEquivalenceChecker>(qc1, qc2, configuration));
+                auto&      zxChecker = checkers.back();
+                const auto result    = zxChecker->run();
+
+                results.equivalence = result;
+                // break if equivalence has been shown
+                if (result == EquivalenceCriterion::EquivalentUpToGlobalPhase) {
+                    done = true;
+                    doneCond.notify_one();
+                }
+            } else {
+                std::clog << "Checking symbolic circuits requires transformation to ZX-diagram but one of the circuits contains operations not supported by this checker! Exiting!" << std::endl;
+                checkers.clear();
+                results.equivalence = EquivalenceCriterion::NoInformation;
+                return;
+            }
+        }
+
+        if (!done) {
+            //instantiate variabels
+            sym::VariableAssignment assignment{};
+            for (const auto& var: qc1.getVariables()) {
+                std::cout << var.getName() << std::endl;
+                assignment[var] = 0.0;
+            }
+            qc1.instantiate(assignment);
+            qc2.instantiate(assignment);
+            configuration.execution.runZXChecker = false;
+            checkParallel();
+        }
+        const auto end    = std::chrono::steady_clock::now();
+        results.checkTime = std::chrono::duration<double>(end - start).count();
+        // appropriately join the timeout thread, if it was launched
+        if (timeoutThread.joinable()) {
+            timeoutThread.join();
         }
     }
 
