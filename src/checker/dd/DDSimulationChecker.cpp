@@ -32,8 +32,10 @@ EquivalenceCriterion DDSimulationChecker::checkEquivalence() {
 
 void DDSimulationChecker::setRandomInitialState(StateGenerator& generator) {
   const dd::QubitCount nancillary = nqubits - qc1.getNqubitsWithoutAncillae();
-  initialState                    = generator.generateRandomState(
-      dd, nqubits, nancillary, configuration.simulation.stateType);
+  const auto           stateType  = configuration.simulation.stateType;
+
+  initialState =
+      generator.generateRandomState(dd, nqubits, nancillary, stateType);
 }
 
 } // namespace ec
