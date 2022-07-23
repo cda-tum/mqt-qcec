@@ -25,10 +25,7 @@ public:
         this->configuration.application.constructionScheme);
   }
 
-  void json(nlohmann::json& j) const noexcept override {
-    DDEquivalenceChecker::json(j);
-    j["checker"] = "decision_diagram_construction";
-  }
+  void json(nlohmann::json& j) const noexcept override;
 
 private:
   void initializeTask(

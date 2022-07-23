@@ -34,10 +34,7 @@ public:
   }
   [[nodiscard]] double getRuntime() const noexcept { return runtime; }
 
-  virtual void json(nlohmann::json& j) const noexcept {
-    j["equivalence"] = toString(equivalence);
-    j["runtime"]     = getRuntime();
-  }
+  virtual void json(nlohmann::json& j) const noexcept;
 
   void signalDone() { done.store(true, std::memory_order_relaxed); }
   [[nodiscard]] auto isDone() const {
