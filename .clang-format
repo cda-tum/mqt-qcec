@@ -1,24 +1,7 @@
-BasedOnStyle:                              LLVM
-AccessModifierOffset:                      -4
-AlignConsecutiveAssignments:               Consecutive
-AlignConsecutiveDeclarations:              Consecutive
-AllowShortBlocksOnASingleLine:             Empty
-BraceWrapping:
-  SplitEmptyFunction:    false
-  SplitEmptyRecord:      false
-BreakConstructorInitializers:              AfterColon
-BreakInheritanceList:                      AfterColon
-ColumnLimit:                               0
-IncludeBlocks:                             Regroup
-IndentCaseLabels:                          true
-IndentPPDirectives:                        BeforeHash
-IndentWidth:                               4
-KeepEmptyLinesAtTheStartOfBlocks:          false
-NamespaceIndentation:                      All
-PointerAlignment:                          Left
-SpaceAfterTemplateKeyword:                 false
-SpaceBeforeCtorInitializerColon:           false
-SpaceBeforeInheritanceColon:               false
-SpaceBeforeRangeBasedForLoopColon:         false
-SpacesInAngles:                            false
-SpacesInContainerLiterals:                 false
+BasedOnStyle:                     LLVM
+AlignConsecutiveAssignments:      Consecutive
+AlignConsecutiveDeclarations:     Consecutive
+IncludeBlocks:                    Regroup
+KeepEmptyLinesAtTheStartOfBlocks: false
+PointerAlignment:                 Left
+SpacesInContainerLiterals:        false
