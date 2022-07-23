@@ -29,7 +29,7 @@ protected:
 
     configuration.application.alternatingScheme =
         ec::ApplicationSchemeType::GateCost;
-    configuration.application.costFunction = ec::LegacyIBMCostFunction;
+    configuration.application.costFunction = ec::legacyCostFunction;
   }
 };
 

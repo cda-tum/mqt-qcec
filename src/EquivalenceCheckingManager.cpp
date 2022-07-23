@@ -509,7 +509,7 @@ void EquivalenceCheckingManager::checkParallel() {
 
       // some special handling in case non-equivalence has been shown by a
       // simulation run
-      if (auto* simulationChecker =
+      if (const auto* simulationChecker =
               dynamic_cast<DDSimulationChecker*>(checker)) {
         results.performedSimulations++;
 

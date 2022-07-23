@@ -25,7 +25,7 @@ ZXEquivalenceChecker::ZXEquivalenceChecker(const qc::QuantumComputation& qc1,
   zx::ZXDiagram dPrime =
       zx::FunctionalityConstruction::buildFunctionality(&qc2);
 
-  if ((qc1.getNancillae() != 0) || (qc2.getNancillae() != 0)) {
+  if ((qc1.getNancillae() != 0U) || (qc2.getNancillae() != 0U)) {
     ancilla = true;
   }
 
@@ -34,7 +34,7 @@ ZXEquivalenceChecker::ZXEquivalenceChecker(const qc::QuantumComputation& qc1,
 
   // fix ancillaries to |0>
   const auto nQubitsWithoutAncillae = qc1.getNqubitsWithoutAncillae();
-  for (auto anc = static_cast<dd::Qubit>(qc1.getNqubits() - 1);
+  for (auto anc = static_cast<dd::Qubit>(qc1.getNqubits() - 1U);
        anc >= nQubitsWithoutAncillae; --anc) {
     miter.makeAncilla(anc, p1.at(anc));
     dPrime.makeAncilla(anc, p2.at(anc));
@@ -55,9 +55,9 @@ EquivalenceCriterion ZXEquivalenceChecker::run() {
     const auto& p2 = invert(invertPermutations(qc2));
 
     const auto nQubits = miter.getNQubits();
-    for (std::size_t i = 0; i < nQubits; ++i) {
+    for (std::size_t i = 0U; i < nQubits; ++i) {
       const auto& in  = miter.getInput(i);
-      const auto& out = miter.incidentEdge(in, 0).to;
+      const auto& out = miter.incidentEdge(in, 0U).to;
 
       if (p1.at(static_cast<dd::Qubit>(miter.getVData(in).value().qubit)) !=
           p2.at(static_cast<dd::Qubit>(miter.getVData(out).value().qubit))) {
@@ -179,7 +179,7 @@ std::size_t ZXEquivalenceChecker::fullReduceApproximate() {
     miter.approximateCliffords(tolerance);
     newSimps = fullReduce();
     nSimplifications += newSimps;
-  } while (!isDone() && (newSimps > 0));
+  } while (!isDone() && (newSimps > 0U));
   return nSimplifications;
 }
 
@@ -190,14 +190,14 @@ std::size_t ZXEquivalenceChecker::fullReduce() {
   interiorCliffordSimp();
 
   bool        newMatches       = true;
-  std::size_t nSimplifications = 0;
+  std::size_t nSimplifications = 0U;
   while (!isDone() && newMatches) {
     newMatches = false;
     cliffordSimp();
     const auto nGadget = gadgetSimp();
     interiorCliffordSimp();
     const auto nPivot = pivotGadgetSimp();
-    if ((nGadget + nPivot) != 0) {
+    if ((nGadget + nPivot) != 0U) {
       newMatches = true;
       ++nSimplifications;
     }
@@ -210,7 +210,7 @@ std::size_t ZXEquivalenceChecker::fullReduce() {
 }
 
 std::size_t ZXEquivalenceChecker::gadgetSimp() {
-  std::size_t nSimplifications = 0;
+  std::size_t nSimplifications = 0U;
   bool        newMatches       = true;
 
   while (!isDone() && newMatches) {
@@ -233,7 +233,7 @@ std::size_t ZXEquivalenceChecker::interiorCliffordSimp() {
   spiderSimp();
 
   bool        newMatches       = true;
-  std::size_t nSimplifications = 0;
+  std::size_t nSimplifications = 0U;
   while (!isDone() && newMatches) {
     newMatches            = false;
     const auto nId        = idSimp();
@@ -241,7 +241,7 @@ std::size_t ZXEquivalenceChecker::interiorCliffordSimp() {
     const auto nPivot     = pivotPauliSimp();
     const auto nLocalComp = localCompSimp();
 
-    if ((nId + nSpider + nPivot + nLocalComp) != 0) {
+    if ((nId + nSpider + nPivot + nLocalComp) != 0U) {
       newMatches = true;
       ++nSimplifications;
     }
@@ -251,12 +251,12 @@ std::size_t ZXEquivalenceChecker::interiorCliffordSimp() {
 
 std::size_t ZXEquivalenceChecker::cliffordSimp() {
   bool        newMatches       = true;
-  std::size_t nSimplifications = 0;
+  std::size_t nSimplifications = 0U;
   while (!isDone() && newMatches) {
     newMatches           = false;
     const auto nClifford = interiorCliffordSimp();
     const auto nPivot    = pivotSimp();
-    if ((nClifford + nPivot) != 0) {
+    if ((nClifford + nPivot) != 0U) {
       newMatches = true;
       ++nSimplifications;
     }

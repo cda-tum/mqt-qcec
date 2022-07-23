@@ -18,12 +18,11 @@
 #define MACRO_STRINGIFY(x) STRINGIFY(x)
 
 namespace py = pybind11;
-namespace nl = nlohmann;
 using namespace pybind11::literals;
 
 namespace ec {
 qc::QuantumComputation importCircuit(const py::object& circ) {
-  py::object QuantumCircuit =
+  py::object quantumCircuit =
       py::module::import("qiskit").attr("QuantumCircuit");
   py::object pyQasmQobjExperiment =
       py::module::import("qiskit.qobj").attr("QasmQobjExperiment");
@@ -33,7 +32,7 @@ qc::QuantumComputation importCircuit(const py::object& circ) {
   if (py::isinstance<py::str>(circ)) {
     auto&& file = circ.cast<std::string>();
     qc.import(file);
-  } else if (py::isinstance(circ, QuantumCircuit)) {
+  } else if (py::isinstance(circ, quantumCircuit)) {
     qc::qiskit::QuantumCircuit::import(qc, circ);
   } else if (py::isinstance(circ, pyQasmQobjExperiment)) {
     qc::qiskit::QasmQobjExperiment::import(qc, circ);

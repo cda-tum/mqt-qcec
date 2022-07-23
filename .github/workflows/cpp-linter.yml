@@ -2,8 +2,11 @@ name: cpp-linter
 
 on:
   pull_request:
-    types: [ opened, reopened ]
+    branches:
+      - main
   push:
+    branches:
+      - main
 
 jobs:
   cpp-linter:

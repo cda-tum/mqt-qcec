@@ -26,9 +26,6 @@ public:
 
   virtual EquivalenceCriterion run() = 0;
 
-  [[nodiscard]] const Configuration& getConfiguration() const noexcept {
-    return configuration;
-  }
   [[nodiscard]] EquivalenceCriterion getEquivalence() const noexcept {
     return equivalence;
   }
