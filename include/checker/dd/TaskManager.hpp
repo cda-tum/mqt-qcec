@@ -49,10 +49,6 @@ public:
     return qc;
   }
 
-  [[nodiscard]] const qc::Permutation& getPermutation() const noexcept {
-    return permutation;
-  }
-
   void advanceIterator() { ++iterator; }
 
   void applyGate(DDType& to) {

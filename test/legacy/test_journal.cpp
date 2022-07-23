@@ -12,7 +12,7 @@
 #include <string>
 
 class JournalTestNonEQ
-    : public testing::TestWithParam<std::tuple<std::string, unsigned short>> {
+    : public testing::TestWithParam<std::tuple<std::string, std::uint16_t>> {
 protected:
   qc::QuantumComputation qcOriginal;
   qc::QuantumComputation qcTranspiled;
@@ -21,7 +21,7 @@ protected:
   std::string testOriginalDir   = "./circuits/original/";
   std::string testTranspiledDir = "./circuits/transpiled/";
 
-  unsigned short tries = 10U;
+  std::uint16_t tries = 10U;
 
   double      minTime = 0.;
   double      maxTime = 0.;
@@ -32,17 +32,17 @@ protected:
 
   std::string transpiledFile{};
 
-  std::mt19937_64                                   mt;
-  std::uniform_int_distribution<unsigned long long> distribution;
-  std::function<unsigned long long()>               rng;
+  std::mt19937_64                              mt;
+  std::uniform_int_distribution<std::uint64_t> distribution;
+  std::function<std::uint64_t()>               rng;
 
-  unsigned short                         gatesToRemove = 0U;
-  std::set<std::set<unsigned long long>> alreadyRemoved{};
+  std::uint16_t                     gatesToRemove = 0U;
+  std::set<std::set<std::uint64_t>> alreadyRemoved{};
 
-  unsigned short successes = 0U;
+  std::uint16_t successes = 0U;
 
-  static bool setExists(const std::set<std::set<unsigned long long>>& all,
-                        const std::set<unsigned long long>&           test) {
+  static bool setExists(const std::set<std::set<std::uint64_t>>& all,
+                        const std::set<std::uint64_t>&           test) {
     // first entry
     if (all.empty()) {
       return false;
@@ -70,10 +70,10 @@ protected:
     transpiledFile = ss.str();
 
     std::array<std::mt19937_64::result_type, std::mt19937_64::state_size>
-                       random_data{};
+                       randomData{};
     std::random_device rd;
-    std::generate(begin(random_data), end(random_data), [&]() { return rd(); });
-    std::seed_seq seeds(begin(random_data), end(random_data));
+    std::generate(begin(randomData), end(randomData), [&]() { return rd(); });
+    std::seed_seq seeds(begin(randomData), end(randomData));
     mt.seed(seeds);
     distribution = decltype(distribution)(0U, qcTranspiled.getNops() - 1U);
     rng          = [this]() { return distribution(mt); };
@@ -88,9 +88,8 @@ protected:
     avgSims = 0.;
   }
 
-  void addToStatistics(unsigned short try_count, double time,
-                       std::size_t nsims) {
-    if (try_count == 0U) {
+  void addToStatistics(std::uint16_t tryCount, double time, std::size_t nsims) {
+    if (tryCount == 0U) {
       minTime = time;
       maxTime = time;
       avgTime = time;
@@ -103,9 +102,9 @@ protected:
       maxTime = std::max(maxTime, time);
       maxSims = std::max(maxSims, nsims);
       avgTime =
-          (avgTime * try_count + time) / static_cast<double>(try_count + 1U);
-      avgSims = (avgSims * try_count + static_cast<double>(nsims)) /
-                static_cast<double>(try_count + 1U);
+          (avgTime * tryCount + time) / static_cast<double>(tryCount + 1U);
+      avgSims = (avgSims * tryCount + static_cast<double>(nsims)) /
+                static_cast<double>(tryCount + 1U);
     }
   }
 };
@@ -139,6 +138,8 @@ INSTANTIATE_TEST_SUITE_P(
     });
 
 TEST_P(JournalTestNonEQ, PowerOfSimulation) {
+  using namespace std::chrono_literals;
+
   config.execution.runAlternatingChecker  = false;
   config.execution.runConstructionChecker = false;
   config.execution.runSimulationChecker   = true;
@@ -147,22 +148,22 @@ TEST_P(JournalTestNonEQ, PowerOfSimulation) {
   config.simulation.maxSims               = 16U;
   config.application.simulationScheme = ec::ApplicationSchemeType::Sequential;
 
-  for (unsigned short i = 0U; i < tries; ++i) {
+  for (std::uint16_t i = 0U; i < tries; ++i) {
     qcOriginal.import(testOriginalDir + std::get<0>(GetParam()) + ".real");
 
     // generate non-eq circuit
-    std::set<unsigned long long> removed{};
+    std::set<std::uint64_t> removed{};
     do {
       qcTranspiled.import(transpiledFile);
       removed.clear();
-      for (unsigned short j = 0U; j < gatesToRemove; ++j) {
-        auto gate_to_remove = rng() % qcTranspiled.getNops();
-        while (removed.count(gate_to_remove) != 0U) {
-          gate_to_remove = rng() % qcTranspiled.getNops();
+      for (std::uint16_t j = 0U; j < gatesToRemove; ++j) {
+        auto gateToRemove = rng() % qcTranspiled.getNops();
+        while (removed.count(gateToRemove) != 0U) {
+          gateToRemove = rng() % qcTranspiled.getNops();
         }
-        removed.insert(gate_to_remove);
+        removed.insert(gateToRemove);
         auto it = qcTranspiled.begin();
-        std::advance(it, gate_to_remove);
+        std::advance(it, gateToRemove);
         if (it == qcTranspiled.end()) {
           continue;
         }
@@ -191,6 +192,8 @@ TEST_P(JournalTestNonEQ, PowerOfSimulation) {
 }
 
 TEST_P(JournalTestNonEQ, PowerOfSimulationParallel) {
+  using namespace std::chrono_literals;
+
   config.execution.runAlternatingChecker  = false;
   config.execution.runConstructionChecker = false;
   config.execution.runZXChecker           = false;
@@ -200,22 +203,22 @@ TEST_P(JournalTestNonEQ, PowerOfSimulationParallel) {
   config.simulation.maxSims               = 16U;
   config.application.simulationScheme = ec::ApplicationSchemeType::Sequential;
 
-  for (unsigned short i = 0; i < tries; ++i) {
+  for (std::uint16_t i = 0; i < tries; ++i) {
     qcOriginal.import(testOriginalDir + std::get<0>(GetParam()) + ".real");
 
     // generate non-eq circuit
-    std::set<unsigned long long> removed{};
+    std::set<std::uint64_t> removed{};
     do {
       qcTranspiled.import(transpiledFile);
       removed.clear();
-      for (unsigned short j = 0U; j < gatesToRemove; ++j) {
-        auto gate_to_remove = rng() % qcTranspiled.getNops();
-        while (removed.count(gate_to_remove) != 0U) {
-          gate_to_remove = rng() % qcTranspiled.getNops();
+      for (std::uint16_t j = 0U; j < gatesToRemove; ++j) {
+        auto gateToRemove = rng() % qcTranspiled.getNops();
+        while (removed.count(gateToRemove) != 0U) {
+          gateToRemove = rng() % qcTranspiled.getNops();
         }
-        removed.insert(gate_to_remove);
+        removed.insert(gateToRemove);
         auto it = qcTranspiled.begin();
-        std::advance(it, gate_to_remove);
+        std::advance(it, gateToRemove);
         if (it == qcTranspiled.end()) {
           continue;
         }
@@ -255,6 +258,8 @@ protected:
   std::string transpiledFile{};
 
   void SetUp() override {
+    using namespace std::chrono_literals;
+
     config.execution.parallel               = false;
     config.execution.runConstructionChecker = false;
     config.execution.runAlternatingChecker  = false;

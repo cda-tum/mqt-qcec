@@ -48,15 +48,13 @@ public:
     std::vector<bool> stimulusBits(totalQubits, false);
 
     // check if there still is a unique computational basis state
-    if (constexpr auto bitwidth =
-            std::numeric_limits<std::uint_least64_t>::digits;
+    if (constexpr auto bitwidth = std::numeric_limits<std::uint64_t>::digits;
         randomQubits <= (bitwidth - 1U)) {
-      const auto maxStates = static_cast<std::uint_least64_t>(1U)
-                             << randomQubits;
+      const auto maxStates = static_cast<std::uint64_t>(1U) << randomQubits;
       assert(generatedComputationalBasisStates.size() != maxStates);
       // generate a unique computational basis state
-      std::uniform_int_distribution<std::uint_least64_t> distribution(
-          0, maxStates - 1);
+      std::uniform_int_distribution<std::uint64_t> distribution(0U,
+                                                                maxStates - 1U);
       auto [randomState, success] =
           generatedComputationalBasisStates.insert(distribution(mt));
       while (!success) {
@@ -66,8 +64,7 @@ public:
 
       // generate the bitvector corresponding to the random state
       for (std::size_t i = 0U; i < randomQubits; ++i) {
-        if ((*randomState & (static_cast<std::uint_least64_t>(1U) << i)) !=
-            0U) {
+        if ((*randomState & (static_cast<std::uint64_t>(1U) << i)) != 0U) {
           stimulusBits[i] = true;
         }
       }
@@ -99,7 +96,7 @@ public:
                              const dd::QubitCount        totalQubits,
                              const dd::QubitCount        ancillaryQubits = 0U) {
     // determine how many qubits truly are random
-    const auto randomQubits = totalQubits - ancillaryQubits;
+    const dd::QubitCount randomQubits = totalQubits - ancillaryQubits;
 
     // choose a random basis state for each qubit
     auto randomBasisState =
@@ -185,10 +182,11 @@ private:
   std::mt19937_64 mt;
 
   std::unordered_set<std::size_t> generatedComputationalBasisStates{};
-  constexpr static std::size_t    OneQubitBaseElements = 6U;
+  constexpr static std::size_t    ONE_QUBIT_BASE_ELEMENTS = 6U;
   // this generator produces random bases from the set { |0>, |1>, |+>, |->,
   // |L>, |R> }
   std::uniform_int_distribution<std::size_t> random1QBasisDistribution =
-      std::uniform_int_distribution<std::size_t>(0U, OneQubitBaseElements - 1U);
+      std::uniform_int_distribution<std::size_t>(0U,
+                                                 ONE_QUBIT_BASE_ELEMENTS - 1U);
 };
 } // namespace ec

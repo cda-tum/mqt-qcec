@@ -68,7 +68,7 @@ private:
   template <class CheckFun = zx::VertexCheckFun,
             class RuleFun  = zx::VertexRuleFun>
   std::size_t simplifyVertices(CheckFun check, RuleFun rule) {
-    std::size_t nSimplifications = 0;
+    std::size_t nSimplifications = 0U;
     bool        newMatches       = true;
 
     while (!isDone() && newMatches) {
@@ -87,7 +87,7 @@ private:
 
   template <class CheckFun = zx::EdgeCheckFun, class RuleFun = zx::EdgeRuleFun>
   std::size_t simplifyEdges(CheckFun check, RuleFun rule) {
-    std::size_t nSimplifications = 0;
+    std::size_t nSimplifications = 0U;
     bool        newMatches       = true;
 
     while (!isDone() && newMatches) {

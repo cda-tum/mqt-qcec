@@ -100,7 +100,7 @@ TEST_P(FunctionalityTest, CompilationFlow) {
 
   config.execution.runAlternatingChecker = true;
   config.application.alternatingScheme   = ec::ApplicationSchemeType::GateCost;
-  config.application.costFunction        = ec::LegacyIBMCostFunction;
+  config.application.costFunction        = ec::legacyCostFunction;
 
   ec::EquivalenceCheckingManager ecm(qcOriginal, qcAlternative, config);
   ecm.run();
@@ -194,7 +194,7 @@ TEST_F(FunctionalityTest, test2) {
   EXPECT_TRUE(ecm4.getResults().consideredEquivalent());
 
   config.application.alternatingScheme = ec::ApplicationSchemeType::GateCost;
-  config.application.costFunction      = ec::LegacyIBMCostFunction;
+  config.application.costFunction      = ec::legacyCostFunction;
 
   ec::EquivalenceCheckingManager ecm5(qcOriginal, qcAlternative, config);
   ecm5.run();

@@ -15,9 +15,10 @@
 #include <functional>
 #include <thread>
 
+namespace ec {
+
 using namespace std::chrono_literals;
 
-namespace ec {
 class Configuration {
 public:
   // configuration options for execution
@@ -55,7 +56,7 @@ public:
 
     // options for the gate cost application scheme
     std::string  profile{};
-    CostFunction costFunction = LegacyIBMCostFunction;
+    CostFunction costFunction = &legacyCostFunction;
   };
 
   struct Functionality {
@@ -180,7 +181,7 @@ public:
   }
 
   [[nodiscard]] std::string toString() const {
-    constexpr auto indent = 2U;
+    constexpr auto indent = 2;
     return json().dump(indent);
   }
 };

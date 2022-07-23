@@ -154,7 +154,7 @@ TEST_P(SimpleCircuitIdentitiesTest, SequentialZX) {
 TEST_P(SimpleCircuitIdentitiesTest, GateCostApplicationScheme) {
   ecm->setSimulationChecker(false);
   ecm->setAlternatingApplicationScheme(ec::ApplicationSchemeType::GateCost);
-  ecm->setGateCostFunction(&ec::LegacyIBMCostFunction);
+  ecm->setGateCostFunction(&ec::legacyCostFunction);
   EXPECT_NO_THROW(ecm->run(););
 
   EXPECT_TRUE(ecm->getResults().consideredEquivalent());

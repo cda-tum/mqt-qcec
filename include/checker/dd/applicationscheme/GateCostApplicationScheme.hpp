@@ -26,9 +26,11 @@ template <> struct hash<std::pair<qc::OpType, dd::QubitCount>> {
 } // namespace std
 
 namespace ec {
-using GateCostLUTKeyType = std::pair<qc::OpType, dd::QubitCount>;
-using GateCostLUT        = std::unordered_map<GateCostLUTKeyType, std::size_t>;
-using CostFunction = std::function<std::size_t(const GateCostLUTKeyType&)>;
+using GateCostLookupTableKeyType = std::pair<qc::OpType, dd::QubitCount>;
+using GateCostLookupTable =
+    std::unordered_map<GateCostLookupTableKeyType, std::size_t>;
+using CostFunction =
+    std::function<std::size_t(const GateCostLookupTableKeyType&)>;
 
 template <class DDType, class DDPackage = dd::Package<>>
 class GateCostApplicationScheme final
@@ -38,70 +40,74 @@ public:
                             TaskManager<DDType, DDPackage>& taskManager2,
                             const CostFunction&             costFunction)
       : ApplicationScheme<DDType, DDPackage>(taskManager1, taskManager2) {
-    populateLUT(costFunction, taskManager1.getCircuit());
-    populateLUT(costFunction, taskManager2.getCircuit());
+    populateLookupTable(costFunction, taskManager1.getCircuit());
+    populateLookupTable(costFunction, taskManager2.getCircuit());
   }
 
   GateCostApplicationScheme(TaskManager<DDType, DDPackage>& taskManager1,
                             TaskManager<DDType, DDPackage>& taskManager2,
                             const std::string&              filename)
       : ApplicationScheme<DDType, DDPackage>(taskManager1, taskManager2) {
-    populateLUT(filename);
+    populateLookupTable(filename);
   }
 
   std::pair<size_t, size_t> operator()() override {
-    if (gateCostLUT.empty()) {
+    if (gateCostLookupTable.empty()) {
       return {1U, 1U};
     }
 
-    const auto& op   = this->taskManager1();
-    const auto  key  = GateCostLUTKeyType{op->getType(), op->getNcontrols()};
+    const auto& op = this->taskManager1();
+    const auto  key =
+        GateCostLookupTableKeyType{op->getType(), op->getNcontrols()};
     std::size_t cost = 1U;
-    if (auto it = gateCostLUT.find(key); it != gateCostLUT.end()) {
+    if (auto it = gateCostLookupTable.find(key);
+        it != gateCostLookupTable.end()) {
       cost = it->second;
     }
     return {1U, cost};
   }
 
 private:
-  GateCostLUT gateCostLUT{};
+  GateCostLookupTable gateCostLookupTable{};
 
   template <class CostFun>
-  void populateLUT(CostFun costFunction, const qc::QuantumComputation* qc) {
+  void populateLookupTable(CostFun                       costFunction,
+                           const qc::QuantumComputation* qc) {
     for (const auto& op : *qc) {
       const auto type      = op->getType();
       const auto nControls = op->getNcontrols();
-      const auto key       = GateCostLUTKeyType{type, nControls};
-      if (const auto it = gateCostLUT.find(key); it == gateCostLUT.end()) {
+      const auto key       = GateCostLookupTableKeyType{type, nControls};
+      if (const auto it = gateCostLookupTable.find(key);
+          it == gateCostLookupTable.end()) {
         const auto cost = costFunction(key);
-        gateCostLUT.emplace(key, cost);
+        gateCostLookupTable.emplace(key, cost);
       }
     }
   }
 
   // read gate cost LUT from file
-  // very simple file format:
+  // simple file format:
   // each line consists of
   // <identifier> <controls> <cost>
-  void populateLUT(const std::string& filename) {
+  void populateLookupTable(const std::string& filename) {
     std::ifstream ifs(filename);
     if (!ifs.good()) {
       throw std::invalid_argument("Error opening LUT file: " + filename);
     }
-    populateLUT(ifs);
+    populateLookupTable(ifs);
   }
-  void populateLUT(std::istream& is) {
+  void populateLookupTable(std::istream& is) {
     qc::OpType  opType    = qc::OpType::None;
     std::size_t nControls = 0U;
     std::size_t cost      = 1U;
     while (is.good() && (is >> opType >> nControls >> cost)) {
-      gateCostLUT.emplace(std::pair{opType, nControls}, cost);
+      gateCostLookupTable.emplace(std::pair{opType, nControls}, cost);
     }
   }
 };
 
-[[nodiscard]] static std::size_t
-LegacyIBMCostFunction(const GateCostLUTKeyType& key) noexcept {
+[[nodiscard]] std::size_t
+legacyCostFunction(const GateCostLookupTableKeyType& key) noexcept {
   const auto [gate, nc] = key;
 
   if (nc == 0U) {
@@ -147,11 +153,11 @@ LegacyIBMCostFunction(const GateCostLUTKeyType& key) noexcept {
   switch (gate) {
   case qc::X:
     return 2UL * (nc - 2UL) *
-               ((2UL * LegacyIBMCostFunction({qc::Phase, 0})) +
-                (2UL * LegacyIBMCostFunction({qc::U2, 0})) +
-                (3UL * LegacyIBMCostFunction({qc::X, 1}))) +
-           (6UL * LegacyIBMCostFunction({qc::X, 1})) +
-           (8UL * LegacyIBMCostFunction({qc::U3, 0}));
+               ((2UL * legacyCostFunction({qc::Phase, 0})) +
+                (2UL * legacyCostFunction({qc::U2, 0})) +
+                (3UL * legacyCostFunction({qc::X, 1}))) +
+           (6UL * legacyCostFunction({qc::X, 1})) +
+           (8UL * legacyCostFunction({qc::U3, 0}));
   case qc::U3:
   case qc::U2:
   case qc::V:
@@ -162,8 +168,8 @@ LegacyIBMCostFunction(const GateCostLUTKeyType& key) noexcept {
   case qc::SX:
   case qc::SXdag:
     // heuristic
-    return (2U * LegacyIBMCostFunction({qc::X, nc})) +
-           (4U * LegacyIBMCostFunction({qc::U3, 0}));
+    return (2U * legacyCostFunction({qc::X, nc})) +
+           (4U * legacyCostFunction({qc::U3, 0}));
   case qc::Phase:
   case qc::S:
   case qc::Sdag:
@@ -171,23 +177,23 @@ LegacyIBMCostFunction(const GateCostLUTKeyType& key) noexcept {
   case qc::Tdag:
   case qc::RZ:
     // heuristic
-    return (2U * LegacyIBMCostFunction({qc::X, nc})) +
-           (3U * LegacyIBMCostFunction({qc::Phase, 0}));
+    return (2U * legacyCostFunction({qc::X, nc})) +
+           (3U * legacyCostFunction({qc::Phase, 0}));
   case qc::Y:
   case qc::Z:
-    return LegacyIBMCostFunction({qc::X, nc}) +
-           (2U * LegacyIBMCostFunction({qc::U3, 0}));
+    return legacyCostFunction({qc::X, nc}) +
+           (2U * legacyCostFunction({qc::U3, 0}));
   case qc::SWAP:
-    return LegacyIBMCostFunction({qc::X, nc}) +
-           (2U * LegacyIBMCostFunction({qc::X, 1}));
+    return legacyCostFunction({qc::X, nc}) +
+           (2U * legacyCostFunction({qc::X, 1}));
   case qc::iSWAP:
-    return (2U * LegacyIBMCostFunction({qc::X, nc + 1U})) +
-           (2U * LegacyIBMCostFunction({qc::S, nc})) +
-           (2U * LegacyIBMCostFunction({qc::H, nc}));
+    return (2U * legacyCostFunction({qc::X, nc + 1U})) +
+           (2U * legacyCostFunction({qc::S, nc})) +
+           (2U * legacyCostFunction({qc::H, nc}));
   case qc::Peres:
   case qc::Peresdag:
-    return LegacyIBMCostFunction({qc::X, nc + 1U}) +
-           LegacyIBMCostFunction({qc::X, nc});
+    return legacyCostFunction({qc::X, nc + 1U}) +
+           legacyCostFunction({qc::X, nc});
   default:
     return 1U;
   }

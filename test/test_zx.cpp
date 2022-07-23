@@ -78,6 +78,8 @@ TEST_F(ZXTest, NonEquivalent) {
 }
 
 TEST_F(ZXTest, Timeout) {
+  using namespace std::chrono_literals;
+
   // construct large circuit
   constexpr auto numLayers = 10000;
   qcOriginal               = qc::QuantumComputation(2);
@@ -231,8 +233,8 @@ protected:
 
   std::unique_ptr<ec::EquivalenceCheckingManager> ecm{};
 
-  std::string test_original_dir   = "./circuits/original/";
-  std::string test_transpiled_dir = "./circuits/transpiled/";
+  std::string testOriginalDir   = "./circuits/original/";
+  std::string testTranspiledDir = "./circuits/transpiled/";
 
   void SetUp() override {
     config.execution.parallel               = false;
@@ -241,8 +243,8 @@ protected:
     config.execution.runSimulationChecker   = false;
     config.execution.runZXChecker           = true;
 
-    qcOriginal.import(test_original_dir + GetParam() + ".real");
-    qcTranspiled.import(test_transpiled_dir + GetParam() + "_transpiled.qasm");
+    qcOriginal.import(testOriginalDir + GetParam() + ".real");
+    qcTranspiled.import(testTranspiledDir + GetParam() + "_transpiled.qasm");
   }
 };
 
