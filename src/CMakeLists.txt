@@ -12,6 +12,7 @@ add_library(${PROJECT_NAME}
             ${CMAKE_CURRENT_SOURCE_DIR}/checker/dd/DDConstructionChecker.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/checker/dd/DDSimulationChecker.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/checker/dd/DDAlternatingChecker.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/checker/dd/applicationscheme/GateCostApplicationScheme.cpp
 
             ${CMAKE_CURRENT_SOURCE_DIR}/checker/zx/ZXChecker.cpp
             )
