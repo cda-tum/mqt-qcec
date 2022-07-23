@@ -13,6 +13,7 @@ cppcoreguidelines-*,\
 -cppcoreguidelines-macro-usage,\
 google-*,\
 -google-readability-todo,\
+-google-build-using-namespace,\
 misc-*,\
 -misc-no-recursion,\
 -misc-non-private-member-variables-in-classes,\
@@ -26,4 +27,45 @@ readability-*,\
 -readability-function-cognitive-complexity\
 "
 FormatStyle: file
+CheckOptions:
+  - key:   readability-identifier-naming.ClassCase
+    value: CamelCase
+  - key:   readability-identifier-naming.ClassIgnoredRegexp
+    value: '.*ZX.*|.*SWAP.*|.*CEX.*|.*DD.*|.*EQ.*'
+  - key:   readability-identifier-naming.ConstantParameterCase
+    value: camelBack
+  - key:   readability-identifier-naming.EnumCase
+    value: CamelCase
+  - key:   readability-identifier-naming.EnumConstantCase
+    value: CamelCase
+  - key:   readability-identifier-naming.FunctionCase
+    value: camelBack
+  - key:   readability-identifier-naming.FunctionIgnoredRegexp
+    value: '.*ZX.*|.*SWAP.*|.*CEX.*|.*DD.*|.*EQ.*'
+  - key:   readability-identifier-naming.GlobalConstantCase
+    value: UPPER_CASE
+  - key:   readability-identifier-naming.IgnoreMainLikeFunctions
+    value: 'true'
+  - key:   readability-identifier-naming.LocalConstantCase
+    value: camelBack
+  - key:   readability-identifier-naming.LocalVariableCase
+    value: camelBack
+  - key:   readability-identifier-naming.MemberCase
+    value: camelBack
+  - key:   readability-identifier-naming.MemberIgnoredRegexp
+    value: '.*ZX.*|.*SWAP.*|.*CEX.*|.*DD.*|.*EQ.*'
+  - key:   readability-identifier-naming.MethodCase
+    value: camelBack
+  - key: readability-identifier-naming.ParameterCase
+    value: camelBack
+  - key:   readability-identifier-naming.ParameterIgnoredRegexp
+    value: '.*ZX.*|.*SWAP.*|.*CEX.*|.*DD.*|.*EQ.*'
+  - key:   readability-identifier-naming.NamespaceCase
+    value: lower_case
+  - key:   readability-identifier-naming.StaticConstantCase
+    value: UPPER_CASE
+  - key:   readability-identifier-naming.StructCase
+    value: CamelCase
+  - key:   readability-identifier-naming.VariableCase
+    value: camelBack
 ...
