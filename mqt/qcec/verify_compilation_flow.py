@@ -1,8 +1,10 @@
 from __future__ import annotations
 
-from pathlib import Path
+try:
+    from importlib import resources
+except ImportError:
+    import importlib_resources as resources
 
-import pkg_resources
 from mqt.qcec import Configuration, EquivalenceCheckingManager
 from mqt.qcec.compilation_flow_profiles import AncillaMode, generate_profile_name
 from qiskit import QuantumCircuit
@@ -30,14 +32,13 @@ def verify_compilation(
     ecm.set_application_scheme("gate_cost")
 
     # get the pre-defined profile for the gate_cost scheme
-    profile = pkg_resources.resource_filename(
-        __name__,
-        "profiles/" + generate_profile_name(optimization_level=optimization_level, mode=ancilla_mode),
-    )
-    ecm.set_gate_cost_profile(str(Path(__file__).resolve().parent.joinpath(profile)))
+    profile_name = generate_profile_name(optimization_level=optimization_level, mode=ancilla_mode)
+    ref = resources.files("mqt.qcec") / "profiles" / profile_name
+    with resources.as_file(ref) as path:
+        ecm.set_gate_cost_profile(str(path))
 
-    # execute the check
-    ecm.run()
+        # execute the check
+        ecm.run()
 
     # obtain the result
     return ecm.get_results()

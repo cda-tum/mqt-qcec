@@ -108,7 +108,7 @@ setup(
     packages=find_namespace_packages(include=["mqt.*"]),
     include_package_data=True,
     package_data={"": ["profiles/*.profile", "py.typed"]},
-    install_requires=["qiskit-terra~=0.21.0"],
+    install_requires=["qiskit-terra~=0.21.0", "importlib_resources>=5.9; python_version < '3.10'"],
     extras_require={
         "test": ["pytest~=7.1.1"],
         "coverage": ["coverage[toml]~=6.4.2", "pytest-cov~=3.0.0"],
