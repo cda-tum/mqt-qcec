@@ -3,7 +3,25 @@
 # See README.md or go to https://github.com/cda-tum/qcec for more information.
 #
 
-from mqt.qcec.pyqcec import ApplicationScheme, StateType, EquivalenceCriterion, EquivalenceCheckingManager, Configuration, verify
+from mqt.qcec.compilation_flow_profiles import AncillaMode, generate_profile
+from mqt.qcec.pyqcec import (
+    ApplicationScheme,
+    Configuration,
+    EquivalenceCheckingManager,
+    EquivalenceCriterion,
+    StateType,
+    verify,
+)
 from mqt.qcec.verify_compilation_flow import verify_compilation
 
-__all__ = ["ApplicationScheme", "StateType", "EquivalenceCriterion", "EquivalenceCheckingManager", "Configuration", "verify", "verify_compilation"]
+__all__ = [
+    "AncillaMode",
+    "ApplicationScheme",
+    "Configuration",
+    "EquivalenceCheckingManager",
+    "EquivalenceCriterion",
+    "generate_profile",
+    "StateType",
+    "verify",
+    "verify_compilation",
+]
