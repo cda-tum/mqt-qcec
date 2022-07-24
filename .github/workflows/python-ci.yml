@@ -14,8 +14,21 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  lint:
+    runs-on: ubuntu-latest
+    name: Run my[py] linter
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.9"
+      - uses: pre-commit/action@v3.0.0
+        with:
+          extra_args: --all-files --hook-stage manual mypy
+
   tests:
     runs-on: ${{ matrix.runs-on }}
+    needs: [lint]
     strategy:
       fail-fast: false
       matrix:

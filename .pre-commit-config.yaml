@@ -68,6 +68,7 @@ repos:
     rev: "v0.961"
     hooks:
       - id: mypy
+        stages: [manual]
         files: ^(mqt/qcec|test/python)
         args:
           [--no-strict-optional, --ignore-missing-imports, --no-warn-return-any]
