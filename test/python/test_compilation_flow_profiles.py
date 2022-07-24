@@ -1,12 +1,14 @@
 from __future__ import annotations
 
 import filecmp
+import sys
 from pathlib import Path
+from typing import TYPE_CHECKING, Any
 
-try:
-    from importlib import resources
-except ImportError:
+if TYPE_CHECKING or sys.version_info < (3, 9, 0):
     import importlib_resources as resources
+else:
+    from importlib import resources
 
 import pytest
 from mqt import qcec
@@ -14,12 +16,12 @@ from mqt.qcec.compilation_flow_profiles import generate_profile_name
 
 
 @pytest.fixture(params=[0, 1, 2, 3])
-def optimization_level(request: pytest.request) -> int:
+def optimization_level(request: Any) -> int:
     return request.param
 
 
 @pytest.fixture(params=[qcec.AncillaMode.NO_ANCILLA, qcec.AncillaMode.RECURSION, qcec.AncillaMode.V_CHAIN])
-def ancilla_mode(request: pytest.request) -> qcec.AncillaMode:
+def ancilla_mode(request: Any) -> qcec.AncillaMode:
     return request.param
 
 

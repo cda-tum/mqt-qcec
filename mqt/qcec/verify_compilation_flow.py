@@ -1,9 +1,12 @@
 from __future__ import annotations
 
-try:
-    from importlib import resources
-except ImportError:
+import sys
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING or sys.version_info < (3, 9, 0):
     import importlib_resources as resources
+else:
+    from importlib import resources
 
 from mqt.qcec import Configuration, EquivalenceCheckingManager
 from mqt.qcec.compilation_flow_profiles import AncillaMode, generate_profile_name
