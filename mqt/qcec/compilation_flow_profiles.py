@@ -305,10 +305,7 @@ def check_recurrence(seq: list[int], order: int = 2) -> list[int] | None:
         mat.append(seq[i : i + order])
         f.append(seq[i + order])
 
-    try:
-        if np.linalg.det(mat) == 0:
-            return None
-    except TypeError:
+    if np.linalg.det(mat) == 0:
         return None
 
     coeffs = np.linalg.inv(mat).dot(f)
@@ -411,11 +408,3 @@ def generate_profile(
         filepath = filepath.joinpath(filename)
     write_profile_data_to_file(profile, filepath)
     print(f"Wrote profile data to {filepath}")
-
-
-if __name__ == "__main__":
-    optimization_levels = [0, 1, 2, 3]
-    modes = [AncillaMode.NO_ANCILLA, AncillaMode.RECURSION, AncillaMode.V_CHAIN]
-
-    for opt, m in zip(optimization_levels, modes):
-        generate_profile(optimization_level=opt, mode=m)
