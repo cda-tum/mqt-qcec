@@ -68,7 +68,7 @@ jobs:
         with:
           python-version: "3.9"
       - name: Install package
-        run: pip install -e .[test, coverage]
+        run: pip install -e ".[test,coverage]"
       - name: Run coverage
         run: pytest --cov --cov-report=xml
       - name: Upload Coverage to Codecov
