@@ -44,12 +44,12 @@ namespace ec {
         //     std::cout << "Edge " << v << "---" << w << std::endl;
         // }
         fullReduceApproximate();
-        // for (auto [v, data]: miter.getVertices()) {
-        //     std::cout << "vertex " << v << ": " << data.phase << std::endl;
-        // }
-        // for (auto [v, w]: miter.getEdges()) {
-        //     std::cout << "Edge " << v << "---" << w << std::endl;
-        // }
+        for (auto [v, data]: miter.getVertices()) {
+            std::cout << "vertex " << v << ": " << data.phase << std::endl;
+        }
+        for (auto [v, w]: miter.getEdges()) {
+            std::cout << "Edge " << v << "---" << w << std::endl;
+        }
         bool equivalent = true;
 
         if (miter.getNEdges() == miter.getNQubits()) {
@@ -60,8 +60,12 @@ namespace ec {
                 const auto& in  = miter.getInput(i);
                 const auto& out = miter.incidentEdge(in, 0).to;
 
-                // std::cout << "Vertex " << in << " connected to " << out << " meaining qubit " << miter.getVData(in).value().qubit << " connected to " << miter.getVData(out).value().qubit << " and after permuting " << static_cast<int>(p1.at(static_cast<dd::Qubit>(miter.getVData(in).value().qubit))) << " connected to " << static_cast<int>(p2.at(static_cast<dd::Qubit>(miter.getVData(out).value().qubit))) << std::endl;
-                if (p1.at(static_cast<dd::Qubit>(miter.getVData(in).value().qubit)) != p2.at(static_cast<dd::Qubit>(miter.getVData(out).value().qubit)) && miter.getVData(out).value().qubit != miter.getVData(in).value().qubit) {
+                std::cout << "Vertex " << in << " connected to " << out << " meaining qubit " << miter.getVData(in).value().qubit << " connected to " << miter.getVData(out).value().qubit << " and after permuting " << static_cast<int>(p1.at(static_cast<dd::Qubit>(miter.getVData(in).value().qubit))) << " connected to " << static_cast<int>(p2.at(static_cast<dd::Qubit>(miter.getVData(out).value().qubit))) << std::endl;
+                // if (p1.at(static_cast<dd::Qubit>(miter.getVData(in).value().qubit)) != p2.at(static_cast<dd::Qubit>(miter.getVData(out).value().qubit)) && miter.getVData(out).value().qubit != miter.getVData(in).value().qubit) {
+                //     equivalent = false;
+                //     break;
+                // }
+                if (p1.at(static_cast<dd::Qubit>(miter.getVData(in).value().qubit)) != p2.at(static_cast<dd::Qubit>(miter.getVData(out).value().qubit))) {
                     equivalent = false;
                     break;
                 }

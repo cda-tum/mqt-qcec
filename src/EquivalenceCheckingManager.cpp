@@ -11,6 +11,7 @@
 
 #include <iostream>
 #include <memory>
+#include <ostream>
 #include <string>
 
 namespace ec {
@@ -268,7 +269,34 @@ namespace ec {
                 }
             });
         }
-
+        // std::cout << "initial1" << std::endl;
+        // for (auto [k, v]: qc1.initialLayout) {
+        //     std::cout << static_cast<int>(k) << " -- " << static_cast<int>(v) << std::endl;
+        // }
+        // std::cout << std::endl;
+        // std::cout << "initial2" << std::endl;
+        // for (auto [k, v]: qc2.initialLayout) {
+        //     std::cout
+        //             << static_cast<int>(k) << " -- " << static_cast<int>(v) << std::endl;
+        // }
+        // std::cout << "output1" << std::endl;
+        // for (auto [k, v]: qc1.outputPermutation) {
+        //     std::cout << static_cast<int>(k) << " -- " << static_cast<int>(v) << std::endl;
+        // }
+        // std::cout << std::endl;
+        // std::cout << "output2" << std::endl;
+        // for (auto [k, v]: qc2.outputPermutation) {
+        //     std::cout << static_cast<int>(k) << " -- " << static_cast<int>(v) << std::endl;
+        // }
+        // qc2.outputPermutation[0] = 4;
+        // qc2.outputPermutation[1] = 3;
+        // qc2.outputPermutation[2] = 2;
+        // qc2.outputPermutation.erase(3);
+        //         std::cout << std::endl;
+        // std::cout << "output2" << std::endl;
+        // for (auto [k, v]: qc2.outputPermutation) {
+        //     std::cout << static_cast<int>(k) << " -- " << static_cast<int>(v) << std::endl;
+        // }
         if (configuration.execution.runSimulationChecker) {
             checkers.emplace_back(std::make_unique<DDSimulationChecker>(qc1, qc2, configuration));
             auto* simulationChecker = dynamic_cast<DDSimulationChecker*>(checkers.back().get());
