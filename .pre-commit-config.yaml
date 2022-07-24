@@ -73,7 +73,7 @@ repos:
         args:
           [--no-strict-optional, --ignore-missing-imports, --no-warn-return-any]
         additional_dependencies:
-          ["types-setuptools", "qiskit-terra>=0.21.0", "pytest>=6.0"]
+          ["types-setuptools", "pytest>=6.0"]
 
   - repo: https://github.com/pre-commit/mirrors-clang-format
     rev: "v14.0.6"
