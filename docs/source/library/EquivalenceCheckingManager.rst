@@ -27,7 +27,7 @@ This constructs the manager using all the default options. The circuits to be ve
     * `TFC` (e.g. from `Reversible Logic Synthesis Benchmarks Page <http://webhome.cs.uvic.ca/~dmaslov/mach-read.html>`_)
     * `QC` (e.g. from `Feynman <https://github.com/meamy/feynman>`_)
 
-There are two ways of configuring the manager at construction time, e.g., in order to set a timeout of `60` seconds:
+There are two ways of configuring the manager at construction time, e.g., in order to set a timeout of ``60`` seconds:
 
 * Creating and modifying a :class:`Configuration` object that is then passed to the constructor.
 
