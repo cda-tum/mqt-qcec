@@ -25,6 +25,10 @@ def ancilla_mode(request: Any) -> qcec.AncillaMode:
     return request.param
 
 
+@pytest.mark.skipif(
+    sys.version_info < (3, 10, 0) or sys.platform != "linux",
+    reason="Since this check takes quite some time, it is only executed if the current platform is Linux and the Python version is 3.10 or higher.",
+)
 def test_generated_profiles_are_still_valid(optimization_level: int, ancilla_mode: qcec.AncillaMode) -> None:
     """
     Test that the generated profiles are still valid.
