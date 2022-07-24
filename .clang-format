@@ -1,7 +1,7 @@
-BasedOnStyle:                     LLVM
-AlignConsecutiveAssignments:      Consecutive
-AlignConsecutiveDeclarations:     Consecutive
-IncludeBlocks:                    Regroup
+BasedOnStyle: LLVM
+AlignConsecutiveAssignments: Consecutive
+AlignConsecutiveDeclarations: Consecutive
+IncludeBlocks: Regroup
 KeepEmptyLinesAtTheStartOfBlocks: false
-PointerAlignment:                 Left
-SpacesInContainerLiterals:        false
+PointerAlignment: Left
+SpacesInContainerLiterals: false

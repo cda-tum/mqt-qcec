@@ -8,7 +8,7 @@
 
 # MQT QCEC - A tool for Quantum Circuit Equivalence Checking
 
-A tool for quantum circuit equivalence checking developed as part of the *Munich Quantum Toolkit* (*MQT*)[^1] by the [Chair for Design Automation](https://www.cda.cit.tum.de/) at the [Technical University of Munich](https://www.tum.de/).
+A tool for quantum circuit equivalence checking developed as part of the _Munich Quantum Toolkit_ (_MQT_)[^1] by the [Chair for Design Automation](https://www.cda.cit.tum.de/) at the [Technical University of Munich](https://www.tum.de/).
 It builds upon [our quantum functionality representation (QFR)](https://github.com/cda-tum/qfr), [our decision diagram (DD) package](https://github.com/cda-tum/dd_package.git), and [our ZX-diagram package](https://github.com/cda-tum/zx.git)
 .
 
@@ -59,4 +59,4 @@ L. Burgholzer, R. Kueng, and R. Wille, "[Random Stimuli Generation for the Verif
 [![a](https://img.shields.io/static/v1?label=arXiv&message=2106.01099&color=inactive&style=flat-square)](https://arxiv.org/abs/2106.01099)
 L. Burgholzer and R. Wille, "[Handling Non-Unitaries in Quantum Circuit Equivalence Checking](https://arxiv.org/abs/2106.01099)," in Design Automation Conference (DAC), 2022
 
-[^1] The Munich Quantum Toolkit was formerly known under the acronym *JKQ* and developed by the [Institute for Integrated Circuits](https://iic.jku.at/eda/) at the [Johannes Kepler University Linz](https://jku.at)).
+[^1] The Munich Quantum Toolkit was formerly known under the acronym _JKQ_ and developed by the [Institute for Integrated Circuits](https://iic.jku.at/eda/) at the [Johannes Kepler University Linz](https://jku.at)).

@@ -2,17 +2,17 @@ name: CI
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [main, master]
   pull_request:
-    branches: [ main, master ]
+    branches: [main, master]
   workflow_dispatch:
 
 concurrency:
-  group:              ${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 env:
-  MAKEFLAGS:  "-j3"
+  MAKEFLAGS: "-j3"
 
 defaults:
   run:
@@ -60,7 +60,7 @@ jobs:
       - name: Test
         working-directory: ${{github.workspace}}/build/test/Release
         run: ./qcec_test.exe
-    
+
   coverage:
     needs: ubuntu-ci
     runs-on: ubuntu-latest
@@ -69,14 +69,14 @@ jobs:
         with:
           submodules: recursive
       - name: Configure CMake
-        run:  cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=Debug -DBUILD_QCEC_TESTS=ON -DBINDINGS=ON -DCOVERAGE=1
+        run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=Debug -DBUILD_QCEC_TESTS=ON -DBINDINGS=ON -DCOVERAGE=1
       - name: Build
-        run:  cmake --build "${{github.workspace}}/build" --config Debug --target qcec_test
-      - name:              Test
+        run: cmake --build "${{github.workspace}}/build" --config Debug --target qcec_test
+      - name: Test
         working-directory: ${{github.workspace}}/build/test
-        run:               ./qcec_test
+        run: ./qcec_test
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3.1.0
         with:
-          gcov:        true
+          gcov: true
           gcov_ignore: "extern/**/*"
