@@ -44,12 +44,12 @@ namespace ec {
         //     std::cout << "Edge " << v << "---" << w << std::endl;
         // }
         fullReduceApproximate();
-        for (auto [v, data]: miter.getVertices()) {
-            std::cout << "vertex " << v << ": " << data.phase << std::endl;
-        }
-        for (auto [v, w]: miter.getEdges()) {
-            std::cout << "Edge " << v << "---" << w << std::endl;
-        }
+        // for (auto [v, data]: miter.getVertices()) {
+        //     std::cout << "vertex " << v << ": " << data.phase << std::endl;
+        // }
+        // for (auto [v, w]: miter.getEdges()) {
+        //     std::cout << "Edge " << v << "---" << w << std::endl;
+        // }
         bool equivalent = true;
 
         if (miter.getNEdges() == miter.getNQubits()) {
