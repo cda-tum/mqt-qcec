@@ -369,7 +369,9 @@ gate_collection_for_mode = {
 }
 
 
-def generate_profile(optimization_level: int = 1, mode: AncillaMode = AncillaMode.NO_ANCILLA) -> None:
+def generate_profile(
+    optimization_level: int = 1, mode: AncillaMode = AncillaMode.NO_ANCILLA, filepath: Path | None = None
+) -> None:
     """Generate a profile for the given optimization level and ancilla mode."""
 
     # generate general profile data
@@ -403,7 +405,10 @@ def generate_profile(optimization_level: int = 1, mode: AncillaMode = AncillaMod
     # write profile data to file
     filename = generate_profile_name(optimization_level=optimization_level, mode=mode)
 
-    filepath = Path(__file__).resolve().parent.joinpath("profiles/" + filename)
+    if filepath is None:
+        filepath = Path(__file__).resolve().parent.joinpath("profiles/" + filename)
+    else:
+        filepath = filepath.joinpath(filename)
     write_profile_data_to_file(profile, filepath)
     print(f"Wrote profile data to {filepath}")
 
