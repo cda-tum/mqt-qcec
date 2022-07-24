@@ -6,4 +6,3 @@ qreg q[3];
 creg c[2];
 swap q[1],q[2];
 cx q[2],q[0];
-
