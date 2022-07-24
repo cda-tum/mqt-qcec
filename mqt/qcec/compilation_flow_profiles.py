@@ -189,15 +189,13 @@ def create_multi_controlled_gate(
 
 def compute_cost(
     qc: QuantumCircuit,
-    basis_gates: list[str] | None = None,
+    basis_gates: list[str],
     optimization_level: int = 1,
 ) -> int:
     """
     Compute the cost of a circuit by transpiling the circuit
     to a given ``basis_gates`` gate set and a certain ``optimization_level``.
     """
-    if basis_gates is None:
-        basis_gates = ["id", "rz", "sx", "x", "cx"]
     transpiled_circuit = transpile(qc, basis_gates=basis_gates, optimization_level=optimization_level)
     return transpiled_circuit.size()
 
