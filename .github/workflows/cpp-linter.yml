@@ -8,6 +8,10 @@ on:
     branches:
       - main
 
+concurrency:
+  group:              ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   cpp-linter:
     runs-on: ubuntu-22.04
@@ -16,7 +20,7 @@ jobs:
         with:
           submodules: recursive
       - name: Generate compilation database
-        run: CXX=clang++-14 cmake -S . -B build -DBINDINGS=ON -DBUILD_QCEC_TESTS=ON -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+        run:  CXX=clang++-14 cmake -S . -B build -DBINDINGS=ON -DBUILD_QCEC_TESTS=ON -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
       - uses: actions/setup-python@v4
         name: Install Python
         with:
