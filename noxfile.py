@@ -23,7 +23,7 @@ def tests(session: Session) -> None:
 @nox.session
 def coverage(session: Session) -> None:
     """Run the test suite and generate a coverage report."""
-    session.install("-e", ".[test]")
+    session.install("-e", ".[test,coverage]")
     session.run("pytest", "--cov", *session.posargs)
 
 

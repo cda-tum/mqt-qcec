@@ -110,7 +110,8 @@ setup(
     package_data={"": ["profiles/*.profile", "py.typed"]},
     install_requires=["qiskit-terra~=0.21.0"],
     extras_require={
-        "test": ["pytest~=7.1.1", "coverage[toml]~=6.4.2", "pytest-cov~=3.0.0"],
+        "test": ["pytest~=7.1.1"],
+        "coverage": ["coverage[toml]~=6.4.2", "pytest-cov~=3.0.0"],
         "docs": [
             "sphinx==5.0.2",
             "sphinx-rtd-theme==1.0.0",
@@ -120,7 +121,7 @@ setup(
             "pybtex>=0.24",
             "importlib_metadata>=3.6; python_version < '3.10'",
         ],
-        "dev": ["mqt.qcec[test, docs]"],  # requires Pip 21.2 or newer
+        "dev": ["mqt.qcec[test, coverage, docs]"],  # requires Pip 21.2 or newer
     },
     classifiers=[
         "Development Status :: 5 - Production/Stable",

@@ -36,7 +36,6 @@ source = ["mqt.qcec"]
 
 [tool.coverage.report]
 show_missing = true
-skip_covered = true
 skip_empty = true
 precision = 1
 

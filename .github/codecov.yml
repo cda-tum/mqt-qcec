@@ -1,6 +1,6 @@
 ignore:
   - "extern/**/*"
-  - "mqt/**/*"
+  - "mqt/**/*.cpp"
   - "test/**/*"
 
 coverage:
