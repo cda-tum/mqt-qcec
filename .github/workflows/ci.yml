@@ -8,78 +8,57 @@ on:
   workflow_dispatch:
 
 env:
-  BUILD_TYPE: Release
-  MAKEFLAGS:  "-j2"
+  MAKEFLAGS:  "-j3"
 
 defaults:
   run:
     shell: bash
 
 jobs:
-  build:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ ubuntu-latest, macos-latest, windows-latest ]
-
+  ubuntu-ci:
+    runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-      with:
-        submodules: recursive
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+      - name: Configure CMake
+        run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build" -DBUILD_QCEC_TESTS=ON -DBINDINGS=ON
+      - name: Build
+        run: cmake --build "${{github.workspace}}/build"
+      - name: Test
+        working-directory: ${{github.workspace}}/build/test
+        run: ctest --output-on-failure
 
-    - name: Configure CMake
-      run: |
-         if [ "$RUNNER_OS" == "Windows" ]; then
-           cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DBINDINGS=ON -T "ClangCl"
-         else
-           cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DBINDINGS=ON
-         fi  
-        
-    - name: Build
-      run: cmake --build "${{github.workspace}}/build" --config $BUILD_TYPE
-
-  test:
-    needs: build
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-
+  macOS-ci:
+    runs-on: macos-latest
     steps:
-    - uses: actions/checkout@v3
-      with:
-        submodules: recursive
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+      - name: Configure CMake
+        run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build" -DBUILD_QCEC_TESTS=ON -DBINDINGS=ON
+      - name: Build
+        run: cmake --build "${{github.workspace}}/build"
+      - name: Test
+        working-directory: ${{github.workspace}}/build/test
+        run: ctest --output-on-failure
 
-    - name: Configure CMake
-      run: |
-         if [ "$RUNNER_OS" == "Windows" ]; then
-           cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DBUILD_QCEC_TESTS=ON -T "ClangCl"
-         else
-           cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DBUILD_QCEC_TESTS=ON -DBINDINGS=ON
-         fi  
-
-    - name: Build
-      run: |
-        if [ "$RUNNER_OS" == "Windows" ]; then
-          cmake --build "${{github.workspace}}/build" --config $BUILD_TYPE
-        else
-          cmake --build "${{github.workspace}}/build" --config $BUILD_TYPE --target qcec_test
-        fi  
-
-    - name: Test
-      working-directory: ${{github.workspace}}/build/test
-      run: |
-        if [ "$RUNNER_OS" == "Windows" ]; then
-          cd $BUILD_TYPE
-          ./qcec_test.exe
-        else
-          ./qcec_test
-        fi
+  windows-ci:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+      - name: Configure CMake
+        run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=Release -DBUILD_QCEC_TESTS=ON -DBINDINGS=ON -T "ClangCl"
+      - name: Build
+        run: cmake --build "${{github.workspace}}/build" --config Release
+      - name: Test
+        working-directory: ${{github.workspace}}/build/test/Release
+        run: ./qcec_test.exe
     
   coverage:
-    needs: test
+    needs: ubuntu-ci
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -92,22 +71,8 @@ jobs:
       - name:              Test
         working-directory: ${{github.workspace}}/build/test
         run:               ./qcec_test
-      - name: Run gcov
-        run:  |
-              find . -type f -name '*.gcno' -exec gcov -p  {} +
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v3.1.0
         with:
-          fail_ci_if_error: true
-
-  codestyle:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          submodules: recursive
-      - uses: DoozyX/clang-format-lint-action@v0.14
-        with:
-          source: 'include src test mqt/qcec'
-          extensions: 'h,hpp,c,cpp'
-          clangFormatVersion: 12
+          gcov:        true
+          gcov_ignore: "extern/**/*"

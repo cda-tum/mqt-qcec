@@ -1,7 +1,7 @@
-/*
-* This file is part of MQT QCEC library which is released under the MIT license.
-* See file README.md or go to https://www.cda.cit.tum.de/research/quantum_verification/ for more information.
-*/
+//
+// This file is part of the MQT QCEC library released under the MIT license.
+// See README.md or go to https://github.com/cda-tum/qcec for more information.
+//
 
 #pragma once
 
@@ -9,71 +9,79 @@
 #include <iostream>
 
 namespace ec {
-    enum class EquivalenceCriterion {
-        NotEquivalent             = 0,
-        Equivalent                = 1,
-        NoInformation             = 2,
-        ProbablyEquivalent        = 3,
-        EquivalentUpToGlobalPhase = 4,
-        EquivalentUpToPhase       = 5,
-        ProbablyNotEquivalent     = 6
-    };
+enum class EquivalenceCriterion {
+  NotEquivalent             = 0,
+  Equivalent                = 1,
+  NoInformation             = 2,
+  ProbablyEquivalent        = 3,
+  EquivalentUpToGlobalPhase = 4,
+  EquivalentUpToPhase       = 5,
+  ProbablyNotEquivalent     = 6
+};
 
-    inline std::string toString(const EquivalenceCriterion& criterion) noexcept {
-        switch (criterion) {
-            case EquivalenceCriterion::NotEquivalent:
-                return "not_equivalent";
-            case EquivalenceCriterion::Equivalent:
-                return "equivalent";
-            case EquivalenceCriterion::ProbablyEquivalent:
-                return "probably_equivalent";
-            case EquivalenceCriterion::EquivalentUpToGlobalPhase:
-                return "equivalent_up_to_global_phase";
-            case EquivalenceCriterion::EquivalentUpToPhase:
-                return "equivalent_up_to_phase";
-            case EquivalenceCriterion::ProbablyNotEquivalent:
-                return "probably_not_equivalent";
-            case EquivalenceCriterion::NoInformation:
-            default:
-                return "no_information";
-        }
-    }
+inline std::string toString(const EquivalenceCriterion& criterion) noexcept {
+  switch (criterion) {
+  case EquivalenceCriterion::NotEquivalent:
+    return "not_equivalent";
+  case EquivalenceCriterion::Equivalent:
+    return "equivalent";
+  case EquivalenceCriterion::ProbablyEquivalent:
+    return "probably_equivalent";
+  case EquivalenceCriterion::EquivalentUpToGlobalPhase:
+    return "equivalent_up_to_global_phase";
+  case EquivalenceCriterion::EquivalentUpToPhase:
+    return "equivalent_up_to_phase";
+  case EquivalenceCriterion::ProbablyNotEquivalent:
+    return "probably_not_equivalent";
+  default:
+    return "no_information";
+  }
+}
 
-    inline EquivalenceCriterion fromString(const std::string& criterion) {
-        if (criterion == "not_equivalent" || criterion == "0") {
-            return EquivalenceCriterion::NotEquivalent;
-        } else if (criterion == "equivalent" || criterion == "1") {
-            return EquivalenceCriterion::Equivalent;
-        } else if (criterion == "probably_equivalent" || criterion == "2") {
-            return EquivalenceCriterion::ProbablyEquivalent;
-        } else if (criterion == "equivalent_up_to_global_phase" || criterion == "3") {
-            return EquivalenceCriterion::EquivalentUpToGlobalPhase;
-        } else if (criterion == "equivalent_up_to_phase" || criterion == "4") {
-            return EquivalenceCriterion::EquivalentUpToPhase;
-        } else if (criterion == "no_information" || criterion == "5") {
-            return EquivalenceCriterion::NoInformation;
-        } else if (criterion == "probably_not_equivalent" || criterion == "6") {
-            return EquivalenceCriterion::ProbablyNotEquivalent;
-        } else {
-            throw std::runtime_error("Unknown equivalence criterion: " + criterion);
-        }
-    }
+inline EquivalenceCriterion fromString(const std::string& criterion) noexcept {
+  if ((criterion == "not_equivalent") || (criterion == "0")) {
+    return EquivalenceCriterion::NotEquivalent;
+  }
+  if ((criterion == "equivalent") || (criterion == "1")) {
+    return EquivalenceCriterion::Equivalent;
+  }
+  if ((criterion == "probably_equivalent") || (criterion == "2")) {
+    return EquivalenceCriterion::ProbablyEquivalent;
+  }
+  if ((criterion == "equivalent_up_to_global_phase") || (criterion == "3")) {
+    return EquivalenceCriterion::EquivalentUpToGlobalPhase;
+  }
+  if ((criterion == "equivalent_up_to_phase") || (criterion == "4")) {
+    return EquivalenceCriterion::EquivalentUpToPhase;
+  }
+  if ((criterion == "no_information") || (criterion == "5")) {
+    return EquivalenceCriterion::NoInformation;
+  }
+  if ((criterion == "probably_not_equivalent") || (criterion == "6")) {
+    return EquivalenceCriterion::ProbablyNotEquivalent;
+  }
+  std::cerr << "Unknown equivalence criterion: " << criterion
+            << ". Defaulting to `no_information`.\n";
+  return EquivalenceCriterion::NoInformation;
+}
 
-    inline std::istream& operator>>(std::istream& in, EquivalenceCriterion& criterion) {
-        std::string token;
-        in >> token;
+inline std::istream& operator>>(std::istream&         in,
+                                EquivalenceCriterion& criterion) {
+  std::string token;
+  in >> token;
 
-        if (token.empty()) {
-            in.setstate(std::istream::failbit);
-            return in;
-        }
+  if (token.empty()) {
+    in.setstate(std::istream::failbit);
+    return in;
+  }
 
-        criterion = fromString(token);
-        return in;
-    }
+  criterion = fromString(token);
+  return in;
+}
 
-    inline std::ostream& operator<<(std::ostream& out, EquivalenceCriterion& criterion) {
-        out << toString(criterion);
-        return out;
-    }
+inline std::ostream& operator<<(std::ostream&               out,
+                                const EquivalenceCriterion& criterion) {
+  out << toString(criterion);
+  return out;
+}
 } // namespace ec
