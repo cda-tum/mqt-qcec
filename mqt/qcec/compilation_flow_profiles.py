@@ -362,10 +362,13 @@ gate_collection_for_mode = {
     AncillaMode.RECURSION: multi_controlled_gates_recursion,
     AncillaMode.V_CHAIN: multi_controlled_gates_v_chain,
 }
+default_profile_path = Path(__file__).resolve().parent.joinpath("profiles")
 
 
 def generate_profile(
-    optimization_level: int = 1, mode: AncillaMode = AncillaMode.NO_ANCILLA, filepath: Path | None = None
+    optimization_level: int = 1,
+    mode: AncillaMode = AncillaMode.NO_ANCILLA,
+    filepath: Path = default_profile_path,
 ) -> None:
     """Generate a profile for the given optimization level and ancilla mode."""
 
@@ -399,10 +402,6 @@ def generate_profile(
 
     # write profile data to file
     filename = generate_profile_name(optimization_level=optimization_level, mode=mode)
-
-    if filepath is None:
-        filepath = Path(__file__).resolve().parent.joinpath("profiles/" + filename)
-    else:
-        filepath = filepath.joinpath(filename)
+    filepath = filepath.joinpath(filename)
     write_profile_data_to_file(profile, filepath)
     print(f"Wrote profile data to {filepath}")
