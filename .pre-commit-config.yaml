@@ -1,3 +1,7 @@
+ci:
+  autoupdate_commit_msg: "⬆️🪝 update pre-commit hooks"
+  autofix_commit_msg: "🎨 pre-commit fixes"
+
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: "v4.3.0"
