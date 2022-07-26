@@ -17,6 +17,12 @@ updates:
       time: "06:00"
     assignees:
       - "burgholzer"
+    ignore:
+      - dependency-name: "actions/*"
+        # Official actions have moving tags like v1
+        # that are used, so they don't need updates here
+        update-types:
+          ["version-update:semver-minor", "version-update:semver-patch"]
 
   - package-ecosystem: "pip"
     directory: "/"
