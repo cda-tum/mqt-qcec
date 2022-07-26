@@ -113,7 +113,7 @@ setup(
         "test": ["pytest~=7.1.1"],
         "coverage": ["coverage[toml]~=6.4.2", "pytest-cov~=3.0.0"],
         "docs": [
-            "sphinx==5.0.2",
+            "sphinx==5.1.0",
             "sphinx-rtd-theme==1.0.0",
             "sphinxcontrib-bibtex==2.4.2",
             "sphinx-copybutton==0.4.0",
