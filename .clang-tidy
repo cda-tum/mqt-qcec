@@ -1,32 +1,32 @@
----
-Checks: "-*,\
-  clang-diagnostic-*,\
-  clang-analyzer-*,\
-  boost-*,\
-  bugprone-*,\
-  -bugprone-easily-swappable-parameters,\
-  clang-analyzer-*,\
-  cppcoreguidelines-*,\
-  -cppcoreguidelines-non-private-member-variables-in-classes,\
-  -cppcoreguidelines-special-member-functions,\
-  -cppcoreguidelines-avoid-magic-numbers,\
-  -cppcoreguidelines-macro-usage,\
-  google-*,\
-  -google-readability-todo,\
-  -google-build-using-namespace,\
-  misc-*,\
-  -misc-no-recursion,\
-  -misc-non-private-member-variables-in-classes,\
-  modernize-*,\
-  -modernize-use-trailing-return-type,\
-  performance-*,\
-  portability-*,\
-  readability-*,\
-  -readability-identifier-length,\
-  -readability-magic-numbers,\
-  -readability-function-cognitive-complexity\
-  "
 FormatStyle: file
+
+Checks: |
+  clang-diagnostic-*,
+  clang-analyzer-*,
+  boost-*,
+  bugprone-*,
+  -bugprone-easily-swappable-parameters,
+  clang-analyzer-*,
+  cppcoreguidelines-*,
+  -cppcoreguidelines-non-private-member-variables-in-classes,
+  -cppcoreguidelines-special-member-functions,
+  -cppcoreguidelines-avoid-magic-numbers,
+  -cppcoreguidelines-macro-usage,
+  google-*,
+  -google-readability-todo,
+  -google-build-using-namespace,
+  misc-*,
+  -misc-no-recursion,
+  -misc-non-private-member-variables-in-classes,
+  modernize-*,
+  -modernize-use-trailing-return-type,
+  performance-*,
+  portability-*,
+  readability-*,
+  -readability-identifier-length,
+  -readability-magic-numbers,
+  -readability-function-cognitive-complexity
+
 CheckOptions:
   - key: readability-identifier-naming.ClassCase
     value: CamelCase
