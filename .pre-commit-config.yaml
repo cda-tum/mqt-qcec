@@ -31,10 +31,16 @@ repos:
       - id: isort
 
   - repo: https://github.com/psf/black
-    rev: "22.6.0"
+    rev: "22.6.0" # Keep in sync with blacken-docs
     hooks:
       - id: black
-        exclude: docs/source/conf.py
+
+  - repo: https://github.com/asottile/blacken-docs
+    rev: "v1.12.1"
+    hooks:
+      - id: blacken-docs
+        additional_dependencies:
+          - black==22.6.0 # keep in sync with black hook
 
   - repo: https://github.com/asottile/pyupgrade
     rev: "v2.37.1"

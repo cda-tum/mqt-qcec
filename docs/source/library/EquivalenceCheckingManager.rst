@@ -34,14 +34,14 @@ There are two ways of configuring the manager at construction time, e.g., in ord
     .. code-block:: python
 
         config = Configuration()
-        config.execution.timeout = 60.
+        config.execution.timeout = 60.0
         ecm = EquivalenceCheckingManager(circ1=qc1, circ2=qc2, config=config)
 
 * Setting individual options via the appropriate keyword arguments.
 
     .. code-block:: python
 
-        ecm = EquivalenceCheckingManager(circ1=qc1, circ2=qc2, timeout=60.)
+        ecm = EquivalenceCheckingManager(circ1=qc1, circ2=qc2, timeout=60.0)
 
 .. note::
     Every keyword argument that takes an enum value can either be conveniently specified as a string (e.g., :code:`state_type="stabilizer"`) or by providing the respective enum value (e.g., :code:`state_type=qcec.StateType.stabilizer`).
