@@ -76,7 +76,7 @@ jobs:
         working-directory: ${{github.workspace}}/build/test
         run: ./qcec_test
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3.1.0
+        uses: codecov/codecov-action@v3
         with:
           gcov: true
           gcov_ignore: "extern/**/*"
