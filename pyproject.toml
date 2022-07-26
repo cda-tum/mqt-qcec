@@ -32,6 +32,7 @@ testpaths = ["test/python"]
 addopts = ["-ra", "--strict-markers", "--strict-config", "--showlocals"]
 log_cli_level = "INFO"
 xfail_strict = true
+filterwarnings = ["error"]
 
 [tool.coverage.run]
 source = ["mqt.qcec"]
