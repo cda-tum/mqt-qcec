@@ -452,8 +452,10 @@ void EquivalenceCheckingManager::checkParallel() {
 
   if (runSimulation) {
     const auto effectiveThreadsLeft = effectiveThreads - threads.size();
+    const auto simulationsToStart =
+        std::min(effectiveThreadsLeft, configuration.simulation.maxSims);
     // launch as many simulations as possible
-    for (std::size_t i = 0; i < effectiveThreadsLeft && !done; ++i) {
+    for (std::size_t i = 0; i < simulationsToStart && !done; ++i) {
       threads.emplace_back([this, &queue, id] {
         checkers[id] =
             std::make_unique<DDSimulationChecker>(qc1, qc2, configuration);
