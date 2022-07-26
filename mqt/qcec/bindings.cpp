@@ -21,16 +21,16 @@ namespace py = pybind11;
 using namespace pybind11::literals;
 
 namespace ec {
-qc::QuantumComputation importCircuit(const py::object& circ) {
-  py::object quantumCircuit =
+static qc::QuantumComputation importCircuit(const py::object& circ) {
+  const py::object quantumCircuit =
       py::module::import("qiskit").attr("QuantumCircuit");
-  py::object pyQasmQobjExperiment =
+  const py::object pyQasmQobjExperiment =
       py::module::import("qiskit.qobj").attr("QasmQobjExperiment");
 
   auto qc = qc::QuantumComputation();
 
   if (py::isinstance<py::str>(circ)) {
-    auto&& file = circ.cast<std::string>();
+    const auto file = circ.cast<std::string>();
     qc.import(file);
   } else if (py::isinstance(circ, quantumCircuit)) {
     qc::qiskit::QuantumCircuit::import(qc, circ);
@@ -44,14 +44,14 @@ qc::QuantumComputation importCircuit(const py::object& circ) {
   return qc;
 }
 
-std::unique_ptr<EquivalenceCheckingManager>
+static std::unique_ptr<EquivalenceCheckingManager>
 createManagerFromConfiguration(const py::object& circ1, const py::object& circ2,
                                const Configuration& configuration) noexcept {
   qc::QuantumComputation qc1;
   try {
     qc1 = importCircuit(circ1);
   } catch (const std::exception& ex) {
-    std::cerr << "Could not import first circuit: " << ex.what() << std::endl;
+    std::cerr << "Could not import first circuit: " << ex.what() << "\n";
     return {};
   }
 
@@ -59,7 +59,7 @@ createManagerFromConfiguration(const py::object& circ1, const py::object& circ2,
   try {
     qc2 = importCircuit(circ2);
   } catch (const std::exception& ex) {
-    std::cerr << "Could not import second circuit: " << ex.what() << std::endl;
+    std::cerr << "Could not import second circuit: " << ex.what() << "\n";
     return {};
   }
 
@@ -68,24 +68,28 @@ createManagerFromConfiguration(const py::object& circ1, const py::object& circ2,
                                                         configuration);
   } catch (const std::exception& ex) {
     std::cerr << "Failed to construct equivalence checking manager: "
-              << ex.what() << std::endl;
+              << ex.what() << "\n";
     return {};
   }
 }
 
-std::unique_ptr<EquivalenceCheckingManager> createManagerFromOptions(
+static std::unique_ptr<EquivalenceCheckingManager> createManagerFromOptions(
     const py::object& circ1, const py::object& circ2,
     // Execution
-    dd::fp      numericalTolerance = dd::ComplexTable<>::tolerance(),
-    bool        parallel           = true,
-    std::size_t nthreads = std::max(2U, std::thread::hardware_concurrency()),
-    std::chrono::seconds timeout = 0s, bool runConstructionChecker = false,
-    bool runSimulationChecker = true, bool runAlternatingChecker = true,
-    bool runZXChecker = true,
+    const dd::fp      numericalTolerance = dd::ComplexTable<>::tolerance(),
+    const bool        parallel           = true,
+    const std::size_t nthreads           = std::max(2U,
+                                                    std::thread::hardware_concurrency()),
+    const std::chrono::seconds timeout   = 0s,
+    const bool                 runConstructionChecker = false,
+    const bool                 runSimulationChecker   = true,
+    const bool runAlternatingChecker = true, const bool runZXChecker = true,
     // Optimization
-    bool fixOutputPermutationMismatch = false, bool fuseSingleQubitGates = true,
-    bool reconstructSWAPs = true, bool removeDiagonalGatesBeforeMeasure = false,
-    bool transformDynamicCircuit = false, bool reorderOperations = true,
+    const bool fixOutputPermutationMismatch = false,
+    const bool fuseSingleQubitGates = true, const bool reconstructSWAPs = true,
+    const bool removeDiagonalGatesBeforeMeasure = false,
+    const bool transformDynamicCircuit          = false,
+    const bool reorderOperations                = true,
     // Application
     const ApplicationSchemeType& constructionScheme =
         ApplicationSchemeType::Proportional,
@@ -95,14 +99,16 @@ std::unique_ptr<EquivalenceCheckingManager> createManagerFromOptions(
         ApplicationSchemeType::Proportional,
     const std::string& profile = {},
     // Functionality
-    double traceThreshold = 1e-8,
+    const double traceThreshold = 1e-8,
     // Simulation
-    double           fidelityThreshold = 1e-8,
-    std::size_t      maxSims           = std::max(16U,
-                                                  std::thread::hardware_concurrency() - 2U),
-    const StateType& stateType         = StateType::ComputationalBasis,
-    std::size_t seed = 0U, bool storeCEXinput = false,
-    bool storeCEXoutput = false) {
+    const double fidelityThreshold = 1e-8,
+
+    const std::size_t maxSims   = std::max(16U,
+                                           std::thread::hardware_concurrency() -
+                                               2U),
+    const StateType&  stateType = StateType::ComputationalBasis,
+    const std::size_t seed = 0U, const bool storeCEXinput = false,
+    const bool storeCEXoutput = false) {
   Configuration configuration{};
   // Execution
   configuration.execution.numericalTolerance     = numericalTolerance;
@@ -150,10 +156,10 @@ std::unique_ptr<EquivalenceCheckingManager> createManagerFromOptions(
   return createManagerFromConfiguration(circ1, circ2, configuration);
 }
 
-ec::EquivalenceCheckingManager::Results
+static ec::EquivalenceCheckingManager::Results
 verify(const py::object& circ1, const py::object& circ2,
        const Configuration& configuration = Configuration()) {
-  auto ecm = createManagerFromConfiguration(circ1, circ2, configuration);
+  const auto ecm = createManagerFromConfiguration(circ1, circ2, configuration);
   ecm->run();
   return ecm->getResults();
 }
@@ -193,7 +199,7 @@ PYBIND11_MODULE(pyqcec, m) {
       }))
       .def(
           "__str__",
-          [](ApplicationSchemeType scheme) { return toString(scheme); },
+          [](const ApplicationSchemeType scheme) { return toString(scheme); },
           py::prepend());
   py::implicitly_convertible<std::string, ApplicationSchemeType>();
 
@@ -212,7 +218,7 @@ PYBIND11_MODULE(pyqcec, m) {
         return stateTypeFromString(str);
       }))
       .def(
-          "__str__", [](StateType type) { return toString(type); },
+          "__str__", [](const StateType type) { return toString(type); },
           py::prepend());
   py::implicitly_convertible<std::string, StateType>();
 
@@ -247,7 +253,8 @@ PYBIND11_MODULE(pyqcec, m) {
         return fromString(str);
       }))
       .def(
-          "__str__", [](EquivalenceCriterion crit) { return toString(crit); },
+          "__str__",
+          [](const EquivalenceCriterion crit) { return toString(crit); },
           py::prepend());
   py::implicitly_convertible<std::string, EquivalenceCriterion>();
 
