@@ -1,3 +1,12 @@
+# To run all pre-commit checks, use:
+#
+#     pre-commit run -a
+#
+# To install pre-commit hooks that run every time you commit:
+#
+#     pre-commit install
+#
+
 ci:
   autoupdate_commit_msg: "⬆️🪝 update pre-commit hooks"
   autofix_commit_msg: "🎨 pre-commit fixes"
