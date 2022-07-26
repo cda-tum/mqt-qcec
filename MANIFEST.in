@@ -1,3 +1,11 @@
+include CMakeLists.txt
+recursive-include include *.hpp
+recursive-include jkq *.py
+recursive-include src *.cpp
+recursive-include mqt *.cpp
+recursive-include mqt CMakeLists.txt
+recursive-include src CMakeLists.txt
+
 prune docs
 prune test
 

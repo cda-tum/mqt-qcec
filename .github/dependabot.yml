@@ -1,28 +1,34 @@
 version: 2
 updates:
   - package-ecosystem: "gitsubmodule"
-    directory:         "/"
+    directory: "/"
     schedule:
       interval: "weekly"
-      day:      "friday"
-      time:     "06:00"
+      day: "friday"
+      time: "06:00"
     assignees:
       - "burgholzer"
 
   - package-ecosystem: "github-actions"
-    directory:         "/"
+    directory: "/"
     schedule:
       interval: "weekly"
-      day:      "friday"
-      time:     "06:00"
+      day: "friday"
+      time: "06:00"
     assignees:
       - "burgholzer"
+    ignore:
+      - dependency-name: "actions/*"
+        # Official actions have moving tags like v1
+        # that are used, so they don't need updates here
+        update-types:
+          ["version-update:semver-minor", "version-update:semver-patch"]
 
   - package-ecosystem: "pip"
-    directory:         "/"
+    directory: "/"
     schedule:
       interval: "weekly"
-      day:      "friday"
-      time:     "06:00"
+      day: "friday"
+      time: "06:00"
     assignees:
       - "burgholzer"

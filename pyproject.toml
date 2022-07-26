@@ -1,8 +1,7 @@
 [build-system]
 requires = [
     "setuptools>=45",
-    "setuptools_scm>=6.4",
-    "wheel>=0.37",
+    "setuptools_scm[toml]>=6.4",
     "ninja>=1.10; sys_platform != 'win32'",
     "cmake>=3.14",
 ]
@@ -15,7 +14,7 @@ build = "cp3*"
 archs = "auto64"
 test-skip = "*-macosx_arm64 *-musllinux* *aarch64"
 test-extras = ["test"]
-test-command = "python -m pytest {project}/test/python"
+test-command = "python -c \"from mqt import qcec\""
 environment = { DEPLOY = "ON" }
 build-frontend = "build"
 build-verbosity = 3
@@ -26,3 +25,76 @@ build-verbosity = 3
 environment = { MACOSX_DEPLOYMENT_TARGET = "10.15", DEPLOY = "ON" }
 
 [tool.cibuildwheel.windows]
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+testpaths = ["test/python"]
+addopts = ["-ra", "--strict-markers", "--strict-config", "--showlocals"]
+log_cli_level = "INFO"
+xfail_strict = true
+filterwarnings = ["error"]
+
+[tool.coverage.run]
+source = ["mqt.qcec"]
+
+[tool.coverage.report]
+show_missing = true
+skip_empty = true
+precision = 1
+
+[tool.check-manifest]
+ignore = [
+    "docs/**",
+    ".*",
+    ".*/**",
+    "noxfile.py"
+]
+
+[tool.black]
+line-length = 120
+
+[tool.isort]
+profile = "black"
+src_paths = ["mqt/qcec", "test/python"]
+
+[tool.flake8]
+extend-select = "B9"
+extend-ignore = "E203, E231, E501, E722, W503, B950, B014, W504, E123, E126, E226, E121"
+max-line-length = 120
+show-source = true
+exclude = ".git,.idea,.eggs,__pycache__,.tox,docs/source/conf.py,build,.nox,venv,.venv"
+application-import-names = "mqt.qcec"
+
+[tool.mypy]
+files = ["mqt/qcec", "test/python", "setup.py"]
+python_version = "3.7"
+strict = true
+warn_unused_configs = true
+check_untyped_defs = true
+show_error_codes = true
+enable_error_code = ["ignore-without-code", "redundant-expr", "truthy-bool"]
+warn_unreachable = true
+
+[tool.pylint]
+master.py-version = "3.7"
+master.jobs = "0"
+reports.output-format = "colorized"
+similarities.ignore-imports = "yes"
+messages_control.enable = [
+    "useless-suppression",
+]
+messages_control.disable = [
+    "invalid-name",
+    "line-too-long",
+    "missing-module-docstring",
+    "no-member",
+    "protected-access",
+    "too-few-public-methods",
+    "too-many-arguments",
+    "too-many-branches",
+    "too-many-locals",
+    "too-many-statements",
+    "ungrouped-imports",
+    "wrong-import-order",
+    "wrong-import-position",
+]

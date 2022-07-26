@@ -8,6 +8,10 @@ on:
     branches:
       - main
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   cpp-linter:
     runs-on: ubuntu-22.04
@@ -20,21 +24,21 @@ jobs:
       - uses: actions/setup-python@v4
         name: Install Python
         with:
-          python-version: '3.9'
+          python-version: "3.9"
       - name: Install linter python package
         run: python3 -m pip install git+https://github.com/cpp-linter/cpp-linter-action@v1
       - name: Run linter
         id: linter
         run: |
-              cpp-linter \
-              --version=14 \
-              --style=file \
-              --tidy-checks='' \
-              --lines-changed-only=true \
-              --files-changed-only=true \
-              --thread-comments=true \
-              --ignore=build \
-              --database=${{ github.event.repository.name }}/build
+          cpp-linter \
+          --version=14 \
+          --style=file \
+          --tidy-checks='' \
+          --lines-changed-only=true \
+          --files-changed-only=true \
+          --thread-comments=true \
+          --ignore=build \
+          --database=${{ github.event.repository.name }}/build
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Fail if linter found errors

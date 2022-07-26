@@ -11,9 +11,9 @@ However, physical devices today impose several constraints on the circuits to be
 
 1. **Limited gate-set:** Typically, only a small set of gates is natively supported by devices, e.g., consisting of arbitrary single-qubit gates and the two-qubit CNOT operation.
 
-2. **Limited connectivity:** Devices frequently limit the pairs of qubits that operations may be applied to. This is usually described by a coupling graph, where the graph’s nodes represent the qubits and an edge between two nodes indicates that a CNOT operation may be applied to those qubits.
+2. **Limited connectivity:** Devices frequently limit the pairs of qubits that operations may be applied to. This is usually described by a coupling graph, where the graph's nodes represent the qubits and an edge between two nodes indicates that a CNOT operation may be applied to those qubits.
 
-3. **Short coherence times and limited fidelity:** A device’s physical qubits are inherently affected by noise. Until a certain threshold concerning the number of available qubits is reached, error correction is not yet an option.
+3. **Short coherence times and limited fidelity:** A device's physical qubits are inherently affected by noise. Until a certain threshold concerning the number of available qubits is reached, error correction is not yet an option.
 
 The first two, i.e., the limited gate-set and connectivity, constitute hard constraints---a computation not conforming to these restrictions may not be executed on the device. In contrast, the short coherence time and limited gate fidelity represent soft constraints---a quantum circuit may be executed on a device, but it is not guaranteed to produce meaningful results if the circuit, e.g., is too large for the state to stay coherent.
 

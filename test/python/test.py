@@ -1,6 +1,8 @@
+from __future__ import annotations
+
+from mqt import qcec
 from qiskit import QuantumCircuit, transpile
 from qiskit.test.mock import FakeAthens
-from mqt import qcec
 
 if __name__ == "__main__":
     # create quantum circuit for GHZ state
