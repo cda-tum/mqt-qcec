@@ -349,7 +349,9 @@ void EquivalenceCheckingManager::checkSequential() {
 
       results.equivalence = result;
       // break if equivalence has been shown
-      if (result == EquivalenceCriterion::EquivalentUpToGlobalPhase) {
+      if (result == EquivalenceCriterion::EquivalentUpToGlobalPhase ||
+          (configuration.onlyZXCheckerConfigured() &&
+           result == EquivalenceCriterion::ProbablyNotEquivalent)) {
         done = true;
         doneCond.notify_one();
       }
