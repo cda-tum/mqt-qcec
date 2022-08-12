@@ -79,7 +79,11 @@ EquivalenceCriterion ZXEquivalenceChecker::run() {
     equivalence = EquivalenceCriterion::NoInformation;
   } else {
     if (equivalent) {
-      equivalence = EquivalenceCriterion::EquivalentUpToGlobalPhase;
+      if (miter.globalPhaseIsZero()) {
+        equivalence = EquivalenceCriterion::Equivalent;
+      } else {
+        equivalence = EquivalenceCriterion::EquivalentUpToGlobalPhase;
+      }
     } else {
       equivalence = EquivalenceCriterion::ProbablyNotEquivalent;
     }
