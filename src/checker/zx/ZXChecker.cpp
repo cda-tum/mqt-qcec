@@ -13,7 +13,6 @@
 #include "zx/FunctionalityConstruction.hpp"
 
 #include <chrono>
-#include <iostream>
 #include <optional>
 
 namespace ec {

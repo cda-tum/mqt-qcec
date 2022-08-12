@@ -224,6 +224,20 @@ TEST_F(ZXTest, ZXConfiguredForInvalidCircuitSequential) {
             ec::EquivalenceCriterion::NoInformation);
 }
 
+TEST_F(ZXTest, GlobalPhase) {
+  auto qc = qc::QuantumComputation(1);
+  qc.rz(0, zx::PI / 8);
+
+  auto qcPrime = qc::QuantumComputation(1);
+  qcPrime.phase(0, zx::PI / 8);
+
+  ecm = std::make_unique<ec::EquivalenceCheckingManager>(qc, qcPrime, config);
+  ecm->run();
+
+  EXPECT_EQ(ecm->getResults().equivalence,
+            ec::EquivalenceCriterion::EquivalentUpToGlobalPhase);
+}
+
 class ZXTestCompFlow : public testing::TestWithParam<std::string> {
 protected:
   qc::QuantumComputation qcOriginal;
