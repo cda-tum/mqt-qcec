@@ -337,7 +337,8 @@ void EquivalenceCheckingManager::checkSequential() {
 
       results.equivalence = result;
       // break if equivalence has been shown
-      if (result == EquivalenceCriterion::EquivalentUpToGlobalPhase) {
+      if (result == EquivalenceCriterion::EquivalentUpToGlobalPhase ||
+          result == EquivalenceCriterion::Equivalent) {
         done = true;
         doneCond.notify_one();
       }
@@ -535,6 +536,7 @@ void EquivalenceCheckingManager::checkParallel() {
     if (dynamic_cast<const ZXEquivalenceChecker*>(checker) != nullptr) {
       results.equivalence = result;
       if (result == EquivalenceCriterion::EquivalentUpToGlobalPhase ||
+          result == EquivalenceCriterion::Equivalent ||
           (result == EquivalenceCriterion::ProbablyNotEquivalent &&
            configuration.onlyZXCheckerConfigured())) {
         setAndSignalDone();

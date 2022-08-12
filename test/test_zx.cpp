@@ -115,8 +115,7 @@ TEST_F(ZXTest, CloseButNotEqual) {
                                                          qcAlternative, config);
 
   ecm->run();
-  EXPECT_EQ(ecm->equivalence(),
-            ec::EquivalenceCriterion::EquivalentUpToGlobalPhase);
+  EXPECT_EQ(ecm->equivalence(), ec::EquivalenceCriterion::Equivalent);
 }
 
 TEST_F(ZXTest, NotEqual) {
