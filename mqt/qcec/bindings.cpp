@@ -46,31 +46,24 @@ static qc::QuantumComputation importCircuit(const py::object& circ) {
 
 static std::unique_ptr<EquivalenceCheckingManager>
 createManagerFromConfiguration(const py::object& circ1, const py::object& circ2,
-                               const Configuration& configuration) noexcept {
+                               const Configuration& configuration) {
   qc::QuantumComputation qc1;
   try {
     qc1 = importCircuit(circ1);
   } catch (const std::exception& ex) {
-    std::cerr << "Could not import first circuit: " << ex.what() << "\n";
-    return {};
+    throw std::runtime_error("Could not import first circuit: " +
+                             std::string(ex.what()));
   }
 
   qc::QuantumComputation qc2;
   try {
     qc2 = importCircuit(circ2);
   } catch (const std::exception& ex) {
-    std::cerr << "Could not import second circuit: " << ex.what() << "\n";
-    return {};
+    throw std::runtime_error("Could not import second circuit: " +
+                             std::string(ex.what()));
   }
 
-  try {
-    return std::make_unique<EquivalenceCheckingManager>(qc1, qc2,
-                                                        configuration);
-  } catch (const std::exception& ex) {
-    std::cerr << "Failed to construct equivalence checking manager: "
-              << ex.what() << "\n";
-    return {};
-  }
+  return std::make_unique<EquivalenceCheckingManager>(qc1, qc2, configuration);
 }
 
 static std::unique_ptr<EquivalenceCheckingManager> createManagerFromOptions(
