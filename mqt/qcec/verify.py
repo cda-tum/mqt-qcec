@@ -1,11 +1,13 @@
 from __future__ import annotations
 
+from typing import Any
+
 from mqt.qcec import Configuration, EquivalenceCheckingManager
 from qiskit import QuantumCircuit
 
 
 def verify(
-    circ1: QuantumCircuit | str, circ2: QuantumCircuit | str, configuration: Configuration | None = None, **kwargs
+    circ1: QuantumCircuit | str, circ2: QuantumCircuit | str, configuration: Configuration | None = None, **kwargs: Any
 ) -> EquivalenceCheckingManager.Results:
     """
     Verify that ``circ1`` and ``circ2`` are equivalent.

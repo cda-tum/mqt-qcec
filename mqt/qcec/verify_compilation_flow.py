@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import sys
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING or sys.version_info < (3, 9, 0):
     import importlib_resources as resources
@@ -19,7 +19,7 @@ def verify_compilation(
     optimization_level: int = 1,
     ancilla_mode: AncillaMode = AncillaMode.NO_ANCILLA,
     configuration: Configuration | None = None,
-    **kwargs,
+    **kwargs: Any,
 ) -> EquivalenceCheckingManager.Results:
     """
     Verify that the ``compiled_circuit`` (compiled with a certain ``optimization_level`` amd ``ancilla_mode``) is equivalent to the ``original_circuit``.
