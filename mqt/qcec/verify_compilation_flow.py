@@ -19,17 +19,22 @@ def verify_compilation(
     optimization_level: int = 1,
     ancilla_mode: AncillaMode = AncillaMode.NO_ANCILLA,
     configuration: Configuration | None = None,
+    **kwargs,
 ) -> EquivalenceCheckingManager.Results:
     """
     Verify that the ``compiled_circuit`` (compiled with a certain ``optimization_level`` amd ``ancilla_mode``) is equivalent to the ``original_circuit``.
     If ``configuration`` is not ``None``, it is used to configure the ``EquivalenceCheckingManager``.
     """
 
-    if configuration is None:
-        configuration = Configuration()
+    if kwargs:
+        # create the equivalence checker from keyword arguments
+        ecm = EquivalenceCheckingManager(original_circuit, compiled_circuit, **kwargs)
+    else:
+        if configuration is None:
+            configuration = Configuration()
 
-    # create the equivalence checker
-    ecm = EquivalenceCheckingManager(original_circuit, compiled_circuit, configuration)
+        # create the equivalence checker from configuration
+        ecm = EquivalenceCheckingManager(original_circuit, compiled_circuit, configuration)
 
     # use the gate_cost scheme for the verification
     ecm.set_application_scheme("gate_cost")

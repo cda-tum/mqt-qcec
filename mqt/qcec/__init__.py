@@ -10,8 +10,8 @@ from mqt.qcec.pyqcec import (
     EquivalenceCheckingManager,
     EquivalenceCriterion,
     StateType,
-    verify,
 )
+from mqt.qcec.verify import verify
 from mqt.qcec.verify_compilation_flow import verify_compilation
 
 __all__ = [

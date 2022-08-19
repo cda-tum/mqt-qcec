@@ -156,14 +156,6 @@ static std::unique_ptr<EquivalenceCheckingManager> createManagerFromOptions(
   return createManagerFromConfiguration(circ1, circ2, configuration);
 }
 
-static ec::EquivalenceCheckingManager::Results
-verify(const py::object& circ1, const py::object& circ2,
-       const Configuration& configuration = Configuration()) {
-  const auto ecm = createManagerFromConfiguration(circ1, circ2, configuration);
-  ecm->run();
-  return ecm->getResults();
-}
-
 PYBIND11_MODULE(pyqcec, m) {
   m.doc() = "Python interface for the MQT QCEC quantum circuit equivalence "
             "checking tool";
@@ -737,14 +729,6 @@ PYBIND11_MODULE(pyqcec, m) {
           "store a full representation of a quantum state increases "
           "exponentially, this is only recommended for a small number of "
           "qubits and defaults to :code:`False`.");
-
-  m.def("verify", &verify, "circ1"_a, "circ2"_a,
-        "config"_a = ec::Configuration{},
-        "Convenience function for verifying the equivalence of two circuits. "
-        "Wraps creating an instance of :class:`EquivalenceCheckingManager "
-        "<.EquivalenceCheckingManager>`, calling "
-        ":meth:`EquivalenceCheckingManager.run` and calling "
-        ":meth:`EquivalenceCheckingManager.get_result`.");
 
 #ifdef VERSION_INFO
   m.attr("__version__") = MACRO_STRINGIFY(VERSION_INFO);
