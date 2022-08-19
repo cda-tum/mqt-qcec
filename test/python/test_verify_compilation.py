@@ -6,14 +6,6 @@ from qiskit import QuantumCircuit, transpile
 from qiskit.providers.fake_provider import FakeAthens
 
 
-def get_circuits(qc: QuantumCircuit, optimization_level: int = 1) -> tuple[QuantumCircuit, QuantumCircuit]:
-    """
-    Compile the circuit ``qc`` to the 5-qubit IBMQ Athens architecture.
-    """
-    qc_comp = transpile(qc, backend=FakeAthens(), optimization_level=optimization_level)
-    return qc, qc_comp
-
-
 @pytest.fixture
 def original_circuit() -> QuantumCircuit:
     qc = QuantumCircuit(3)
