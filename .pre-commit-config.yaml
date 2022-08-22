@@ -78,7 +78,7 @@ repos:
 
   # Run Flake8 checks
   - repo: https://github.com/PyCQA/flake8
-    rev: "4.0.1"
+    rev: "5.0.4"
     hooks:
       - id: flake8
         entry: pflake8
@@ -105,7 +105,7 @@ repos:
 
   # Check for spelling
   - repo: https://github.com/codespell-project/codespell
-    rev: "v2.1.0"
+    rev: "v2.2.1"
     hooks:
       - id: codespell
         args: ["-L", "wille,linz"]
@@ -128,7 +128,7 @@ repos:
 
   # Format configuration files with prettier
   - repo: https://github.com/pre-commit/mirrors-prettier
-    rev: "v2.7.1"
+    rev: "v3.0.0-alpha.0"
     hooks:
       - id: prettier
         types_or: [yaml, markdown, html, css, scss, javascript, json]
