@@ -118,7 +118,7 @@ setup(
         "docs": [
             "sphinx==5.1.1",
             "sphinx-rtd-theme==1.0.0",
-            "sphinxcontrib-bibtex==2.4.2",
+            "sphinxcontrib-bibtex==2.5.0",
             "sphinx-copybutton==0.4.0",
             "sphinx-hoverxref==1.1.3",
             "pybtex>=0.24",
