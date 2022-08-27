@@ -3,7 +3,7 @@ import re
 import subprocess
 import sys
 
-from setuptools import Extension, find_namespace_packages, setup
+from setuptools import Extension, setup
 from setuptools.command.build_ext import build_ext
 
 
@@ -91,62 +91,7 @@ class CMakeBuild(build_ext):
         )
 
 
-README_PATH = os.path.join(os.path.abspath(os.path.dirname(__file__)), "README.md")
-with open(README_PATH) as readme_file:
-    README = readme_file.read()
-
 setup(
-    name="mqt.qcec",
-    author="Lukas Burgholzer",
-    author_email="lukas.burgholzer@jku.at",
-    description="A tool for Quantum Circuit Equivalence Checking",
-    long_description=README,
-    long_description_content_type="text/markdown",
-    python_requires=">=3.7",
-    license="MIT",
-    url="https://www.cda.cit.tum.de/research/quantum_verification/",
     ext_modules=[CMakeExtension("pyqcec", namespace="mqt.qcec")],
     cmdclass={"build_ext": CMakeBuild},
-    zip_safe=False,
-    packages=find_namespace_packages(include=["mqt.*"]),
-    include_package_data=True,
-    package_data={"": ["profiles/*.profile", "py.typed"]},
-    install_requires=["qiskit-terra~=0.21.0", "importlib_resources>=5.9; python_version < '3.10'"],
-    extras_require={
-        "test": ["pytest~=7.1.1"],
-        "coverage": ["coverage[toml]~=6.4.2", "pytest-cov~=3.0.0"],
-        "docs": [
-            "sphinx==5.1.1",
-            "sphinx-rtd-theme==1.0.0",
-            "sphinxcontrib-bibtex==2.5.0",
-            "sphinx-copybutton==0.4.0",
-            "sphinx-hoverxref==1.1.3",
-            "pybtex>=0.24",
-            "importlib_metadata>=3.6; python_version < '3.10'",
-        ],
-        "dev": ["mqt.qcec[test, coverage, docs]"],  # requires Pip 21.2 or newer
-    },
-    classifiers=[
-        "Development Status :: 5 - Production/Stable",
-        "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.7",
-        "Programming Language :: Python :: 3.8",
-        "Programming Language :: Python :: 3.9",
-        "Programming Language :: Python :: 3.10",
-        "Programming Language :: C++",
-        "License :: OSI Approved :: MIT License",
-        "Operating System :: Microsoft :: Windows",
-        "Operating System :: MacOS",
-        "Operating System :: POSIX :: Linux",
-        "Intended Audience :: Science/Research",
-        "Natural Language :: English",
-        "Topic :: Scientific/Engineering :: Electronic Design Automation (EDA)",
-    ],
-    keywords="MQT quantum verification",
-    project_urls={
-        "Source": "https://github.com/cda-tum/qcec/",
-        "Tracker": "https://github.com/cda-tum/qcec/issues",
-        "Research": "https://www.cda.cit.tum.de/research/quantum_verification/",
-        "Documentation": "https://qcec.readthedocs.io",
-    },
 )
