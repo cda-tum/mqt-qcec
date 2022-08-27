@@ -8,10 +8,9 @@ from setuptools.command.build_ext import build_ext
 
 
 class CMakeExtension(Extension):
-    def __init__(self, name, sourcedir="", namespace=""):
+    def __init__(self, name, sourcedir=""):
         Extension.__init__(self, name, sources=[])
         self.sourcedir = os.path.abspath(sourcedir)
-        self.namespace = namespace
 
 
 class CMakeBuild(build_ext):
@@ -20,7 +19,6 @@ class CMakeBuild(build_ext):
 
         version = get_version(relative_to=__file__)
 
-        self.package = ext.namespace
         extdir = os.path.abspath(os.path.dirname(self.get_ext_fullpath(ext.name)))
         # required for auto-detection of auxiliary "native" libs
         if not extdir.endswith(os.path.sep):
@@ -86,12 +84,12 @@ class CMakeBuild(build_ext):
                 pass
         subprocess.check_call(["cmake", ext.sourcedir] + cmake_args, cwd=self.build_temp)
         subprocess.check_call(
-            ["cmake", "--build", ".", "--target", ext.name] + build_args,
+            ["cmake", "--build", ".", "--target", ext.name.split(".")[-1]] + build_args,
             cwd=self.build_temp,
         )
 
 
 setup(
-    ext_modules=[CMakeExtension("pyqcec", namespace="mqt.qcec")],
+    ext_modules=[CMakeExtension("mqt.qcec.pyqcec")],
     cmdclass={"build_ext": CMakeBuild},
 )
