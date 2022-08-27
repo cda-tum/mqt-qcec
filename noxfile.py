@@ -40,7 +40,7 @@ def pylint(session: Session) -> None:
 
     session.install("pylint")
     session.install("-e", ".")
-    session.run("pylint", "--recursive=y", "mqt/qcec", *session.posargs)
+    session.run("pylint", "mqt.qcec", "--extension-pkg-allow-list=mqt.qcec.pyqcec", *session.posargs)
 
 
 @nox.session
