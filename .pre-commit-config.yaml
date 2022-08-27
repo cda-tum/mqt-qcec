@@ -81,8 +81,7 @@ repos:
     rev: "4.0.1"
     hooks:
       - id: flake8
-        entry: pflake8
-        additional_dependencies: [pyproject-flake8, flake8-bugbear]
+        additional_dependencies: [flake8-bugbear]
 
   # Check the manifest for missing files
   - repo: https://github.com/mgedmin/check-manifest
