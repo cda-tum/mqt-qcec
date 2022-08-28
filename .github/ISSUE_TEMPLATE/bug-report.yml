@@ -7,14 +7,13 @@ assignees:
 body:
 - type: markdown
   attributes:
-    value: >
-    **Thank you for wanting to report a bug for this project!**
+    value: >-
+      **Thank you for wanting to report a bug for this project!**
 
-    ⚠
-    Verify first that your issue is not [already reported on GitHub](https://github.com/cda-tum/qcec/search?q=is%3Aissue&type=issues).
+      ⚠
+      Verify first that your issue is not [already reported on GitHub](https://github.com/cda-tum/qcec/search?q=is%3Aissue&type=issues).
 
-    If you are having general questions, please consider [starting a discussion](https://github.com/cda-tum/qcec/discussions).
-
+      If you are having general questions, please consider [starting a discussion](https://github.com/cda-tum/qcec/discussions).
 - type: markdown
   attributes:
     value: **Environment**
