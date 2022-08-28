@@ -16,7 +16,8 @@ body:
       If you are having general questions, please consider [starting a discussion](https://github.com/cda-tum/qcec/discussions).
 - type: markdown
   attributes:
-    value: **Environment**
+    value: >-
+      **Environment**
 - type: input
   attributes:
     label: mqt.qcec version
