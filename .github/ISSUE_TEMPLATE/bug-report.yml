@@ -61,4 +61,3 @@ body:
       3. An error occurs.
   validations:
     required: true
-
