@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 import sys
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
-if TYPE_CHECKING or sys.version_info < (3, 9, 0):
+if sys.version_info < (3, 10, 0):
     import importlib_resources as resources
 else:
     from importlib import resources

@@ -1,11 +1,68 @@
 [build-system]
 requires = [
-    "setuptools>=45",
+    "setuptools>=61",
     "setuptools_scm[toml]>=6.4",
     "ninja>=1.10; sys_platform != 'win32'",
     "cmake>=3.14",
 ]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "mqt.qcec"
+description = "A tool for Quantum Circuit Equivalence Checking"
+readme = "README.md"
+authors = [
+    { name = "Lukas Burgholzer", email = "lukas.burgholzer@jku.at"}
+]
+keywords = ["MQT", "quantum computing", "design automation", "equivalence checking", "verification"]
+license = { file = "LICENSE.md" }
+
+classifiers=[
+    "Development Status :: 5 - Production/Stable",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: C++",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: MacOS",
+    "Operating System :: POSIX :: Linux",
+    "Intended Audience :: Science/Research",
+    "Natural Language :: English",
+    "Topic :: Scientific/Engineering :: Electronic Design Automation (EDA)",
+]
+requires-python = ">=3.7"
+dependencies = [
+    "importlib_resources>=5.9; python_version < '3.10'",
+    "qiskit-terra~=0.21.0"
+]
+dynamic = ["version"]
+
+[project.optional-dependencies]
+test = ["pytest>=7"]
+coverage = ["coverage[toml]~=6.4.2", "pytest-cov~=3.0.0"]
+docs = [
+    "sphinx>=5.1.1",
+    "sphinx-rtd-theme",
+    "sphinxcontrib-bibtex~=2.5",
+    "sphinx-copybutton",
+    "sphinx-hoverxref~=1.1.3",
+    "pybtex>=0.24",
+    "importlib_metadata>=3.6; python_version < '3.10'",
+]
+dev = ["mqt.qcec[test, coverage, docs]"]
+
+[project.urls]
+Homepage = "https://github.com/cda-tum/qcec"
+Documentation = "https://qcec.readthedocs.io"
+"Bug Tracker" = "https://github.com/cda-tum/qcec/issues"
+Discussions = "https://github.com/cda-tum/qcec/discussions"
+Research = "https://www.cda.cit.tum.de/research/quantum_verification/"
+
+[tool.setuptools.packages.find]
+include = ["mqt.*"]
 
 [tool.setuptools_scm]
 
