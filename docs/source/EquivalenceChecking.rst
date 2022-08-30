@@ -77,7 +77,7 @@ ZX-Calculus Equivalence Checker
 In :cite:p:`kissinger2019PyZXLargeScale`, Kissinger and van de Wetering proposed an algorithm for optimizing quantum circuits based on ZX-calculus rewriting.
 In their initial article they also show that this rewriting approach can be used to prove the equivalence of quantum circuits.
 The idea is to construct the ZX-diagram of :math:`G^{\prime -1} G`  and reduce this ZX-diagram using the rules of the ZX-calculus until no further rewrites can be made.
-If the resulting diagram consists only of wires (the identity ZX-diagram) then :math:`G = G^{\prime}`.
+If the resulting diagram consists only of wires (the identity ZX-diagram) then :math:`G = G^{\prime}`. This approach has been extended in :cite:p:`peham2022equivalenceCheckingZXCalculus` to also handle ancillary qubits, floating point inaccuracies in gate parameters, as well as permutations of input and output layout of quantum circuits.
 
 In :cite:p:`peham2022EquivalenceCheckingParadigms`, it has been shown that equivalence checking with the ZX-calculus naturally complements equivalence checking with decision diagrams.
 Since the size of the ZX-diagram during rewriting is bounded by the size of the initial diagram, this checker can be easily executed in parallel to the aforementioned approaches based on decision diagrams.
