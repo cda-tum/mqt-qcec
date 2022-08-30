@@ -38,7 +38,7 @@ jobs:
           --files-changed-only=false \
           --thread-comments=true \
           --ignore=build \
-          --database=${{ github.event.repository.name }}/build
+          --database=build
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Fail if linter found errors
