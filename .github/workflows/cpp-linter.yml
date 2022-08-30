@@ -27,7 +27,7 @@ jobs:
         with:
           version: 14
           style: file
-          tidy-checks: ''
+          tidy-checks: ""
           lines-changed-only: false
           files-changed-only: false
           thread-comments: true
