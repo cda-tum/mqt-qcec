@@ -12,8 +12,6 @@
 #include <sstream>
 #include <string>
 
-using ::testing::HasSubstr;
-
 class GeneralTest : public ::testing::Test {
 protected:
   qc::QuantumComputation qc1;
