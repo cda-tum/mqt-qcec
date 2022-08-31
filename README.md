@@ -13,7 +13,11 @@ A tool for quantum circuit equivalence checking developed as part of the _Munich
 It builds upon [our quantum functionality representation (QFR)](https://github.com/cda-tum/qfr), [our decision diagram (DD) package](https://github.com/cda-tum/dd_package.git), and [our ZX-diagram package](https://github.com/cda-tum/zx.git)
 .
 
-**Detailed documentation on all available methods, options, and input formats is available at [ReadTheDocs](https://qcec.readthedocs.io/en/latest/).**
+<p align="center">
+  <a href="https://qcec.readthedocs.io/en/latest/">
+  <img width=30% src="https://img.shields.io/badge/documentation-blue?style=for-the-badge&logo=read%20the%20docs" alt="Documentation" />
+  </a>
+</p>
 
 If you have any questions, feel free to contact us via [quantum.cda@xcit.tum.de](mailto:quantum.cda@xcit.tum.de) or by creating an issue on [GitHub](https://github.com/cda-tum/qcec/issues).
 
@@ -36,6 +40,8 @@ result = qcec.verify("circ1.qasm", "circ2.qasm")
 # print the result
 print(result.equivalence)
 ```
+
+**Detailed documentation on all available methods, options, and input formats is available at [ReadTheDocs](https://qcec.readthedocs.io/en/latest/).**
 
 ## System Requirements and Building
 
