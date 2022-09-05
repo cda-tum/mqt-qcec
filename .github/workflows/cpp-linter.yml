@@ -21,10 +21,6 @@ jobs:
           submodules: recursive
       - name: Generate compilation database
         run: CXX=clang++-14 cmake -S . -B build -DBINDINGS=ON -DBUILD_QCEC_TESTS=ON -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
-      - uses: actions/setup-python@v4
-        name: Install Python
-        with:
-          python-version: "3.9"
       - uses: cpp-linter/cpp-linter-action@v2
         id: linter
         env:
