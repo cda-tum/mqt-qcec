@@ -34,9 +34,11 @@ jobs:
           languages: ${{ matrix.language }}
           queries: +security-and-quality
 
-      # Autobuild attempts to build any compiled languages  (C/C++, C#, or Java).
-      - name: Autobuild
-        uses: github/codeql-action/autobuild@v2
+      - if: matrix.language == 'cpp'
+        name: Build C++
+        run: |
+          cmake -S . -B build -DBINDINGS=ON -DBUILD_QCEC_TESTS=ON
+          cmake --build build --parallel 4
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v2
