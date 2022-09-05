@@ -25,22 +25,19 @@ jobs:
         name: Install Python
         with:
           python-version: "3.9"
-      - name: Install linter python package
-        run: python3 -m pip install git+https://github.com/cpp-linter/cpp-linter-action@v1
-      - name: Run linter
+      - uses: cpp-linter/cpp-linter-action@v2
         id: linter
-        run: |
-          cpp-linter \
-          --version=14 \
-          --style=file \
-          --tidy-checks='' \
-          --lines-changed-only=true \
-          --files-changed-only=true \
-          --thread-comments=true \
-          --ignore=build \
-          --database=build
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          version: 14
+          style: file
+          tidy-checks: ""
+          lines-changed-only: false
+          files-changed-only: false
+          thread-comments: true
+          ignore: build
+          database: build
       - name: Fail if linter found errors
         if: steps.linter.outputs.checks-failed > 0
         run: echo "Linter found errors" && exit 1
