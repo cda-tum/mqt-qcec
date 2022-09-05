@@ -33,6 +33,7 @@ jobs:
         with:
           languages: ${{ matrix.language }}
           queries: +security-and-quality
+          paths-ignore: extern/**
 
       - if: matrix.language == 'cpp'
         name: Build C++
