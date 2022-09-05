@@ -153,6 +153,7 @@ PYBIND11_MODULE(pyqcec, m) {
   m.doc() = "Python interface for the MQT QCEC quantum circuit equivalence "
             "checking tool";
 
+  // Application scheme enum
   py::enum_<ApplicationSchemeType>(m, "ApplicationScheme")
       .value("sequential", ApplicationSchemeType::Sequential,
              "Applies all gates from the first circuit, before proceeding with "
@@ -179,15 +180,19 @@ PYBIND11_MODULE(pyqcec, m) {
           "from the first circuit is applied *f(g)* gates are applied from the "
           "second circuit. Referred to as *compilation_flow* in "
           ":cite:p:`burgholzer2020verifyingResultsIBM`.")
+      // allow construction from a string
       .def(py::init([](const std::string& str) -> ApplicationSchemeType {
         return applicationSchemeFromString(str);
       }))
+      // provide a string representation of the enum
       .def(
           "__str__",
           [](const ApplicationSchemeType scheme) { return toString(scheme); },
           py::prepend());
+  // allow implicit conversion from string to ApplicationSchemeType
   py::implicitly_convertible<std::string, ApplicationSchemeType>();
 
+  // State type enum
   py::enum_<StateType>(m, "StateType")
       .value("computational_basis", StateType::ComputationalBasis,
              "Randomly choose computational basis states. Also referred to as "
@@ -199,14 +204,18 @@ PYBIND11_MODULE(pyqcec, m) {
       .value("stabilizer", StateType::Stabilizer,
              "Randomly choose a stabilizer state by creating a random Clifford "
              "circuit. Also referred to as *global_random*.")
+      // allow construction from a string
       .def(py::init([](const std::string& str) -> StateType {
         return stateTypeFromString(str);
       }))
+      // provide a string representation of the enum
       .def(
           "__str__", [](const StateType type) { return toString(type); },
           py::prepend());
+  // allow implicit conversion from string to StateType
   py::implicitly_convertible<std::string, StateType>();
 
+  // Equivalence criterion enum
   py::enum_<EquivalenceCriterion>(m, "EquivalenceCriterion")
       .value("no_information", EquivalenceCriterion::NoInformation,
              "No information on the equivalence is available. This can be due "
@@ -234,13 +243,16 @@ PYBIND11_MODULE(pyqcec, m) {
              "whenever the :ref:`ZX-calculus checker "
              "<EquivalenceChecking:ZX-Calculus Equivalence Checker>` could not "
              "reduce the combined circuit to the identity.")
+      // allow construction from a string
       .def(py::init([](const std::string& str) -> EquivalenceCriterion {
         return fromString(str);
       }))
+      // provide a string representation of the enum
       .def(
           "__str__",
           [](const EquivalenceCriterion crit) { return toString(crit); },
           py::prepend());
+  // allow implicit conversion from string to EquivalenceCriterion
   py::implicitly_convertible<std::string, EquivalenceCriterion>();
 
   // Class definitions
@@ -249,7 +261,6 @@ PYBIND11_MODULE(pyqcec, m) {
       "Main class for orchestrating the equivalence check");
   py::class_<EquivalenceCheckingManager::Results> results(
       ecm, "Results", "Equivalence checking results");
-
   py::class_<Configuration> configuration(
       m, "Configuration",
       "Configuration options for the QCEC quantum circuit equivalence checking "
@@ -456,6 +467,7 @@ PYBIND11_MODULE(pyqcec, m) {
            "Prints a JSON-formatted representation of all the information "
            "present in the :class:`.EquivalenceCheckingManager`");
 
+  // EquivalenceCheckingManager::Results bindings
   results.def(py::init<>())
       .def_readwrite("preprocessing_time",
                      &EquivalenceCheckingManager::Results::preprocessingTime,
@@ -493,6 +505,7 @@ PYBIND11_MODULE(pyqcec, m) {
       .def("__repr__", &EquivalenceCheckingManager::Results::toString,
            "Prints a JSON-formatted representation of the results.");
 
+  // Configuration sub-classes
   py::class_<Configuration::Execution> execution(
       configuration, "Execution",
       "Options that orchestrate the :meth:`~.EquivalenceCheckingManager.run` "
@@ -528,6 +541,7 @@ PYBIND11_MODULE(pyqcec, m) {
       .def("__repr__", &Configuration::toString,
            "Prints a JSON-formatted representation of the configuration.");
 
+  // execution options
   execution.def(py::init<>())
       .def_readwrite("parallel", &Configuration::Execution::parallel,
                      "Set whether execution should happen in parallel. "
@@ -576,6 +590,7 @@ PYBIND11_MODULE(pyqcec, m) {
                      "diagram package. Defaults to :code:`~2e-13` and should "
                      "only be changed by users who know what they are doing.");
 
+  // optimization options
   optimizations.def(py::init<>())
       .def_readwrite(
           "fix_output_permutation_mismatch",
@@ -629,6 +644,7 @@ PYBIND11_MODULE(pyqcec, m) {
           "graph for the operations and, then, traversing it in a "
           "breadth-first fashion. Defaults to :code:`True`.");
 
+  // application options
   application.def(py::init<>())
       .def_readwrite(
           "construction_scheme",
@@ -657,6 +673,7 @@ PYBIND11_MODULE(pyqcec, m) {
           "a single-qubit X gate has a cost of :code:`1`, while :code:`X 2 15` "
           "denotes that a Toffoli gate has a cost of :code:`15`.");
 
+  // functionality options
   functionality.def(py::init<>())
       .def_readwrite(
           "trace_threshold", &Configuration::Functionality::traceThreshold,
@@ -679,6 +696,7 @@ PYBIND11_MODULE(pyqcec, m) {
           "more than the configured threshold, the circuits are concluded to "
           "be non-equivalent. Defaults to :code:`1e-8`.");
 
+  // simulation options
   simulation.def(py::init<>())
       .def_readwrite(
           "fidelity_threshold", &Configuration::Simulation::fidelityThreshold,

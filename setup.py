@@ -1,4 +1,5 @@
 import os
+import pathlib
 import re
 import subprocess
 import sys
@@ -75,13 +76,14 @@ class CMakeBuild(build_ext):
         if sys.platform == "win32":
             cmake_args += ["-T", "ClangCl"]
 
-        if not os.path.exists(self.build_temp):
-            os.makedirs(self.build_temp)
-        else:
-            try:
-                os.remove(os.path.join(self.build_temp, "CMakeCache.txt"))
-            except OSError:
-                pass
+        build_dir = pathlib.Path(self.build_temp)
+        build_dir.mkdir(parents=True, exist_ok=True)
+        try:
+            pathlib.Path(build_dir / "CMakeCache.txt").unlink()
+        except FileNotFoundError:
+            # if the file doesn't exist, it's probably a fresh build
+            pass
+
         subprocess.check_call(["cmake", ext.sourcedir] + cmake_args, cwd=self.build_temp)
         subprocess.check_call(
             ["cmake", "--build", ".", "--target", ext.name.split(".")[-1]] + build_args,
