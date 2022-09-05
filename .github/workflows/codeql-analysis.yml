@@ -32,8 +32,7 @@ jobs:
         uses: github/codeql-action/init@v2
         with:
           languages: ${{ matrix.language }}
-          queries: +security-and-quality
-          paths-ignore: extern/**
+          config-file: .github/codeql-config.yml
 
       - if: matrix.language == 'cpp'
         name: Build C++

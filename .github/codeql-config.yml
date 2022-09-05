@@ -1,0 +1,7 @@
+name: GitHub CodeQL Config
+
+paths-ignore:
+  - extern
+
+queries:
+  - uses: security-and-quality
