@@ -20,7 +20,7 @@ jobs:
         with:
           submodules: recursive
       - name: Generate compilation database
-        run: CC=clang-14 CXX=clang++-14 cmake -S . -B build -DBINDINGS=ON -DBUILD_QCEC_TESTS=ON -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+        run: CC=clang-13 CXX=clang++-13 cmake -S . -B build -DBINDINGS=ON -DBUILD_QCEC_TESTS=ON -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
       - uses: cpp-linter/cpp-linter-action@v2
         id: linter
         env:
