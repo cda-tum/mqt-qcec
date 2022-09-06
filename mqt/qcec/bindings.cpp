@@ -41,8 +41,6 @@ static qc::QuantumComputation importCircuit(const py::object& circ) {
         "PyObject is neither py::str, QuantumCircuit, nor QasmQobjExperiment");
   }
 
-  int useless;
-
   return qc;
 }
 
