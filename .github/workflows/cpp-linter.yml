@@ -14,13 +14,13 @@ concurrency:
 
 jobs:
   cpp-linter:
-    runs-on: ubuntu-20.04
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v3
         with:
           submodules: recursive
       - name: Generate compilation database
-        run: CC=clang-12 CXX=clang++-12 cmake -S . -B build -DBINDINGS=ON -DBUILD_QCEC_TESTS=ON -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+        run: cmake -S . -B build -DBINDINGS=ON -DBUILD_QCEC_TESTS=ON -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
       - uses: cpp-linter/cpp-linter-action@v2
         id: linter
         env:
