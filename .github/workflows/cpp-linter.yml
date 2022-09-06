@@ -14,25 +14,33 @@ concurrency:
 
 jobs:
   cpp-linter:
-    runs-on: macos-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
         with:
           submodules: recursive
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
       - name: Generate compilation database
-        run: cmake -S . -B build -DBINDINGS=ON -DBUILD_QCEC_TESTS=ON -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
-      - uses: cpp-linter/cpp-linter-action@v2
+        run: CC=clang-14 CXX=clang++-14 cmake -S . -B build -DBINDINGS=ON -DBUILD_QCEC_TESTS=ON -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+      - name: Update clang-tidy-14
+        run: sudo apt-get install -y clang-tidy-14
+      - name: Install cpp-linter
+        run: pip install cpp-linter
+      - name: Run cpp-linter
         id: linter
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          version: 14
-          style: file
-          tidy-checks: ""
-          thread-comments: true
-          files-changed-only: false
-          ignore: build
-          database: build
+        run: |
+          cpp-linter \
+          --version=14 \
+          --style="file" \
+          --tidy-checks="" \
+          --thread-comments=true \
+          --files-changed-only=false \
+          --ignore="build" \
+          --database=build
       - name: Fail if linter found errors
         if: steps.linter.outputs.checks-failed > 0
         run: echo "Linter found errors" && exit 1
