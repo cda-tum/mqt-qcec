@@ -20,18 +20,20 @@ jobs:
         with:
           submodules: recursive
       - name: Generate compilation database
-        run: CXX=clang++-14 cmake -S . -B build -DBINDINGS=ON -DBUILD_QCEC_TESTS=ON -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
-      - uses: cpp-linter/cpp-linter-action@v2
+        run: CC=clang-14 CXX=clang++-14 cmake -S . -B build -DBINDINGS=ON -DBUILD_QCEC_TESTS=ON -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+      - name: Run cpp-linter
         id: linter
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          version: 14
-          style: file
-          tidy-checks: ""
-          thread-comments: true
-          ignore: build
-          database: build
+        run: |
+          pipx run cpp-linter \
+          --version=14 \
+          --style="file" \
+          --tidy-checks="" \
+          --thread-comments=true \
+          --files-changed-only=true \
+          --ignore="build" \
+          --database=build
       - name: Fail if linter found errors
         if: steps.linter.outputs.checks-failed > 0
         run: echo "Linter found errors" && exit 1
