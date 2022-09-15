@@ -17,7 +17,7 @@ concurrency:
 jobs:
   lint:
     runs-on: ubuntu-latest
-    name: Run my[py] linter
+    name: my[py] linter
     steps:
       - uses: actions/checkout@v3
       - name: Setup nox
