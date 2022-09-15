@@ -2,9 +2,9 @@ name: "CodeQL"
 
 on:
   push:
-    branches: [main, master]
+    branches: [main]
   pull_request:
-    branches: [main, master]
+    branches: [main]
   schedule:
     - cron: "15 21 * * 6"
 
@@ -12,9 +12,12 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  CMAKE_BUILD_PARALLEL_LEVEL: 3
+
 jobs:
   analyze:
-    name: Analyze
+    name: Analyze ${{ matrix.language }}
     runs-on: ubuntu-latest
     permissions:
       security-events: write
@@ -39,10 +42,12 @@ jobs:
           config-file: .github/codeql-config.yml
 
       - if: matrix.language == 'cpp'
-        name: Build C++
-        run: |
-          cmake -S . -B build -DBINDINGS=ON -DBUILD_QCEC_TESTS=ON
-          cmake --build build --parallel 4
+        name: Configure CMake
+        run: cmake -S . -B build -DBINDINGS=ON -DBUILD_QCEC_TESTS=ON
+
+      - if: matrix.language == 'cpp'
+        name: Build
+        run: cmake --build build
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v2

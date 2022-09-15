@@ -1,10 +1,11 @@
-name: Python-CI
+name: Python
 
 on:
   pull_request:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 env:
   FORCE_COLOR: 3
@@ -19,57 +20,47 @@ jobs:
     name: Run my[py] linter
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
-        with:
-          python-version: "3.9"
-      - uses: pre-commit/action@v3.0.0
-        with:
-          extra_args: --all-files --hook-stage manual mypy
+      - name: Setup nox
+        uses: excitedleigh/setup-nox@v2.1.0
+      - name: Run mypy via nox
+        run: nox -s mypy
 
-  tests:
+  python-tests:
+    name: Tests ${{ matrix.runs-on }}
     runs-on: ${{ matrix.runs-on }}
-    needs: [lint]
     strategy:
       fail-fast: false
       matrix:
         runs-on: [ubuntu-latest, macos-latest, windows-latest]
-    name: Tests on ${{ matrix.runs-on }}
     steps:
       - uses: actions/checkout@v3
         with:
           submodules: recursive
+          fetch-depth: 0
       - name: Setup nox
         uses: excitedleigh/setup-nox@v2.1.0
-
-      # On Linux, all supported Python versions are tested.
-      # For the other systems, only the minimum and the maximum Python version are tested.
-
       - name: Test on 🐍 3.7
         run: nox -s tests-3.7
-      - name: Test on 🐍 3.8
-        if: runner.os == 'Linux'
+      # Python 3.8 and 3.9 are only tested on Linux.
+      - if: runner.os == 'Linux'
+        name: Test on 🐍 3.8
         run: nox -s tests-3.8
-      - name: Test on 🐍 3.9
-        if: runner.os == 'Linux'
+      - if: runner.os == 'Linux'
+        name: Test on 🐍 3.9
         run: nox -s tests-3.9
-      - name: Test on 🐍 3.10
-        if: runner.os != 'Linux'
+      # Python 3.10 under Linux is tested separately as part of the coverage job.
+      - if: runner.os != 'Linux'
+        name: Test on 🐍 3.10
         run: nox -s tests-3.10
-
-  coverage:
-    runs-on: ubuntu-latest
-    name: Test and Coverage on 🐍 3.10
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          submodules: recursive
-      - uses: actions/setup-python@v4
+      # Setup Python 3.10, run the coverage job, and upload the coverage data.
+      - if: runner.os == 'Linux'
+        uses: actions/setup-python@v4
         name: Install Python
         with:
           python-version: "3.10"
-      - name: Install package
-        run: pip install -e ".[test,coverage]"
-      - name: Run coverage
-        run: pytest --cov --cov-report=xml
-      - name: Upload Coverage to Codecov
-        uses: codecov/codecov-action@v3
+      - if: runner.os == 'Linux'
+        name: Test and Coverage on 🐍 3.10
+        run: nox -s coverage -- --cov-report=xml
+      - if: runner.os == 'Linux'
+        name: Upload Coverage to Codecov
+        uses: codecov/codecov-action@v3.1.0

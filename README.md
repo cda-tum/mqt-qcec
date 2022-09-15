@@ -1,8 +1,9 @@
 [![PyPI](https://img.shields.io/pypi/v/mqt.qcec?logo=pypi&style=flat-square)](https://pypi.org/project/mqt.qcec/)
 ![OS](https://img.shields.io/badge/os-linux%20%7C%20macos%20%7C%20windows-blue?style=flat-square)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](https://opensource.org/licenses/MIT)
-[![CI](https://img.shields.io/github/workflow/status/cda-tum/qcec/CI?style=flat-square&logo=github&label=c%2B%2B)](https://github.com/cda-tum/qcec/actions/workflows/ci.yml)
-[![Bindings](https://img.shields.io/github/workflow/status/cda-tum/qcec/Deploy%20to%20PyPI?style=flat-square&logo=github&label=python)](https://github.com/cda-tum/qcec/actions/workflows/deploy.yml)
+[![CI](https://img.shields.io/github/workflow/status/cda-tum/qcec/C++?style=flat-square&logo=github&label=c%2B%2B)](https://github.com/cda-tum/qcec/actions/workflows/ci.yml)
+[![Python CI](https://img.shields.io/github/workflow/status/cda-tum/qcec/Python?style=flat-square&logo=github&label=python)](https://github.com/cda-tum/qcec/actions/workflows/python-ci.yml)
+[![Bindings](https://img.shields.io/github/workflow/status/cda-tum/qcec/Python%20Packaging?style=flat-square&logo=github&label=packaging)](https://github.com/cda-tum/qcec/actions/workflows/deploy.yml)
 [![Documentation](https://img.shields.io/readthedocs/qcec?logo=readthedocs&style=flat-square)](https://qcec.readthedocs.io/en/latest/)
 [![codecov](https://img.shields.io/codecov/c/github/cda-tum/qcec?style=flat-square&logo=codecov)](https://codecov.io/gh/cda-tum/qcec)
 
