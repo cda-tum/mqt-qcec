@@ -21,10 +21,9 @@ def tests(session: Session) -> None:
     Run as `nox -rs tests -- skip-install` to skip installing the package and its dependencies.
     """
     run_install = True
-    if session.posargs:
-        if "skip-install" in session.posargs:
-            run_install = False
-            session.posargs.remove("skip-install")
+    if session.posargs and "skip-install" in session.posargs:
+        run_install = False
+        session.posargs.remove("skip-install")
     if run_install:
         session.install("-e", ".[test]")
     session.run("pytest", *session.posargs)
@@ -38,10 +37,9 @@ def coverage(session: Session) -> None:
     Run as `nox -rs coverage -- skip-install` to skip installing the package and its dependencies.
     """
     run_install = True
-    if session.posargs:
-        if "skip-install" in session.posargs:
-            run_install = False
-            session.posargs.remove("skip-install")
+    if session.posargs and "skip-install" in session.posargs:
+        run_install = False
+        session.posargs.remove("skip-install")
     if run_install:
         session.install("-e", ".[coverage]")
     session.run("pytest", "--cov", *session.posargs)
@@ -66,10 +64,9 @@ def pylint(session: Session) -> None:
     """
     session.install("pylint")
     run_install = True
-    if session.posargs:
-        if "skip-install" in session.posargs:
-            run_install = False
-            session.posargs.remove("skip-install")
+    if session.posargs and "skip-install" in session.posargs:
+        run_install = False
+        session.posargs.remove("skip-install")
     if run_install:
         session.install("-e", ".")
     session.run("pylint", "mqt.qcec", "--extension-pkg-allow-list=mqt.qcec.pyqcec", *session.posargs)
@@ -93,10 +90,9 @@ def docs(session: Session) -> None:
     Run as `nox -rs docs -- skip-install` to skip installing the package and its dependencies.
     """
     run_install = True
-    if session.posargs:
-        if "skip-install" in session.posargs:
-            run_install = False
-            session.posargs.remove("skip-install")
+    if session.posargs and "skip-install" in session.posargs:
+        run_install = False
+        session.posargs.remove("skip-install")
     if run_install:
         session.install("-e", ".[docs]")
     session.chdir("docs")
