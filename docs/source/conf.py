@@ -1,7 +1,9 @@
-try:
-    from importlib import metadata
-except ImportError:
+import sys
+
+if sys.version_info < (3, 10, 0):
     import importlib_metadata as metadata
+else:
+    from importlib import metadata
 
 import pybtex.plugin
 from pybtex.style.formatting.unsrt import Style as UnsrtStyle

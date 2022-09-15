@@ -13,6 +13,8 @@ If you have any questions, feel free to contact us via `quantum.cda@xcit.tum.de 
    EquivalenceChecking
    CompilationFlowVerification
    Installation
+   DevelopmentGuide
+   Contributing
    Library
    Publications
 
