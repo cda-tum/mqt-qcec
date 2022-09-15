@@ -285,7 +285,7 @@ def generate_profile_name(optimization_level: int = 1, mode: AncillaMode = Ancil
 
 def write_profile_data_to_file(profile_data: dict[tuple[str, int], int], filename: Path) -> None:
     """Write the profile data to a file."""
-    with open(filename, "w+", encoding="utf-8") as f:
+    with Path(filename).open("w+", encoding="utf-8") as f:
         for (gate, controls), cost in profile_data.items():
             f.write(f"{gate} {controls} {cost}\n")
 
