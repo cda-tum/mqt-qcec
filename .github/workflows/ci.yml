@@ -38,7 +38,7 @@ jobs:
         with:
           submodules: recursive
       - name: Configure CMake
-        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DBUILD_QCEC_TESTS=ON ${{ matrix.config.toolchain }}
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DBUILD_QCEC_TESTS=ON -DBINDINGS=ON ${{ matrix.config.toolchain }}
       - name: Build
         run: cmake --build build --config Release
       - name: Test
@@ -47,7 +47,7 @@ jobs:
       - if: runner.os == 'Linux'
         name: Coverage
         run: |
-          cmake -S . -B buildCov -DCMAKE_BUILD_TYPE=Debug -DBUILD_QCEC_TESTS=ON -DCOVERAGE=ON
+          cmake -S . -B buildCov -DCMAKE_BUILD_TYPE=Debug -DBUILD_QCEC_TESTS=ON -DBINDINGS=ON -DCOVERAGE=ON
           cmake --build buildCov --config Debug
           cd buildCov/test
           ctest -C Debug --output-on-failure
