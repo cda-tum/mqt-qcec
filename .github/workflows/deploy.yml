@@ -1,12 +1,11 @@
-name: Deploy to PyPI
+name: Python Packaging
 
 on:
   release:
     types: [published]
-  push:
-    branches: [main, master]
   pull_request:
-    branches: [main, master]
+  push:
+    branches: [main]
   workflow_dispatch:
 
 concurrency:
@@ -15,7 +14,7 @@ concurrency:
 
 jobs:
   build_wheels:
-    name: Build ${{ matrix.os }}${{ matrix.archname }}${{ matrix.libc }} wheels
+    name: ${{ matrix.os }}${{ matrix.archname }}${{ matrix.libc }} wheels
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -66,7 +65,7 @@ jobs:
           path: ./wheelhouse/*.whl
 
   build_sdist:
-    name: Build source distribution
+    name: sdist
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
