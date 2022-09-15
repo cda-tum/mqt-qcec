@@ -1,8 +1,9 @@
 import os
-import pathlib
 import re
 import subprocess
 import sys
+from contextlib import suppress
+from pathlib import Path
 
 from setuptools import Extension, setup
 from setuptools.command.build_ext import build_ext
@@ -11,7 +12,7 @@ from setuptools.command.build_ext import build_ext
 class CMakeExtension(Extension):
     def __init__(self, name, sourcedir=""):
         Extension.__init__(self, name, sources=[])
-        self.sourcedir = os.path.abspath(sourcedir)
+        self.sourcedir = str(Path(sourcedir).resolve())
 
 
 class CMakeBuild(build_ext):
@@ -20,10 +21,7 @@ class CMakeBuild(build_ext):
 
         version = get_version(relative_to=__file__)
 
-        extdir = os.path.abspath(os.path.dirname(self.get_ext_fullpath(ext.name)))
-        # required for auto-detection of auxiliary "native" libs
-        if not extdir.endswith(os.path.sep):
-            extdir += os.path.sep
+        extdir = str(Path(self.get_ext_fullpath(ext.name)).parent.resolve())
 
         cmake_generator = os.environ.get("CMAKE_GENERATOR", "")
         cfg = "Debug" if self.debug else "Release"
@@ -69,20 +67,16 @@ class CMakeBuild(build_ext):
                 cmake_args += ["-DCMAKE_OSX_ARCHITECTURES={}".format(";".join(archs))]
 
         # Set CMAKE_BUILD_PARALLEL_LEVEL to control the parallel build level across all generators.
-        if "CMAKE_BUILD_PARALLEL_LEVEL" not in os.environ:
-            if hasattr(self, "parallel") and self.parallel:
-                build_args += [f"-j{self.parallel}"]
+        if "CMAKE_BUILD_PARALLEL_LEVEL" not in os.environ and hasattr(self, "parallel") and self.parallel:
+            build_args += [f"-j{self.parallel}"]
 
         if sys.platform == "win32":
             cmake_args += ["-T", "ClangCl"]
 
-        build_dir = pathlib.Path(self.build_temp)
+        build_dir = Path(self.build_temp)
         build_dir.mkdir(parents=True, exist_ok=True)
-        try:
-            pathlib.Path(build_dir / "CMakeCache.txt").unlink()
-        except FileNotFoundError:
-            # if the file doesn't exist, it's probably a fresh build
-            pass
+        with suppress(FileNotFoundError):
+            Path(build_dir / "CMakeCache.txt").unlink()
 
         subprocess.check_call(["cmake", ext.sourcedir] + cmake_args, cwd=self.build_temp)
         subprocess.check_call(
