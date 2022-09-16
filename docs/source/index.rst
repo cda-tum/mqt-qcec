@@ -3,20 +3,45 @@ Welcome to QCEC's documentation!
 
 QCEC is a tool for :doc:`quantum circuit equivalence checking <EquivalenceChecking>` developed as part of the *Munich Quantum Toolkit* (*MQT*) [#]_ by the `Chair for Design Automation <https://www.cda.cit.tum.de/>`_ at the `Technical University of Munich <https://www.tum.de>`_. It builds upon `our quantum functionality representation (QFR) <https://github.com/cda-tum/qfr>`_, `our decision diagram (DD) package <https://github.com/cda-tum/dd_package.git>`_, and `our ZX-diagram package <https://github.com/cda-tum/zx.git>`_.
 
-If you have any questions, feel free to contact us via `quantum.cda@xcit.tum.de <mailto:quantum.cda@xcit.tum.de>`_ or by creating an issue on `GitHub <https://github.com/cda-tum/qcec/issues>`_.
+We recommend you to start with the :doc:`installation instructions <Installation>`.
+Then proceed to the :doc:`quickstart guide <Quickstart>` and read the :doc:`reference documentation <library/Library>`.
+If you are interested in the theory behind QCEC, have a look at the publications in the :doc:`publication list <Publications>`.
+
+We appreciate any feedback and contributions to the project. If you want to contribute, you can find more information in the :doc:`Contribution <Contributing>` guide. If you are having trouble with the installation or the usage of QCEC, please let us know at our :doc:`Support <Support>` page or by reaching out to us at `quantum.cda@xcit.tum.de <mailto:quantum.cda@xcit.tum.de>`_.
 
 ----
 
-.. toctree::
-   :maxdepth: 3
+ .. toctree::
+    :hidden:
 
-   EquivalenceChecking
-   CompilationFlowVerification
-   Installation
-   DevelopmentGuide
-   Contributing
-   Library
-   Publications
+    self
+
+ .. toctree::
+    :maxdepth: 2
+    :caption: User Guide
+    :glob:
+
+    Installation
+    Quickstart
+    EquivalenceChecking
+    CompilationFlowVerification
+    Publications
+
+ .. toctree::
+    :maxdepth: 2
+    :caption: Developers
+    :glob:
+
+    Contributing
+    DevelopmentGuide
+    Support
+
+ .. toctree::
+    :maxdepth: 6
+    :caption: API Reference
+    :glob:
+
+    library/Library
 
 ----
 

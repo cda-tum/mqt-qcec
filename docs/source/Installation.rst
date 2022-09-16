@@ -12,6 +12,27 @@ We encourage installing QCEC via pip (preferably in a `virtual environment <http
 
 In most practical cases (under 64-bit Linux, MacOS incl. Apple Silicon, and Windows), this requires no compilation and merely downloads and installs a platform-specific pre-built wheel.
 
+.. note::
+    In order to set up a virtual environment, you can use the following commands:
+
+    .. code-block:: console
+
+        $ python3 -m venv venv
+        $ source venv/bin/activate
+
+    If you are using Windows, you can use the following commands instead:
+
+    .. code-block:: console
+
+        $ python3 -m venv venv
+        $ venv\Scripts\activate.bat
+
+    It is recommended to make sure that you are using the latest version of pip, setuptools, and wheel before trying to install the project:
+
+    .. code-block:: console
+
+        (venv) $ pip install --upgrade pip setuptools wheel
+
 A Detailed Walk Through
 #######################
 
