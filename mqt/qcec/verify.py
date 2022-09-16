@@ -14,7 +14,18 @@ def verify(
     Wraps creating an instance of :class:`EquivalenceCheckingManager <.EquivalenceCheckingManager>`,
     calling :meth:`EquivalenceCheckingManager.run`,
     and calling :meth:`EquivalenceCheckingManager.get_result`.
-    If ``configuration`` is not ``None``, it is used to configure the ``EquivalenceCheckingManager``.
+
+    There are two ways of configuring the equivalence checking process:
+
+    1. Pass a :class:`Configuration <.Configuration>` instance as the ``configuration`` argument.
+
+    2. Pass keyword arguments to this function. These are directly passed to the :meth:`constructor <.EquivalenceCheckingManager.__init__>` of the :class:`EquivalenceCheckingManager`.
+
+    :param circ1: The first circuit.
+    :param circ2: The second circuit.
+    :param configuration: The configuration to use for the equivalence checking process.
+    :param kwargs: Keyword arguments to pass to the :class:`EquivalenceCheckingManager <.EquivalenceCheckingManager>` constructor.
+    :return: The results of the equivalence checking process.
     """
 
     if kwargs:
