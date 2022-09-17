@@ -66,12 +66,26 @@ public:
   // configuration options for the simulation scheme
   struct Simulation {
     double      fidelityThreshold = 1e-8;
-    std::size_t maxSims =
-        std::max(16U, std::thread::hardware_concurrency() - 2U);
-    StateType   stateType      = StateType::ComputationalBasis;
-    std::size_t seed           = 0U;
-    bool        storeCEXinput  = false;
-    bool        storeCEXoutput = false;
+    std::size_t maxSims           = computeMaxSims();
+    StateType   stateType         = StateType::ComputationalBasis;
+    std::size_t seed              = 0U;
+    bool        storeCEXinput     = false;
+    bool        storeCEXoutput    = false;
+
+    // this function makes sure that the maximum number of simulations is
+    // configured properly.
+    static std::size_t computeMaxSims() {
+      constexpr std::size_t defaultMaxSims                 = 16U;
+      constexpr std::size_t defaultConfiguredOtherCheckers = 2U;
+      const auto            systemThreads = std::thread::hardware_concurrency();
+      // catch the case where hardware_concurrency() returns 0 or the other
+      // pre-configured checkers already use up all the available threads
+      if (systemThreads < defaultConfiguredOtherCheckers) {
+        return defaultMaxSims;
+      }
+      return std::max(defaultMaxSims,
+                      systemThreads - defaultConfiguredOtherCheckers);
+    }
   };
 
   Execution     execution{};
