@@ -1,7 +1,9 @@
-try:
-    from importlib import metadata
-except ImportError:
+import sys
+
+if sys.version_info < (3, 10, 0):
     import importlib_metadata as metadata
+else:
+    from importlib import metadata
 
 import pybtex.plugin
 from pybtex.style.formatting.unsrt import Style as UnsrtStyle
@@ -13,6 +15,8 @@ author = "Lukas Burgholzer"
 
 release = metadata.version("mqt.qcec")
 version = ".".join(release.split(".")[:3])
+language = "en"
+copyright = "Chair for Design Automation, Technical University of Munich"
 
 # -- General configuration ---------------------------------------------------
 extensions = [
@@ -27,7 +31,19 @@ extensions = [
     "sphinxcontrib.bibtex",
     "sphinx_copybutton",
     "hoverxref.extension",
+    "nbsphinx",
 ]
+
+nbsphinx_execute = "auto"  # auto, never
+
+highlight_language = "python3"
+
+nbsphinx_execute_arguments = [
+    "--InlineBackend.figure_formats={'png2x'}",
+    "--InlineBackend.rc=figure.dpi=96",
+]
+
+nbsphinx_kernel_name = "python3"
 
 autosectionlabel_prefix_document = True
 
@@ -45,6 +61,7 @@ hoverxref_role_types = {
     "attr": "tooltip",
     "property": "tooltip",
 }
+exclude_patterns = ["_build", "build", "**.ipynb_checkpoints", "Thumbs.db", ".DS_Store", ".env"]
 
 
 class CDAStyle(UnsrtStyle):
@@ -58,7 +75,7 @@ pybtex.plugin.register_plugin("pybtex.style.formatting", "cda_style", CDAStyle)
 bibtex_bibfiles = ["refs.bib"]
 bibtex_default_style = "cda_style"
 
-copybutton_prompt_text = r"(?:\(venv\) )?\$ "
+copybutton_prompt_text = r"(?:\(venv\) )?(?:\[.*\] )?\$ "
 copybutton_prompt_is_regexp = True
 copybutton_line_continuation_character = "\\"
 
@@ -66,3 +83,5 @@ autosummary_generate = True
 
 # -- Options for HTML output -------------------------------------------------
 html_theme = "sphinx_rtd_theme"
+
+html_baseurl = "https://qcec.readthedocs.io/en/latest/"

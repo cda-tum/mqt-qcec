@@ -22,8 +22,28 @@ def verify_compilation(
     **kwargs: Any,
 ) -> EquivalenceCheckingManager.Results:
     """
-    Verify that the ``compiled_circuit`` (compiled with a certain ``optimization_level`` amd ``ancilla_mode``) is equivalent to the ``original_circuit``.
-    If ``configuration`` is not ``None``, it is used to configure the ``EquivalenceCheckingManager``.
+    Similar to :func:`verify <.verify>`, but uses a dedicated compilation flow profile to guide the equivalence checking process.
+    The compilation flow profile is determined by the ``optimization_level`` and ``ancilla_mode`` arguments.
+
+    There are two ways of configuring the equivalence checking process:
+
+    1. Pass a :class:`Configuration <.Configuration>` instance as the ``configuration`` argument.
+
+    2. Pass keyword arguments to this function. These are directly passed to the :meth:`constructor <.EquivalenceCheckingManager.__init__>` of the :class:`EquivalenceCheckingManager`.
+
+    :param original_circuit: The original circuit.
+    :type original_circuit: QuantumCircuit | str
+    :param compiled_circuit: The compiled circuit.
+    :type compiled_circuit: QuantumCircuit | str
+    :param optimization_level: The optimization level used for compiling the circuit (0, 1, 2, or 3).
+    :type optimization_level: int
+    :param ancilla_mode: The `ancilla mode <.AncillaMode>` used for realizing multi-controlled Toffoli gates, as available in Qiskit
+    :type ancilla_mode: AncillaMode
+    :param configuration: The configuration to use for the equivalence checking process.
+    :type configuration: Configuration
+    :param kwargs: Keyword arguments to pass to the :class:`EquivalenceCheckingManager <.EquivalenceCheckingManager>` constructor.
+    :return: The results of the equivalence checking process.
+    :rtype: EquivalenceCheckingManager.Results
     """
 
     if kwargs:
