@@ -24,7 +24,7 @@ You can contribute in several ways:
     Propose new features at https://github.com/cda-tum/qcec/issues using the *✨ Feature request* issue template. Please make sure to fill out all relevant information in the respective issue form.
 
 - ✨ Implement New Features
-    Look through the `GitHub Issues <https://github.com/cda-tum/qcec/issues>` for features. Anything tagged with "feature" is open to whoever wants to implement it. We highly appreciate external contributions to the project.
+    Look through the `GitHub Issues <https://github.com/cda-tum/qcec/issues>`_ for features. Anything tagged with "feature" is open to whoever wants to implement it. We highly appreciate external contributions to the project.
 
 - 📝 Write Documentation
     QCEC could always use some more `documentation <https://qcec.readthedocs.io/en/latest/>`_, and we appreciate any help with that.
