@@ -115,8 +115,7 @@ TEST_F(ZXTest, CloseButNotEqual) {
                                                          qcAlternative, config);
 
   ecm->run();
-  EXPECT_EQ(ecm->equivalence(),
-            ec::EquivalenceCriterion::EquivalentUpToGlobalPhase);
+  EXPECT_EQ(ecm->equivalence(), ec::EquivalenceCriterion::Equivalent);
 }
 
 TEST_F(ZXTest, NotEqual) {
@@ -223,6 +222,20 @@ TEST_F(ZXTest, ZXConfiguredForInvalidCircuitSequential) {
 
   EXPECT_EQ(ecm->getResults().equivalence,
             ec::EquivalenceCriterion::NoInformation);
+}
+
+TEST_F(ZXTest, GlobalPhase) {
+  auto qc = qc::QuantumComputation(1);
+  qc.rz(0, zx::PI / 8);
+
+  auto qcPrime = qc::QuantumComputation(1);
+  qcPrime.phase(0, zx::PI / 8);
+
+  ecm = std::make_unique<ec::EquivalenceCheckingManager>(qc, qcPrime, config);
+  ecm->run();
+
+  EXPECT_EQ(ecm->getResults().equivalence,
+            ec::EquivalenceCriterion::EquivalentUpToGlobalPhase);
 }
 
 class ZXTestCompFlow : public testing::TestWithParam<std::string> {

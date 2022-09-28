@@ -1,14 +1,18 @@
 /build*
 /cmake-build-*
-/.idea/*
-!/.idea/runConfigurations
-!/.idea/cmake.xml
-.cache/
+.idea/*
+!.idea/runConfigurations
+!.idea/cmake.xml
+.vscode/*
+*~
 
 __pycache__/
 *.so
 *.py[cod]
 
+*.egg
+*.eggs
+*.egg-info
 bin/
 build/
 develop-eggs/
@@ -19,10 +23,17 @@ lib64/
 parts/
 sdist/
 var/
-*.egg-info/
 .installed.cfg
-*.egg
+
+.cache/
 .pytest_cache/
+.coverage
+.coverage*
+.tox
+coverage.xml
+htmlcov
+
+docs/_build
 
 .env
 .venv

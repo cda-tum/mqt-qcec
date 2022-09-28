@@ -21,16 +21,16 @@ namespace py = pybind11;
 using namespace pybind11::literals;
 
 namespace ec {
-qc::QuantumComputation importCircuit(const py::object& circ) {
-  py::object quantumCircuit =
+static qc::QuantumComputation importCircuit(const py::object& circ) {
+  const py::object quantumCircuit =
       py::module::import("qiskit").attr("QuantumCircuit");
-  py::object pyQasmQobjExperiment =
+  const py::object pyQasmQobjExperiment =
       py::module::import("qiskit.qobj").attr("QasmQobjExperiment");
 
   auto qc = qc::QuantumComputation();
 
   if (py::isinstance<py::str>(circ)) {
-    auto&& file = circ.cast<std::string>();
+    const auto file = circ.cast<std::string>();
     qc.import(file);
   } else if (py::isinstance(circ, quantumCircuit)) {
     qc::qiskit::QuantumCircuit::import(qc, circ);
@@ -44,48 +44,45 @@ qc::QuantumComputation importCircuit(const py::object& circ) {
   return qc;
 }
 
-std::unique_ptr<EquivalenceCheckingManager>
+static std::unique_ptr<EquivalenceCheckingManager>
 createManagerFromConfiguration(const py::object& circ1, const py::object& circ2,
-                               const Configuration& configuration) noexcept {
+                               const Configuration& configuration) {
   qc::QuantumComputation qc1;
   try {
     qc1 = importCircuit(circ1);
   } catch (const std::exception& ex) {
-    std::cerr << "Could not import first circuit: " << ex.what() << std::endl;
-    return {};
+    throw std::runtime_error("Could not import first circuit: " +
+                             std::string(ex.what()));
   }
 
   qc::QuantumComputation qc2;
   try {
     qc2 = importCircuit(circ2);
   } catch (const std::exception& ex) {
-    std::cerr << "Could not import second circuit: " << ex.what() << std::endl;
-    return {};
+    throw std::runtime_error("Could not import second circuit: " +
+                             std::string(ex.what()));
   }
 
-  try {
-    return std::make_unique<EquivalenceCheckingManager>(qc1, qc2,
-                                                        configuration);
-  } catch (const std::exception& ex) {
-    std::cerr << "Failed to construct equivalence checking manager: "
-              << ex.what() << std::endl;
-    return {};
-  }
+  return std::make_unique<EquivalenceCheckingManager>(qc1, qc2, configuration);
 }
 
-std::unique_ptr<EquivalenceCheckingManager> createManagerFromOptions(
+static std::unique_ptr<EquivalenceCheckingManager> createManagerFromOptions(
     const py::object& circ1, const py::object& circ2,
     // Execution
-    dd::fp      numericalTolerance = dd::ComplexTable<>::tolerance(),
-    bool        parallel           = true,
-    std::size_t nthreads = std::max(2U, std::thread::hardware_concurrency()),
-    std::chrono::seconds timeout = 0s, bool runConstructionChecker = false,
-    bool runSimulationChecker = true, bool runAlternatingChecker = true,
-    bool runZXChecker = true,
+    const dd::fp      numericalTolerance = dd::ComplexTable<>::tolerance(),
+    const bool        parallel           = true,
+    const std::size_t nthreads           = std::max(2U,
+                                                    std::thread::hardware_concurrency()),
+    const std::chrono::seconds timeout   = 0s,
+    const bool                 runConstructionChecker = false,
+    const bool                 runSimulationChecker   = true,
+    const bool runAlternatingChecker = true, const bool runZXChecker = true,
     // Optimization
-    bool fixOutputPermutationMismatch = false, bool fuseSingleQubitGates = true,
-    bool reconstructSWAPs = true, bool removeDiagonalGatesBeforeMeasure = false,
-    bool transformDynamicCircuit = false, bool reorderOperations = true,
+    const bool fixOutputPermutationMismatch = false,
+    const bool fuseSingleQubitGates = true, const bool reconstructSWAPs = true,
+    const bool removeDiagonalGatesBeforeMeasure = false,
+    const bool transformDynamicCircuit          = false,
+    const bool reorderOperations                = true,
     // Application
     const ApplicationSchemeType& constructionScheme =
         ApplicationSchemeType::Proportional,
@@ -95,14 +92,16 @@ std::unique_ptr<EquivalenceCheckingManager> createManagerFromOptions(
         ApplicationSchemeType::Proportional,
     const std::string& profile = {},
     // Functionality
-    double traceThreshold = 1e-8,
+    const double traceThreshold = 1e-8,
     // Simulation
-    double           fidelityThreshold = 1e-8,
-    std::size_t      maxSims           = std::max(16U,
-                                                  std::thread::hardware_concurrency() - 2U),
-    const StateType& stateType         = StateType::ComputationalBasis,
-    std::size_t seed = 0U, bool storeCEXinput = false,
-    bool storeCEXoutput = false) {
+    const double fidelityThreshold = 1e-8,
+
+    const std::size_t maxSims   = std::max(16U,
+                                           std::thread::hardware_concurrency() -
+                                               2U),
+    const StateType&  stateType = StateType::ComputationalBasis,
+    const std::size_t seed = 0U, const bool storeCEXinput = false,
+    const bool storeCEXoutput = false) {
   Configuration configuration{};
   // Execution
   configuration.execution.numericalTolerance     = numericalTolerance;
@@ -150,18 +149,11 @@ std::unique_ptr<EquivalenceCheckingManager> createManagerFromOptions(
   return createManagerFromConfiguration(circ1, circ2, configuration);
 }
 
-ec::EquivalenceCheckingManager::Results
-verify(const py::object& circ1, const py::object& circ2,
-       const Configuration& configuration = Configuration()) {
-  auto ecm = createManagerFromConfiguration(circ1, circ2, configuration);
-  ecm->run();
-  return ecm->getResults();
-}
-
 PYBIND11_MODULE(pyqcec, m) {
   m.doc() = "Python interface for the MQT QCEC quantum circuit equivalence "
             "checking tool";
 
+  // Application scheme enum
   py::enum_<ApplicationSchemeType>(m, "ApplicationScheme")
       .value("sequential", ApplicationSchemeType::Sequential,
              "Applies all gates from the first circuit, before proceeding with "
@@ -188,15 +180,19 @@ PYBIND11_MODULE(pyqcec, m) {
           "from the first circuit is applied *f(g)* gates are applied from the "
           "second circuit. Referred to as *compilation_flow* in "
           ":cite:p:`burgholzer2020verifyingResultsIBM`.")
+      // allow construction from a string
       .def(py::init([](const std::string& str) -> ApplicationSchemeType {
         return applicationSchemeFromString(str);
       }))
+      // provide a string representation of the enum
       .def(
           "__str__",
-          [](ApplicationSchemeType scheme) { return toString(scheme); },
+          [](const ApplicationSchemeType scheme) { return toString(scheme); },
           py::prepend());
+  // allow implicit conversion from string to ApplicationSchemeType
   py::implicitly_convertible<std::string, ApplicationSchemeType>();
 
+  // State type enum
   py::enum_<StateType>(m, "StateType")
       .value("computational_basis", StateType::ComputationalBasis,
              "Randomly choose computational basis states. Also referred to as "
@@ -208,14 +204,18 @@ PYBIND11_MODULE(pyqcec, m) {
       .value("stabilizer", StateType::Stabilizer,
              "Randomly choose a stabilizer state by creating a random Clifford "
              "circuit. Also referred to as *global_random*.")
+      // allow construction from a string
       .def(py::init([](const std::string& str) -> StateType {
         return stateTypeFromString(str);
       }))
+      // provide a string representation of the enum
       .def(
-          "__str__", [](StateType type) { return toString(type); },
+          "__str__", [](const StateType type) { return toString(type); },
           py::prepend());
+  // allow implicit conversion from string to StateType
   py::implicitly_convertible<std::string, StateType>();
 
+  // Equivalence criterion enum
   py::enum_<EquivalenceCriterion>(m, "EquivalenceCriterion")
       .value("no_information", EquivalenceCriterion::NoInformation,
              "No information on the equivalence is available. This can be due "
@@ -243,12 +243,16 @@ PYBIND11_MODULE(pyqcec, m) {
              "whenever the :ref:`ZX-calculus checker "
              "<EquivalenceChecking:ZX-Calculus Equivalence Checker>` could not "
              "reduce the combined circuit to the identity.")
+      // allow construction from a string
       .def(py::init([](const std::string& str) -> EquivalenceCriterion {
         return fromString(str);
       }))
+      // provide a string representation of the enum
       .def(
-          "__str__", [](EquivalenceCriterion crit) { return toString(crit); },
+          "__str__",
+          [](const EquivalenceCriterion crit) { return toString(crit); },
           py::prepend());
+  // allow implicit conversion from string to EquivalenceCriterion
   py::implicitly_convertible<std::string, EquivalenceCriterion>();
 
   // Class definitions
@@ -257,7 +261,6 @@ PYBIND11_MODULE(pyqcec, m) {
       "Main class for orchestrating the equivalence check");
   py::class_<EquivalenceCheckingManager::Results> results(
       ecm, "Results", "Equivalence checking results");
-
   py::class_<Configuration> configuration(
       m, "Configuration",
       "Configuration options for the QCEC quantum circuit equivalence checking "
@@ -464,6 +467,7 @@ PYBIND11_MODULE(pyqcec, m) {
            "Prints a JSON-formatted representation of all the information "
            "present in the :class:`.EquivalenceCheckingManager`");
 
+  // EquivalenceCheckingManager::Results bindings
   results.def(py::init<>())
       .def_readwrite("preprocessing_time",
                      &EquivalenceCheckingManager::Results::preprocessingTime,
@@ -501,6 +505,7 @@ PYBIND11_MODULE(pyqcec, m) {
       .def("__repr__", &EquivalenceCheckingManager::Results::toString,
            "Prints a JSON-formatted representation of the results.");
 
+  // Configuration sub-classes
   py::class_<Configuration::Execution> execution(
       configuration, "Execution",
       "Options that orchestrate the :meth:`~.EquivalenceCheckingManager.run` "
@@ -536,6 +541,7 @@ PYBIND11_MODULE(pyqcec, m) {
       .def("__repr__", &Configuration::toString,
            "Prints a JSON-formatted representation of the configuration.");
 
+  // execution options
   execution.def(py::init<>())
       .def_readwrite("parallel", &Configuration::Execution::parallel,
                      "Set whether execution should happen in parallel. "
@@ -584,6 +590,7 @@ PYBIND11_MODULE(pyqcec, m) {
                      "diagram package. Defaults to :code:`~2e-13` and should "
                      "only be changed by users who know what they are doing.");
 
+  // optimization options
   optimizations.def(py::init<>())
       .def_readwrite(
           "fix_output_permutation_mismatch",
@@ -637,6 +644,7 @@ PYBIND11_MODULE(pyqcec, m) {
           "graph for the operations and, then, traversing it in a "
           "breadth-first fashion. Defaults to :code:`True`.");
 
+  // application options
   application.def(py::init<>())
       .def_readwrite(
           "construction_scheme",
@@ -665,6 +673,7 @@ PYBIND11_MODULE(pyqcec, m) {
           "a single-qubit X gate has a cost of :code:`1`, while :code:`X 2 15` "
           "denotes that a Toffoli gate has a cost of :code:`15`.");
 
+  // functionality options
   functionality.def(py::init<>())
       .def_readwrite(
           "trace_threshold", &Configuration::Functionality::traceThreshold,
@@ -687,6 +696,7 @@ PYBIND11_MODULE(pyqcec, m) {
           "more than the configured threshold, the circuits are concluded to "
           "be non-equivalent. Defaults to :code:`1e-8`.");
 
+  // simulation options
   simulation.def(py::init<>())
       .def_readwrite(
           "fidelity_threshold", &Configuration::Simulation::fidelityThreshold,
@@ -730,14 +740,6 @@ PYBIND11_MODULE(pyqcec, m) {
           "store a full representation of a quantum state increases "
           "exponentially, this is only recommended for a small number of "
           "qubits and defaults to :code:`False`.");
-
-  m.def("verify", &verify, "circ1"_a, "circ2"_a,
-        "config"_a = ec::Configuration{},
-        "Convenience function for verifying the equivalence of two circuits. "
-        "Wraps creating an instance of :class:`EquivalenceCheckingManager "
-        "<.EquivalenceCheckingManager>`, calling "
-        ":meth:`EquivalenceCheckingManager.run` and calling "
-        ":meth:`EquivalenceCheckingManager.get_result`.");
 
 #ifdef VERSION_INFO
   m.attr("__version__") = MACRO_STRINGIFY(VERSION_INFO);

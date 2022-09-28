@@ -1,28 +1,31 @@
 version: 2
 updates:
   - package-ecosystem: "gitsubmodule"
-    directory:         "/"
+    directory: "/"
     schedule:
       interval: "weekly"
-      day:      "friday"
-      time:     "06:00"
+      day: "friday"
+      time: "06:00"
+      timezone: "Europe/Vienna"
     assignees:
       - "burgholzer"
 
   - package-ecosystem: "github-actions"
-    directory:         "/"
+    directory: "/"
     schedule:
       interval: "weekly"
-      day:      "friday"
-      time:     "06:00"
+      day: "friday"
+      time: "06:00"
+      timezone: "Europe/Vienna"
     assignees:
       - "burgholzer"
 
   - package-ecosystem: "pip"
-    directory:         "/"
+    directory: "/"
     schedule:
       interval: "weekly"
-      day:      "friday"
-      time:     "06:00"
+      day: "friday"
+      time: "06:00"
+      timezone: "Europe/Vienna"
     assignees:
       - "burgholzer"

@@ -8,6 +8,10 @@ on:
     branches:
       - main
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   cpp-linter:
     runs-on: ubuntu-22.04
@@ -16,27 +20,20 @@ jobs:
         with:
           submodules: recursive
       - name: Generate compilation database
-        run: CXX=clang++-14 cmake -S . -B build -DBINDINGS=ON -DBUILD_QCEC_TESTS=ON -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
-      - uses: actions/setup-python@v4
-        name: Install Python
-        with:
-          python-version: '3.9'
-      - name: Install linter python package
-        run: python3 -m pip install git+https://github.com/cpp-linter/cpp-linter-action@v1
-      - name: Run linter
+        run: CC=clang-14 CXX=clang++-14 cmake -S . -B build -DBINDINGS=ON -DBUILD_QCEC_TESTS=ON -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+      - name: Run cpp-linter
         id: linter
-        run: |
-              cpp-linter \
-              --version=14 \
-              --style=file \
-              --tidy-checks='' \
-              --lines-changed-only=true \
-              --files-changed-only=true \
-              --thread-comments=true \
-              --ignore=build \
-              --database=${{ github.event.repository.name }}/build
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          pipx run cpp-linter \
+          --version=14 \
+          --style="file" \
+          --tidy-checks="" \
+          --thread-comments=true \
+          --files-changed-only=true \
+          --ignore="build" \
+          --database=build
       - name: Fail if linter found errors
         if: steps.linter.outputs.checks-failed > 0
         run: echo "Linter found errors" && exit 1

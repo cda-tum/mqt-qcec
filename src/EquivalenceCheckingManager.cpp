@@ -20,7 +20,7 @@ void EquivalenceCheckingManager::setupAncillariesAndGarbage() {
       qc1.getNqubits() > qc2.getNqubits() ? this->qc1 : this->qc2;
   auto& smallerCircuit =
       qc1.getNqubits() > qc2.getNqubits() ? this->qc2 : this->qc1;
-  dd::QubitCount qubitDifference =
+  const dd::QubitCount qubitDifference =
       largerCircuit.getNqubits() - smallerCircuit.getNqubits();
 
   std::vector<std::pair<dd::Qubit, dd::Qubit>> removed{};
@@ -30,7 +30,7 @@ void EquivalenceCheckingManager::setupAncillariesAndGarbage() {
   std::vector<bool> garbage(nqubits);
 
   for (dd::QubitCount i = 0; i < qubitDifference; ++i) {
-    auto logicalQubitIndex =
+    const auto logicalQubitIndex =
         qc::QuantumComputation::getHighestLogicalQubitIndex(
             largerCircuit.initialLayout);
     garbage[logicalQubitIndex] =
@@ -43,7 +43,8 @@ void EquivalenceCheckingManager::setupAncillariesAndGarbage() {
 
   // reverse iterate over the removed qubits and add them back into the larger
   // circuit as ancillary
-  for (auto it = removed.rbegin(); it != removed.rend(); ++it) {
+  const auto rend = removed.rend();
+  for (auto it = removed.rbegin(); it != rend; ++it) {
     largerCircuit.addAncillaryQubit(it->first, it->second);
     // restore garbage
     if (garbage[largerCircuit.getNqubits() - 1]) {
@@ -67,17 +68,18 @@ void EquivalenceCheckingManager::fixOutputPermutationMismatch() {
   auto&       largerGarbage = largerCircuit.garbage;
 
   for (const auto& [lPhysical, lLogical] : largerOutput) {
-    dd::Qubit outputQubitInLargerCircuit = lLogical;
-    dd::Qubit nout                       = 1;
+    const dd::Qubit outputQubitInLargerCircuit = lLogical;
+    dd::Qubit       nout                       = 1;
     for (dd::Qubit i = 0; i < outputQubitInLargerCircuit; ++i) {
       if (!largerGarbage[i]) {
         ++nout;
       }
     }
 
-    dd::QubitCount outcount        = nout;
-    bool           existsInSmaller = false;
-    for (dd::QubitCount i = 0; i < smallerCircuit.getNqubits(); ++i) {
+    auto       outcount        = static_cast<dd::QubitCount>(nout);
+    bool       existsInSmaller = false;
+    const auto nqubits         = smallerCircuit.getNqubits();
+    for (dd::QubitCount i = 0U; i < nqubits; ++i) {
       if (!smallerGarbage[i]) {
         --outcount;
       }
@@ -91,7 +93,7 @@ void EquivalenceCheckingManager::fixOutputPermutationMismatch() {
       continue;
     }
 
-    std::cerr << "Uncorrected mismatch in output qubits!" << std::endl;
+    std::cerr << "Uncorrected mismatch in output qubits!\n";
   }
 }
 
@@ -150,8 +152,7 @@ void EquivalenceCheckingManager::run() {
   results.equivalence = EquivalenceCriterion::NoInformation;
 
   if (!configuration.anythingToExecute()) {
-    std::clog << "Nothing to be executed. Check your configuration!"
-              << std::endl;
+    std::clog << "Nothing to be executed. Check your configuration!\n";
     return;
   }
 
@@ -196,8 +197,7 @@ EquivalenceCheckingManager::EquivalenceCheckingManager(
   if (this->qc1.getNqubitsWithoutAncillae() !=
       this->qc2.getNqubitsWithoutAncillae()) {
     std::clog << "[QCEC] Warning: circuits have different number of primary "
-                 "inputs! Proceed with caution!"
-              << std::endl;
+                 "inputs! Proceed with caution!\n";
   }
 
   // try to fix a potential mismatch in the output permutations of both
@@ -235,7 +235,7 @@ void EquivalenceCheckingManager::checkSequential() {
     timeoutThread =
         std::thread([this, timeout = configuration.execution.timeout] {
           std::unique_lock doneLock(doneMutex);
-          auto             finished =
+          const auto       finished =
               doneCond.wait_for(doneLock, timeout, [this] { return done; });
           // if the thread has already finished within the timeout, nothing
           // has to be done
@@ -248,7 +248,7 @@ void EquivalenceCheckingManager::checkSequential() {
   if (configuration.execution.runSimulationChecker) {
     checkers.emplace_back(
         std::make_unique<DDSimulationChecker>(qc1, qc2, configuration));
-    auto* simulationChecker =
+    auto* const simulationChecker =
         dynamic_cast<DDSimulationChecker*>(checkers.back().get());
     while (results.startedSimulations < configuration.simulation.maxSims &&
            !done) {
@@ -265,8 +265,7 @@ void EquivalenceCheckingManager::checkSequential() {
       if (result == EquivalenceCriterion::NoInformation) {
         if (!done) {
           std::clog << "Simulation run returned without any information. "
-                       "Something probably went wrong. Exiting!"
-                    << std::endl;
+                       "Something probably went wrong. Exiting!\n";
         }
         return;
       }
@@ -350,15 +349,13 @@ void EquivalenceCheckingManager::checkSequential() {
       results.equivalence = result;
       // break if equivalence has been shown
       if (result == EquivalenceCriterion::EquivalentUpToGlobalPhase ||
-          (configuration.onlyZXCheckerConfigured() &&
-           result == EquivalenceCriterion::ProbablyNotEquivalent)) {
+          result == EquivalenceCriterion::Equivalent) {
         done = true;
         doneCond.notify_one();
       }
     } else if (configuration.onlyZXCheckerConfigured()) {
       std::clog << "Only ZX checker specified but one of the circuits contains "
-                   "operations not supported by this checker! Exiting!"
-                << std::endl;
+                   "operations not supported by this checker! Exiting!\n";
       checkers.clear();
       results.equivalence = EquivalenceCriterion::NoInformation;
       return;
@@ -384,10 +381,9 @@ void EquivalenceCheckingManager::checkParallel() {
 
   if (const auto threadLimit = std::thread::hardware_concurrency();
       threadLimit != 0U && configuration.execution.nthreads > threadLimit) {
-    std::clog << "Trying to use more threads than the underlying "
-                 "architecture claims "
-                 "to support. Over-subscription might impact performance!"
-              << std::endl;
+    std::clog
+        << "Trying to use more threads than the underlying architecture claims "
+           "to support. Over-subscription might impact performance!\n";
   }
 
   const auto maxThreads      = configuration.execution.nthreads;
@@ -455,8 +451,7 @@ void EquivalenceCheckingManager::checkParallel() {
       ++id;
     } else if (configuration.onlyZXCheckerConfigured()) {
       std::clog << "Only ZX checker specified but one of the circuits contains "
-                   "operations not supported by this checker! Exiting!"
-                << std::endl;
+                   "operations not supported by this checker! Exiting!\n";
       checkers.clear();
       results.equivalence = EquivalenceCriterion::NoInformation;
       done                = true;
@@ -465,14 +460,17 @@ void EquivalenceCheckingManager::checkParallel() {
 
   if (runSimulation) {
     const auto effectiveThreadsLeft = effectiveThreads - threads.size();
+    const auto simulationsToStart =
+        std::min(effectiveThreadsLeft, configuration.simulation.maxSims);
     // launch as many simulations as possible
-    for (std::size_t i = 0; i < effectiveThreadsLeft && !done; ++i) {
+    for (std::size_t i = 0; i < simulationsToStart && !done; ++i) {
       threads.emplace_back([this, &queue, id] {
         checkers[id] =
             std::make_unique<DDSimulationChecker>(qc1, qc2, configuration);
-        auto* checker = dynamic_cast<DDSimulationChecker*>(checkers[id].get());
+        auto* const checker =
+            dynamic_cast<DDSimulationChecker*>(checkers[id].get());
         {
-          std::lock_guard stateGeneratorLock(stateGeneratorMutex);
+          const std::lock_guard stateGeneratorLock(stateGeneratorMutex);
           checker->setRandomInitialState(stateGenerator);
         }
         if (!done) {
@@ -506,13 +504,12 @@ void EquivalenceCheckingManager::checkParallel() {
     threads.at(*completedID).join();
 
     // in case non-equivalence has been shown, the execution can be stopped
-    auto*      checker = checkers.at(*completedID).get();
-    const auto result  = checker->getEquivalence();
+    const auto* const checker = checkers.at(*completedID).get();
+    const auto        result  = checker->getEquivalence();
 
     if (result == EquivalenceCriterion::NoInformation) {
       std::clog << "Finished equivalence check provides no information. "
-                   "Something probably went wrong. Exiting."
-                << std::endl;
+                   "Something probably went wrong. Exiting.\n";
       break;
     }
 
@@ -522,9 +519,9 @@ void EquivalenceCheckingManager::checkParallel() {
 
       // some special handling in case non-equivalence has been shown by a
       // simulation run
-      if (const auto* simulationChecker =
-              dynamic_cast<DDSimulationChecker*>(checker)) {
-        results.performedSimulations++;
+      if (const auto* const simulationChecker =
+              dynamic_cast<const DDSimulationChecker*>(checker)) {
+        ++results.performedSimulations;
 
         if (configuration.simulation.storeCEXinput) {
           results.cexInput = simulationChecker->getInitialVector();
@@ -538,18 +535,19 @@ void EquivalenceCheckingManager::checkParallel() {
       break;
     }
 
-    // the alternating and the construction checker provide definitive
-    // answers once they finish
-    if ((dynamic_cast<DDAlternatingChecker*>(checker) != nullptr) ||
-        (dynamic_cast<DDConstructionChecker*>(checker) != nullptr)) {
+    // the alternating and the construction checker provide definitive answers
+    // once they finish
+    if ((dynamic_cast<const DDAlternatingChecker*>(checker) != nullptr) ||
+        (dynamic_cast<const DDConstructionChecker*>(checker) != nullptr)) {
       setAndSignalDone();
       results.equivalence = result;
       break;
     }
 
-    if (dynamic_cast<ZXEquivalenceChecker*>(checker) != nullptr) {
+    if (dynamic_cast<const ZXEquivalenceChecker*>(checker) != nullptr) {
       results.equivalence = result;
       if (result == EquivalenceCriterion::EquivalentUpToGlobalPhase ||
+          result == EquivalenceCriterion::Equivalent ||
           (result == EquivalenceCriterion::ProbablyNotEquivalent &&
            configuration.onlyZXCheckerConfigured())) {
         setAndSignalDone();
@@ -560,9 +558,9 @@ void EquivalenceCheckingManager::checkParallel() {
     }
 
     // at this point, the only option is that this is a simulation checker
-    if (dynamic_cast<DDSimulationChecker*>(checker) != nullptr) {
-      // if the simulation has not shown the non-equivalence, then both
-      // circuits are considered probably equivalent
+    if (dynamic_cast<const DDSimulationChecker*>(checker) != nullptr) {
+      // if the simulation has not shown the non-equivalence, then both circuits
+      // are considered probably equivalent
       results.equivalence = EquivalenceCriterion::ProbablyEquivalent;
       ++results.performedSimulations;
 
@@ -570,10 +568,10 @@ void EquivalenceCheckingManager::checkParallel() {
       // conducted
       if (results.startedSimulations < configuration.simulation.maxSims) {
         threads[*completedID] = std::thread([&, this, id = *completedID] {
-          auto* simChecker =
+          auto* const simChecker =
               dynamic_cast<DDSimulationChecker*>(checkers[id].get());
           {
-            std::lock_guard stateGeneratorLock(stateGeneratorMutex);
+            const std::lock_guard stateGeneratorLock(stateGeneratorMutex);
             simChecker->setRandomInitialState(stateGenerator);
           }
           if (!done) {

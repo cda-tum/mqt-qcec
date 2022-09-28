@@ -1,27 +1,72 @@
-import pkg_resources
-from pathlib import Path
-from qiskit import QuantumCircuit
-from typing import Union
+from __future__ import annotations
 
-from mqt.qcec import EquivalenceCheckingManager, Configuration
+import sys
+from typing import Any
+
+if sys.version_info < (3, 10, 0):
+    import importlib_resources as resources
+else:
+    from importlib import resources
+
+from mqt.qcec import Configuration, EquivalenceCheckingManager
 from mqt.qcec.compilation_flow_profiles import AncillaMode, generate_profile_name
+from qiskit import QuantumCircuit
 
 
-def verify_compilation(original_circuit: Union[QuantumCircuit, str], compiled_circuit: Union[QuantumCircuit, str],
-                       optimization_level: int = 1, ancilla_mode: AncillaMode = AncillaMode.NO_ANCILLA,
-                       configuration: Configuration = Configuration()) -> EquivalenceCheckingManager.Results:
-    # create the equivalence checker
-    ecm = EquivalenceCheckingManager(original_circuit, compiled_circuit, configuration)
+def verify_compilation(
+    original_circuit: QuantumCircuit | str,
+    compiled_circuit: QuantumCircuit | str,
+    optimization_level: int = 1,
+    ancilla_mode: AncillaMode = AncillaMode.NO_ANCILLA,
+    configuration: Configuration | None = None,
+    **kwargs: Any,
+) -> EquivalenceCheckingManager.Results:
+    """
+    Similar to :func:`verify <.verify>`, but uses a dedicated compilation flow profile to guide the equivalence checking process.
+    The compilation flow profile is determined by the ``optimization_level`` and ``ancilla_mode`` arguments.
+
+    There are two ways of configuring the equivalence checking process:
+
+    1. Pass a :class:`Configuration <.Configuration>` instance as the ``configuration`` argument.
+
+    2. Pass keyword arguments to this function. These are directly passed to the :meth:`constructor <.EquivalenceCheckingManager.__init__>` of the :class:`EquivalenceCheckingManager`.
+
+    :param original_circuit: The original circuit.
+    :type original_circuit: QuantumCircuit | str
+    :param compiled_circuit: The compiled circuit.
+    :type compiled_circuit: QuantumCircuit | str
+    :param optimization_level: The optimization level used for compiling the circuit (0, 1, 2, or 3).
+    :type optimization_level: int
+    :param ancilla_mode: The `ancilla mode <.AncillaMode>` used for realizing multi-controlled Toffoli gates, as available in Qiskit
+    :type ancilla_mode: AncillaMode
+    :param configuration: The configuration to use for the equivalence checking process.
+    :type configuration: Configuration
+    :param kwargs: Keyword arguments to pass to the :class:`EquivalenceCheckingManager <.EquivalenceCheckingManager>` constructor.
+    :return: The results of the equivalence checking process.
+    :rtype: EquivalenceCheckingManager.Results
+    """
+
+    if kwargs:
+        # create the equivalence checker from keyword arguments
+        ecm = EquivalenceCheckingManager(original_circuit, compiled_circuit, **kwargs)
+    else:
+        if configuration is None:
+            configuration = Configuration()
+
+        # create the equivalence checker from configuration
+        ecm = EquivalenceCheckingManager(original_circuit, compiled_circuit, configuration)
 
     # use the gate_cost scheme for the verification
     ecm.set_application_scheme("gate_cost")
 
     # get the pre-defined profile for the gate_cost scheme
-    profile = pkg_resources.resource_filename(__name__, 'profiles/' + generate_profile_name(optimization_level=optimization_level, mode=ancilla_mode))
-    ecm.set_gate_cost_profile(str(Path(__file__).resolve().parent.joinpath(profile)))
+    profile_name = generate_profile_name(optimization_level=optimization_level, mode=ancilla_mode)
+    ref = resources.files("mqt.qcec") / "profiles" / profile_name
+    with resources.as_file(ref) as path:
+        ecm.set_gate_cost_profile(str(path))
 
-    # execute the check
-    ecm.run()
+        # execute the check
+        ecm.run()
 
     # obtain the result
     return ecm.get_results()

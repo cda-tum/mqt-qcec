@@ -7,4 +7,3 @@ creg c[2];
 swap q[0],q[1];
 cx q[0],q[1];
 swap q[0],q[1];
-
