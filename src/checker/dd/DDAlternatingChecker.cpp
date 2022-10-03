@@ -12,12 +12,9 @@ void DDAlternatingChecker::initialize() {
   functionality = dd->makeIdent(nqubits);
   dd->incRef(functionality);
 
-  // only count ancillaries that are present in but not acted upon in both of
-  // the circuits at the moment this is just to be on the safe side. It might be
-  // fine to also start with the reduced matrix for every ancillary without any
-  // restriction
-  // TODO: check whether the way ancillaries are handled here is theoretically
-  // sound
+  // Only count ancillaries that are present in but not acted upon in both of
+  // the circuits. Otherwise, the alternating checker must not be used.
+  // Counter-example: H |0><0| H^-1 = [[0.5, 0.5], [0.5, 0.5]] != |0><0|
   std::vector<bool> ancillary(nqubits);
   for (auto q = static_cast<dd::Qubit>(nqubits - 1U); q >= 0; --q) {
     if (qc1.logicalQubitIsAncillary(q) && qc2.logicalQubitIsAncillary(q)) {
@@ -43,6 +40,11 @@ void DDAlternatingChecker::initialize() {
       // qubit only really exists or is acted on in one of the circuits
       if ((found1 != found2) || (isIdle1 != isIdle2)) {
         ancillary[static_cast<std::size_t>(q)] = true;
+      } else {
+        throw std::invalid_argument(
+            "Alternating checker must not be used for "
+            "circuits that both have non-idle ancillary "
+            "qubits. Use the construction checker instead.");
       }
     }
   }
@@ -51,8 +53,8 @@ void DDAlternatingChecker::initialize() {
   // [1 0] if the qubit is no ancillary, or it is acted upon by both circuits
   // [0 1]
   //
-  // [1 0] for an ancillary that is present in one circuit and not acted upon in
-  // the other [0 0]
+  // [1 0] (= |0><0|) for an ancillary only acted on in one circuit
+  // [0 0]
   functionality = dd->reduceAncillae(functionality, ancillary);
 }
 
@@ -122,16 +124,6 @@ void DDAlternatingChecker::postprocess() {
   if (isDone()) {
     return;
   }
-
-  // TODO: check whether reducing ancillaries here is theoretically sound
-  taskManager1.reduceAncillae(functionality);
-  if (isDone()) {
-    return;
-  }
-  taskManager2.reduceAncillae(functionality);
-  if (isDone()) {
-    return;
-  }
 }
 
 EquivalenceCriterion DDAlternatingChecker::checkEquivalence() {
@@ -143,7 +135,6 @@ EquivalenceCriterion DDAlternatingChecker::checkEquivalence() {
   taskManager1.reduceGarbage(goalMatrix);
   taskManager2.reduceGarbage(goalMatrix);
 
-  // TODO: check whether reducing ancillaries here is theoretically sound
   taskManager1.reduceAncillae(goalMatrix);
   taskManager2.reduceAncillae(goalMatrix);
 
@@ -151,7 +142,7 @@ EquivalenceCriterion DDAlternatingChecker::checkEquivalence() {
   // [1 0] if the qubit is no ancillary
   // [0 1]
   //
-  // [1 0] for an ancillary that is present in either circuit
+  // [1 0] (= |0><0>|) for an ancillary that is present in either circuit
   // [0 0]
 
   // compare the obtained functionality to the goal matrix
