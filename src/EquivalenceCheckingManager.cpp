@@ -647,10 +647,8 @@ void EquivalenceCheckingManager::checkSymbolic() {
 
       results.equivalence = result;
       // break if equivalence has been shown
-      if (result == EquivalenceCriterion::EquivalentUpToGlobalPhase) {
-        done = true;
-        doneCond.notify_one();
-      }
+      done = true;
+      doneCond.notify_one();
     } else {
       std::clog << "Checking symbolic circuits requires transformation "
                    "to ZX-diagram but one of the circuits contains "
@@ -662,18 +660,18 @@ void EquivalenceCheckingManager::checkSymbolic() {
     }
   }
 
-  if (!done) {
-    // instantiate variabels
-    sym::VariableAssignment assignment{};
-    for (const auto& var : qc1.getVariables()) {
-      std::cout << var.getName() << std::endl;
-      assignment[var] = 0.0;
-    }
-    qc1.instantiate(assignment);
-    qc2.instantiate(assignment);
-    configuration.execution.runZXChecker = false;
-    checkParallel();
-  }
+  // if (!done) {
+  //   // instantiate variabels
+  //   sym::VariableAssignment assignment{};
+  //   for (const auto& var : qc1.getVariables()) {
+  //     std::cout << var.getName() << std::endl;
+  //     assignment[var] = 0.0;
+  //   }
+  //   qc1.instantiate(assignment);
+  //   qc2.instantiate(assignment);
+  //   configuration.execution.runZXChecker = false;
+  //   checkParallel();
+  // }
   const auto end    = std::chrono::steady_clock::now();
   results.checkTime = std::chrono::duration<double>(end - start).count();
   // appropriately join the timeout thread, if it was launched
