@@ -5,8 +5,8 @@ from mqt import qcec
 from qiskit import QuantumCircuit
 from qiskit.circuit import Parameter
 
-alpha = Parameter('alpha')
-beta = Parameter('beta')
+alpha = Parameter("alpha")
+beta = Parameter("beta")
 
 
 @pytest.fixture
@@ -49,6 +49,8 @@ def test_non_equivalent_simple(original_circuit: QuantumCircuit, alternative_cir
     assert result.equivalence == qcec.EquivalenceCriterion.not_equivalent
 
 
-def test_non_equivalent_random_simple(original_circuit: QuantumCircuit, alternative_circuit_incorrect: QuantumCircuit) -> None:
+def test_non_equivalent_random_simple(
+    original_circuit: QuantumCircuit, alternative_circuit_incorrect: QuantumCircuit
+) -> None:
     result = qcec.verify(original_circuit, alternative_circuit_incorrect, n_symbolic_checks=0)
     assert result.equivalence == qcec.EquivalenceCriterion.not_equivalent

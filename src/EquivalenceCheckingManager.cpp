@@ -646,7 +646,7 @@ void EquivalenceCheckingManager::checkSymbolic() {
       const auto result    = zxChecker->run();
 
       results.equivalence = result;
-      done = true;
+      done                = true;
       doneCond.notify_one();
     } else {
       std::clog << "Checking symbolic circuits requires transformation "
