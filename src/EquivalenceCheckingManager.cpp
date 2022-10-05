@@ -646,7 +646,6 @@ void EquivalenceCheckingManager::checkSymbolic() {
       const auto result    = zxChecker->run();
 
       results.equivalence = result;
-      // break if equivalence has been shown
       done = true;
       doneCond.notify_one();
     } else {

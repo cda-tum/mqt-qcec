@@ -23,6 +23,8 @@ def check_symbolic_zx(
 
     ecm.run()
 
+    print(circ1.draw())
+    print(circ2.draw())
     return ecm.get_results()
 
 
@@ -40,7 +42,7 @@ def extract_params(circ1: QuantumCircuit, circ2: QuantumCircuit) -> set[Paramete
         return type(x) is Parameter or type(x) is ParameterExpression
 
     symb_params = [param for param in p if is_expr(param)]
-    symb_params.sort()
+    symb_params.sort(key=lambda param: param.name)
     symb_exprs = list(filter(is_expr, exprs))
     zero_map = {param: 0 for param in symb_params}
 
@@ -73,6 +75,8 @@ def check_instantiated(
 
     ecm.run()
 
+    print(circ1.draw())
+    print(circ2.draw())
     return ecm.get_results()
 
 
@@ -97,7 +101,7 @@ def check_instantiated_random(
 
 
 def check_symbolic(
-    circ1: QuantumCircuit, circ2: QuantumCircuit, n_checks: int = 2, tol: float = 1e-15, **kwargs: Any
+    circ1: QuantumCircuit, circ2: QuantumCircuit, n_checks: int = 6, tol: float = 1e-15, **kwargs: Any
 ) -> EquivalenceCheckingManager.EquivalenceCheckingManager.Results:
     """Equivalence checking flow for parameterized circuit."""
     res = check_symbolic_zx(circ1, circ2, **kwargs)
@@ -110,7 +114,7 @@ def check_symbolic(
     def instantiate_params(i, qc1: QuantumCircuit, qc2: QuantumCircuit) -> tuple[QuantumCircuit, QuantumCircuit]:
         phases = [0, np.pi, np.pi / 2, -np.pi / 2, np.pi / 4, -np.pi / 4]
         if i > 0:
-            b = np.random.random_choice(phases, size=len(parameters)) + offsets
+            b = np.random.choice(phases, size=len(offsets)) + offsets
         else:
             b = offsets
 
@@ -136,10 +140,9 @@ def check_symbolic(
 
         circ1_inst, circ2_inst = instantiate_params(i, circ1, circ2, **kwargs)
         res = check_instantiated(circ1_inst, circ2_inst)
-        if res.equivalence == "non_equivalent":
+        if res.equivalence == "not_equivalent":
             return res
 
-    return res
     res = check_instantiated_random(circ1, circ2, parameters, **kwargs)
 
     return res

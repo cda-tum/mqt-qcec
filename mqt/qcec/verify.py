@@ -5,14 +5,14 @@ from typing import Any
 from mqt.qcec import Configuration, EquivalenceCheckingManager
 from qiskit import QuantumCircuit
 
-from symbolic import check_symbolic
+from .symbolic import check_symbolic
 
 
 def verify(
     circ1: QuantumCircuit | str,
     circ2: QuantumCircuit | str,
     configuration: Configuration | None = None,
-    n_symbolc_checks: int = 2,
+    n_symbolic_checks: int = 6,
     symbolic_tol: float = 1e-12,
     **kwargs: Any,
 ) -> EquivalenceCheckingManager.Results:
@@ -38,7 +38,7 @@ def verify(
     :return: The results of the equivalence checking process.
     """
     if (not isinstance(circ1, str) and circ1.parameters) or (not isinstance(circ2, str) and circ2.parameters):
-        return check_symbolic(circ1, circ2, n_symbolc_checks, symbolic_tol, **kwargs)
+        return check_symbolic(circ1, circ2, n_symbolic_checks, symbolic_tol, **kwargs)
 
     if kwargs:
         # create the equivalence checker from keyword arguments
