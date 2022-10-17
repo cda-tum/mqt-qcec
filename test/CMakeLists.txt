@@ -47,7 +47,8 @@ package_add_test(
   test_simple_circuit_identities.cpp
   test_gate_cost_application_scheme.cpp
   test_equality.cpp
-  test_zx.cpp)
+  test_zx.cpp
+  test_symbolic.cpp)
 
 add_custom_command(
   TARGET ${PROJECT_NAME}_test
