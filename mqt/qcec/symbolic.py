@@ -48,7 +48,6 @@ def extract_params(circ1: QuantumCircuit, circ2: QuantumCircuit) -> set[Paramete
 
     offsets = np.zeros(len(symb_exprs))
     for row, expr in enumerate(symb_exprs):
-        zero_map = {param: 0 for param in expr.parameters}
         offsets[row] = -float(expr.bind(zero_map))
 
     equs = np.zeros((len(symb_exprs), n_params))
@@ -129,7 +128,7 @@ def check_symbolic(
                 params = instr[0].params
                 instr[0].params = [float(x) for x in params]
                 instr[0].params = [0 if np.abs(x) < tol else x for x in instr[0].params]
-                return qc
+            return qc
 
         qc1_bound = round_zero_params(qc1_bound)
         qc2_bound = round_zero_params(qc2_bound)
