@@ -384,18 +384,35 @@ void EquivalenceCheckingManager::checkParallel() {
         << "Trying to use more threads than the underlying architecture claims "
            "to support. Over-subscription might impact performance!\n";
   }
+  const auto maxThreads = configuration.execution.nthreads;
 
-  const auto maxThreads      = configuration.execution.nthreads;
-  const auto runAlternating  = configuration.execution.runAlternatingChecker;
-  const auto runConstruction = configuration.execution.runConstructionChecker;
-  const auto runZX           = configuration.execution.runZXChecker;
-  const auto runSimulation   = configuration.execution.runSimulationChecker &&
-                             configuration.simulation.maxSims > 0;
-
-  const std::size_t tasksToExecute =
-      configuration.simulation.maxSims * (static_cast<int>(runSimulation)) +
-      (runAlternating ? 1U : 0U) + (runConstruction ? 1U : 0U) +
-      (runZX ? 1U : 0U);
+  std::size_t tasksToExecute = 0U;
+  if (configuration.execution.runAlternatingChecker) {
+    ++tasksToExecute;
+  }
+  if (configuration.execution.runConstructionChecker) {
+    ++tasksToExecute;
+  }
+  if (configuration.execution.runSimulationChecker) {
+    if (configuration.simulation.maxSims > 0U) {
+      tasksToExecute += configuration.simulation.maxSims;
+    } else {
+      configuration.execution.runSimulationChecker = false;
+    }
+  }
+  if (configuration.execution.runZXChecker) {
+    if (zx::FunctionalityConstruction::transformableToZX(&qc1) &&
+        zx::FunctionalityConstruction::transformableToZX(&qc2)) {
+      ++tasksToExecute;
+    } else if (configuration.onlyZXCheckerConfigured()) {
+      std::clog << "Only ZX checker specified but one of the circuits contains "
+                   "operations not supported by this checker! Exiting!\n";
+      results.equivalence = EquivalenceCriterion::NoInformation;
+      setAndSignalDone();
+    } else {
+      configuration.execution.runZXChecker = false;
+    }
+  }
 
   const auto effectiveThreads = std::min(maxThreads, tasksToExecute);
 
@@ -411,7 +428,7 @@ void EquivalenceCheckingManager::checkParallel() {
   std::vector<std::thread> threads{};
   threads.reserve(effectiveThreads);
 
-  if (runAlternating) {
+  if (configuration.execution.runAlternatingChecker) {
     // start a new thread that constructs and runs the alternating check
     threads.emplace_back([this, &queue, id] {
       checkers[id] =
@@ -422,7 +439,7 @@ void EquivalenceCheckingManager::checkParallel() {
     ++id;
   }
 
-  if (runConstruction && !done) {
+  if (configuration.execution.runConstructionChecker && !done) {
     // start a new thread that constructs and runs the construction check
     threads.emplace_back([this, &queue, id] {
       checkers[id] =
@@ -435,29 +452,20 @@ void EquivalenceCheckingManager::checkParallel() {
     ++id;
   }
 
-  if (runZX && !done) {
-    if (zx::FunctionalityConstruction::transformableToZX(&qc1) &&
-        zx::FunctionalityConstruction::transformableToZX(&qc2)) {
-      // start a new thread that constructs and runs the ZX checker
-      threads.emplace_back([this, &queue, id] {
-        checkers[id] =
-            std::make_unique<ZXEquivalenceChecker>(qc1, qc2, configuration);
-        if (!done) {
-          checkers[id]->run();
-        }
-        queue.push(id);
-      });
-      ++id;
-    } else if (configuration.onlyZXCheckerConfigured()) {
-      std::clog << "Only ZX checker specified but one of the circuits contains "
-                   "operations not supported by this checker! Exiting!\n";
-      checkers.clear();
-      results.equivalence = EquivalenceCriterion::NoInformation;
-      done                = true;
-    }
+  if (configuration.execution.runZXChecker && !done) {
+    // start a new thread that constructs and runs the ZX checker
+    threads.emplace_back([this, &queue, id] {
+      checkers[id] =
+          std::make_unique<ZXEquivalenceChecker>(qc1, qc2, configuration);
+      if (!done) {
+        checkers[id]->run();
+      }
+      queue.push(id);
+    });
+    ++id;
   }
 
-  if (runSimulation) {
+  if (configuration.execution.runSimulationChecker) {
     const auto effectiveThreadsLeft = effectiveThreads - threads.size();
     const auto simulationsToStart =
         std::min(effectiveThreadsLeft, configuration.simulation.maxSims);
