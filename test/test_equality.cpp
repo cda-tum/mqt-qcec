@@ -157,9 +157,10 @@ TEST_F(EqualityTest, AutomaticSwitchToConstructionChecker) {
   const auto result = ecm.equivalence();
   EXPECT_EQ(result, ec::EquivalenceCriterion::Equivalent);
 
-  // also check an exception is thrown
-  // if the checker is configured after initialization
+  // Check an error is raised for a checker configured after initialization.
+  // Note: this has to be a death test since the exception is raised in a
+  // different thread and hence cannot be caught by the test.
   ecm.reset();
   ecm.setAlternatingChecker(true);
-  EXPECT_THROW(ecm.run(), std::invalid_argument);
+  EXPECT_DEATH(ecm.run(), ".*");
 }
