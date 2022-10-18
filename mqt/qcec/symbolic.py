@@ -23,8 +23,6 @@ def check_symbolic_zx(
 
     ecm.run()
 
-    print(circ1.draw())
-    print(circ2.draw())
     return ecm.get_results()
 
 
@@ -44,10 +42,10 @@ def extract_params(circ1: QuantumCircuit, circ2: QuantumCircuit) -> set[Paramete
     symb_params = [param for param in p if is_expr(param)]
     symb_params.sort(key=lambda param: param.name)
     symb_exprs = list(filter(is_expr, exprs))
-    zero_map = {param: 0 for param in symb_params}
 
     offsets = np.zeros(len(symb_exprs))
     for row, expr in enumerate(symb_exprs):
+        zero_map = {param: 0 for param in expr.parameters}
         offsets[row] = -float(expr.bind(zero_map))
 
     equs = np.zeros((len(symb_exprs), n_params))
@@ -74,8 +72,6 @@ def check_instantiated(
 
     ecm.run()
 
-    print(circ1.draw())
-    print(circ2.draw())
     return ecm.get_results()
 
 
