@@ -157,10 +157,11 @@ TEST_F(EqualityTest, AutomaticSwitchToConstructionChecker) {
   const auto result = ecm.equivalence();
   EXPECT_EQ(result, ec::EquivalenceCriterion::Equivalent);
 
-  // Check an error is raised for a checker configured after initialization.
-  // Note: this has to be a death test since the exception is raised in a
-  // different thread and hence cannot be caught by the test.
+  // Check an exception is raised for a checker configured after initialization.
+  // Note: this exception can only be caught in sequential mode since it is
+  // raised in a different thread otherwise.
   ecm.reset();
   ecm.setAlternatingChecker(true);
-  EXPECT_DEATH(ecm.run(), ".*");
+  ecm.setParallel(false);
+  EXPECT_THROW(ecm.run(), std::invalid_argument);
 }
