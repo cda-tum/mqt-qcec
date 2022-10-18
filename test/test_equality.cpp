@@ -156,4 +156,10 @@ TEST_F(EqualityTest, AutomaticSwitchToConstructionChecker) {
   // ancillary and garbage qubit
   const auto result = ecm.equivalence();
   EXPECT_EQ(result, ec::EquivalenceCriterion::Equivalent);
+
+  // also check an exception is thrown
+  // if the checker is configured after initialization
+  ecm.reset();
+  ecm.setAlternatingChecker(true);
+  EXPECT_THROW(ecm.run(), std::invalid_argument);
 }
