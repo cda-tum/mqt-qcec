@@ -39,6 +39,12 @@ public:
     j["checker"] = "decision_diagram_alternating";
   }
 
+  /// a function to determine whether the alternating checker can handle
+  /// checking both circuits. In particular, it checks whether both circuits
+  /// contain non-idle ancillaries.
+  static bool canHandle(const qc::QuantumComputation& qc1,
+                        const qc::QuantumComputation& qc2);
+
 private:
   qc::MatrixDD functionality{};
 

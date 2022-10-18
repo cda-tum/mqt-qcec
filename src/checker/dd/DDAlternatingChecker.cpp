@@ -160,4 +160,32 @@ EquivalenceCriterion DDAlternatingChecker::checkEquivalence() {
   return op1.equals(op2);
 }
 
+bool DDAlternatingChecker::canHandle(const qc::QuantumComputation& qc1,
+                                     const qc::QuantumComputation& qc2) {
+  assert(qc1.getNqubits() == qc2.getNqubits());
+  const auto nqubits = qc1.getNqubits();
+
+  for (auto q = static_cast<dd::Qubit>(nqubits - 1U); q >= 0; --q) {
+    if (qc1.logicalQubitIsAncillary(q) && qc2.logicalQubitIsAncillary(q)) {
+      const auto [found1, physical1] = qc1.containsLogicalQubit(q);
+      const auto [found2, physical2] = qc2.containsLogicalQubit(q);
+
+      // just continue, if a qubit is not found in both circuits
+      if (found1 != found2) {
+        continue;
+      }
+
+      const auto isIdle1 = found1 && qc1.isIdleQubit(*physical1);
+      const auto isIdle2 = found2 && qc2.isIdleQubit(*physical2);
+
+      // if an ancillary qubit is acted on in both circuits,
+      // the alternating checker cannot be used.
+      if (!isIdle1 && !isIdle2) {
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
 } // namespace ec
