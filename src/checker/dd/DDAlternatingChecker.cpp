@@ -18,24 +18,11 @@ void DDAlternatingChecker::initialize() {
   std::vector<bool> ancillary(nqubits);
   for (auto q = static_cast<dd::Qubit>(nqubits - 1U); q >= 0; --q) {
     if (qc1.logicalQubitIsAncillary(q) && qc2.logicalQubitIsAncillary(q)) {
-      bool found1  = false;
-      bool isIdle1 = false;
-      if (const auto it = std::find_if(
-              qc1.initialLayout.cbegin(), qc1.initialLayout.cend(),
-              [q](const auto& mapping) { return mapping.second == q; });
-          it != qc1.initialLayout.cend()) {
-        found1  = true;
-        isIdle1 = qc1.isIdleQubit(it->first);
-      }
-      bool found2  = false;
-      bool isIdle2 = false;
-      if (const auto it = std::find_if(
-              qc2.initialLayout.cbegin(), qc2.initialLayout.cend(),
-              [q](const auto& mapping) { return mapping.second == q; });
-          it != qc2.initialLayout.cend()) {
-        found2  = true;
-        isIdle2 = qc2.isIdleQubit(it->first);
-      }
+      const auto [found1, physical1] = qc1.containsLogicalQubit(q);
+      const auto isIdle1             = found1 && qc1.isIdleQubit(*physical1);
+
+      const auto [found2, physical2] = qc2.containsLogicalQubit(q);
+      const auto isIdle2             = found2 && qc2.isIdleQubit(*physical2);
 
       // qubit only really exists or is acted on in one of the circuits
       if ((found1 != found2) || (isIdle1 != isIdle2)) {
