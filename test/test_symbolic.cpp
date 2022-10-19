@@ -29,8 +29,7 @@ TEST_F(SymbolicTest, SymbolicEqu) {
   symQc2.rz(0, xMonom);
   symQc2.h(0);
 
-  ec::Configuration config{};
-  auto ecm = ec::EquivalenceCheckingManager(symQc1, symQc2, config);
+  auto ecm = ec::EquivalenceCheckingManager(symQc1, symQc2);
   ecm.run();
 
   EXPECT_TRUE(ecm.getResults().consideredEquivalent());
@@ -43,8 +42,7 @@ TEST_F(SymbolicTest, SymbolicNonEqu) {
   symQc2.rz(0, xMonomNeg);
   symQc2.h(0);
 
-  ec::Configuration config{};
-  auto ecm = ec::EquivalenceCheckingManager(symQc1, symQc2, config);
+  auto ecm = ec::EquivalenceCheckingManager(symQc1, symQc2);
   ecm.run();
 
   EXPECT_FALSE(ecm.getResults().consideredEquivalent());
@@ -77,8 +75,7 @@ TEST_F(SymbolicTest, InvalidCircuit) {
   auto qc = qc::QuantumComputation(4);
   qc.x(0, {1_pc, 2_pc, 3_pc});
   qc.rx(0, xMonom);
-  ec::Configuration config{};
-  auto              ecm = ec::EquivalenceCheckingManager(qc, qc, config);
+  auto ecm = ec::EquivalenceCheckingManager(qc, qc);
   ecm.run();
 
   EXPECT_EQ(ecm.getResults().equivalence,

@@ -309,15 +309,17 @@ void EquivalenceCheckingManager::checkSequential() {
     checkers.emplace_back(
         std::make_unique<DDAlternatingChecker>(qc1, qc2, configuration));
     const auto& alternatingChecker = checkers.back();
-    const auto  result             = alternatingChecker->run();
+    if (!done) {
+      const auto result = alternatingChecker->run();
 
-    // if the alternating check produces a result, this is final
-    if (result != EquivalenceCriterion::NoInformation) {
-      results.equivalence = result;
+      // if the alternating check produces a result, this is final
+      if (result != EquivalenceCriterion::NoInformation) {
+        results.equivalence = result;
 
-      // everything is done
-      done = true;
-      doneCond.notify_one();
+        // everything is done
+        done = true;
+        doneCond.notify_one();
+      }
     }
   }
 
@@ -325,15 +327,17 @@ void EquivalenceCheckingManager::checkSequential() {
     checkers.emplace_back(
         std::make_unique<DDConstructionChecker>(qc1, qc2, configuration));
     const auto& constructionChecker = checkers.back();
-    const auto  result              = constructionChecker->run();
+    if (!done) {
+      const auto result = constructionChecker->run();
 
-    // if the construction check produces a result, this is final
-    if (result != EquivalenceCriterion::NoInformation) {
-      results.equivalence = result;
+      // if the construction check produces a result, this is final
+      if (result != EquivalenceCriterion::NoInformation) {
+        results.equivalence = result;
 
-      // everything is done
-      done = true;
-      doneCond.notify_one();
+        // everything is done
+        done = true;
+        doneCond.notify_one();
+      }
     }
   }
 
@@ -343,14 +347,16 @@ void EquivalenceCheckingManager::checkSequential() {
       checkers.emplace_back(
           std::make_unique<ZXEquivalenceChecker>(qc1, qc2, configuration));
       const auto& zxChecker = checkers.back();
-      const auto  result    = zxChecker->run();
+      if (!done) {
+        const auto result = zxChecker->run();
 
-      results.equivalence = result;
-      // break if equivalence has been shown
-      if (result == EquivalenceCriterion::EquivalentUpToGlobalPhase ||
-          result == EquivalenceCriterion::Equivalent) {
-        done = true;
-        doneCond.notify_one();
+        results.equivalence = result;
+        // break if equivalence has been shown
+        if (result == EquivalenceCriterion::EquivalentUpToGlobalPhase ||
+            result == EquivalenceCriterion::Equivalent) {
+          done = true;
+          doneCond.notify_one();
+        }
       }
     } else if (configuration.onlyZXCheckerConfigured()) {
       std::clog << "Only ZX checker specified but one of the circuits contains "
@@ -649,12 +655,13 @@ void EquivalenceCheckingManager::checkSymbolic() {
         zx::FunctionalityConstruction::transformableToZX(&qc2)) {
       checkers.emplace_back(
           std::make_unique<ZXEquivalenceChecker>(qc1, qc2, configuration));
-      auto&      zxChecker = checkers.back();
-      const auto result    = zxChecker->run();
-
-      results.equivalence = result;
-      done                = true;
-      doneCond.notify_one();
+      const auto& zxChecker = checkers.back();
+      if (!done) {
+        const auto result   = zxChecker->run();
+        results.equivalence = result;
+        done                = true;
+        doneCond.notify_one();
+      }
     } else {
       std::clog << "Checking symbolic circuits requires transformation "
                    "to ZX-diagram but one of the circuits contains "
