@@ -96,11 +96,15 @@ static std::unique_ptr<EquivalenceCheckingManager> createManagerFromOptions(
     // Simulation
     const double fidelityThreshold = 1e-8,
 
-    const std::size_t maxSims   = std::max(16U,
-                                           std::thread::hardware_concurrency() -
-                                               2U),
-    const StateType&  stateType = StateType::ComputationalBasis,
+    const std::size_t maxSims = std::max(16U,
+                                         std::thread::hardware_concurrency() -
+                                             2U),
+    // Parameterized
+    const double      parameterizedTol          = 1e-12,
+    const std::size_t nAdditionalInstantiations = 0,
+    const StateType&  stateType                 = StateType::ComputationalBasis,
     const std::size_t seed = 0U, const bool storeCEXinput = false,
+
     const bool storeCEXoutput = false) {
   Configuration configuration{};
   // Execution
@@ -145,6 +149,10 @@ static std::unique_ptr<EquivalenceCheckingManager> createManagerFromOptions(
   configuration.simulation.seed              = seed;
   configuration.simulation.storeCEXinput     = storeCEXinput;
   configuration.simulation.storeCEXoutput    = storeCEXoutput;
+  // Parameterized
+  configuration.parameterized.parameterizedTol = parameterizedTol;
+  configuration.parameterized.nAdditionalInstantiations =
+      nAdditionalInstantiations;
 
   return createManagerFromConfiguration(circ1, circ2, configuration);
 }
@@ -283,6 +291,8 @@ PYBIND11_MODULE(pyqcec, m) {
          "alternating_scheme"_a = "proportional", "profile"_a = "",
          "trace_threshold"_a = 1e-8, "fidelity_threshold"_a = 1e-8,
          "max_sims"_a = std::max(16U, std::thread::hardware_concurrency() - 2U),
+         "parameterized_tolerance"_a   = 1e-12,
+         "additional_instantiations"_a = 0U,
          "state_type"_a = "computational_basis", "seed"_a = 0U,
          "store_cex_input"_a = false, "store_cex_output"_a = false)
       .def(py::init([](const py::object& circ1, const py::object& circ2,
@@ -334,6 +344,9 @@ PYBIND11_MODULE(pyqcec, m) {
            "Set whether the :ref:`ZX-calculus checker "
            "<EquivalenceChecking:ZX-Calculus Equivalence Checker>` should be "
            "executed.")
+      .def("disable_all_checkers",
+           &EquivalenceCheckingManager::disableAllCheckers,
+           "Disable all equivalence checkers.")
       // Optimization
       .def("fix_output_permutation_mismatch",
            &EquivalenceCheckingManager::runFixOutputPermutationMismatch,
@@ -528,6 +541,10 @@ PYBIND11_MODULE(pyqcec, m) {
       "Options that influence the :ref:`simulation checker "
       "<EquivalenceChecking:Simulation Equivalence Checker (using Decision "
       "Diagrams)>`.");
+  py::class_<Configuration::Parameterized> parameterized(
+      configuration, "Parameterized",
+      "Options that influence the equivalence checking scheme for "
+      "parameterized circuits.");
 
   // Configuration
   configuration.def(py::init<>())
@@ -536,6 +553,7 @@ PYBIND11_MODULE(pyqcec, m) {
       .def_readwrite("application", &Configuration::application)
       .def_readwrite("functionality", &Configuration::functionality)
       .def_readwrite("simulation", &Configuration::simulation)
+      .def_readwrite("parameterized", &Configuration::parameterized)
       .def("json", &Configuration::json,
            "Returns a JSON-style dictionary of the configuration.")
       .def("__repr__", &Configuration::toString,
@@ -740,6 +758,33 @@ PYBIND11_MODULE(pyqcec, m) {
           "store a full representation of a quantum state increases "
           "exponentially, this is only recommended for a small number of "
           "qubits and defaults to :code:`False`.");
+
+  // parameterized options
+  parameterized.def(py::init<>())
+      .def_readwrite("parameterized_tolerance",
+                     &Configuration::Parameterized::parameterizedTol,
+                     "Set threshold below which instantiated parameters shall "
+                     "be considered zero.")
+      .def_readwrite(
+          "addtitional_instantiations",
+          &Configuration::Parameterized::nAdditionalInstantiations,
+          "Number of instantiations shall be performed in addition to the "
+          "default ones. "
+          "For parameterized circuits that cannot be shown to be equivalent "
+          "by the ZX checker "
+          "the circuits are instantiated with concrete values for parameters "
+          "and subsequently "
+          "checked with QCEC's default schemes. The first instantiation "
+          "tries to set as many "
+          "gate parameters to 0. The last instantiations initializes the "
+          "parameters with "
+          "random values to guarantee completeness of the equivalence check. "
+          "Because random "
+          "instantiation is costly, additional instantiations can be "
+          "performed that lead "
+          "to simpler equivalence checking instances as the random "
+          "instantiation. This option "
+          "changes how many of those additional checks are performed.");
 
 #ifdef VERSION_INFO
   m.attr("__version__") = MACRO_STRINGIFY(VERSION_INFO);

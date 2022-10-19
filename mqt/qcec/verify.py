@@ -5,15 +5,13 @@ from typing import Any
 from mqt.qcec import Configuration, EquivalenceCheckingManager
 from qiskit import QuantumCircuit
 
-from .symbolic import check_symbolic
+from .parameterized import check_parameterized
 
 
 def verify(
     circ1: QuantumCircuit | str,
     circ2: QuantumCircuit | str,
     configuration: Configuration | None = None,
-    n_symbolic_checks: int = 6,
-    symbolic_tol: float = 1e-12,
     **kwargs: Any,
 ) -> EquivalenceCheckingManager.Results:
     """
@@ -32,13 +30,15 @@ def verify(
     :param circ1: The first circuit.
     :param circ2: The second circuit.
     :param configuration: The configuration to use for the equivalence checking process.
-    :param n_symbolic_checks: The number of times a parametrized circuit should be instantiated and checked
-    :param symbolic_tol: The tolerance to which instantiated parameters should be recognized as 0
     :param kwargs: Keyword arguments to pass to the :class:`EquivalenceCheckingManager <.EquivalenceCheckingManager>` constructor.
     :return: The results of the equivalence checking process.
     """
-    if (not isinstance(circ1, str) and circ1.parameters) or (not isinstance(circ2, str) and circ2.parameters):
-        return check_symbolic(circ1, circ2, n_symbolic_checks, symbolic_tol, **kwargs)
+
+    def is_parameterized(qc: QuantumCircuit) -> bool:
+        return not isinstance(qc, str) and qc.parameters
+
+    if is_parameterized(circ1) or is_parameterized(circ2):
+        return check_parameterized(circ1, circ2, configuration, **kwargs)
 
     if kwargs:
         # create the equivalence checker from keyword arguments

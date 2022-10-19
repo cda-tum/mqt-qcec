@@ -11,7 +11,6 @@
 
 #include <iostream>
 #include <memory>
-#include <ostream>
 #include <string>
 
 namespace ec {
@@ -186,6 +185,7 @@ EquivalenceCheckingManager::EquivalenceCheckingManager(
     // run all configured optimization passes
     runOptimizationPasses();
   }
+
   // strip away qubits that are not acted upon
   this->qc1.stripIdleQubits();
   this->qc2.stripIdleQubits();
@@ -200,8 +200,7 @@ EquivalenceCheckingManager::EquivalenceCheckingManager(
                  "inputs! Proceed with caution!\n";
   }
 
-  // try to fix a potential mismatch in the output permutations of both
-  // circuits
+  // try to fix a potential mismatch in the output permutations of both circuits
   if (configuration.optimizations.fixOutputPermutationMismatch) {
     fixOutputPermutationMismatch();
   }

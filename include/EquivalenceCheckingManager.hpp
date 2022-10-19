@@ -115,6 +115,13 @@ public:
   }
   void setZXChecker(bool run) { configuration.execution.runZXChecker = run; }
 
+  void disableAllCheckers() {
+    configuration.execution.runConstructionChecker = false;
+    configuration.execution.runZXChecker           = false;
+    configuration.execution.runSimulationChecker   = false;
+    configuration.execution.runAlternatingChecker  = false;
+  }
+
   // Optimization: Optimizations are applied during initialization. Already
   // configured and applied optimizations cannot be reverted
   void runFixOutputPermutationMismatch();
