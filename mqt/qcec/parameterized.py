@@ -107,9 +107,9 @@ def __parse_args(configuration: Configuration | None = None, **kwargs: Any) -> t
     n_checks = 0
     tol = 1e-12
     if kwargs:
-        if kwargs["additional_instantiations"]:
+        if kwargs.get("additional_instantiations"):
             n_checks = kwargs["additional_instantiations"]
-        if kwargs["parameterized_tolerance"]:
+        if kwargs.get("parameterized_tolerance"):
             tol = kwargs["parameterized_tolerance"]
     elif configuration is not None:
         n_checks = configuration.parameterized.additional_instantiations
