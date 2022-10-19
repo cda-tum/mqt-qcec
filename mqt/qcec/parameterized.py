@@ -161,13 +161,13 @@ def check_parameterized(
 
     if n_checks > 0:
         circ1_inst, circ2_inst = instantiate_params_zero(circ1, circ2)
-        res = check_instantiated(circ1, circ2, configuration, **kwargs)
+        res = check_instantiated(circ1_inst, circ2_inst, configuration, **kwargs)
         if res.equivalence == "not_equivalent":
             return res
 
     for _i in range(1, n_checks - 1):
         circ1_inst, circ2_inst = instantiate_params_phases(circ1, circ2)
-        res = check_instantiated(circ1_inst, circ2_inst, **kwargs)
+        res = check_instantiated(circ1_inst, circ2_inst, configuration, **kwargs)
         if res.equivalence == "not_equivalent":
             return res
 
