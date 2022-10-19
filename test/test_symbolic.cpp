@@ -75,7 +75,7 @@ TEST_F(SymbolicTest, InvalidCircuit) {
   auto qc = qc::QuantumComputation(4);
   qc.x(0, {1_pc, 2_pc, 3_pc});
   qc.rx(0, xMonom);
-  auto              ecm = ec::EquivalenceCheckingManager(qc, qc);
+  auto ecm = ec::EquivalenceCheckingManager(qc, qc);
   ecm.run();
 
   EXPECT_EQ(ecm.getResults().equivalence,
