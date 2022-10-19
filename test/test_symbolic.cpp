@@ -49,3 +49,38 @@ TEST_F(SymbolicTest, SymbolicNonEqu) {
 
   EXPECT_FALSE(ecm.getResults().consideredEquivalent());
 }
+
+TEST_F(SymbolicTest, Timeout) {
+  using namespace std::chrono_literals;
+
+  // construct large circuit
+  constexpr auto numLayers = 100000;
+  symQc1                   = qc::QuantumComputation(2);
+  symQc2                   = qc::QuantumComputation(2);
+  for (auto i = 0; i < numLayers; ++i) {
+    symQc1.x(0, 1_pc);
+    symQc1.rx(0, xMonom);
+
+    symQc2.x(0, 1_pc);
+    symQc2.rx(0, xMonom);
+  }
+  ec::Configuration config{};
+  config.execution.timeout = 1s;
+  auto ecm = ec::EquivalenceCheckingManager(symQc1, symQc2, config);
+
+  ecm.run();
+  EXPECT_EQ(ecm.getResults().equivalence,
+            ec::EquivalenceCriterion::NoInformation);
+}
+
+TEST_F(SymbolicTest, InvalidCircuit) {
+  auto qc = qc::QuantumComputation(4);
+  qc.x(0, {1_pc, 2_pc, 3_pc});
+  qc.rx(0, xMonom);
+  ec::Configuration config{};
+  auto              ecm = ec::EquivalenceCheckingManager(qc, qc, config);
+  ecm.run();
+
+  EXPECT_EQ(ecm.getResults().equivalence,
+            ec::EquivalenceCriterion::NoInformation);
+}

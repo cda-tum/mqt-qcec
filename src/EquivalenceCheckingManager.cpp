@@ -239,7 +239,7 @@ void EquivalenceCheckingManager::checkSequential() {
           // if the thread has already finished within the timeout, nothing
           // has to be done
           if (!finished) {
-            done = true;
+            setAndSignalDone();
           }
         });
   }
@@ -639,7 +639,7 @@ void EquivalenceCheckingManager::checkSymbolic() {
       // if the thread has already finished within the timeout,
       // nothing has to be done
       if (!finished) {
-        done = true;
+        setAndSignalDone();
       }
     });
   }
