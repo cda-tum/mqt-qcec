@@ -649,12 +649,13 @@ void EquivalenceCheckingManager::checkSymbolic() {
         zx::FunctionalityConstruction::transformableToZX(&qc2)) {
       checkers.emplace_back(
           std::make_unique<ZXEquivalenceChecker>(qc1, qc2, configuration));
-      auto&      zxChecker = checkers.back();
-      const auto result    = zxChecker->run();
-
-      results.equivalence = result;
-      done                = true;
-      doneCond.notify_one();
+      const auto& zxChecker = checkers.back();
+      if (!done) {
+        const auto result   = zxChecker->run();
+        results.equivalence = result;
+        done                = true;
+        doneCond.notify_one();
+      }
     } else {
       std::clog << "Checking symbolic circuits requires transformation "
                    "to ZX-diagram but one of the circuits contains "
