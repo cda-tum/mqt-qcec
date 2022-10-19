@@ -56,7 +56,7 @@ jobs:
         uses: codecov/codecov-action@v3.1.1
         with:
           fail_ci_if_error: true
-          flags:            c++
-          gcov:             true
-          gcov_ignore:      "extern/**/*"
-          token:            ${{ secrets.CODECOV_TOKEN }}
+          flags: c++
+          gcov: true
+          gcov_ignore: "extern/**/*"
+          token: ${{ secrets.CODECOV_TOKEN }}
