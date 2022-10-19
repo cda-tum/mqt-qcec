@@ -148,7 +148,6 @@ def check_parameterized(
 
         qc1_bound = round_zero_params(qc1_bound)
         qc2_bound = round_zero_params(qc2_bound)
-
         return (qc1_bound, qc2_bound)
 
     def instantiate_params_zero(qc1: QuantumCircuit, qc2: QuantumCircuit) -> tuple[QuantumCircuit, QuantumCircuit]:
@@ -159,11 +158,10 @@ def check_parameterized(
         b = np.random.choice(phases, size=len(offsets)) + offsets
         return instantiate_params(qc1, qc2, b)
 
-    if n_checks > 0:
-        circ1_inst, circ2_inst = instantiate_params_zero(circ1, circ2)
-        res = check_instantiated(circ1_inst, circ2_inst, configuration, **kwargs)
-        if res.equivalence == "not_equivalent":
-            return res
+    circ1_inst, circ2_inst = instantiate_params_zero(circ1, circ2)
+    res = check_instantiated(circ1_inst, circ2_inst, configuration, **kwargs)
+    if res.equivalence == "not_equivalent":
+        return res
 
     for _i in range(1, n_checks - 1):
         circ1_inst, circ2_inst = instantiate_params_phases(circ1, circ2)
