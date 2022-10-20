@@ -125,3 +125,43 @@ TEST_F(EqualityTest, SimulationMoreThan64Qubits) {
   std::cout << ecm << std::endl;
   EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::ProbablyEquivalent);
 }
+
+TEST_F(EqualityTest, AutomaticSwitchToConstructionChecker) {
+  // add ancillary qubits to both circuits
+  qc1.addAncillaryQubit(1, -1);
+  qc2.addAncillaryQubit(1, -1);
+
+  // perform the same action on both circuits' primary qubit
+  qc1.x(0);
+  qc2.x(0);
+
+  // perform a different action on the ancillary qubit
+  qc1.x(1);
+  qc2.z(1);
+
+  // setup default configuration
+  config = ec::Configuration{};
+  ec::EquivalenceCheckingManager ecm(qc1, qc2, config);
+
+  // this should notice that the alternating checker is not capable of running
+  // the circuit and should switch to the construction checker
+  const auto runConfig = ecm.getConfiguration();
+  EXPECT_TRUE(runConfig.execution.runConstructionChecker);
+  EXPECT_FALSE(runConfig.execution.runAlternatingChecker);
+
+  // run the equivalence checker
+  ecm.run();
+
+  // both circuits should be equivalent since their action only differs on an
+  // ancillary and garbage qubit
+  const auto result = ecm.equivalence();
+  EXPECT_EQ(result, ec::EquivalenceCriterion::Equivalent);
+
+  // Check an exception is raised for a checker configured after initialization.
+  // Note: this exception can only be caught in sequential mode since it is
+  // raised in a different thread otherwise.
+  ecm.reset();
+  ecm.setAlternatingChecker(true);
+  ecm.setParallel(false);
+  EXPECT_THROW(ecm.run(), std::invalid_argument);
+}

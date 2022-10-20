@@ -196,6 +196,16 @@ EquivalenceCheckingManager::EquivalenceCheckingManager(
     fixOutputPermutationMismatch();
   }
 
+  // check whether the alternating checker is configured and can handle the
+  // circuits
+  if (configuration.execution.runAlternatingChecker &&
+      !DDAlternatingChecker::canHandle(this->qc1, this->qc2)) {
+    std::clog << "[QCEC] Warning: alternating checker cannot handle the "
+                 "circuits. Falling back to construction checker.\n";
+    this->configuration.execution.runAlternatingChecker  = false;
+    this->configuration.execution.runConstructionChecker = true;
+  }
+
   // initialize the stimuli generator
   stateGenerator = StateGenerator(configuration.simulation.seed);
 

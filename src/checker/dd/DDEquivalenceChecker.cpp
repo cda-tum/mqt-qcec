@@ -52,14 +52,19 @@ DDEquivalenceChecker<DDType, DDPackage>::equals(const DDType& e,
     // product trace(U V^-1) and comparing it to some threshold. in a similar
     // fashion, we can simply compare U V^-1 with the identity, which results in
     // a much simpler check that is not prone to overflow.
-    bool isClose{};
-    if (e.p->isIdentity()) {
-      isClose =
-          dd->isCloseToIdentity(f, configuration.functionality.traceThreshold);
-    } else if (f.p->isIdentity()) {
-      isClose =
-          dd->isCloseToIdentity(e, configuration.functionality.traceThreshold);
+    bool       isClose{};
+    const bool eIsClose =
+        dd->isCloseToIdentity(e, configuration.functionality.traceThreshold);
+    const bool fIsClose =
+        dd->isCloseToIdentity(f, configuration.functionality.traceThreshold);
+    if (eIsClose || fIsClose) {
+      // if any of the DDs is close to the identity (structure), the result can
+      // be decided by whether both DDs are close enough to the identity.
+      isClose = eIsClose && fIsClose;
     } else {
+      // otherwise, one DD needs to be inverted before multiplying both of them
+      // together and checking whether the resulting DD is close enough to the
+      // identity.
       auto g = dd->multiply(e, dd->conjugateTranspose(f));
       isClose =
           dd->isCloseToIdentity(g, configuration.functionality.traceThreshold);
