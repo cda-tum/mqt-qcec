@@ -12,7 +12,8 @@ name = "mqt.qcec"
 description = "A tool for Quantum Circuit Equivalence Checking"
 readme = "README.md"
 authors = [
-    { name = "Lukas Burgholzer", email = "lukas.burgholzer@jku.at"}
+    { name = "Lukas Burgholzer", email = "lukas.burgholzer@jku.at"},
+    { name = "Tom Peham", email = "tom.peham@tum.de" }
 ]
 keywords = ["MQT", "quantum computing", "design automation", "equivalence checking", "verification"]
 license = { file = "LICENSE.md" }
