@@ -12,37 +12,26 @@ void DDAlternatingChecker::initialize() {
   functionality = dd->makeIdent(nqubits);
   dd->incRef(functionality);
 
-  // only count ancillaries that are present in but not acted upon in both of
-  // the circuits at the moment this is just to be on the safe side. It might be
-  // fine to also start with the reduced matrix for every ancillary without any
-  // restriction
-  // TODO: check whether the way ancillaries are handled here is theoretically
-  // sound
+  // Only count ancillaries that are present in but not acted upon in both of
+  // the circuits. Otherwise, the alternating checker must not be used.
+  // Counter-example: H |0><0| H^-1 = [[0.5, 0.5], [0.5, 0.5]] != |0><0|
   std::vector<bool> ancillary(nqubits);
   for (auto q = static_cast<dd::Qubit>(nqubits - 1U); q >= 0; --q) {
     if (qc1.logicalQubitIsAncillary(q) && qc2.logicalQubitIsAncillary(q)) {
-      bool found1  = false;
-      bool isIdle1 = false;
-      if (const auto it = std::find_if(
-              qc1.initialLayout.cbegin(), qc1.initialLayout.cend(),
-              [q](const auto& mapping) { return mapping.second == q; });
-          it != qc1.initialLayout.cend()) {
-        found1  = true;
-        isIdle1 = qc1.isIdleQubit(it->first);
-      }
-      bool found2  = false;
-      bool isIdle2 = false;
-      if (const auto it = std::find_if(
-              qc2.initialLayout.cbegin(), qc2.initialLayout.cend(),
-              [q](const auto& mapping) { return mapping.second == q; });
-          it != qc2.initialLayout.cend()) {
-        found2  = true;
-        isIdle2 = qc2.isIdleQubit(it->first);
-      }
+      const auto [found1, physical1] = qc1.containsLogicalQubit(q);
+      const auto isIdle1             = found1 && qc1.isIdleQubit(*physical1);
+
+      const auto [found2, physical2] = qc2.containsLogicalQubit(q);
+      const auto isIdle2             = found2 && qc2.isIdleQubit(*physical2);
 
       // qubit only really exists or is acted on in one of the circuits
       if ((found1 != found2) || (isIdle1 != isIdle2)) {
         ancillary[static_cast<std::size_t>(q)] = true;
+      } else {
+        throw std::invalid_argument(
+            "Alternating checker must not be used for "
+            "circuits that both have non-idle ancillary "
+            "qubits. Use the construction checker instead.");
       }
     }
   }
@@ -51,8 +40,8 @@ void DDAlternatingChecker::initialize() {
   // [1 0] if the qubit is no ancillary, or it is acted upon by both circuits
   // [0 1]
   //
-  // [1 0] for an ancillary that is present in one circuit and not acted upon in
-  // the other [0 0]
+  // [1 0] (= |0><0|) for an ancillary only acted on in one circuit
+  // [0 0]
   functionality = dd->reduceAncillae(functionality, ancillary);
 }
 
@@ -122,16 +111,6 @@ void DDAlternatingChecker::postprocess() {
   if (isDone()) {
     return;
   }
-
-  // TODO: check whether reducing ancillaries here is theoretically sound
-  taskManager1.reduceAncillae(functionality);
-  if (isDone()) {
-    return;
-  }
-  taskManager2.reduceAncillae(functionality);
-  if (isDone()) {
-    return;
-  }
 }
 
 EquivalenceCriterion DDAlternatingChecker::checkEquivalence() {
@@ -143,7 +122,6 @@ EquivalenceCriterion DDAlternatingChecker::checkEquivalence() {
   taskManager1.reduceGarbage(goalMatrix);
   taskManager2.reduceGarbage(goalMatrix);
 
-  // TODO: check whether reducing ancillaries here is theoretically sound
   taskManager1.reduceAncillae(goalMatrix);
   taskManager2.reduceAncillae(goalMatrix);
 
@@ -151,7 +129,7 @@ EquivalenceCriterion DDAlternatingChecker::checkEquivalence() {
   // [1 0] if the qubit is no ancillary
   // [0 1]
   //
-  // [1 0] for an ancillary that is present in either circuit
+  // [1 0] (= |0><0>|) for an ancillary that is present in either circuit
   // [0 0]
 
   // compare the obtained functionality to the goal matrix
@@ -167,6 +145,34 @@ EquivalenceCriterion DDAlternatingChecker::checkEquivalence() {
   const auto& op2 = *taskManager2();
 
   return op1.equals(op2);
+}
+
+bool DDAlternatingChecker::canHandle(const qc::QuantumComputation& qc1,
+                                     const qc::QuantumComputation& qc2) {
+  assert(qc1.getNqubits() == qc2.getNqubits());
+  const auto nqubits = qc1.getNqubits();
+
+  for (auto q = static_cast<dd::Qubit>(nqubits - 1U); q >= 0; --q) {
+    if (qc1.logicalQubitIsAncillary(q) && qc2.logicalQubitIsAncillary(q)) {
+      const auto [found1, physical1] = qc1.containsLogicalQubit(q);
+      const auto [found2, physical2] = qc2.containsLogicalQubit(q);
+
+      // just continue, if a qubit is not found in both circuits
+      if (found1 != found2) {
+        continue;
+      }
+
+      const auto isIdle1 = found1 && qc1.isIdleQubit(*physical1);
+      const auto isIdle2 = found2 && qc2.isIdleQubit(*physical2);
+
+      // if an ancillary qubit is acted on in both circuits,
+      // the alternating checker cannot be used.
+      if (!isIdle1 && !isIdle2) {
+        return false;
+      }
+    }
+  }
+  return true;
 }
 
 } // namespace ec
