@@ -7,13 +7,30 @@ coverage:
   range: 60..90
   precision: 1
   status:
-    project:
-      default:
-        threshold: 0.5%
-    patch:
-      default:
-        threshold: 1%
-        target: 90%
+    project: off
+    patch: off
+
+flag_management:
+  individual_flags:
+    - name: cpp
+      paths:
+        - "include/**/*.hpp"
+        - "src/**/*.cpp"
+      statuses:
+        - type: project
+          threshold: 0.5%
+        - type: patch
+          threshold: 1%
+          target: 90%
+    - name: python
+      paths:
+        - "mqt/**/*.py"
+      statuses:
+        - type: project
+          threshold: 0.5%
+        - type: patch
+          threshold: 1%
+          target: 95%
 
 parsers:
   gcov:
