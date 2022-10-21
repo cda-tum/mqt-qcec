@@ -113,14 +113,16 @@ def test_equivalent_rz_commute(rz_commute_lhs: QuantumCircuit, rz_commute_rhs_co
 
 
 def test_non_equivalent_rz_commute(rz_commute_lhs: QuantumCircuit, rz_commute_rhs_incorrect: QuantumCircuit) -> None:
-    result = qcec.verify(rz_commute_lhs, rz_commute_rhs_incorrect)
+    result = qcec.verify(rz_commute_lhs, rz_commute_rhs_incorrect, timeout=datetime.timedelta(seconds=3600))
     assert result.equivalence == qcec.EquivalenceCriterion.not_equivalent
 
 
 def test_non_equivalent_phase_rz_commute(
     rz_commute_lhs: QuantumCircuit, rz_commute_rhs_incorrect: QuantumCircuit
 ) -> None:
-    result = qcec.verify(rz_commute_lhs, rz_commute_rhs_incorrect, additional_instantiations=2)
+    result = qcec.verify(
+        rz_commute_lhs, rz_commute_rhs_incorrect, additional_instantiations=2, timeout=datetime.timedelta(seconds=3600)
+    )
     assert result.equivalence == qcec.EquivalenceCriterion.not_equivalent
 
 
