@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import pytest
 from mqt import qcec
+from mqt.qcec.compilation_flow_profiles import AncillaMode
 from qiskit import QuantumCircuit, transpile
 from qiskit.circuit import Parameter
 from qiskit.providers.fake_provider import FakeAthens
@@ -166,7 +167,9 @@ def test_verify_compilation_on_optimization_levels(original_circuit: QuantumCirc
     to the 5-qubit IBMQ Athens architecture with various optimization levels.
     """
     compiled_circuit = transpile(original_circuit, backend=FakeAthens(), optimization_level=optimization_level)
-    result = qcec.verify_compilation(original_circuit, compiled_circuit, optimization_level=optimization_level)
+    result = qcec.verify_compilation(
+        original_circuit, compiled_circuit, optimization_level=optimization_level, timeout=3600
+    )
     assert (
         result.equivalence == qcec.EquivalenceCriterion.equivalent
         or result.equivalence == qcec.EquivalenceCriterion.equivalent_up_to_global_phase
@@ -185,7 +188,7 @@ def test_verify_compilation_on_optimization_levels_config(
     config.execution.run_zx_checker = False
     compiled_circuit = transpile(original_circuit, backend=FakeAthens(), optimization_level=optimization_level)
     result = qcec.verify_compilation(
-        original_circuit, compiled_circuit, optimization_level=optimization_level, configuration=config, timeout=3600
+        original_circuit, compiled_circuit, optimization_level, AncillaMode.NO_ANCILLA, config
     )
     assert (
         result.equivalence == qcec.EquivalenceCriterion.equivalent
