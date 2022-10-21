@@ -11,6 +11,10 @@ from qiskit import QuantumCircuit
 from qiskit.circuit import Parameter, ParameterExpression
 
 
+def __is_parameterized(qc: QuantumCircuit) -> bool:
+    return not isinstance(qc, str) and qc.parameters
+
+
 def __ecm_from_config_or_kwargs(
     circ1: QuantumCircuit, circ2: QuantumCircuit, configuration: Configuration | None = None, **kwargs: Any
 ) -> EquivalenceCheckingManager:
@@ -163,7 +167,7 @@ def check_parameterized(
     if res.equivalence == "not_equivalent":
         return res
 
-    for _i in range(1, n_checks - 1):
+    for _i in range(n_checks):
         circ1_inst, circ2_inst = instantiate_params_phases(circ1, circ2)
         res = check_instantiated(circ1_inst, circ2_inst, configuration, **kwargs)
         if res.equivalence == "not_equivalent":

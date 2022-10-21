@@ -96,16 +96,15 @@ static std::unique_ptr<EquivalenceCheckingManager> createManagerFromOptions(
     // Simulation
     const double fidelityThreshold = 1e-8,
 
-    const std::size_t maxSims = std::max(16U,
-                                         std::thread::hardware_concurrency() -
-                                             2U),
+    const std::size_t maxSims   = std::max(16U,
+                                           std::thread::hardware_concurrency() -
+                                               2U),
+    const StateType&  stateType = StateType::ComputationalBasis,
+    const std::size_t seed = 0U, const bool storeCEXinput = false,
+    const bool storeCEXoutput = false,
     // Parameterized
     const double      parameterizedTol          = 1e-12,
-    const std::size_t nAdditionalInstantiations = 0,
-    const StateType&  stateType                 = StateType::ComputationalBasis,
-    const std::size_t seed = 0U, const bool storeCEXinput = false,
-
-    const bool storeCEXoutput = false) {
+    const std::size_t nAdditionalInstantiations = 0) {
   Configuration configuration{};
   // Execution
   configuration.execution.numericalTolerance     = numericalTolerance;
@@ -291,10 +290,10 @@ PYBIND11_MODULE(pyqcec, m) {
          "alternating_scheme"_a = "proportional", "profile"_a = "",
          "trace_threshold"_a = 1e-8, "fidelity_threshold"_a = 1e-8,
          "max_sims"_a = std::max(16U, std::thread::hardware_concurrency() - 2U),
-         "parameterized_tolerance"_a   = 1e-12,
-         "additional_instantiations"_a = 0U,
          "state_type"_a = "computational_basis", "seed"_a = 0U,
-         "store_cex_input"_a = false, "store_cex_output"_a = false)
+         "store_cex_input"_a = false, "store_cex_output"_a = false,
+         "parameterized_tolerance"_a   = 1e-12,
+         "additional_instantiations"_a = 0U)
       .def(py::init([](const py::object& circ1, const py::object& circ2,
                        const Configuration& config) {
              return createManagerFromConfiguration(circ1, circ2, config);

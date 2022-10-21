@@ -2,8 +2,9 @@ from __future__ import annotations
 
 import pytest
 from mqt import qcec
-from qiskit import QuantumCircuit
+from qiskit import QuantumCircuit, transpile
 from qiskit.circuit import Parameter
+from qiskit.providers.fake_provider import FakeAthens
 
 alpha = Parameter("alpha")
 beta = Parameter("beta")
@@ -92,6 +93,17 @@ def cnot_rx_flipped_approx() -> QuantumCircuit:
     return qc
 
 
+@pytest.fixture
+def original_circuit() -> QuantumCircuit:
+    qc = QuantumCircuit(3)
+    qc.h(0)
+    qc.cx(0, 1)
+    qc.cx(0, 2)
+    qc.rx(alpha, 0)
+    qc.measure_all()
+    return qc
+
+
 def test_equivalent_rz_commute(rz_commute_lhs: QuantumCircuit, rz_commute_rhs_correct: QuantumCircuit) -> None:
     result = qcec.verify(rz_commute_lhs, rz_commute_rhs_correct)
     assert result.equivalence == qcec.EquivalenceCriterion.equivalent
@@ -145,3 +157,17 @@ def test_cnot_rx_non_equ(cnot_rx: QuantumCircuit, cnot_rx_flipped: QuantumCircui
 def test_cnot_rx_non_equ_approx(cnot_rx: QuantumCircuit, cnot_rx_flipped_approx: QuantumCircuit) -> None:
     result = qcec.verify(cnot_rx, cnot_rx_flipped_approx)
     assert result.equivalence == qcec.EquivalenceCriterion.not_equivalent
+
+
+@pytest.mark.parametrize("optimization_level", [0, 1, 2, 3])
+def test_verify_compilation_on_optimization_levels(original_circuit: QuantumCircuit, optimization_level: int) -> None:
+    """
+    Test the verification of the compilation of a circuit
+    to the 5-qubit IBMQ Athens architecture with various optimization levels.
+    """
+    compiled_circuit = transpile(original_circuit, backend=FakeAthens(), optimization_level=optimization_level)
+    result = qcec.verify_compilation(original_circuit, compiled_circuit, optimization_level=optimization_level)
+    assert (
+        result.equivalence == qcec.EquivalenceCriterion.equivalent
+        or result.equivalence == qcec.EquivalenceCriterion.equivalent_up_to_global_phase
+    )

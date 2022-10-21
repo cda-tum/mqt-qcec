@@ -5,7 +5,7 @@ from typing import Any
 from mqt.qcec import Configuration, EquivalenceCheckingManager
 from qiskit import QuantumCircuit
 
-from .parameterized import check_parameterized
+from .parameterized import __is_parameterized, check_parameterized
 
 
 def verify(
@@ -34,10 +34,7 @@ def verify(
     :return: The results of the equivalence checking process.
     """
 
-    def is_parameterized(qc: QuantumCircuit) -> bool:
-        return not isinstance(qc, str) and qc.parameters
-
-    if is_parameterized(circ1) or is_parameterized(circ2):
+    if __is_parameterized(circ1) or __is_parameterized(circ2):
         return check_parameterized(circ1, circ2, configuration, **kwargs)
 
     if kwargs:
