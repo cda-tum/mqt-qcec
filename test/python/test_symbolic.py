@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import datetime
+
 import pytest
 from mqt import qcec
 from mqt.qcec.compilation_flow_profiles import AncillaMode
@@ -168,7 +170,7 @@ def test_verify_compilation_on_optimization_levels(original_circuit: QuantumCirc
     """
     compiled_circuit = transpile(original_circuit, backend=FakeAthens(), optimization_level=optimization_level)
     result = qcec.verify_compilation(
-        original_circuit, compiled_circuit, optimization_level=optimization_level, timeout=3600
+        original_circuit, compiled_circuit, optimization_level, timeout=datetime.timedelta(seconds=3600)
     )
     assert (
         result.equivalence == qcec.EquivalenceCriterion.equivalent
