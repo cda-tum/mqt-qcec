@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import time
-from datetime import timedelta
 from itertools import chain
 from typing import Any
 
@@ -17,9 +16,7 @@ def __is_parameterized(qc: QuantumCircuit) -> bool:
     return not isinstance(qc, str) and qc.parameters
 
 
-def __adjust_timeout(
-    curr_timeout: timedelta | None, res: EquivalenceCheckingManager.Results | float
-) -> timedelta | None:
+def __adjust_timeout(curr_timeout: float | None, res: EquivalenceCheckingManager.Results | float) -> float | None:
     if curr_timeout is not None:
         if isinstance(res, EquivalenceCheckingManager.Results):
             return curr_timeout - (res.check_time + res.preprocessing_time)
@@ -171,7 +168,13 @@ def check_parameterized(
         return res
 
     update_stats(res)
-    timeout = __adjust_timeout(kwargs.get("timeout"), res)
+
+    if kwargs.get("timeout"):
+        timeout = kwargs["timeout"].total_seconds()
+    else:
+        timeout = None
+
+    timeout = __adjust_timeout(timeout, res)
 
     n_checks, tol = __parse_args(configuration, **kwargs)
 
@@ -214,14 +217,14 @@ def check_parameterized(
     timeout = __adjust_timeout(timeout, runtime)
 
     if timeout is not None and timeout < 0:
-        write_stats(res)
+        write_stats(1, res)
         res.equivalence = EquivalenceCriterion.no_information
         return res
 
     res = check_instantiated(circ1_inst, circ2_inst, configuration, **kwargs)
     update_stats(res)
     if res.equivalence == EquivalenceCriterion.not_equivalent:
-        write_stats(0, res)
+        write_stats(1, res)
         return res
 
     for i in range(n_checks):
@@ -231,14 +234,14 @@ def check_parameterized(
         timeout = __adjust_timeout(timeout, res)
 
         if timeout is not None and timeout < 0:
-            write_stats(i, res)
+            write_stats(i + 2, res)
             res.equivalence = EquivalenceCriterion.no_information
             return res
 
         update_stats(res)
 
         if res.equivalence == EquivalenceCriterion.not_equivalent:
-            write_stats(res)
+            write_stats(i + 2, res)
             return res
 
     res = check_instantiated_random(circ1, circ2, parameters, configuration, **kwargs)
@@ -247,5 +250,5 @@ def check_parameterized(
         res.equivalence = EquivalenceCriterion.no_information
 
     update_stats(res)
-    write_stats(n_checks, res)
+    write_stats(n_checks + 2, res)
     return res
