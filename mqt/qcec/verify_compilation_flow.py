@@ -12,6 +12,8 @@ from mqt.qcec import Configuration, EquivalenceCheckingManager
 from mqt.qcec.compilation_flow_profiles import AncillaMode, generate_profile_name
 from qiskit import QuantumCircuit
 
+from .parameterized import __is_parameterized, check_parameterized
+
 
 def verify_compilation(
     original_circuit: QuantumCircuit | str,
@@ -46,6 +48,32 @@ def verify_compilation(
     :rtype: EquivalenceCheckingManager.Results
     """
 
+    # use the gate_cost scheme for the verification
+    scheme = "gate_cost"
+    # get the pre-defined profile for the gate_cost scheme
+    profile_name = generate_profile_name(optimization_level=optimization_level, mode=ancilla_mode)
+    ref = resources.files("mqt.qcec") / "profiles" / profile_name
+
+    if __is_parameterized(original_circuit) or __is_parameterized(compiled_circuit):
+        if kwargs or configuration is None:
+            with resources.as_file(ref) as path:
+                return check_parameterized(
+                    original_circuit,
+                    compiled_circuit,
+                    configuration,
+                    construction_scheme="gate_cost",
+                    profile=str(path),
+                    **kwargs,
+                )
+        else:
+            configuration.application.construction_scheme = scheme
+            configuration.application.simulation_scheme = scheme
+            configuration.application.alternating_scheme = scheme
+            with resources.as_file(ref) as path:
+                configuration.application.profile = str(path)
+                return check_parameterized(original_circuit, compiled_circuit, configuration, **kwargs)
+
+    # Circuit is not parameterized. Execute regular check
     if kwargs:
         # create the equivalence checker from keyword arguments
         ecm = EquivalenceCheckingManager(original_circuit, compiled_circuit, **kwargs)
@@ -56,12 +84,8 @@ def verify_compilation(
         # create the equivalence checker from configuration
         ecm = EquivalenceCheckingManager(original_circuit, compiled_circuit, configuration)
 
-    # use the gate_cost scheme for the verification
-    ecm.set_application_scheme("gate_cost")
+    ecm.set_application_scheme(scheme)
 
-    # get the pre-defined profile for the gate_cost scheme
-    profile_name = generate_profile_name(optimization_level=optimization_level, mode=ancilla_mode)
-    ref = resources.files("mqt.qcec") / "profiles" / profile_name
     with resources.as_file(ref) as path:
         ecm.set_gate_cost_profile(str(path))
 

@@ -6,10 +6,12 @@
 #include "EquivalenceCheckingManager.hpp"
 
 #include "EquivalenceCriterion.hpp"
+#include "Expression.hpp"
 #include "zx/FunctionalityConstruction.hpp"
 
 #include <iostream>
 #include <memory>
+#include <string>
 
 namespace ec {
 void EquivalenceCheckingManager::setupAncillariesAndGarbage() {
@@ -153,11 +155,16 @@ void EquivalenceCheckingManager::run() {
     return;
   }
 
-  if (!configuration.execution.parallel ||
-      configuration.execution.nthreads <= 1 || configuration.onlySingleTask()) {
-    checkSequential();
+  if (qc1.isVariableFree() && qc2.isVariableFree()) {
+    if (!configuration.execution.parallel ||
+        configuration.execution.nthreads <= 1 ||
+        configuration.onlySingleTask()) {
+      checkSequential();
+    } else {
+      checkParallel();
+    }
   } else {
-    checkParallel();
+    checkSymbolic();
   }
 }
 
@@ -174,8 +181,10 @@ EquivalenceCheckingManager::EquivalenceCheckingManager(
   // set numeric tolerance used throughout the check
   setTolerance(configuration.execution.numericalTolerance);
 
-  // run all configured optimization passes
-  runOptimizationPasses();
+  if (qc1.isVariableFree() && qc2.isVariableFree()) {
+    // run all configured optimization passes
+    runOptimizationPasses();
+  }
 
   // strip away qubits that are not acted upon
   this->qc1.stripIdleQubits();
@@ -209,8 +218,8 @@ EquivalenceCheckingManager::EquivalenceCheckingManager(
   // initialize the stimuli generator
   stateGenerator = StateGenerator(configuration.simulation.seed);
 
-  // check whether the number of selected stimuli does exceed the maximum number
-  // of unique computational basis states
+  // check whether the number of selected stimuli does exceed the maximum
+  // number of unique computational basis states
   if (configuration.execution.runSimulationChecker &&
       configuration.simulation.stateType == StateType::ComputationalBasis) {
     const auto        nq           = this->qc1.getNqubitsWithoutAncillae();
@@ -228,8 +237,8 @@ EquivalenceCheckingManager::EquivalenceCheckingManager(
 void EquivalenceCheckingManager::checkSequential() {
   const auto start = std::chrono::steady_clock::now();
 
-  // in case a timeout is configured, a separate thread is started that sets the
-  // `done` flag after the timeout has passed
+  // in case a timeout is configured, a separate thread is started that sets
+  // the `done` flag after the timeout has passed
   std::thread timeoutThread{};
   if (configuration.execution.timeout > 0s) {
     timeoutThread =
@@ -237,10 +246,10 @@ void EquivalenceCheckingManager::checkSequential() {
           std::unique_lock doneLock(doneMutex);
           const auto       finished =
               doneCond.wait_for(doneLock, timeout, [this] { return done; });
-          // if the thread has already finished within the timeout, nothing has
-          // to be done
+          // if the thread has already finished within the timeout, nothing
+          // has to be done
           if (!finished) {
-            done = true;
+            setAndSignalDone();
           }
         });
   }
@@ -260,8 +269,8 @@ void EquivalenceCheckingManager::checkSequential() {
       const auto result = simulationChecker->run();
       ++results.performedSimulations;
 
-      // if the run completed but has not yielded any information this indicates
-      // a timeout
+      // if the run completed but has not yielded any information this
+      // indicates a timeout
       if (result == EquivalenceCriterion::NoInformation) {
         if (!done) {
           std::clog << "Simulation run returned without any information. "
@@ -276,7 +285,8 @@ void EquivalenceCheckingManager::checkSequential() {
         break;
       }
 
-      // Otherwise, circuits are probably equivalent and execution can continue
+      // Otherwise, circuits are probably equivalent and execution can
+      // continue
       results.equivalence = EquivalenceCriterion::ProbablyEquivalent;
     }
 
@@ -309,15 +319,17 @@ void EquivalenceCheckingManager::checkSequential() {
     checkers.emplace_back(
         std::make_unique<DDAlternatingChecker>(qc1, qc2, configuration));
     const auto& alternatingChecker = checkers.back();
-    const auto  result             = alternatingChecker->run();
+    if (!done) {
+      const auto result = alternatingChecker->run();
 
-    // if the alternating check produces a result, this is final
-    if (result != EquivalenceCriterion::NoInformation) {
-      results.equivalence = result;
+      // if the alternating check produces a result, this is final
+      if (result != EquivalenceCriterion::NoInformation) {
+        results.equivalence = result;
 
-      // everything is done
-      done = true;
-      doneCond.notify_one();
+        // everything is done
+        done = true;
+        doneCond.notify_one();
+      }
     }
   }
 
@@ -325,15 +337,17 @@ void EquivalenceCheckingManager::checkSequential() {
     checkers.emplace_back(
         std::make_unique<DDConstructionChecker>(qc1, qc2, configuration));
     const auto& constructionChecker = checkers.back();
-    const auto  result              = constructionChecker->run();
+    if (!done) {
+      const auto result = constructionChecker->run();
 
-    // if the construction check produces a result, this is final
-    if (result != EquivalenceCriterion::NoInformation) {
-      results.equivalence = result;
+      // if the construction check produces a result, this is final
+      if (result != EquivalenceCriterion::NoInformation) {
+        results.equivalence = result;
 
-      // everything is done
-      done = true;
-      doneCond.notify_one();
+        // everything is done
+        done = true;
+        doneCond.notify_one();
+      }
     }
   }
 
@@ -343,14 +357,16 @@ void EquivalenceCheckingManager::checkSequential() {
       checkers.emplace_back(
           std::make_unique<ZXEquivalenceChecker>(qc1, qc2, configuration));
       const auto& zxChecker = checkers.back();
-      const auto  result    = zxChecker->run();
+      if (!done) {
+        const auto result = zxChecker->run();
 
-      results.equivalence = result;
-      // break if equivalence has been shown
-      if (result == EquivalenceCriterion::EquivalentUpToGlobalPhase ||
-          result == EquivalenceCriterion::Equivalent) {
-        done = true;
-        doneCond.notify_one();
+        results.equivalence = result;
+        // break if equivalence has been shown
+        if (result == EquivalenceCriterion::EquivalentUpToGlobalPhase ||
+            result == EquivalenceCriterion::Equivalent) {
+          done = true;
+          doneCond.notify_one();
+        }
       }
     } else if (configuration.onlyZXCheckerConfigured()) {
       std::clog << "Only ZX checker specified but one of the circuits contains "
@@ -416,8 +432,8 @@ void EquivalenceCheckingManager::checkParallel() {
 
   const auto effectiveThreads = std::min(maxThreads, tasksToExecute);
 
-  // reserve space for as many equivalence checkers as there will be parallel
-  // threads
+  // reserve space for as many equivalence checkers as there will be
+  // parallel threads
   checkers.resize(effectiveThreads);
 
   // create a thread safe queue which is used to check for available results
@@ -499,8 +515,8 @@ void EquivalenceCheckingManager::checkParallel() {
       completedID = queue.waitAndPop();
     }
 
-    // in case no completed ID has been returned this indicates a timeout and
-    // the computation should stop
+    // in case no completed ID has been returned this indicates a timeout
+    // and the computation should stop
     if (!completedID) {
       setAndSignalDone();
       break;
@@ -571,7 +587,8 @@ void EquivalenceCheckingManager::checkParallel() {
       results.equivalence = EquivalenceCriterion::ProbablyEquivalent;
       ++results.performedSimulations;
 
-      // it has to be checked, whether further simulations shall be conducted
+      // it has to be checked, whether further simulations shall be
+      // conducted
       if (results.startedSimulations < configuration.simulation.maxSims) {
         threads[*completedID] = std::thread([&, this, id = *completedID] {
           auto* const simChecker =
@@ -589,8 +606,8 @@ void EquivalenceCheckingManager::checkParallel() {
       } else if (configuration.onlySimulationCheckerConfigured() &&
                  results.performedSimulations ==
                      configuration.simulation.maxSims) {
-        // in case only simulations are performed and every single one is done,
-        // everything is done
+        // in case only simulations are performed and every single one is
+        // done, everything is done
         setAndSignalDone();
         break;
       }
@@ -601,7 +618,8 @@ void EquivalenceCheckingManager::checkParallel() {
   results.checkTime = std::chrono::duration<double>(end - start).count();
 
   // cleanup threads that are still running by joining them
-  // start by joining all the completed threads, which should succeed instantly
+  // start by joining all the completed threads, which should succeed
+  // instantly
   while (!queue.empty()) {
     const auto completedID = queue.waitAndPop();
     auto&      thread      = threads.at(*completedID);
@@ -611,15 +629,64 @@ void EquivalenceCheckingManager::checkParallel() {
   }
 
   // afterwards, join all threads that are still (potentially) running.
-  // at the moment there seems to be no solution for prematurely killing running
-  // threads without risking synchronisation issues. on the positive side,
-  // joining should avoid all of these potential issues on the negative side,
-  // one of the threads might still be stuck in a long-running operation and
-  // does not check for the `done` signal until this operation completes
+  // at the moment there seems to be no solution for prematurely killing
+  // running threads without risking synchronisation issues. on the positive
+  // side, joining should avoid all of these potential issues on the
+  // negative side, one of the threads might still be stuck in a
+  // long-running operation and does not check for the `done` signal until
+  // this operation completes
   for (auto& thread : threads) {
     if (thread.joinable()) {
       thread.join();
     }
+  }
+}
+
+void EquivalenceCheckingManager::checkSymbolic() {
+  const auto start = std::chrono::steady_clock::now();
+  // in case a timeout is configured, a separate thread is started that
+  // sets the `done` flag after the timeout has passed
+  std::thread timeoutThread{};
+  if (configuration.execution.timeout > 0s) {
+    timeoutThread = std::thread([&, timeout = configuration.execution.timeout] {
+      std::unique_lock doneLock(doneMutex);
+      auto             finished =
+          doneCond.wait_for(doneLock, timeout, [&] { return done; });
+      // if the thread has already finished within the timeout,
+      // nothing has to be done
+      if (!finished) {
+        setAndSignalDone();
+      }
+    });
+  }
+
+  if (!done) {
+    if (zx::FunctionalityConstruction::transformableToZX(&qc1) &&
+        zx::FunctionalityConstruction::transformableToZX(&qc2)) {
+      checkers.emplace_back(
+          std::make_unique<ZXEquivalenceChecker>(qc1, qc2, configuration));
+      const auto& zxChecker = checkers.back();
+      if (!done) {
+        const auto result   = zxChecker->run();
+        results.equivalence = result;
+        done                = true;
+        doneCond.notify_one();
+      }
+    } else {
+      std::clog << "Checking symbolic circuits requires transformation "
+                   "to ZX-diagram but one of the circuits contains "
+                   "operations not supported by this checker! Exiting!"
+                << std::endl;
+      checkers.clear();
+      results.equivalence = EquivalenceCriterion::NoInformation;
+      return;
+    }
+  }
+  const auto end    = std::chrono::steady_clock::now();
+  results.checkTime = std::chrono::duration<double>(end - start).count();
+  // appropriately join the timeout thread, if it was launched
+  if (timeoutThread.joinable()) {
+    timeoutThread.join();
   }
 }
 
@@ -693,6 +760,8 @@ nlohmann::json EquivalenceCheckingManager::Results::json() const {
       }
     }
   }
+  auto& par                       = res["parameterized"];
+  par["performed_instantiations"] = performedInstantiations;
 
   return res;
 }

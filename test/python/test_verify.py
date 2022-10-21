@@ -34,3 +34,21 @@ def test_verify(original_circuit: QuantumCircuit, alternative_circuit: QuantumCi
     """
     result = qcec.verify(original_circuit, alternative_circuit)
     assert result.equivalence == qcec.EquivalenceCriterion.equivalent
+
+
+def test_verify_kwargs(original_circuit: QuantumCircuit, alternative_circuit: QuantumCircuit) -> None:
+    """
+    Test the verification of two equivalent circuits with a keyword argument.
+    """
+    result = qcec.verify(original_circuit, alternative_circuit, timeout=3600.0)
+    assert result.equivalence == qcec.EquivalenceCriterion.equivalent
+
+
+def test_verify_config(original_circuit: QuantumCircuit, alternative_circuit: QuantumCircuit) -> None:
+    """
+    Test the verification of two equivalent circuits with a configuration object.
+    """
+    config = qcec.Configuration()
+    config.execution.timeout = 3600.0
+    result = qcec.verify(original_circuit, alternative_circuit, config)
+    assert result.equivalence == qcec.EquivalenceCriterion.equivalent

@@ -38,6 +38,7 @@ public:
     dd::CVec    cexInput{};
     dd::CVec    cexOutput1{};
     dd::CVec    cexOutput2{};
+    std::size_t performedInstantiations = 0U;
 
     [[nodiscard]] bool consideredEquivalent() const {
       switch (equivalence) {
@@ -114,6 +115,13 @@ public:
     configuration.execution.runAlternatingChecker = run;
   }
   void setZXChecker(bool run) { configuration.execution.runZXChecker = run; }
+
+  void disableAllCheckers() {
+    configuration.execution.runConstructionChecker = false;
+    configuration.execution.runZXChecker           = false;
+    configuration.execution.runSimulationChecker   = false;
+    configuration.execution.runAlternatingChecker  = false;
+  }
 
   // Optimization: Optimizations are applied during initialization. Already
   // configured and applied optimizations cannot be reverted
@@ -250,6 +258,8 @@ protected:
   /// the circuits are probably equivalent. To assure this, the alternating
   /// decision diagram checker is invoked to determine the equivalence.
   void checkSequential();
+
+  void checkSymbolic();
 
   /// Parallel Equivalence Check
   /// The parallel flow makes use of the available processing power by

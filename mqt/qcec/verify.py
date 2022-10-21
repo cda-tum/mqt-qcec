@@ -5,12 +5,18 @@ from typing import Any
 from mqt.qcec import Configuration, EquivalenceCheckingManager
 from qiskit import QuantumCircuit
 
+from .parameterized import __is_parameterized, check_parameterized
+
 
 def verify(
-    circ1: QuantumCircuit | str, circ2: QuantumCircuit | str, configuration: Configuration | None = None, **kwargs: Any
+    circ1: QuantumCircuit | str,
+    circ2: QuantumCircuit | str,
+    configuration: Configuration | None = None,
+    **kwargs: Any,
 ) -> EquivalenceCheckingManager.Results:
     """
     Verify that ``circ1`` and ``circ2`` are equivalent.
+
     Wraps creating an instance of :class:`EquivalenceCheckingManager <.EquivalenceCheckingManager>`,
     calling :meth:`EquivalenceCheckingManager.run`,
     and calling :meth:`EquivalenceCheckingManager.get_result`.
@@ -27,6 +33,9 @@ def verify(
     :param kwargs: Keyword arguments to pass to the :class:`EquivalenceCheckingManager <.EquivalenceCheckingManager>` constructor.
     :return: The results of the equivalence checking process.
     """
+
+    if __is_parameterized(circ1) or __is_parameterized(circ2):
+        return check_parameterized(circ1, circ2, configuration, **kwargs)
 
     if kwargs:
         # create the equivalence checker from keyword arguments

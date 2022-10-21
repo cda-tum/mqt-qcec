@@ -88,11 +88,17 @@ public:
     }
   };
 
+  struct Parameterized {
+    double      parameterizedTol          = 1e-12;
+    std::size_t nAdditionalInstantiations = 0;
+  };
+
   Execution     execution{};
   Optimizations optimizations{};
   Application   application{};
   Functionality functionality{};
   Simulation    simulation{};
+  Parameterized parameterized{};
 
   [[nodiscard]] bool anythingToExecute() const noexcept {
     return (execution.runSimulationChecker && simulation.maxSims > 0U) ||
@@ -175,6 +181,10 @@ public:
         app["profile"] = "cost_function";
       }
     }
+
+    auto& par                        = config["parameterized"];
+    par["tolerance"]                 = parameterized.parameterizedTol;
+    par["additional_instantiations"] = parameterized.nAdditionalInstantiations;
 
     if (execution.runConstructionChecker || execution.runAlternatingChecker) {
       auto& fun              = config["functionality"];

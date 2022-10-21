@@ -14,3 +14,4 @@ The :class:`Configuration` class provides all the means to configure QCEC. All o
    configuration/Application
    configuration/Functionality
    configuration/Simulation
+   configuration/Parameterized
