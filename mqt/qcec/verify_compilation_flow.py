@@ -63,6 +63,7 @@ def verify_compilation(
                     configuration,
                     construction_scheme="gate_cost",
                     profile=str(path),
+                    **kwargs,
                 )
         else:
             configuration.application.construction_scheme = scheme
@@ -70,7 +71,7 @@ def verify_compilation(
             configuration.application.alternating_scheme = scheme
             with resources.as_file(ref) as path:
                 configuration.application.profile = str(path)
-                return check_parameterized(original_circuit, compiled_circuit, configuration)
+                return check_parameterized(original_circuit, compiled_circuit, configuration, **kwargs)
 
     # Circuit is not parameterized. Execute regular check
     if kwargs:
