@@ -34,15 +34,12 @@ extensions = [
     "nbsphinx",
 ]
 
-nbsphinx_execute = "auto"  # auto, never
-
+nbsphinx_execute = "auto"
 highlight_language = "python3"
-
 nbsphinx_execute_arguments = [
-    "--InlineBackend.figure_formats={'png2x'}",
-    "--InlineBackend.rc=figure.dpi=96",
+    "--InlineBackend.figure_formats={'svg', 'pdf'}",
+    "--InlineBackend.rc=figure.dpi=200",
 ]
-
 nbsphinx_kernel_name = "python3"
 
 autosectionlabel_prefix_document = True
