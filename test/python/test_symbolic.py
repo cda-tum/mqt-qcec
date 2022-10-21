@@ -200,7 +200,7 @@ def test_verify_compilation_on_optimization_levels_config(
     )
 
 
-def test_performed_insantiations(rz_commute_lhs: QuantumCircuit, rz_commute_rhs_incorrect: QuantumCircuit) -> None:
+def test_performed_instantiations(rz_commute_lhs: QuantumCircuit, rz_commute_rhs_incorrect: QuantumCircuit) -> None:
     result = qcec.verify(rz_commute_lhs, rz_commute_rhs_incorrect, additional_instantiations=10)
     assert result.equivalence == qcec.EquivalenceCriterion.not_equivalent
     assert 1 < result.performed_instantiations < 10

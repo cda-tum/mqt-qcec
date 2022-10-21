@@ -149,7 +149,6 @@ def check_parameterized(
         total_runtime += res.check_time
         total_simulations_started += res.started_simulations
         total_simulations_finished += res.performed_simulations
-        return
 
     def write_stats(i: int, res: EquivalenceCheckingManager.Results) -> None:
         nonlocal total_preprocessing_time
