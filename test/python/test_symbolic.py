@@ -171,3 +171,17 @@ def test_verify_compilation_on_optimization_levels(original_circuit: QuantumCirc
         result.equivalence == qcec.EquivalenceCriterion.equivalent
         or result.equivalence == qcec.EquivalenceCriterion.equivalent_up_to_global_phase
     )
+
+
+def test_performed_insantiations(rz_commute_lhs: QuantumCircuit, rz_commute_rhs_incorrect: QuantumCircuit) -> None:
+    result = qcec.verify(rz_commute_lhs, rz_commute_rhs_incorrect, additional_instantiations=10)
+    assert result.equivalence == qcec.EquivalenceCriterion.not_equivalent
+    assert 1 < result.performed_instantiations < 10
+
+
+def test_with_config(rz_commute_lhs: QuantumCircuit, rz_commute_rhs_incorrect: QuantumCircuit) -> None:
+    config = qcec.Configuration()
+    config.parameterized.additional_instantiations = 10
+    result = qcec.verify(rz_commute_lhs, rz_commute_rhs_incorrect, config)
+    assert result.equivalence == qcec.EquivalenceCriterion.not_equivalent
+    assert 1 < result.performed_instantiations < 10

@@ -182,9 +182,9 @@ public:
       }
     }
 
-    auto& par                       = config["parameterized"];
-    par["tolerance"]                = parameterized.parameterizedTol;
-    par["addtional_instantiations"] = parameterized.nAdditionalInstantiations;
+    auto& par                        = config["parameterized"];
+    par["tolerance"]                 = parameterized.parameterizedTol;
+    par["additional_instantiations"] = parameterized.nAdditionalInstantiations;
 
     if (execution.runConstructionChecker || execution.runAlternatingChecker) {
       auto& fun              = config["functionality"];

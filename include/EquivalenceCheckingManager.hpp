@@ -38,6 +38,7 @@ public:
     dd::CVec    cexInput{};
     dd::CVec    cexOutput1{};
     dd::CVec    cexOutput2{};
+    std::size_t performedInstantiations = 0U;
 
     [[nodiscard]] bool consideredEquivalent() const {
       switch (equivalence) {

@@ -760,6 +760,8 @@ nlohmann::json EquivalenceCheckingManager::Results::json() const {
       }
     }
   }
+  auto& par                       = res["parameterized"];
+  par["performed_instantiations"] = performedInstantiations;
 
   return res;
 }

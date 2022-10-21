@@ -152,7 +152,6 @@ static std::unique_ptr<EquivalenceCheckingManager> createManagerFromOptions(
   configuration.parameterized.parameterizedTol = parameterizedTol;
   configuration.parameterized.nAdditionalInstantiations =
       nAdditionalInstantiations;
-
   return createManagerFromConfiguration(circ1, circ2, configuration);
 }
 
@@ -508,6 +507,11 @@ PYBIND11_MODULE(pyqcec, m) {
                      &EquivalenceCheckingManager::Results::cexOutput2,
                      "State vector representation of the second circuit's "
                      "counterexample output state.")
+      .def_readwrite(
+          "performed_instantiations",
+          &EquivalenceCheckingManager::Results::performedInstantiations,
+          "Number of circuit instantiations that have been performed during "
+          "equivalence checking of parameterized quantum circuits.")
       .def("considered_equivalent",
            &EquivalenceCheckingManager::Results::consideredEquivalent,
            "Convenience function to check whether the obtained result is to be "
@@ -765,7 +769,7 @@ PYBIND11_MODULE(pyqcec, m) {
                      "Set threshold below which instantiated parameters shall "
                      "be considered zero.")
       .def_readwrite(
-          "addtitional_instantiations",
+          "additional_instantiations",
           &Configuration::Parameterized::nAdditionalInstantiations,
           "Number of instantiations shall be performed in addition to the "
           "default ones. "
