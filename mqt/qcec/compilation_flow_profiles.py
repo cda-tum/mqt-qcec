@@ -196,7 +196,9 @@ def compute_cost(
     Compute the cost of a circuit by transpiling the circuit
     to a given ``basis_gates`` gate set and a certain ``optimization_level``.
     """
-    transpiled_circuit = transpile(qc, basis_gates=basis_gates, optimization_level=optimization_level)
+    transpiled_circuit = transpile(
+        qc, basis_gates=basis_gates, optimization_level=optimization_level, seed_transpiler=0
+    )
     return transpiled_circuit.size()
 
 
