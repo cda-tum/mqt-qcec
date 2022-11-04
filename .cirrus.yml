@@ -59,6 +59,6 @@ publish_task:
   install_script: pip install twine
   publish_script:
     - curl -L https://api.cirrus-ci.com/v1/artifact/build/$CIRRUS_BUILD_ID/wheels.zip -o wheels.zip
-    - unzip wheels.zip -d "dist"
-    - python -m twine check dist/*
-    - python -m twine upload dist/*
+    - unzip wheels.zip
+    - python -m twine check wheelhouse/*
+    - python -m twine upload wheelhouse/*
