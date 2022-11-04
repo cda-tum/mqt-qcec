@@ -6,8 +6,19 @@ build_and_store_wheels: &BUILD_AND_STORE_WHEELS
   wheels_artifacts:
     path: "wheelhouse/*"
 
+.clone_script: &clone |
+  if [ -z "$CIRRUS_PR" ]; then
+    git clone --recursive --branch=$CIRRUS_BRANCH https://x-access-token:${CIRRUS_REPO_CLONE_TOKEN}@github.com/${CIRRUS_REPO_FULL_NAME}.git $CIRRUS_WORKING_DIR
+    git reset --hard $CIRRUS_CHANGE_IN_REPO
+  else
+    git clone --recursive https://x-access-token:${CIRRUS_REPO_CLONE_TOKEN}@github.com/${CIRRUS_REPO_FULL_NAME}.git $CIRRUS_WORKING_DIR
+    git fetch origin pull/$CIRRUS_PR/head:pull/$CIRRUS_PR
+    git reset --hard $CIRRUS_CHANGE_IN_REPO
+  fi
+
 linux_aarch64_task:
   name: Build Linux aarch64 wheels.
+  clone_script: *clone
   compute_engine_instance:
     image_project: cirrus-images
     image: family/docker-builder-arm64
@@ -21,6 +32,7 @@ linux_aarch64_task:
 
 macos_arm64_task:
   name: Build macOS arm64 wheels.
+  clone_script: *clone
   macos_instance:
     image: ghcr.io/cirruslabs/macos-monterey-xcode
 
