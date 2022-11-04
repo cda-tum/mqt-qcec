@@ -1,0 +1,61 @@
+build_and_store_wheels: &BUILD_AND_STORE_WHEELS
+  install_cibuildwheel_script:
+    - python -m pip install cibuildwheel==2.11.2
+  run_cibuildwheel_script:
+    - cibuildwheel
+  wheels_artifacts:
+    path: "wheelhouse/*"
+
+.clone_script: &clone |
+  if [ -z "$CIRRUS_PR" ]; then
+    git clone --recursive --branch=$CIRRUS_BRANCH https://x-access-token:${CIRRUS_REPO_CLONE_TOKEN}@github.com/${CIRRUS_REPO_FULL_NAME}.git $CIRRUS_WORKING_DIR
+    git reset --hard $CIRRUS_CHANGE_IN_REPO
+  else
+    git clone --recursive https://x-access-token:${CIRRUS_REPO_CLONE_TOKEN}@github.com/${CIRRUS_REPO_FULL_NAME}.git $CIRRUS_WORKING_DIR
+    git fetch origin pull/$CIRRUS_PR/head:pull/$CIRRUS_PR
+    git reset --hard $CIRRUS_CHANGE_IN_REPO
+  fi
+
+linux_aarch64_task:
+  name: Build Linux aarch64 wheels.
+  clone_script: *clone
+  compute_engine_instance:
+    image_project: cirrus-images
+    image: family/docker-builder-arm64
+    architecture: arm64
+    platform: linux
+    cpu: 4
+  env:
+    CIBW_SKIP: "*-musllinux_*"
+
+  install_pre_requirements_script:
+    - apt install -y python3-venv python-is-python3
+  <<: *BUILD_AND_STORE_WHEELS
+
+macos_arm64_task:
+  name: Build macOS arm64 wheels.
+  clone_script: *clone
+  macos_instance:
+    image: ghcr.io/cirruslabs/macos-monterey-xcode
+
+  env:
+    PATH: /opt/homebrew/opt/python@3.10/bin:$PATH
+  install_pre_requirements_script:
+    - brew install python@3.10
+    - ln -s python3 /opt/homebrew/opt/python@3.10/bin/python
+  <<: *BUILD_AND_STORE_WHEELS
+
+publish_task:
+  name: Upload to PyPI
+  container: { image: "python:3.10-bullseye" }
+  depends_on: [linux_aarch64, macos_arm64]
+  only_if: "$CIRRUS_RELEASE != ''"
+  env:
+    TWINE_REPOSITORY: pypi
+    TWINE_USERNAME: __token__
+    TWINE_PASSWORD: ENCRYPTED[963630b0d5f7e9ad0aba1e51f63d69ecc36ea550ccce3a382cee179da6b286ccc644aebd482f97a919f1f6a1810a0d25]
+  install_script: pip install twine
+  publish_script:
+    - curl -L https://api.cirrus-ci.com/v1/artifact/build/$CIRRUS_BUILD_ID/wheels.zip | tar xvz -C dist
+    - python -m twine check dist/*
+    - python -m twine upload dist/*
