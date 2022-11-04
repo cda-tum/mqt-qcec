@@ -58,6 +58,7 @@ publish_task:
     TWINE_PASSWORD: ENCRYPTED[963630b0d5f7e9ad0aba1e51f63d69ecc36ea550ccce3a382cee179da6b286ccc644aebd482f97a919f1f6a1810a0d25]
   install_script: pip install twine
   publish_script:
-    - curl -L https://api.cirrus-ci.com/v1/artifact/build/$CIRRUS_BUILD_ID/wheels.zip | tar xvz -C dist
+    - curl -L https://api.cirrus-ci.com/v1/artifact/build/$CIRRUS_BUILD_ID/wheels.zip -o wheels.zip
+    - unzip wheels.zip -d "dist"
     - python -m twine check dist/*
     - python -m twine upload dist/*
