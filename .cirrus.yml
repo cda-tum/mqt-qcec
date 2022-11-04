@@ -48,7 +48,9 @@ macos_arm64_task:
 publish_task:
   name: Upload to PyPI
   container: { image: "python:3.10-bullseye" }
-  depends_on: [linux_aarch64, macos_arm64]
+  depends_on:
+    - Build Linux aarch64 wheels.
+    - Build macOS arm64 wheels.
   only_if: "$CIRRUS_RELEASE != ''"
   env:
     TWINE_REPOSITORY: pypi
