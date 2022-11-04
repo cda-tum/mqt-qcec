@@ -14,52 +14,20 @@ concurrency:
 
 jobs:
   build_wheels:
-    name: ${{ matrix.os }}${{ matrix.archname }}${{ matrix.libc }} wheels
+    name: ${{ matrix.os }}$ wheels
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        arch: [x86_64]
-        archname: [""]
-        skip: ["*-musllinux_*"]
-        libc: [""]
-        include:
-          - arch: arm64
-            archname: "-arm64"
-            os: macos-latest
-          - arch: x86_64
-            os: ubuntu-latest
-            skip: "*-manylinux_*"
-            libc: "-musl"
-    #          - arch:     aarch64
-    #            archname: "-arm64"
-    #            os:       ubuntu-latest
-    #            qemu:     true
-    #          - arch:     aarch64
-    #            archname: "-arm64"
-    #            os:       ubuntu-latest
-    #            qemu:     true
-    #            skip:     "*-manylinux_*"
-    #            libc:     "-musl"
-
     steps:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
           submodules: recursive
       - uses: ilammy/msvc-dev-cmd@v1
-      #      - name: Install QEMU
-      #        uses: docker/setup-qemu-action@v1
-      #        if:   matrix.qemu
-      #        with:
-      #          platforms: arm64
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.11.2
-        env:
-          CIBW_ARCHS_MACOS: ${{ matrix.arch }}
-          CIBW_ARCHS_LINUX: ${{ matrix.arch }}
-          CIBW_SKIP: ${{ matrix.skip }}
       - uses: actions/upload-artifact@v3
         with:
           path: ./wheelhouse/*.whl
