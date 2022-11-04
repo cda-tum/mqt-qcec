@@ -77,7 +77,6 @@ include = ["mqt.*"]
 build = "cp3*"
 skip = "*-musllinux_*"
 archs = "auto64"
-test-skip = "cp311-* *-macosx_arm64 *-musllinux* *aarch64"
 test-extras = ["test"]
 test-command = "python -c \"from mqt import qcec\""
 environment = { DEPLOY = "ON" }
