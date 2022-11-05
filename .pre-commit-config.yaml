@@ -67,7 +67,7 @@ repos:
   - repo: https://github.com/psf/black
     rev: "22.10.0" # Keep in sync with blacken-docs
     hooks:
-      - id: black
+      - id: black-jupyter
 
   # Also run Black on examples in the documentation
   - repo: https://github.com/asottile/blacken-docs
