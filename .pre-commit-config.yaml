@@ -141,6 +141,6 @@ repos:
 
   # Clean jupyter notebooks
   - repo: https://github.com/srstevenson/nb-clean
-    rev: "2.3.0"
+    rev: "2.4.0"
     hooks:
       - id: nb-clean
