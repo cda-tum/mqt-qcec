@@ -45,6 +45,10 @@ jobs:
         with:
           submodules: recursive
           fetch-depth: 0
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
       - name: Setup nox
         run: pipx install nox
       - name: Test on 🐍 ${{ matrix.python-version }}
@@ -81,6 +85,10 @@ jobs:
         with:
           submodules: recursive
           fetch-depth: 0
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
       - name: Setup nox
         run: pipx install nox
       - name: Run session
