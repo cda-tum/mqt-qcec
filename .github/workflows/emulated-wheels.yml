@@ -1,4 +1,4 @@
-name: Python Packaging
+name: Python Packaging Emulated Wheels
 
 on:
   release:
@@ -13,43 +13,33 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build_wheels:
-    name: ${{ matrix.os }} wheels
-    runs-on: ${{ matrix.os }}
+  build_wheels_emulation:
+    name: ${{ matrix.python }} wheels on ${{ matrix.arch }}
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        arch: ["s390x", "ppc64le"]
+        python: ["cp37-*", "cp38-*", "cp39-*", "cp310-*", "cp311-*"]
     steps:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
           submodules: recursive
-      - uses: ilammy/msvc-dev-cmd@v1
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.11.2
+        env:
+          CIBW_ARCHS_LINUX: ${{ matrix.arch }}
+          CIBW_BUILD: ${{ matrix.python }}
+          CIBW_TEST_SKIP: "cp*"
       - uses: actions/upload-artifact@v3
         with:
           path: ./wheelhouse/*.whl
 
-  build_sdist:
-    name: sdist
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-          submodules: recursive
-      - name: Build SDist
-        run: pipx run build --sdist
-      - name: Install sdist
-        run: python -m pip install --verbose dist/*.tar.gz
-      - uses: actions/upload-artifact@v3
-        with:
-          path: dist/*.tar.gz
-
   upload_pypi:
-    needs: [build_wheels, build_sdist]
+    needs: [build_wheels_emulation]
     runs-on: ubuntu-latest
     if: github.event_name == 'release' && github.event.action == 'published'
     steps:
