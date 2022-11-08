@@ -3,9 +3,6 @@ name: Python Packaging Emulated Wheels
 on:
   release:
     types: [published]
-  pull_request:
-  push:
-    branches: [main]
   workflow_dispatch:
 
 concurrency:
