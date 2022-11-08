@@ -48,8 +48,33 @@ jobs:
         with:
           path: dist/*.tar.gz
 
+  build_wheels_emulation:
+    name: ${{ matrix.python }} wheels on ${{ matrix.arch }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: ["s390x", "ppc64le"]
+        python: ["cp37-*", "cp38-*", "cp39-*", "cp310-*", "cp311-*"]
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          submodules: recursive
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+      - name: Build wheels
+        uses: pypa/cibuildwheel@v2.11.2
+        env:
+          CIBW_ARCHS_LINUX: ${{ matrix.arch }}
+          CIBW_BUILD: ${{ matrix.python }}
+          CIBW_TEST_SKIP: "cp*"
+      - uses: actions/upload-artifact@v3
+        with:
+          path: ./wheelhouse/*.whl
+
   upload_pypi:
-    needs: [build_wheels, build_sdist]
+    needs: [build_wheels, build_sdist, build_wheels_emulation]
     runs-on: ubuntu-latest
     if: github.event_name == 'release' && github.event.action == 'published'
     steps:
