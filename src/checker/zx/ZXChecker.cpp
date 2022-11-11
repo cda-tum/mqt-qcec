@@ -56,8 +56,14 @@ EquivalenceCriterion ZXEquivalenceChecker::run() {
 
     const auto nQubits = miter.getNQubits();
     for (std::size_t i = 0U; i < nQubits; ++i) {
-      const auto& in  = miter.getInput(i);
-      const auto& out = miter.incidentEdge(in, 0U).to;
+      const auto& in   = miter.getInput(i);
+      const auto& edge = miter.incidentEdge(in, 0U);
+
+      if (edge.type == zx::EdgeType::Hadamard) {
+        equivalent = false;
+        break;
+      }
+      const auto& out = edge.to;
 
       if (p1.at(static_cast<dd::Qubit>(miter.getVData(in).value().qubit)) !=
           p2.at(static_cast<dd::Qubit>(miter.getVData(out).value().qubit))) {
