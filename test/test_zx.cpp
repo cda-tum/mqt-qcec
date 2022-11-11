@@ -278,3 +278,17 @@ TEST_P(ZXTestCompFlow, EquivalenceCompilationFlow) {
   std::cout << ecm->toString() << std::endl;
   EXPECT_TRUE(ecm->getResults().consideredEquivalent());
 }
+
+TEST(ZXTestsMisc, IdentityNotHadamard) {
+  const auto qc1 = qc::QuantumComputation(1);
+  auto       qc2 = qc::QuantumComputation(1);
+  qc2.h(0);
+
+  auto ecm = ec::EquivalenceCheckingManager(qc1, qc2);
+  ecm.disableAllCheckers();
+  ecm.setZXChecker(true);
+  ecm.run();
+
+  EXPECT_EQ(ecm.getResults().equivalence,
+            ec::EquivalenceCriterion::ProbablyNotEquivalent);
+}
