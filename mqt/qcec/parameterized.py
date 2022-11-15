@@ -20,8 +20,7 @@ def __adjust_timeout(curr_timeout: float | None, res: EquivalenceCheckingManager
     if curr_timeout is not None:
         if isinstance(res, EquivalenceCheckingManager.Results):
             return curr_timeout - (res.check_time + res.preprocessing_time)
-        else:
-            return curr_timeout - res
+        return curr_timeout - res
     return None
 
 
@@ -31,12 +30,11 @@ def __ecm_from_config_or_kwargs(
     if kwargs:
         # create the equivalence checker from keyword arguments
         return EquivalenceCheckingManager(circ1, circ2, **kwargs)
-    else:
-        if configuration is None:
-            configuration = Configuration()
+    if configuration is None:
+        configuration = Configuration()
 
-        # create the equivalence checker from configuration
-        return EquivalenceCheckingManager(circ1, circ2, configuration)
+    # create the equivalence checker from configuration
+    return EquivalenceCheckingManager(circ1, circ2, configuration)
 
 
 def check_parameterized_zx(
