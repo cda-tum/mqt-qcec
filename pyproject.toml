@@ -130,12 +130,14 @@ src_paths = ["mqt/qcec", "test/python"]
 files = ["mqt/qcec", "test/python", "setup.py"]
 python_version = "3.7"
 strict = true
-warn_unused_configs = true
-check_untyped_defs = true
 show_error_codes = true
 enable_error_code = ["ignore-without-code", "redundant-expr", "truthy-bool"]
 warn_unreachable = true
 explicit_package_bases = true
+
+[[tool.mypy.overrides]]
+module = ["qiskit.*"]
+ignore_missing_imports = true
 
 [tool.pylint]
 master.py-version = "3.7"
