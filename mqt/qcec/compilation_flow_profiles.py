@@ -199,7 +199,8 @@ def compute_cost(
     transpiled_circuit = transpile(
         qc, basis_gates=basis_gates, optimization_level=optimization_level, seed_transpiler=0
     )
-    return transpiled_circuit.size()
+    size: int = transpiled_circuit.size()
+    return size
 
 
 class GateType(Enum):
@@ -370,7 +371,7 @@ default_profile_path = Path(__file__).resolve().parent.joinpath("profiles")
 def generate_profile(
     optimization_level: int = 1,
     mode: AncillaMode = AncillaMode.NO_ANCILLA,
-    filepath: Path = None,
+    filepath: Path | None = None,
 ) -> None:
     """
     Generate a compilation flow profile for the given optimization level and ancilla mode.

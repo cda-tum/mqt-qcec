@@ -6,9 +6,9 @@ from typing import Any
 if sys.version_info < (3, 10, 0):
     import importlib_resources as resources
 else:
-    from importlib import resources
+    from importlib import resources  # type: ignore[no-redef]
 
-from mqt.qcec import Configuration, EquivalenceCheckingManager
+from mqt.qcec import ApplicationScheme, Configuration, EquivalenceCheckingManager
 from mqt.qcec.compilation_flow_profiles import AncillaMode, generate_profile_name
 from qiskit import QuantumCircuit
 
@@ -49,7 +49,7 @@ def verify_compilation(
     """
 
     # use the gate_cost scheme for the verification
-    scheme = "gate_cost"
+    scheme = ApplicationScheme.gate_cost
     # get the pre-defined profile for the gate_cost scheme
     profile_name = generate_profile_name(optimization_level=optimization_level, mode=ancilla_mode)
     ref = resources.files("mqt.qcec") / "profiles" / profile_name
