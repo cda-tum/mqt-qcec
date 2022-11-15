@@ -23,20 +23,14 @@ def test_application_scheme(application_scheme_string: str, application_scheme_e
     config = qcec.Configuration()
 
     config.application.construction_scheme = application_scheme_enum
-    config.application.construction_scheme = application_scheme_string
-
     config.application.simulation_scheme = application_scheme_enum
-    config.application.simulation_scheme = application_scheme_string
-
     config.application.alternating_scheme = application_scheme_enum
-    config.application.alternating_scheme = application_scheme_string
 
 
 def test_timeout() -> None:
     import datetime
 
     config = qcec.Configuration()
-    config.execution.timeout = 60.0
     config.execution.timeout = datetime.timedelta(seconds=60)
 
 
@@ -56,4 +50,3 @@ def test_state_type(state_type_string: str, state_type_enum: qcec.StateType) -> 
 
     config = qcec.Configuration()
     config.simulation.state_type = state_type_enum
-    config.simulation.state_type = state_type_string

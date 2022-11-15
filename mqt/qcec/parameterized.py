@@ -8,6 +8,7 @@ from typing import Any
 
 import numpy as np
 from mqt.qcec import Configuration, EquivalenceCheckingManager, EquivalenceCriterion
+from numpy.typing import NDArray
 from qiskit import QuantumCircuit
 from qiskit.circuit import Parameter, ParameterExpression
 
@@ -20,8 +21,7 @@ def __adjust_timeout(curr_timeout: float | None, res: EquivalenceCheckingManager
     if curr_timeout is not None:
         if isinstance(res, EquivalenceCheckingManager.Results):
             return curr_timeout - (res.check_time + res.preprocessing_time)
-        else:
-            return curr_timeout - res
+        return curr_timeout - res
     return None
 
 
@@ -31,12 +31,11 @@ def __ecm_from_config_or_kwargs(
     if kwargs:
         # create the equivalence checker from keyword arguments
         return EquivalenceCheckingManager(circ1, circ2, **kwargs)
-    else:
-        if configuration is None:
-            configuration = Configuration()
+    if configuration is None:
+        configuration = Configuration()
 
-        # create the equivalence checker from configuration
-        return EquivalenceCheckingManager(circ1, circ2, configuration)
+    # create the equivalence checker from configuration
+    return EquivalenceCheckingManager(circ1, circ2, configuration)
 
 
 def check_parameterized_zx(
@@ -52,7 +51,9 @@ def check_parameterized_zx(
     return ecm.get_results()
 
 
-def extract_params(circ1: QuantumCircuit, circ2: QuantumCircuit) -> tuple[list[Parameter], np.array, np.array]:
+def extract_params(
+    circ1: QuantumCircuit, circ2: QuantumCircuit
+) -> tuple[list[Parameter], NDArray[np.float64], NDArray[np.float64]]:
     """Extract parameters and equations of parameterized circuits."""
     p1 = set(circ1.parameters)
     p2 = set(circ2.parameters)
@@ -65,8 +66,8 @@ def extract_params(circ1: QuantumCircuit, circ2: QuantumCircuit) -> tuple[list[P
     def is_expr(x: float | Parameter | ParameterExpression) -> bool:
         return isinstance(x, (Parameter, ParameterExpression))
 
-    symb_params = [param for param in p if is_expr(param)]
-    symb_params.sort(key=lambda param: param.name)
+    symb_params: list[Parameter | ParameterExpression] = [param for param in p if is_expr(param)]
+    symb_params.sort(key=lambda param: param.name)  # type: ignore[no-any-return]
     symb_exprs = list(filter(is_expr, exprs))
 
     offsets = np.zeros(len(symb_exprs))
@@ -133,7 +134,7 @@ def __parse_args(configuration: Configuration | None = None, **kwargs: Any) -> t
 
 def check_parameterized(
     circ1: QuantumCircuit, circ2: QuantumCircuit, configuration: Configuration | None = None, **kwargs: Any
-) -> EquivalenceCheckingManager.EquivalenceCheckingManager.Results:
+) -> EquivalenceCheckingManager.Results:
     """Equivalence checking flow for parameterized circuit."""
     total_preprocessing_time = 0.0
     total_runtime = 0.0
@@ -180,7 +181,7 @@ def check_parameterized(
     parameters, A, offsets = extract_params(circ1, circ2)
 
     def instantiate_params(
-        qc1: QuantumCircuit, qc2: QuantumCircuit, b: np.array
+        qc1: QuantumCircuit, qc2: QuantumCircuit, b: NDArray[np.float64]
     ) -> tuple[QuantumCircuit, QuantumCircuit, float]:
         start_time = time.time()
         A_pinv = np.linalg.pinv(A)
