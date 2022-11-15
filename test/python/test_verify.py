@@ -48,7 +48,9 @@ def test_verify_config(original_circuit: QuantumCircuit, alternative_circuit: Qu
     """
     Test the verification of two equivalent circuits with a configuration object.
     """
+    import datetime
+
     config = qcec.Configuration()
-    config.execution.timeout = 3600.0
+    config.execution.timeout = datetime.timedelta(seconds=3600)
     result = qcec.verify(original_circuit, alternative_circuit, config)
     assert result.equivalence == qcec.EquivalenceCriterion.equivalent
