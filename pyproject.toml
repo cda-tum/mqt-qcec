@@ -57,6 +57,7 @@ docs = [
     "ipython",
     "ipykernel",
     "nbsphinx",
+    "sphinxext-opengraph",
     "qiskit-terra[visualization]",
 ]
 dev = ["mqt.qcec[coverage, docs]"]
