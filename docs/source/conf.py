@@ -32,6 +32,7 @@ extensions = [
     "sphinx_copybutton",
     "hoverxref.extension",
     "nbsphinx",
+    "sphinx_rtd_dark_mode",
 ]
 
 nbsphinx_execute = "auto"
@@ -80,5 +81,7 @@ autosummary_generate = True
 
 # -- Options for HTML output -------------------------------------------------
 html_theme = "sphinx_rtd_theme"
-
 html_baseurl = "https://qcec.readthedocs.io/en/latest/"
+html_logo = "_static/mqt_light.png"
+html_static_path = ["_static"]
+html_css_files = ["custom.css"]
