@@ -65,8 +65,7 @@ private:
     return simplifyEdges(zx::checkPivotGadget, zx::pivotGadget);
   }
 
-  template <class CheckFun = zx::VertexCheckFun,
-            class RuleFun  = zx::VertexRuleFun>
+  template <class CheckFun, class RuleFun>
   std::size_t simplifyVertices(CheckFun check, RuleFun rule) {
     std::size_t nSimplifications = 0U;
     bool        newMatches       = true;
@@ -85,7 +84,7 @@ private:
     return nSimplifications;
   }
 
-  template <class CheckFun = zx::EdgeCheckFun, class RuleFun = zx::EdgeRuleFun>
+  template <class CheckFun, class RuleFun>
   std::size_t simplifyEdges(CheckFun check, RuleFun rule) {
     std::size_t nSimplifications = 0U;
     bool        newMatches       = true;
