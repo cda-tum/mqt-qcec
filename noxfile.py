@@ -26,6 +26,7 @@ def tests(session: Session) -> None:
         session.posargs.remove("skip-install")
     if run_install:
         session.install("-e", ".[test]")
+    session.run("pip", "show", "qiskit-terra")
     session.run("pytest", *session.posargs)
 
 
@@ -42,6 +43,7 @@ def coverage(session: Session) -> None:
         session.posargs.remove("skip-install")
     if run_install:
         session.install("-e", ".[coverage]")
+    session.run("pip", "show", "qiskit-terra")
     session.run("pytest", "--cov", *session.posargs)
 
 
