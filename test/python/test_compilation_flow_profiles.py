@@ -44,4 +44,11 @@ def test_generated_profiles_are_still_valid(optimization_level: int, ancilla_mod
 
     # compare the generated profile with the reference profile
     with resources.as_file(ref) as path:
-        assert filecmp.cmp(path, profile_name)
+        equal = filecmp.cmp(path, profile_name, shallow=False)
+        if not equal:
+            import difflib
+
+            ref_profile = path.read_text().splitlines(keepends=True)
+            gen_profile = Path(profile_name).read_text().splitlines(keepends=True)
+            sys.stdout.writelines(difflib.unified_diff(ref_profile, gen_profile))
+        assert equal
