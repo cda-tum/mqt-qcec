@@ -45,10 +45,21 @@ def test_generated_profiles_are_still_valid(optimization_level: int, ancilla_mod
     # compare the generated profile with the reference profile
     with resources.as_file(ref) as path:
         equal = filecmp.cmp(path, profile_name, shallow=False)
-        if not equal:
-            import difflib
 
-            ref_profile = path.read_text().splitlines(keepends=True)
-            gen_profile = Path(profile_name).read_text().splitlines(keepends=True)
-            sys.stdout.writelines(difflib.unified_diff(ref_profile, gen_profile))
-        assert equal
+        if equal:
+            return
+
+        import difflib
+
+        ref_profile = path.read_text().splitlines(keepends=True)
+        gen_profile = Path(profile_name).read_text().splitlines(keepends=True)
+        diff = difflib.unified_diff(ref_profile, gen_profile, fromfile="reference", tofile="generated", n=0)
+        sys.stdout.writelines(diff)
+
+        # compute the number of differences
+        num_diffs = sum(1 for line in diff if line.startswith("-") and not line.startswith("---"))
+
+        assert num_diffs <= 1, (
+            f"The generated profile {profile_name} differs from the reference profile {ref} by {num_diffs} lines. "
+            f"This might be due to a change in Qiskit. If this is the case, the reference profile should be updated."
+        )
