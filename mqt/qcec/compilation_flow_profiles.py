@@ -137,7 +137,7 @@ def create_general_gate(qubits: int, params: int, controls: int, identifier: str
     for _ in range(params):
         parameter_list.append(random.uniform(-np.pi, np.pi))
 
-    getattr(qc, gate_identifier)(*parameter_list, *range(required_qubits))
+    getattr(qc, gate_identifier)(*parameter_list, *reversed(range(required_qubits)))
     return qc
 
 
