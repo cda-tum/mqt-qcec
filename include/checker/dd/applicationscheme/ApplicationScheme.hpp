@@ -86,11 +86,12 @@ operator<<(std::ostream& out, const ApplicationSchemeType& applicationScheme) {
 // Given the current state of the check (tracked by two task managers), an
 // application scheme describes how to proceed with the check, i.e., how many
 // operations to apply from either circuit.
-template <class DDType, class DDPackage = dd::Package<>>
-class ApplicationScheme {
+template <class DDType, class Config> class ApplicationScheme {
+protected:
+  using TM = TaskManager<DDType, Config>;
+
 public:
-  ApplicationScheme(TaskManager<DDType, DDPackage>& taskManager1,
-                    TaskManager<DDType, DDPackage>& taskManager2) noexcept
+  ApplicationScheme(TM& taskManager1, TM& taskManager2) noexcept
       : taskManager1(taskManager1), taskManager2(taskManager2){};
 
   virtual ~ApplicationScheme() = default;
@@ -99,8 +100,8 @@ public:
   virtual std::pair<std::size_t, std::size_t> operator()() = 0;
 
 protected:
-  TaskManager<DDType, DDPackage>& taskManager1;
-  TaskManager<DDType, DDPackage>& taskManager2;
+  TM& taskManager1;
+  TM& taskManager2;
 };
 
 } // namespace ec

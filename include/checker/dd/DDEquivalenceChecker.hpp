@@ -16,12 +16,16 @@
 #include <utility>
 
 namespace ec {
-template <class DDType, class DDPackage>
+template <class DDType, class Config>
 class DDEquivalenceChecker : public EquivalenceChecker {
 public:
   DDEquivalenceChecker(const qc::QuantumComputation& qc1,
                        const qc::QuantumComputation& qc2,
-                       Configuration                 configuration) noexcept;
+                       Configuration                 configuration) noexcept
+      : EquivalenceChecker(qc1, qc2, std::move(configuration)),
+        dd(std::make_unique<dd::Package<Config>>(nqubits)),
+        taskManager1(TaskManager<DDType, Config>(qc1, dd)),
+        taskManager2(TaskManager<DDType, Config>(qc2, dd)) {}
 
   EquivalenceCriterion run() override;
 
@@ -31,12 +35,14 @@ public:
   }
 
 protected:
+  using DDPackage = typename dd::Package<Config>;
+
   std::unique_ptr<DDPackage> dd;
 
-  TaskManager<DDType, DDPackage> taskManager1;
-  TaskManager<DDType, DDPackage> taskManager2;
+  TaskManager<DDType, Config> taskManager1;
+  TaskManager<DDType, Config> taskManager2;
 
-  std::unique_ptr<ApplicationScheme<DDType, DDPackage>> applicationScheme;
+  std::unique_ptr<ApplicationScheme<DDType, Config>> applicationScheme;
 
   std::size_t maxActiveNodes{};
 
@@ -46,11 +52,11 @@ protected:
   // in some form
   EquivalenceCriterion equals(const DDType& e, const DDType& f);
 
-  virtual void initializeTask(TaskManager<DDType, DDPackage>& taskManager) = 0;
+  virtual void initializeTask(TaskManager<DDType, Config>& taskManager) = 0;
   virtual void initialize();
   virtual void execute();
   virtual void finish();
-  virtual void postprocessTask(TaskManager<DDType, DDPackage>& task);
+  virtual void postprocessTask(TaskManager<DDType, Config>& task);
   virtual void postprocess();
   virtual EquivalenceCriterion checkEquivalence();
 };

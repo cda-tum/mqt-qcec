@@ -8,14 +8,13 @@
 #include "ApplicationScheme.hpp"
 
 namespace ec {
-template <class DDType, class DDPackage = dd::Package<>>
+template <class DDType, class Config>
 class OneToOneApplicationScheme final
-    : public ApplicationScheme<DDType, DDPackage> {
+    : public ApplicationScheme<DDType, Config> {
 public:
-  OneToOneApplicationScheme(
-      TaskManager<DDType, DDPackage>& taskManager1,
-      TaskManager<DDType, DDPackage>& taskManager2) noexcept
-      : ApplicationScheme<DDType, DDPackage>(taskManager1, taskManager2) {}
+  OneToOneApplicationScheme(TaskManager<DDType, Config>& taskManager1,
+                            TaskManager<DDType, Config>& taskManager2) noexcept
+      : ApplicationScheme<DDType, Config>(taskManager1, taskManager2) {}
 
   std::pair<size_t, size_t> operator()() noexcept override { return {1U, 1U}; }
 };

@@ -8,14 +8,14 @@
 #include "ApplicationScheme.hpp"
 
 namespace ec {
-template <class DDType, class DDPackage = dd::Package<>>
+template <class DDType, class Config>
 class SequentialApplicationScheme final
-    : public ApplicationScheme<DDType, DDPackage> {
+    : public ApplicationScheme<DDType, Config> {
 public:
   SequentialApplicationScheme(
-      TaskManager<DDType, DDPackage>& taskManager1,
-      TaskManager<DDType, DDPackage>& taskManager2) noexcept
-      : ApplicationScheme<DDType, DDPackage>(taskManager1, taskManager2),
+      TaskManager<DDType, Config>& taskManager1,
+      TaskManager<DDType, Config>& taskManager2) noexcept
+      : ApplicationScheme<DDType, Config>(taskManager1, taskManager2),
         gates1(taskManager1.getCircuit()->getNops()),
         gates2(taskManager2.getCircuit()->getNops()) {}
 
