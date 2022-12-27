@@ -23,7 +23,7 @@ set_target_properties(${PROJECT_NAME} PROPERTIES CMAKE_CXX_STANDARD_REQUIRED ON 
 
 # add MQT::qfr library
 add_subdirectory("${PROJECT_SOURCE_DIR}/extern/qfr" "extern/qfr")
-target_link_libraries(${PROJECT_NAME} PUBLIC MQT::qfr)
+target_link_libraries(${PROJECT_NAME} PUBLIC MQT::qfr_dd MQT::qfr_zx)
 
 # enable interprocedural optimization if it is supported
 include(CheckIPOSupported)
