@@ -6,10 +6,8 @@
 #include "EquivalenceCheckingManager.hpp"
 #include "algorithms/BernsteinVazirani.hpp"
 
-#include "gmock/gmock.h"
 #include "gtest/gtest.h"
 #include <iostream>
-#include <sstream>
 #include <string>
 
 class GeneralTest : public ::testing::Test {
@@ -135,6 +133,8 @@ TEST_F(GeneralTest, NothingToDo) {
 }
 
 TEST_F(GeneralTest, NoGateCancellation) {
+  using namespace qc::literals;
+
   qc1.addQubitRegister(2U);
   qc2.addQubitRegister(2U);
 

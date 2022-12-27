@@ -19,16 +19,16 @@ void EquivalenceCheckingManager::setupAncillariesAndGarbage() {
       qc1.getNqubits() > qc2.getNqubits() ? this->qc1 : this->qc2;
   auto& smallerCircuit =
       qc1.getNqubits() > qc2.getNqubits() ? this->qc2 : this->qc1;
-  const dd::QubitCount qubitDifference =
+  const auto qubitDifference =
       largerCircuit.getNqubits() - smallerCircuit.getNqubits();
 
-  std::vector<std::pair<dd::Qubit, dd::Qubit>> removed{};
+  std::vector<std::pair<qc::Qubit, std::optional<qc::Qubit>>> removed{};
   removed.reserve(qubitDifference);
 
   const auto        nqubits = largerCircuit.getNqubits();
   std::vector<bool> garbage(nqubits);
 
-  for (dd::QubitCount i = 0; i < qubitDifference; ++i) {
+  for (std::size_t i = 0; i < qubitDifference; ++i) {
     const auto logicalQubitIndex =
         qc::QuantumComputation::getHighestLogicalQubitIndex(
             largerCircuit.initialLayout);
@@ -48,11 +48,11 @@ void EquivalenceCheckingManager::setupAncillariesAndGarbage() {
     // restore garbage
     if (garbage[largerCircuit.getNqubits() - 1]) {
       largerCircuit.setLogicalQubitGarbage(
-          static_cast<dd::Qubit>(largerCircuit.getNqubits() - 1));
+          static_cast<qc::Qubit>(largerCircuit.getNqubits() - 1));
     }
     // also set the appropriate qubits in the smaller circuit as garbage
     smallerCircuit.setLogicalQubitGarbage(
-        static_cast<dd::Qubit>(largerCircuit.getNqubits() - 1));
+        static_cast<qc::Qubit>(largerCircuit.getNqubits() - 1));
   }
 }
 
@@ -67,22 +67,21 @@ void EquivalenceCheckingManager::fixOutputPermutationMismatch() {
   auto&       largerGarbage = largerCircuit.garbage;
 
   for (const auto& [lPhysical, lLogical] : largerOutput) {
-    const dd::Qubit outputQubitInLargerCircuit = lLogical;
-    dd::Qubit       nout                       = 1;
-    for (dd::Qubit i = 0; i < outputQubitInLargerCircuit; ++i) {
+    const qc::Qubit outputQubitInLargerCircuit = lLogical;
+    qc::Qubit       nout                       = 1;
+    for (qc::Qubit i = 0; i < outputQubitInLargerCircuit; ++i) {
       if (!largerGarbage[i]) {
         ++nout;
       }
     }
 
-    auto       outcount        = static_cast<dd::QubitCount>(nout);
     bool       existsInSmaller = false;
     const auto nqubits         = smallerCircuit.getNqubits();
-    for (dd::QubitCount i = 0U; i < nqubits; ++i) {
+    for (std::size_t i = 0U; i < nqubits; ++i) {
       if (!smallerGarbage[i]) {
-        --outcount;
+        --nout;
       }
-      if (outcount == 0) {
+      if (nout == 0) {
         existsInSmaller = true;
         break;
       }
