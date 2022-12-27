@@ -33,11 +33,12 @@ ZXEquivalenceChecker::ZXEquivalenceChecker(const qc::QuantumComputation& qc1,
   const auto& p2 = invertPermutations(qc2);
 
   // fix ancillaries to |0>
-  const auto nQubitsWithoutAncillae = qc1.getNqubitsWithoutAncillae();
-  for (auto anc = static_cast<dd::Qubit>(qc1.getNqubits() - 1U);
+  const auto nQubitsWithoutAncillae =
+      static_cast<zx::Qubit>(qc1.getNqubitsWithoutAncillae());
+  for (auto anc = static_cast<zx::Qubit>(qc1.getNqubits() - 1U);
        anc >= nQubitsWithoutAncillae; --anc) {
-    miter.makeAncilla(anc, p1.at(anc));
-    dPrime.makeAncilla(anc, p2.at(anc));
+    miter.makeAncilla(anc, static_cast<zx::Qubit>(p1.at(anc)));
+    dPrime.makeAncilla(anc, static_cast<zx::Qubit>(p2.at(anc)));
   }
   miter.invert();
   miter.concat(dPrime);
@@ -65,8 +66,8 @@ EquivalenceCriterion ZXEquivalenceChecker::run() {
       }
       const auto& out = edge.to;
 
-      if (p1.at(static_cast<dd::Qubit>(miter.getVData(in).value().qubit)) !=
-          p2.at(static_cast<dd::Qubit>(miter.getVData(out).value().qubit))) {
+      if (p1.at(static_cast<qc::Qubit>(miter.getVData(in).value().qubit)) !=
+          p2.at(static_cast<qc::Qubit>(miter.getVData(out).value().qubit))) {
         equivalent = false;
         break;
       }
@@ -116,7 +117,7 @@ qc::Permutation concat(const qc::Permutation& p1,
   return pComb;
 }
 
-qc::Permutation complete(const qc::Permutation& p, const dd::QubitCount n) {
+qc::Permutation complete(const qc::Permutation& p, const std::size_t n) {
   qc::Permutation pComp = p;
 
   std::vector<bool> mappedTo(n, false);
@@ -127,7 +128,7 @@ qc::Permutation complete(const qc::Permutation& p, const dd::QubitCount n) {
   }
 
   // Try to map identity
-  for (dd::Qubit i = 0; i < n; ++i) {
+  for (std::size_t i = 0; i < n; ++i) {
     if (mappedFrom[i] || mappedTo[i]) {
       continue;
     }
@@ -138,11 +139,11 @@ qc::Permutation complete(const qc::Permutation& p, const dd::QubitCount n) {
   }
 
   // Try to map inverse
-  for (dd::Qubit i = 0; i < n; ++i) {
+  for (std::size_t i = 0; i < n; ++i) {
     if (mappedFrom[i]) {
       continue;
     }
-    std::optional<dd::Qubit> j;
+    std::optional<qc::Qubit> j;
     for (const auto [k, v] : p) {
       if (v == i) {
         j = k;
@@ -161,12 +162,12 @@ qc::Permutation complete(const qc::Permutation& p, const dd::QubitCount n) {
 
   // Map rest greedily
 
-  for (dd::Qubit i = 0; i < n; ++i) {
+  for (std::size_t i = 0; i < n; ++i) {
     if (mappedFrom[i]) {
       continue;
     }
 
-    for (dd::Qubit j = 0; j < n; ++j) {
+    for (std::size_t j = 0; j < n; ++j) {
       if (!mappedTo[j]) {
         pComp[i]    = j;
         mappedTo[j] = true;
