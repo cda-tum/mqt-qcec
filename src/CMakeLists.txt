@@ -21,9 +21,6 @@ add_library(
 target_include_directories(${PROJECT_NAME} PUBLIC ${PROJECT_SOURCE_DIR}/include
                                                   ${PROJECT_BINARY_DIR}/include)
 
-# add options and warnings to the library
-target_link_libraries(${PROJECT_NAME} PRIVATE project_options project_warnings)
-
 # link to the MQT::qfr libraries
 target_link_libraries(${PROJECT_NAME} PUBLIC MQT::qfr_dd MQT::qfr_zx)
 
