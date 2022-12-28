@@ -24,9 +24,9 @@ protected:
   void SetUp() override {
     const auto [circ1, circ2] = GetParam().second;
     std::stringstream ss1{circ1};
-    qcOriginal.import(ss1, qc::OpenQASM);
+    qcOriginal.import(ss1, qc::Format::OpenQASM);
     std::stringstream ss2{circ2};
-    qcAlternative.import(ss2, qc::OpenQASM);
+    qcAlternative.import(ss2, qc::Format::OpenQASM);
 
     config.optimizations.reconstructSWAPs     = false;
     config.optimizations.fuseSingleQubitGates = false;

@@ -8,7 +8,6 @@
 
 #include "gtest/gtest.h"
 
-using namespace dd::literals;
 using namespace qc;
 using namespace sym;
 class SymbolicTest : public ::testing::Test {

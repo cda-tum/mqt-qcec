@@ -105,7 +105,7 @@ private:
   }
 };
 
-qc::Permutation complete(const qc::Permutation& p, dd::QubitCount n);
+qc::Permutation complete(const qc::Permutation& p, std::size_t n);
 qc::Permutation concat(const qc::Permutation& p1, const qc::Permutation& p2);
 qc::Permutation invert(const qc::Permutation& p);
 qc::Permutation invertPermutations(const qc::QuantumComputation& qc);

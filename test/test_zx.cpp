@@ -15,7 +15,6 @@
 #include <sstream>
 #include <string>
 
-using namespace dd::literals;
 class ZXTest : public testing::TestWithParam<std::string> {
 protected:
   qc::QuantumComputation qcOriginal;
@@ -65,11 +64,11 @@ TEST_F(ZXTest, NonEquivalent) {
   qcOriginal.import(
       std::stringstream("OPENQASM 2.0;\ninclude \"qelib1.inc\";\nqreg "
                         "q[2];\ncx q[0], q[1];\n"),
-      qc::OpenQASM);
+      qc::Format::OpenQASM);
   qcAlternative.import(
       std::stringstream("OPENQASM 2.0;\ninclude \"qelib1.inc\";\nqreg q[2];\nh "
                         "q[0]; cx q[1], q[0]; h q[0]; h q[1];\n"),
-      qc::OpenQASM);
+      qc::Format::OpenQASM);
   ecm = std::make_unique<ec::EquivalenceCheckingManager>(qcOriginal,
                                                          qcAlternative, config);
 
@@ -78,6 +77,7 @@ TEST_F(ZXTest, NonEquivalent) {
 }
 
 TEST_F(ZXTest, Timeout) {
+  using namespace qc::literals;
   using namespace std::chrono_literals;
 
   // construct large circuit
@@ -136,6 +136,8 @@ TEST_F(ZXTest, NotEqual) {
 }
 
 TEST_F(ZXTest, PermutationMismatch) {
+  using namespace qc::literals;
+
   qcOriginal = qc::QuantumComputation(2);
   qcOriginal.x(0, 1_pc);
 
@@ -172,6 +174,8 @@ TEST_F(ZXTest, Permutation) {
 }
 
 TEST_F(ZXTest, Ancilla) {
+  using namespace qc::literals;
+
   auto qc1 = qc::QuantumComputation(1);
   auto qc2 = qc::QuantumComputation(2);
 
@@ -186,6 +190,8 @@ TEST_F(ZXTest, Ancilla) {
 }
 
 TEST_F(ZXTest, ZXWrongAncilla) {
+  using namespace qc::literals;
+
   auto            qc1 = qc::QuantumComputation(1);
   auto            qc2 = qc::QuantumComputation(2);
   qc::Permutation p1{};
@@ -202,6 +208,8 @@ TEST_F(ZXTest, ZXWrongAncilla) {
 }
 
 TEST_F(ZXTest, ZXConfiguredForInvalidCircuitParallel) {
+  using namespace qc::literals;
+
   auto qc = qc::QuantumComputation(4);
   qc.x(0, {1_pc, 2_pc, 3_pc});
 
@@ -213,6 +221,8 @@ TEST_F(ZXTest, ZXConfiguredForInvalidCircuitParallel) {
 }
 
 TEST_F(ZXTest, ZXConfiguredForInvalidCircuitSequential) {
+  using namespace qc::literals;
+
   auto qc = qc::QuantumComputation(4);
   qc.x(0, {1_pc, 2_pc, 3_pc});
 

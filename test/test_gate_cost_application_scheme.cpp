@@ -11,8 +11,6 @@
 #include <sstream>
 #include <string>
 
-using namespace dd::literals;
-
 class GateCostApplicationSchemeTest : public testing::Test {
   void SetUp() override {
     dd = std::make_unique<dd::Package<>>(nqubits);
@@ -26,8 +24,10 @@ protected:
 };
 
 TEST_F(GateCostApplicationSchemeTest, SchemeFromProfile) {
-  std::string   filename = "simple.profile";
-  std::ofstream ofs(filename);
+  using namespace qc::literals;
+
+  const std::string filename = "simple.profile";
+  std::ofstream     ofs(filename);
 
   // create a very simple profile that just specifies that a Toffoli corresponds
   // to 15 gates
@@ -69,6 +69,8 @@ TEST_F(GateCostApplicationSchemeTest, iSWAP) {
 }
 
 TEST_F(GateCostApplicationSchemeTest, Peres) {
+  using namespace qc::literals;
+
   qc.peres(1, 2, 0_pc);
 
   auto tm = ec::TaskManager<qc::MatrixDD>(qc, dd);

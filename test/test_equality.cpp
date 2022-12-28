@@ -10,8 +10,6 @@
 #include <functional>
 #include <sstream>
 
-using namespace dd::literals;
-
 class EqualityTest : public testing::Test {
   void SetUp() override {
     qc1                                       = qc::QuantumComputation(nqubits);
@@ -113,10 +111,12 @@ TEST_F(EqualityTest, CloseButNotEqualSimulation) {
 }
 
 TEST_F(EqualityTest, SimulationMoreThan64Qubits) {
+  using namespace qc::literals;
+
   qc1 = qc::QuantumComputation(65U);
   qc1.h(0);
   for (auto i = 0U; i < 64U; ++i) {
-    qc1.x(static_cast<dd::Qubit>(i + 1), 0_pc);
+    qc1.x(static_cast<qc::Qubit>(i + 1), 0_pc);
   }
   qc2                                   = qc1.clone();
   config.execution.runSimulationChecker = true;
@@ -128,8 +128,8 @@ TEST_F(EqualityTest, SimulationMoreThan64Qubits) {
 
 TEST_F(EqualityTest, AutomaticSwitchToConstructionChecker) {
   // add ancillary qubits to both circuits
-  qc1.addAncillaryQubit(1, -1);
-  qc2.addAncillaryQubit(1, -1);
+  qc1.addAncillaryQubit(1, std::nullopt);
+  qc2.addAncillaryQubit(1, std::nullopt);
 
   // perform the same action on both circuits' primary qubit
   qc1.x(0);
