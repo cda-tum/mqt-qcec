@@ -37,8 +37,10 @@ ZXEquivalenceChecker::ZXEquivalenceChecker(const qc::QuantumComputation& qc1,
       static_cast<zx::Qubit>(qc1.getNqubitsWithoutAncillae());
   for (auto anc = static_cast<zx::Qubit>(qc1.getNqubits() - 1U);
        anc >= nQubitsWithoutAncillae; --anc) {
-    miter.makeAncilla(anc, static_cast<zx::Qubit>(p1.at(anc)));
-    dPrime.makeAncilla(anc, static_cast<zx::Qubit>(p2.at(anc)));
+    miter.makeAncilla(
+        anc, static_cast<zx::Qubit>(p1.at(static_cast<qc::Qubit>(anc))));
+    dPrime.makeAncilla(
+        anc, static_cast<zx::Qubit>(p2.at(static_cast<qc::Qubit>(anc))));
   }
   miter.invert();
   miter.concat(dPrime);
@@ -132,8 +134,8 @@ qc::Permutation complete(const qc::Permutation& p, const std::size_t n) {
     if (mappedFrom[i] || mappedTo[i]) {
       continue;
     }
-
-    pComp[i]      = i;
+    const auto q  = static_cast<qc::Qubit>(i);
+    pComp[q]      = q;
     mappedFrom[i] = true;
     mappedTo[i]   = true;
   }
@@ -155,9 +157,9 @@ qc::Permutation complete(const qc::Permutation& p, const std::size_t n) {
       continue;
     }
 
-    pComp[i]            = j.value();
-    mappedFrom[i]       = true;
-    mappedTo[j.value()] = true;
+    pComp[static_cast<qc::Qubit>(i)] = j.value();
+    mappedFrom[i]                    = true;
+    mappedTo[j.value()]              = true;
   }
 
   // Map rest greedily
@@ -169,8 +171,8 @@ qc::Permutation complete(const qc::Permutation& p, const std::size_t n) {
 
     for (std::size_t j = 0; j < n; ++j) {
       if (!mappedTo[j]) {
-        pComp[i]    = j;
-        mappedTo[j] = true;
+        pComp[static_cast<qc::Qubit>(i)] = static_cast<qc::Qubit>(j);
+        mappedTo[j]                      = true;
         break;
       }
     }

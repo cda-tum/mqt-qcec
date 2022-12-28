@@ -30,7 +30,7 @@ public:
 private:
   void initializeTask(TaskManager<qc::MatrixDD, ConstructionDDPackageConfig>&
                           taskManager) override {
-    const auto initial = dd->makeIdent(nqubits);
+    const auto initial = dd->makeIdent(static_cast<dd::QubitCount>(nqubits));
     taskManager.setInternalState(initial);
     taskManager.incRef();
     taskManager.reduceAncillae();

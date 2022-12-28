@@ -9,14 +9,16 @@ namespace ec {
 void DDAlternatingChecker::initialize() {
   DDEquivalenceChecker::initialize();
   // create the full identity matrix
-  functionality = dd->makeIdent(nqubits);
+  functionality = dd->makeIdent(static_cast<dd::QubitCount>(nqubits));
   dd->incRef(functionality);
 
   // Only count ancillaries that are present in but not acted upon in both of
   // the circuits. Otherwise, the alternating checker must not be used.
   // Counter-example: H |0><0| H^-1 = [[0.5, 0.5], [0.5, 0.5]] != |0><0|
   std::vector<bool> ancillary(nqubits);
-  for (auto q = static_cast<dd::Qubit>(nqubits - 1U); q >= 0; --q) {
+  for (auto qubit = static_cast<std::make_signed_t<qc::Qubit>>(nqubits - 1U);
+       qubit >= 0; --qubit) {
+    const auto q = static_cast<qc::Qubit>(qubit);
     if (qc1.logicalQubitIsAncillary(q) && qc2.logicalQubitIsAncillary(q)) {
       const auto [found1, physical1] = qc1.containsLogicalQubit(q);
       const auto isIdle1             = found1 && qc1.isIdleQubit(*physical1);
@@ -115,7 +117,7 @@ void DDAlternatingChecker::postprocess() {
 
 EquivalenceCriterion DDAlternatingChecker::checkEquivalence() {
   // create the full identity matrix
-  auto goalMatrix = dd->makeIdent(nqubits);
+  auto goalMatrix = dd->makeIdent(static_cast<dd::QubitCount>(nqubits));
   dd->incRef(goalMatrix);
 
   // account for any garbage
@@ -152,7 +154,9 @@ bool DDAlternatingChecker::canHandle(const qc::QuantumComputation& qc1,
   assert(qc1.getNqubits() == qc2.getNqubits());
   const auto nqubits = qc1.getNqubits();
 
-  for (auto q = static_cast<dd::Qubit>(nqubits - 1U); q >= 0; --q) {
+  for (auto qubit = static_cast<std::make_signed_t<qc::Qubit>>(nqubits - 1U);
+       qubit >= 0; --qubit) {
+    const auto q = static_cast<qc::Qubit>(qubit);
     if (qc1.logicalQubitIsAncillary(q) && qc2.logicalQubitIsAncillary(q)) {
       const auto [found1, physical1] = qc1.containsLogicalQubit(q);
       const auto [found2, physical2] = qc2.containsLogicalQubit(q);
