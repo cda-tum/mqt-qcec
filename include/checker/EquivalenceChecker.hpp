@@ -42,7 +42,7 @@ protected:
   const qc::QuantumComputation& qc1;
   const qc::QuantumComputation& qc2;
 
-  dd::QubitCount nqubits{};
+  std::size_t nqubits{};
 
   Configuration configuration;
 
