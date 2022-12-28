@@ -15,7 +15,7 @@ DDSimulationChecker::DDSimulationChecker(const qc::QuantumComputation& qc1,
 }
 
 void DDSimulationChecker::initializeTask(
-    TaskManager<qc::VectorDD, SimulationDDPackage>& taskManager) {
+    TaskManager<qc::VectorDD, SimulationDDPackageConfig>& taskManager) {
   taskManager.setInternalState(initialState);
   taskManager.incRef();
 }

@@ -15,19 +15,9 @@
 
 namespace ec {
 
-template <class DDType, class DDPackage>
-DDEquivalenceChecker<DDType, DDPackage>::DDEquivalenceChecker(
-    const qc::QuantumComputation& qc1, const qc::QuantumComputation& qc2,
-    Configuration configuration) noexcept
-    : EquivalenceChecker(qc1, qc2, std::move(configuration)),
-      dd(std::make_unique<DDPackage>(nqubits)),
-      taskManager1(TaskManager<DDType, DDPackage>(qc1, dd)),
-      taskManager2(TaskManager<DDType, DDPackage>(qc2, dd)) {}
-
-template <class DDType, class DDPackage>
+template <class DDType, class Config>
 EquivalenceCriterion
-DDEquivalenceChecker<DDType, DDPackage>::equals(const DDType& e,
-                                                const DDType& f) {
+DDEquivalenceChecker<DDType, Config>::equals(const DDType& e, const DDType& f) {
   // both node pointers being equivalent is the strongest indication that the
   // two decision diagrams are equivalent
   if (e.p == f.p) {
@@ -102,8 +92,8 @@ DDEquivalenceChecker<DDType, DDPackage>::equals(const DDType& e,
   return EquivalenceCriterion::NotEquivalent;
 }
 
-template <class DDType, class DDPackage>
-EquivalenceCriterion DDEquivalenceChecker<DDType, DDPackage>::run() {
+template <class DDType, class Config>
+EquivalenceCriterion DDEquivalenceChecker<DDType, Config>::run() {
   const auto start = std::chrono::steady_clock::now();
 
   // initialize the internal representation (initial state, initial matrix,
@@ -153,14 +143,14 @@ EquivalenceCriterion DDEquivalenceChecker<DDType, DDPackage>::run() {
   return equivalence;
 }
 
-template <class DDType, class DDPackage>
-void DDEquivalenceChecker<DDType, DDPackage>::initialize() {
+template <class DDType, class Config>
+void DDEquivalenceChecker<DDType, Config>::initialize() {
   initializeTask(taskManager1);
   initializeTask(taskManager2);
 }
 
-template <class DDType, class DDPackage>
-void DDEquivalenceChecker<DDType, DDPackage>::execute() {
+template <class DDType, class Config>
+void DDEquivalenceChecker<DDType, Config>::execute() {
   while (!taskManager1.finished() && !taskManager2.finished() && !isDone()) {
     // skip over any SWAP operations
     taskManager1.applySwapOperations();
@@ -183,8 +173,8 @@ void DDEquivalenceChecker<DDType, DDPackage>::execute() {
   }
 }
 
-template <class DDType, class DDPackage>
-void DDEquivalenceChecker<DDType, DDPackage>::finish() {
+template <class DDType, class Config>
+void DDEquivalenceChecker<DDType, Config>::finish() {
   taskManager1.finish();
   if (isDone()) {
     return;
@@ -192,9 +182,9 @@ void DDEquivalenceChecker<DDType, DDPackage>::finish() {
   taskManager2.finish();
 }
 
-template <class DDType, class DDPackage>
-void DDEquivalenceChecker<DDType, DDPackage>::postprocessTask(
-    TaskManager<DDType, DDPackage>& task) {
+template <class DDType, class Config>
+void DDEquivalenceChecker<DDType, Config>::postprocessTask(
+    TaskManager<DDType, Config>& task) {
   // ensure that the permutation that was tracked throughout the circuit matches
   // the expected output permutation
   task.changePermutation();
@@ -211,8 +201,8 @@ void DDEquivalenceChecker<DDType, DDPackage>::postprocessTask(
   task.reduceGarbage();
 }
 
-template <class DDType, class DDPackage>
-void DDEquivalenceChecker<DDType, DDPackage>::postprocess() {
+template <class DDType, class Config>
+void DDEquivalenceChecker<DDType, Config>::postprocess() {
   postprocessTask(taskManager1);
   if (isDone()) {
     return;
@@ -220,32 +210,30 @@ void DDEquivalenceChecker<DDType, DDPackage>::postprocess() {
   postprocessTask(taskManager2);
 }
 
-template <class DDType, class DDPackage>
-EquivalenceCriterion
-DDEquivalenceChecker<DDType, DDPackage>::checkEquivalence() {
+template <class DDType, class Config>
+EquivalenceCriterion DDEquivalenceChecker<DDType, Config>::checkEquivalence() {
   return equals(taskManager1.getInternalState(),
                 taskManager2.getInternalState());
 }
 
-template <class DDType, class DDPackage>
-void DDEquivalenceChecker<DDType, DDPackage>::initializeApplicationScheme(
+template <class DDType, class Config>
+void DDEquivalenceChecker<DDType, Config>::initializeApplicationScheme(
     const ApplicationSchemeType scheme) {
   switch (scheme) {
   case ApplicationSchemeType::Sequential:
     applicationScheme =
-        std::make_unique<SequentialApplicationScheme<DDType, DDPackage>>(
+        std::make_unique<SequentialApplicationScheme<DDType, Config>>(
             taskManager1, taskManager2);
     break;
   case ApplicationSchemeType::OneToOne:
     applicationScheme =
-        std::make_unique<OneToOneApplicationScheme<DDType, DDPackage>>(
+        std::make_unique<OneToOneApplicationScheme<DDType, Config>>(
             taskManager1, taskManager2);
     break;
   case ApplicationSchemeType::Lookahead:
     if constexpr (std::is_same_v<DDType, qc::MatrixDD>) {
-      applicationScheme =
-          std::make_unique<LookaheadApplicationScheme<DDPackage>>(taskManager1,
-                                                                  taskManager2);
+      applicationScheme = std::make_unique<LookaheadApplicationScheme<Config>>(
+          taskManager1, taskManager2);
     } else {
       throw std::invalid_argument(
           "Lookahead application scheme can only be used for matrices.");
@@ -254,29 +242,29 @@ void DDEquivalenceChecker<DDType, DDPackage>::initializeApplicationScheme(
   case ApplicationSchemeType::GateCost:
     if (!configuration.application.profile.empty()) {
       applicationScheme =
-          std::make_unique<GateCostApplicationScheme<DDType, DDPackage>>(
+          std::make_unique<GateCostApplicationScheme<DDType, Config>>(
               taskManager1, taskManager2, configuration.application.profile);
     } else {
       applicationScheme =
-          std::make_unique<GateCostApplicationScheme<DDType, DDPackage>>(
+          std::make_unique<GateCostApplicationScheme<DDType, Config>>(
               taskManager1, taskManager2,
               configuration.application.costFunction);
     }
     break;
   default:
     applicationScheme =
-        std::make_unique<ProportionalApplicationScheme<DDType, DDPackage>>(
+        std::make_unique<ProportionalApplicationScheme<DDType, Config>>(
             taskManager1, taskManager2);
     break;
   }
 }
 
-template class DDEquivalenceChecker<qc::VectorDD, dd::Package<>>;
-template class DDEquivalenceChecker<qc::MatrixDD, dd::Package<>>;
-template class DDEquivalenceChecker<qc::VectorDD, SimulationDDPackage>;
-template class DDEquivalenceChecker<qc::MatrixDD, SimulationDDPackage>;
-template class DDEquivalenceChecker<qc::VectorDD, ConstructionDDPackage>;
-template class DDEquivalenceChecker<qc::MatrixDD, ConstructionDDPackage>;
-template class DDEquivalenceChecker<qc::VectorDD, AlternatingDDPackage>;
-template class DDEquivalenceChecker<qc::MatrixDD, AlternatingDDPackage>;
+template class DDEquivalenceChecker<qc::VectorDD, dd::DDPackageConfig>;
+template class DDEquivalenceChecker<qc::MatrixDD, dd::DDPackageConfig>;
+template class DDEquivalenceChecker<qc::VectorDD, SimulationDDPackageConfig>;
+template class DDEquivalenceChecker<qc::MatrixDD, SimulationDDPackageConfig>;
+template class DDEquivalenceChecker<qc::VectorDD, ConstructionDDPackageConfig>;
+template class DDEquivalenceChecker<qc::MatrixDD, ConstructionDDPackageConfig>;
+template class DDEquivalenceChecker<qc::VectorDD, AlternatingDDPackageConfig>;
+template class DDEquivalenceChecker<qc::MatrixDD, AlternatingDDPackageConfig>;
 } // namespace ec

@@ -11,7 +11,9 @@
 namespace ec {
 enum class Direction : bool { Left = true, Right = false };
 
-template <class DDType, class DDPackage = dd::Package<>> class TaskManager {
+template <class DDType, class Config = dd::DDPackageConfig> class TaskManager {
+  using DDPackage = typename dd::Package<Config>;
+
 public:
   TaskManager(const qc::QuantumComputation& qc,
               std::unique_ptr<DDPackage>&   package,

@@ -11,7 +11,7 @@
 
 namespace ec {
 class DDAlternatingChecker final
-    : public DDEquivalenceChecker<qc::MatrixDD, AlternatingDDPackage> {
+    : public DDEquivalenceChecker<qc::MatrixDD, AlternatingDDPackageConfig> {
 public:
   DDAlternatingChecker(const qc::QuantumComputation& qc1,
                        const qc::QuantumComputation& qc2,
@@ -24,9 +24,9 @@ public:
         this->configuration.application.alternatingScheme);
 
     // special treatment for the lookahead application scheme
-    if (auto* lookahead =
-            dynamic_cast<LookaheadApplicationScheme<AlternatingDDPackage>*>(
-                applicationScheme.get())) {
+    if (auto* lookahead = dynamic_cast<
+            LookaheadApplicationScheme<AlternatingDDPackageConfig>*>(
+            applicationScheme.get())) {
       // initialize links for the internal state and the package of the
       // lookahead scheme
       lookahead->setInternalState(functionality);
@@ -49,7 +49,7 @@ private:
   qc::MatrixDD functionality{};
 
   void initializeTask(
-      [[maybe_unused]] TaskManager<qc::MatrixDD, AlternatingDDPackage>&
+      [[maybe_unused]] TaskManager<qc::MatrixDD, AlternatingDDPackageConfig>&
           taskManager) override{
       // task initialization is conducted separately for this checker
   };

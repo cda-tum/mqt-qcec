@@ -10,7 +10,7 @@
 
 namespace ec {
 class DDConstructionChecker final
-    : public DDEquivalenceChecker<qc::MatrixDD, ConstructionDDPackage> {
+    : public DDEquivalenceChecker<qc::MatrixDD, ConstructionDDPackageConfig> {
 public:
   DDConstructionChecker(const qc::QuantumComputation& qc1,
                         const qc::QuantumComputation& qc2,
@@ -28,8 +28,8 @@ public:
   void json(nlohmann::json& j) const noexcept override;
 
 private:
-  void initializeTask(
-      TaskManager<qc::MatrixDD, ConstructionDDPackage>& taskManager) override {
+  void initializeTask(TaskManager<qc::MatrixDD, ConstructionDDPackageConfig>&
+                          taskManager) override {
     const auto initial = dd->makeIdent(nqubits);
     taskManager.setInternalState(initial);
     taskManager.incRef();

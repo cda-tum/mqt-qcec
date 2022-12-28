@@ -10,7 +10,7 @@
 
 namespace ec {
 class DDSimulationChecker final
-    : public DDEquivalenceChecker<qc::VectorDD, SimulationDDPackage> {
+    : public DDEquivalenceChecker<qc::VectorDD, SimulationDDPackageConfig> {
 public:
   DDSimulationChecker(const qc::QuantumComputation& qc1,
                       const qc::QuantumComputation& qc2,
@@ -38,8 +38,8 @@ private:
   // |0...0>
   qc::VectorDD initialState{};
 
-  void initializeTask(
-      TaskManager<qc::VectorDD, SimulationDDPackage>& taskManager) override;
+  void initializeTask(TaskManager<qc::VectorDD, SimulationDDPackageConfig>&
+                          taskManager) override;
   EquivalenceCriterion checkEquivalence() override;
 };
 } // namespace ec

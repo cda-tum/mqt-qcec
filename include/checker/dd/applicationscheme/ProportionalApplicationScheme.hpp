@@ -8,13 +8,13 @@
 #include "ApplicationScheme.hpp"
 
 namespace ec {
-template <class DDType, class DDPackage = dd::Package<>>
+template <class DDType, class Config>
 class ProportionalApplicationScheme final
-    : public ApplicationScheme<DDType, DDPackage> {
+    : public ApplicationScheme<DDType, Config> {
 public:
-  ProportionalApplicationScheme(TaskManager<DDType, DDPackage>& taskManager1,
-                                TaskManager<DDType, DDPackage>& taskManager2)
-      : ApplicationScheme<DDType, DDPackage>(taskManager1, taskManager2),
+  ProportionalApplicationScheme(TaskManager<DDType, Config>& taskManager1,
+                                TaskManager<DDType, Config>& taskManager2)
+      : ApplicationScheme<DDType, Config>(taskManager1, taskManager2),
         gateRatio(computeGateRatio()) {}
 
   std::pair<size_t, size_t> operator()() noexcept override {

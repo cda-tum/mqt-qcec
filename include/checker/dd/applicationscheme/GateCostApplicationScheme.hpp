@@ -32,22 +32,22 @@ using GateCostLookupTable =
 using CostFunction =
     std::function<std::size_t(const GateCostLookupTableKeyType&)>;
 
-template <class DDType, class DDPackage = dd::Package<>>
+template <class DDType, class Config>
 class GateCostApplicationScheme final
-    : public ApplicationScheme<DDType, DDPackage> {
+    : public ApplicationScheme<DDType, Config> {
 public:
-  GateCostApplicationScheme(TaskManager<DDType, DDPackage>& taskManager1,
-                            TaskManager<DDType, DDPackage>& taskManager2,
-                            const CostFunction&             costFunction)
-      : ApplicationScheme<DDType, DDPackage>(taskManager1, taskManager2) {
+  GateCostApplicationScheme(TaskManager<DDType, Config>& taskManager1,
+                            TaskManager<DDType, Config>& taskManager2,
+                            const CostFunction&          costFunction)
+      : ApplicationScheme<DDType, Config>(taskManager1, taskManager2) {
     populateLookupTable(costFunction, taskManager1.getCircuit());
     populateLookupTable(costFunction, taskManager2.getCircuit());
   }
 
-  GateCostApplicationScheme(TaskManager<DDType, DDPackage>& taskManager1,
-                            TaskManager<DDType, DDPackage>& taskManager2,
-                            const std::string&              filename)
-      : ApplicationScheme<DDType, DDPackage>(taskManager1, taskManager2) {
+  GateCostApplicationScheme(TaskManager<DDType, Config>& taskManager1,
+                            TaskManager<DDType, Config>& taskManager2,
+                            const std::string&           filename)
+      : ApplicationScheme<DDType, Config>(taskManager1, taskManager2) {
     populateLookupTable(filename);
   }
 

@@ -8,20 +8,19 @@
 #include "ApplicationScheme.hpp"
 
 namespace ec {
-template <class DDPackage = dd::Package<>>
+template <class Config>
 class LookaheadApplicationScheme final
-    : public ApplicationScheme<qc::MatrixDD, DDPackage> {
+    : public ApplicationScheme<qc::MatrixDD, Config> {
 public:
   LookaheadApplicationScheme(
-      TaskManager<qc::MatrixDD, DDPackage>& taskManager1,
-      TaskManager<qc::MatrixDD, DDPackage>& taskManager2) noexcept
-      : ApplicationScheme<qc::MatrixDD, DDPackage>(taskManager1, taskManager2) {
-  }
+      TaskManager<qc::MatrixDD, Config>& taskManager1,
+      TaskManager<qc::MatrixDD, Config>& taskManager2) noexcept
+      : ApplicationScheme<qc::MatrixDD, Config>(taskManager1, taskManager2) {}
 
   void setInternalState(qc::MatrixDD& state) noexcept {
     internalState = &state;
   }
-  void setPackage(DDPackage* dd) noexcept { package = dd; }
+  void setPackage(dd::Package<Config>* dd) noexcept { package = dd; }
 
   // in general, the lookup application scheme will apply a single operation of
   // either circuit for every invocation. manipulation of the state is handled
@@ -84,7 +83,7 @@ private:
 
   // the lookahead application scheme maintains links to an internal state to
   // manipulate and a package to use
-  qc::MatrixDD* internalState{};
-  DDPackage*    package{};
+  qc::MatrixDD*        internalState{};
+  dd::Package<Config>* package{};
 };
 } // namespace ec
