@@ -12,6 +12,7 @@
 #include <iostream>
 #include <memory>
 #include <string>
+#include <utility>
 
 namespace ec {
 void EquivalenceCheckingManager::setupAncillariesAndGarbage() {
@@ -169,10 +170,10 @@ void EquivalenceCheckingManager::run() {
 
 EquivalenceCheckingManager::EquivalenceCheckingManager(
     const qc::QuantumComputation& circ1, const qc::QuantumComputation& circ2,
-    const Configuration& config)
+    Configuration config)
     : qc1(circ1.size() > circ2.size() ? circ2.clone() : circ1.clone()),
       qc2(circ1.size() > circ2.size() ? circ1.clone() : circ2.clone()),
-      configuration(config) {
+      configuration(std::move(config)) {
   // clones both circuits (the circuit with fewer gates always gets to be qc1)
 
   const auto start = std::chrono::steady_clock::now();

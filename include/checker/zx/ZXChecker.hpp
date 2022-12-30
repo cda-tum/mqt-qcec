@@ -17,9 +17,9 @@
 namespace ec {
 class ZXEquivalenceChecker : public EquivalenceChecker {
 public:
-  ZXEquivalenceChecker(const qc::QuantumComputation& qc1,
-                       const qc::QuantumComputation& qc2,
-                       Configuration                 configuration) noexcept;
+  ZXEquivalenceChecker(const qc::QuantumComputation& circ1,
+                       const qc::QuantumComputation& circ2,
+                       Configuration                 config) noexcept;
 
   EquivalenceCriterion run() override;
 
