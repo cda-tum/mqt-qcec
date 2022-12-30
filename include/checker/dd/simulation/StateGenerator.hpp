@@ -161,7 +161,7 @@ public:
     return initial;
   }
 
-  void seedGenerator(const std::size_t s);
+  void seedGenerator(std::size_t s);
 
   void clear() { generatedComputationalBasisStates.clear(); }
 
