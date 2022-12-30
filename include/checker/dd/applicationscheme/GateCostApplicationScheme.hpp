@@ -106,6 +106,6 @@ private:
   }
 };
 
-[[nodiscard]] std::size_t
+[[nodiscard, gnu::pure]] std::size_t
 legacyCostFunction(const GateCostLookupTableKeyType& key) noexcept;
 } // namespace ec
