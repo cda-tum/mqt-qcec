@@ -89,9 +89,9 @@ INSTANTIATE_TEST_SUITE_P(
                             "OPENQASM 2.0;\ninclude \"qelib1.inc\";\nqreg "
                             "q[1];\n x q[0];\n"}}),
     [](const testing::TestParamInfo<SimpleCircuitIdentitiesTest::ParamType>&
-           info) {
+           inf) {
       std::stringstream ss{};
-      ss << info.param.first;
+      ss << inf.param.first;
       return ss.str();
     });
 

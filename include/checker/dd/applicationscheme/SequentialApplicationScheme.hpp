@@ -12,12 +12,11 @@ template <class DDType, class Config>
 class SequentialApplicationScheme final
     : public ApplicationScheme<DDType, Config> {
 public:
-  SequentialApplicationScheme(
-      TaskManager<DDType, Config>& taskManager1,
-      TaskManager<DDType, Config>& taskManager2) noexcept
-      : ApplicationScheme<DDType, Config>(taskManager1, taskManager2),
-        gates1(taskManager1.getCircuit()->getNops()),
-        gates2(taskManager2.getCircuit()->getNops()) {}
+  SequentialApplicationScheme(TaskManager<DDType, Config>& tm1,
+                              TaskManager<DDType, Config>& tm2) noexcept
+      : ApplicationScheme<DDType, Config>(tm1, tm2),
+        gates1(tm1.getCircuit()->getNops()),
+        gates2(tm2.getCircuit()->getNops()) {}
 
   std::pair<size_t, size_t> operator()() noexcept override {
     return {gates1, gates2};

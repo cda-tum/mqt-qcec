@@ -15,12 +15,12 @@
 namespace ec {
 class EquivalenceChecker {
 public:
-  EquivalenceChecker(const qc::QuantumComputation& qc1,
-                     const qc::QuantumComputation& qc2,
-                     Configuration                 configuration) noexcept
-      : qc1(qc1), qc2(qc2),
+  EquivalenceChecker(const qc::QuantumComputation& circ1,
+                     const qc::QuantumComputation& circ2,
+                     Configuration                 config) noexcept
+      : qc1(circ1), qc2(circ2),
         nqubits(std::max(qc1.getNqubits(), qc2.getNqubits())),
-        configuration(std::move(configuration)){};
+        configuration(std::move(config)){};
 
   virtual ~EquivalenceChecker() = default;
 

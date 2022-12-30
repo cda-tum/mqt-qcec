@@ -41,9 +41,9 @@ INSTANTIATE_TEST_SUITE_P(
                     "optimizedswap",
                     "ancilla_inputperm_outputperm_optimizedswap",
                     "ancilla_inputperm_outputperm_optimizedswap2"),
-    [](const testing::TestParamInfo<FunctionalityTest::ParamType>& info) {
+    [](const testing::TestParamInfo<FunctionalityTest::ParamType>& inf) {
       std::stringstream ss{};
-      ss << info.param;
+      ss << inf.param;
       return ss.str();
     });
 

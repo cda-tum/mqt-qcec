@@ -168,11 +168,11 @@ void EquivalenceCheckingManager::run() {
 }
 
 EquivalenceCheckingManager::EquivalenceCheckingManager(
-    const qc::QuantumComputation& qc1, const qc::QuantumComputation& qc2,
-    const Configuration& configuration)
-    : qc1(qc1.size() > qc2.size() ? qc2.clone() : qc1.clone()),
-      qc2(qc1.size() > qc2.size() ? qc1.clone() : qc2.clone()),
-      configuration(configuration) {
+    const qc::QuantumComputation& circ1, const qc::QuantumComputation& circ2,
+    const Configuration& config)
+    : qc1(circ1.size() > circ2.size() ? circ2.clone() : circ1.clone()),
+      qc2(circ1.size() > circ2.size() ? circ1.clone() : circ2.clone()),
+      configuration(config) {
   // clones both circuits (the circuit with fewer gates always gets to be qc1)
 
   const auto start = std::chrono::steady_clock::now();

@@ -91,8 +91,8 @@ protected:
   using TM = TaskManager<DDType, Config>;
 
 public:
-  ApplicationScheme(TM& taskManager1, TM& taskManager2) noexcept
-      : taskManager1(taskManager1), taskManager2(taskManager2){};
+  ApplicationScheme(TM& tm1, TM& tm2) noexcept
+      : taskManager1(tm1), taskManager2(tm2){};
 
   virtual ~ApplicationScheme() = default;
 

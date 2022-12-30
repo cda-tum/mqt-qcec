@@ -116,7 +116,7 @@ TEST_F(EqualityTest, SimulationMoreThan64Qubits) {
   qc1 = qc::QuantumComputation(65U);
   qc1.h(0);
   for (auto i = 0U; i < 64U; ++i) {
-    qc1.x(static_cast<qc::Qubit>(i + 1), 0_pc);
+    qc1.x(i + 1, 0_pc);
   }
   qc2                                   = qc1.clone();
   config.execution.runSimulationChecker = true;

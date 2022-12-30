@@ -128,9 +128,9 @@ INSTANTIATE_TEST_SUITE_P(
             ),
         testing::Range(static_cast<unsigned short>(1U),
                        static_cast<unsigned short>(4U), 2)),
-    [](const testing::TestParamInfo<JournalTestNonEQ::ParamType>& info) {
-      std::string    name            = std::get<0>(info.param);
-      unsigned short gates_to_remove = std::get<1>(info.param);
+    [](const testing::TestParamInfo<JournalTestNonEQ::ParamType>& inf) {
+      std::string    name            = std::get<0>(inf.param);
+      unsigned short gates_to_remove = std::get<1>(inf.param);
       std::replace(name.begin(), name.end(), '-', '_');
       std::stringstream ss{};
       ss << name << "_removed_" << gates_to_remove;
@@ -298,8 +298,8 @@ INSTANTIATE_TEST_SUITE_P(
                     //"cm151a_211",
                     //"apla_203"
                     ),
-    [](const testing::TestParamInfo<JournalTestEQ::ParamType>& info) {
-      std::string name = info.param;
+    [](const testing::TestParamInfo<JournalTestEQ::ParamType>& inf) {
+      std::string name = inf.param;
       std::replace(name.begin(), name.end(), '-', '_');
       std::stringstream ss{};
       ss << name;

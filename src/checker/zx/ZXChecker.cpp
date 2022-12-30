@@ -16,10 +16,10 @@
 #include <optional>
 
 namespace ec {
-ZXEquivalenceChecker::ZXEquivalenceChecker(const qc::QuantumComputation& qc1,
-                                           const qc::QuantumComputation& qc2,
-                                           Configuration configuration) noexcept
-    : EquivalenceChecker(qc1, qc2, std::move(configuration)),
+ZXEquivalenceChecker::ZXEquivalenceChecker(const qc::QuantumComputation& circ1,
+                                           const qc::QuantumComputation& circ2,
+                                           Configuration config) noexcept
+    : EquivalenceChecker(circ1, circ2, std::move(config)),
       miter(zx::FunctionalityConstruction::buildFunctionality(&qc1)),
       tolerance(configuration.functionality.traceThreshold) {
   zx::ZXDiagram dPrime =

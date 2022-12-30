@@ -17,7 +17,7 @@
 namespace ec {
 class StateGenerator {
 public:
-  explicit StateGenerator(const std::size_t seed) : seed(seed) {
+  explicit StateGenerator(const std::size_t s) : seed(s) {
     seedGenerator(seed);
   }
   StateGenerator() : StateGenerator(0U) {}
