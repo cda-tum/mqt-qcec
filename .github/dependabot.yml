@@ -3,12 +3,10 @@ updates:
   - package-ecosystem: "gitsubmodule"
     directory: "/"
     schedule:
-      interval: "weekly"
+      interval: "monthly"
       day: "friday"
       time: "06:00"
       timezone: "Europe/Vienna"
-    assignees:
-      - "burgholzer"
 
   - package-ecosystem: "github-actions"
     directory: "/"
@@ -17,8 +15,6 @@ updates:
       day: "friday"
       time: "06:00"
       timezone: "Europe/Vienna"
-    assignees:
-      - "burgholzer"
 
   - package-ecosystem: "pip"
     directory: "/"
@@ -27,5 +23,3 @@ updates:
       day: "friday"
       time: "06:00"
       timezone: "Europe/Vienna"
-    assignees:
-      - "burgholzer"

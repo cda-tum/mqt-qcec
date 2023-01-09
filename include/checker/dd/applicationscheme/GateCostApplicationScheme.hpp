@@ -36,18 +36,18 @@ template <class DDType, class Config>
 class GateCostApplicationScheme final
     : public ApplicationScheme<DDType, Config> {
 public:
-  GateCostApplicationScheme(TaskManager<DDType, Config>& taskManager1,
-                            TaskManager<DDType, Config>& taskManager2,
+  GateCostApplicationScheme(TaskManager<DDType, Config>& tm1,
+                            TaskManager<DDType, Config>& tm2,
                             const CostFunction&          costFunction)
-      : ApplicationScheme<DDType, Config>(taskManager1, taskManager2) {
-    populateLookupTable(costFunction, taskManager1.getCircuit());
-    populateLookupTable(costFunction, taskManager2.getCircuit());
+      : ApplicationScheme<DDType, Config>(tm1, tm2) {
+    populateLookupTable(costFunction, tm1.getCircuit());
+    populateLookupTable(costFunction, tm2.getCircuit());
   }
 
-  GateCostApplicationScheme(TaskManager<DDType, Config>& taskManager1,
-                            TaskManager<DDType, Config>& taskManager2,
+  GateCostApplicationScheme(TaskManager<DDType, Config>& tm1,
+                            TaskManager<DDType, Config>& tm2,
                             const std::string&           filename)
-      : ApplicationScheme<DDType, Config>(taskManager1, taskManager2) {
+      : ApplicationScheme<DDType, Config>(tm1, tm2) {
     populateLookupTable(filename);
   }
 
@@ -106,6 +106,6 @@ private:
   }
 };
 
-[[nodiscard]] std::size_t
+[[nodiscard, gnu::pure]] std::size_t
 legacyCostFunction(const GateCostLookupTableKeyType& key) noexcept;
 } // namespace ec

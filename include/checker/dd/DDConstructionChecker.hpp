@@ -12,10 +12,10 @@ namespace ec {
 class DDConstructionChecker final
     : public DDEquivalenceChecker<qc::MatrixDD, ConstructionDDPackageConfig> {
 public:
-  DDConstructionChecker(const qc::QuantumComputation& qc1,
-                        const qc::QuantumComputation& qc2,
-                        ec::Configuration             configuration)
-      : DDEquivalenceChecker(qc1, qc2, std::move(configuration)) {
+  DDConstructionChecker(const qc::QuantumComputation& circ1,
+                        const qc::QuantumComputation& circ2,
+                        ec::Configuration             config)
+      : DDEquivalenceChecker(circ1, circ2, std::move(config)) {
     if (this->configuration.application.constructionScheme ==
         ApplicationSchemeType::Lookahead) {
       throw std::invalid_argument("Lookahead application scheme must not be "
@@ -30,7 +30,7 @@ public:
 private:
   void initializeTask(TaskManager<qc::MatrixDD, ConstructionDDPackageConfig>&
                           taskManager) override {
-    const auto initial = dd->makeIdent(nqubits);
+    const auto initial = dd->makeIdent(static_cast<dd::QubitCount>(nqubits));
     taskManager.setInternalState(initial);
     taskManager.incRef();
     taskManager.reduceAncillae();

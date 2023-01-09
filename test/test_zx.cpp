@@ -44,9 +44,9 @@ INSTANTIATE_TEST_SUITE_P(
                     "optimizedswap",
                     "ancilla_inputperm_outputperm_optimizedswap",
                     "ancilla_inputperm_outputperm_optimizedswap2"),
-    [](const testing::TestParamInfo<ZXTest::ParamType>& info) {
+    [](const testing::TestParamInfo<ZXTest::ParamType>& inf) {
       std::stringstream ss{};
-      ss << info.param;
+      ss << inf.param;
       return ss.str();
     });
 
@@ -275,8 +275,8 @@ INSTANTIATE_TEST_SUITE_P(
     ZXTestCompFlow, ZXTestCompFlow,
     testing::Values("c2_181", "rd73_312", "sym9_317", "mod5adder_306",
                     "rd84_313"),
-    [](const testing::TestParamInfo<ZXTestCompFlow::ParamType>& info) {
-      auto s = info.param;
+    [](const testing::TestParamInfo<ZXTestCompFlow::ParamType>& inf) {
+      auto s = inf.param;
       std::replace(s.begin(), s.end(), '-', '_');
       return s;
     });

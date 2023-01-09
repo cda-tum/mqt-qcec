@@ -12,10 +12,9 @@ template <class Config>
 class LookaheadApplicationScheme final
     : public ApplicationScheme<qc::MatrixDD, Config> {
 public:
-  LookaheadApplicationScheme(
-      TaskManager<qc::MatrixDD, Config>& taskManager1,
-      TaskManager<qc::MatrixDD, Config>& taskManager2) noexcept
-      : ApplicationScheme<qc::MatrixDD, Config>(taskManager1, taskManager2) {}
+  LookaheadApplicationScheme(TaskManager<qc::MatrixDD, Config>& tm1,
+                             TaskManager<qc::MatrixDD, Config>& tm2) noexcept
+      : ApplicationScheme<qc::MatrixDD, Config>(tm1, tm2) {}
 
   void setInternalState(qc::MatrixDD& state) noexcept {
     internalState = &state;

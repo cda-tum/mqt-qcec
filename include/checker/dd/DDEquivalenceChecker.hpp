@@ -19,13 +19,13 @@ namespace ec {
 template <class DDType, class Config>
 class DDEquivalenceChecker : public EquivalenceChecker {
 public:
-  DDEquivalenceChecker(const qc::QuantumComputation& qc1,
-                       const qc::QuantumComputation& qc2,
-                       Configuration                 configuration) noexcept
-      : EquivalenceChecker(qc1, qc2, std::move(configuration)),
+  DDEquivalenceChecker(const qc::QuantumComputation& circ1,
+                       const qc::QuantumComputation& circ2,
+                       Configuration                 config) noexcept
+      : EquivalenceChecker(circ1, circ2, std::move(config)),
         dd(std::make_unique<dd::Package<Config>>(nqubits)),
-        taskManager1(TaskManager<DDType, Config>(qc1, dd)),
-        taskManager2(TaskManager<DDType, Config>(qc2, dd)) {}
+        taskManager1(TaskManager<DDType, Config>(circ1, dd)),
+        taskManager2(TaskManager<DDType, Config>(circ2, dd)) {}
 
   EquivalenceCriterion run() override;
 

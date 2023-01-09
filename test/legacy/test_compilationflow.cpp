@@ -40,8 +40,8 @@ INSTANTIATE_TEST_SUITE_P(
                     "example2_231", "c2_181", "rd73_312", "cm150a_210",
                     "cm163a_213", "c2_182", "sym9_317", "mod5adder_306",
                     "rd84_313", "cm151a_211", "apla_203"),
-    [](const testing::TestParamInfo<CompilationFlowTest::ParamType>& info) {
-      auto s = info.param;
+    [](const testing::TestParamInfo<CompilationFlowTest::ParamType>& inf) {
+      auto s = inf.param;
       std::replace(s.begin(), s.end(), '-', '_');
       return s;
     });
