@@ -8,9 +8,10 @@ if sys.version_info < (3, 10, 0):
 else:
     from importlib import resources  # type: ignore[no-redef]
 
+from qiskit import QuantumCircuit
+
 from mqt.qcec import ApplicationScheme, Configuration, EquivalenceCheckingManager
 from mqt.qcec.compilation_flow_profiles import AncillaMode, generate_profile_name
-from qiskit import QuantumCircuit
 
 from .parameterized import __is_parameterized, check_parameterized
 

@@ -1,11 +1,12 @@
 from __future__ import annotations
 
 import pytest
+
 from mqt import qcec
 
 
 @pytest.mark.parametrize(
-    "application_scheme_string, application_scheme_enum",
+    ("application_scheme_string", "application_scheme_enum"),
     [
         ("sequential", qcec.ApplicationScheme.sequential),
         ("reference", qcec.ApplicationScheme.sequential),
@@ -35,7 +36,7 @@ def test_timeout() -> None:
 
 
 @pytest.mark.parametrize(
-    "state_type_string, state_type_enum",
+    ("state_type_string", "state_type_enum"),
     [
         ("computational_basis", qcec.StateType.computational_basis),
         ("classical", qcec.StateType.computational_basis),

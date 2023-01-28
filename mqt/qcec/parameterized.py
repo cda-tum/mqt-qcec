@@ -7,10 +7,11 @@ from itertools import chain
 from typing import Any
 
 import numpy as np
-from mqt.qcec import Configuration, EquivalenceCheckingManager, EquivalenceCriterion
 from numpy.typing import NDArray
 from qiskit import QuantumCircuit
 from qiskit.circuit import Parameter, ParameterExpression
+
+from mqt.qcec import Configuration, EquivalenceCheckingManager, EquivalenceCriterion
 
 
 def __is_parameterized(qc: QuantumCircuit) -> bool:
@@ -169,10 +170,7 @@ def check_parameterized(
 
     update_stats(res)
 
-    if kwargs.get("timeout"):
-        timeout = kwargs["timeout"].total_seconds()
-    else:
-        timeout = None
+    timeout = kwargs["timeout"].total_seconds() if kwargs.get("timeout") else None
 
     timeout = __adjust_timeout(timeout, res)
 

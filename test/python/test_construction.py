@@ -1,11 +1,12 @@
 from __future__ import annotations
 
 import pytest
-from mqt import qcec
 from qiskit import QuantumCircuit
 
+from mqt import qcec
 
-@pytest.fixture
+
+@pytest.fixture()
 def example_circuit() -> QuantumCircuit:
     qc = QuantumCircuit(1)
     qc.h(0)

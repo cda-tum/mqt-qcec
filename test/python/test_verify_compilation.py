@@ -1,12 +1,13 @@
 from __future__ import annotations
 
 import pytest
-from mqt import qcec
 from qiskit import QuantumCircuit, transpile
 from qiskit.providers.fake_provider import FakeAthens
 
+from mqt import qcec
 
-@pytest.fixture
+
+@pytest.fixture()
 def original_circuit() -> QuantumCircuit:
     qc = QuantumCircuit(3)
     qc.h(0)

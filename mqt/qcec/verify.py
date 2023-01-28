@@ -2,8 +2,9 @@ from __future__ import annotations
 
 from typing import Any
 
-from mqt.qcec import Configuration, EquivalenceCheckingManager
 from qiskit import QuantumCircuit
+
+from mqt.qcec import Configuration, EquivalenceCheckingManager
 
 from .parameterized import __is_parameterized, check_parameterized
 
