@@ -21,7 +21,6 @@ license = { file = "LICENSE.md" }
 classifiers=[
     "Development Status :: 5 - Production/Stable",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
@@ -35,7 +34,7 @@ classifiers=[
     "Natural Language :: English",
     "Topic :: Scientific/Engineering :: Electronic Design Automation (EDA)",
 ]
-requires-python = ">=3.7"
+requires-python = ">=3.8"
 dependencies = [
     "importlib_resources>=5.0; python_version < '3.10'",
     "qiskit-terra>=0.20",
@@ -130,7 +129,7 @@ src_paths = ["mqt/qcec", "test/python"]
 
 [tool.mypy]
 files = ["mqt/qcec", "test/python", "setup.py"]
-python_version = "3.7"
+python_version = "3.8"
 strict = true
 show_error_codes = true
 enable_error_code = ["ignore-without-code", "redundant-expr", "truthy-bool"]
@@ -142,7 +141,7 @@ module = ["qiskit.*"]
 ignore_missing_imports = true
 
 [tool.pylint]
-master.py-version = "3.7"
+master.py-version = "3.8"
 master.jobs = "0"
 reports.output-format = "colorized"
 similarities.ignore-imports = "yes"
