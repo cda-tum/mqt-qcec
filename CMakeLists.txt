@@ -10,7 +10,7 @@ project(
   LANGUAGES CXX
   DESCRIPTION "MQT QCEC - A tool for Quantum Circuit Equivalence Checking")
 
-# check whether the submodule ``modulename`` is correctly cloned in the ``/extern`` directory.
+# check whether `modulename` is correctly cloned in the `extern` directory.
 macro(CHECK_SUBMODULE_PRESENT modulename)
   if(NOT EXISTS "${PROJECT_SOURCE_DIR}/extern/${modulename}/CMakeLists.txt")
     message(
