@@ -43,7 +43,7 @@ dynamic = ["version"]
 
 [project.optional-dependencies]
 test = ["pytest>=7.2"]
-coverage = ["mqt.qcec[test]", "coverage[toml]>=6.3", "pytest-cov>=3"]
+coverage = ["mqt.qcec[test]", "pytest-cov[toml]"]
 docs = [
     "sphinx>=5",
     "sphinx-rtd-theme",
