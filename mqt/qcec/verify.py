@@ -1,8 +1,11 @@
 from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING
 
-from qiskit import QuantumCircuit
+if TYPE_CHECKING:
+    from typing import Any
+
+    from qiskit import QuantumCircuit
 
 from mqt.qcec import Configuration, EquivalenceCheckingManager
 

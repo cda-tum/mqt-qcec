@@ -3,7 +3,10 @@ from __future__ import annotations
 import random
 from enum import Enum
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from typing import Any
 
 import numpy as np
 from qiskit import QuantumCircuit, transpile
@@ -163,7 +166,8 @@ def create_multi_controlled_gate(
 
     # special handling for recursion mode with less than 5 controls,
     # which does not require ancilla qubits
-    if mode == "recursion" and controls < 5:
+    no_ancilla_threshold = 5
+    if mode == "recursion" and controls < no_ancilla_threshold:
         ancilla_qubits = 0
 
     required_qubits += ancilla_qubits

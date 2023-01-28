@@ -4,11 +4,15 @@ from __future__ import annotations
 
 import time
 from itertools import chain
-from typing import Any
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from typing import Any
+
+    from numpy.typing import NDArray
+    from qiskit import QuantumCircuit
 
 import numpy as np
-from numpy.typing import NDArray
-from qiskit import QuantumCircuit
 from qiskit.circuit import Parameter, ParameterExpression
 
 from mqt.qcec import Configuration, EquivalenceCheckingManager, EquivalenceCriterion

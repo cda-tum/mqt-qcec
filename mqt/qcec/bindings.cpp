@@ -439,7 +439,7 @@ PYBIND11_MODULE(pyqcec, m) {
            ":ref:`simulation checker <EquivalenceChecking:Simulation "
            "Equivalence Checker (using Decision Diagrams)>`.")
       .def("set_state_type", &EquivalenceCheckingManager::setStateType,
-           "type"_a = "computational_basis",
+           "state_type"_a = "computational_basis",
            "Set the :attr:`type of states "
            "<.Configuration.Simulation.state_type>` used for the simulations "
            "in the :ref:`simulation checker <EquivalenceChecking:Simulation "
