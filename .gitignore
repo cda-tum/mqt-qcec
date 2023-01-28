@@ -45,3 +45,4 @@ env.bak/
 venv.bak/
 
 .ruff_cache/
+.mypy_cache/
