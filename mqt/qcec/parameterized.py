@@ -4,11 +4,9 @@ from __future__ import annotations
 
 import time
 from itertools import chain
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
-if TYPE_CHECKING:
-    from typing import Any
-
+if TYPE_CHECKING:  # pragma: no cover
     from numpy.typing import NDArray
     from qiskit import QuantumCircuit
 

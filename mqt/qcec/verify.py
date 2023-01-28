@@ -1,10 +1,8 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
-if TYPE_CHECKING:
-    from typing import Any
-
+if TYPE_CHECKING:  # pragma: no cover
     from qiskit import QuantumCircuit
 
 from mqt.qcec import Configuration, EquivalenceCheckingManager

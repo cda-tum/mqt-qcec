@@ -1,11 +1,9 @@
 from __future__ import annotations
 
 import sys
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
-if TYPE_CHECKING:
-    from typing import Any
-
+if TYPE_CHECKING:  # pragma: no cover
     from qiskit import QuantumCircuit
 
 if sys.version_info < (3, 10, 0):
