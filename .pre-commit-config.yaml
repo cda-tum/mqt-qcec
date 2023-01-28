@@ -98,7 +98,6 @@ repos:
     rev: v0.991
     hooks:
       - id: mypy
-        stages: [manual]
         files: ^(mqt/qcec|test/python|setup.py)
         args: []
         additional_dependencies:

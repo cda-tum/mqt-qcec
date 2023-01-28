@@ -72,16 +72,6 @@ def lint(session: Session) -> None:
 
 
 @nox.session
-def mypy(session: Session) -> None:
-    """
-    Run mypy.
-    Simply execute `nox -rs mypy` to run mypy.
-    """
-    session.install("pre-commit")
-    session.run("pre-commit", "run", "--all-files", "--hook-stage", "manual", "mypy", *session.posargs)
-
-
-@nox.session
 def docs(session: Session) -> None:
     """
     Build the documentation.
