@@ -140,30 +140,6 @@ explicit_package_bases = true
 module = ["qiskit.*"]
 ignore_missing_imports = true
 
-[tool.pylint]
-master.py-version = "3.8"
-master.jobs = "0"
-reports.output-format = "colorized"
-similarities.ignore-imports = "yes"
-messages_control.enable = [
-    "useless-suppression",
-]
-messages_control.disable = [
-    "invalid-name",
-    "line-too-long",
-    "missing-module-docstring",
-    "no-member",
-    "protected-access",
-    "too-few-public-methods",
-    "too-many-arguments",
-    "too-many-branches",
-    "too-many-locals",
-    "too-many-statements",
-    "ungrouped-imports",
-    "wrong-import-order",
-    "wrong-import-position",
-]
-
 [tool.ruff]
 select = [
     "E", "F", "W", # flake8
@@ -188,7 +164,7 @@ select = [
     "YTT",         # flake8-2020
 ]
 ignore = ["E501"]
-target-version = "py37"
+target-version = "py38"
 
 # Exclude a variety of commonly ignored directories.
 exclude = [
