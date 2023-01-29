@@ -240,18 +240,18 @@ void EquivalenceCheckingManager::checkSequential() {
   // in case a timeout is configured, a separate thread is started that sets
   // the `done` flag after the timeout has passed
   std::thread timeoutThread{};
-  if (configuration.execution.timeout > 0s) {
-    timeoutThread =
-        std::thread([this, timeout = configuration.execution.timeout] {
-          std::unique_lock doneLock(doneMutex);
-          const auto       finished =
-              doneCond.wait_for(doneLock, timeout, [this] { return done; });
-          // if the thread has already finished within the timeout, nothing
-          // has to be done
-          if (!finished) {
-            setAndSignalDone();
-          }
-        });
+  if (configuration.execution.timeout > 0.) {
+    timeoutThread = std::thread([this, timeout = std::chrono::duration<double>(
+                                           configuration.execution.timeout)] {
+      std::unique_lock doneLock(doneMutex);
+      const auto       finished =
+          doneCond.wait_for(doneLock, timeout, [this] { return done; });
+      // if the thread has already finished within the timeout, nothing
+      // has to be done
+      if (!finished) {
+        setAndSignalDone();
+      }
+    });
   }
 
   if (configuration.execution.runSimulationChecker) {
@@ -389,9 +389,12 @@ void EquivalenceCheckingManager::checkSequential() {
 void EquivalenceCheckingManager::checkParallel() {
   const auto start = std::chrono::steady_clock::now();
 
-  std::chrono::steady_clock::time_point deadline{};
-  if (configuration.execution.timeout > 0s) {
-    deadline = start + configuration.execution.timeout;
+  std::chrono::time_point<std::chrono::steady_clock,
+                          std::chrono::duration<double>>
+      deadline{};
+  if (configuration.execution.timeout > 0.) {
+    deadline =
+        start + std::chrono::duration<double>(configuration.execution.timeout);
   }
 
   if (const auto threadLimit = std::thread::hardware_concurrency();
@@ -509,7 +512,7 @@ void EquivalenceCheckingManager::checkParallel() {
   // wait in a loop while no definitive result has been obtained
   while (!done) {
     std::shared_ptr<std::size_t> completedID{};
-    if (configuration.execution.timeout > 0s) {
+    if (configuration.execution.timeout > 0.) {
       completedID = queue.waitAndPopUntil(deadline);
     } else {
       completedID = queue.waitAndPop();
@@ -647,8 +650,9 @@ void EquivalenceCheckingManager::checkSymbolic() {
   // in case a timeout is configured, a separate thread is started that
   // sets the `done` flag after the timeout has passed
   std::thread timeoutThread{};
-  if (configuration.execution.timeout > 0s) {
-    timeoutThread = std::thread([&, timeout = configuration.execution.timeout] {
+  if (configuration.execution.timeout > 0.) {
+    timeoutThread = std::thread([&, timeout = std::chrono::duration<double>(
+                                        configuration.execution.timeout)] {
       std::unique_lock doneLock(doneMutex);
       auto             finished =
           doneCond.wait_for(doneLock, timeout, [&] { return done; });

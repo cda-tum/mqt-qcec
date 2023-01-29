@@ -48,8 +48,6 @@ TEST_F(SymbolicTest, SymbolicNonEqu) {
 }
 
 TEST_F(SymbolicTest, Timeout) {
-  using namespace std::chrono_literals;
-
   // construct large circuit
   constexpr auto numLayers = 100000;
   symQc1                   = qc::QuantumComputation(2);
@@ -62,7 +60,7 @@ TEST_F(SymbolicTest, Timeout) {
     symQc2.rx(0, xMonom);
   }
   ec::Configuration config{};
-  config.execution.timeout = 1s;
+  config.execution.timeout = 1;
   auto ecm = ec::EquivalenceCheckingManager(symQc1, symQc2, config);
 
   ecm.run();

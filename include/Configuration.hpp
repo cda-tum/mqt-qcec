@@ -11,13 +11,10 @@
 #include "dd/Package.hpp"
 #include "nlohmann/json.hpp"
 
-#include <chrono>
 #include <functional>
 #include <thread>
 
 namespace ec {
-
-using namespace std::chrono_literals;
 
 class Configuration {
 public:
@@ -27,7 +24,7 @@ public:
 
     bool        parallel = true;
     std::size_t nthreads = std::max(2U, std::thread::hardware_concurrency());
-    std::chrono::seconds timeout = 0s;
+    double      timeout  = 0.; // in seconds
 
     bool runConstructionChecker = false;
     bool runSimulationChecker   = true;
@@ -148,8 +145,8 @@ public:
     exe["run_simulation_checker"]   = execution.runSimulationChecker;
     exe["run_alternating_checker"]  = execution.runAlternatingChecker;
     exe["run_zx_checker"]           = execution.runZXChecker;
-    if (execution.timeout > 0s) {
-      exe["timeout"] = execution.timeout.count();
+    if (execution.timeout > 0.) {
+      exe["timeout"] = execution.timeout;
     }
     auto& opt = config["optimizations"];
     opt["fix_output_permutation_mismatch"] =

@@ -36,10 +36,9 @@ def test_application_scheme(
 
 
 def test_timeout() -> None:
-    import datetime
-
     config = qcec.Configuration()
-    config.execution.timeout = datetime.timedelta(seconds=60)
+    config.execution.timeout = 60
+    config.execution.timeout = 60.0
 
 
 @pytest.mark.parametrize(

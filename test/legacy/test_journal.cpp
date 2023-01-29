@@ -138,13 +138,11 @@ INSTANTIATE_TEST_SUITE_P(
     });
 
 TEST_P(JournalTestNonEQ, PowerOfSimulation) {
-  using namespace std::chrono_literals;
-
   config.execution.runAlternatingChecker  = false;
   config.execution.runConstructionChecker = false;
   config.execution.runSimulationChecker   = true;
   config.execution.parallel               = false;
-  config.execution.timeout                = 60s;
+  config.execution.timeout                = 60.;
   config.simulation.maxSims               = 16U;
   config.application.simulationScheme = ec::ApplicationSchemeType::Sequential;
 
@@ -192,14 +190,12 @@ TEST_P(JournalTestNonEQ, PowerOfSimulation) {
 }
 
 TEST_P(JournalTestNonEQ, PowerOfSimulationParallel) {
-  using namespace std::chrono_literals;
-
   config.execution.runAlternatingChecker  = false;
   config.execution.runConstructionChecker = false;
   config.execution.runZXChecker           = false;
   config.execution.runSimulationChecker   = true;
   config.execution.parallel               = true;
-  config.execution.timeout                = 60s;
+  config.execution.timeout                = 60.;
   config.simulation.maxSims               = 16U;
   config.application.simulationScheme = ec::ApplicationSchemeType::Sequential;
 
@@ -258,8 +254,6 @@ protected:
   std::string transpiledFile{};
 
   void SetUp() override {
-    using namespace std::chrono_literals;
-
     config.execution.parallel               = false;
     config.execution.runConstructionChecker = false;
     config.execution.runAlternatingChecker  = false;
@@ -267,7 +261,7 @@ protected:
     config.execution.runSimulationChecker   = false;
     config.simulation.maxSims               = 16;
     config.application.simulationScheme = ec::ApplicationSchemeType::OneToOne;
-    config.execution.timeout            = 60s;
+    config.execution.timeout            = 60.;
 
     std::stringstream ss{};
     ss << testTranspiledDir << GetParam() << "_transpiled.qasm";

@@ -182,7 +182,7 @@ def check_parameterized(
 
     update_stats(res)
 
-    timeout: float | None = kwargs["timeout"].total_seconds() if kwargs.get("timeout") else None
+    timeout: float | None = kwargs.get("timeout")
 
     timeout = __adjust_timeout(timeout, res)
 

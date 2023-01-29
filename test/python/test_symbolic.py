@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import datetime
-
 import pytest
 from qiskit import QuantumCircuit, transpile
 from qiskit.circuit import Parameter
@@ -114,16 +112,14 @@ def test_equivalent_rz_commute(rz_commute_lhs: QuantumCircuit, rz_commute_rhs_co
 
 
 def test_non_equivalent_rz_commute(rz_commute_lhs: QuantumCircuit, rz_commute_rhs_incorrect: QuantumCircuit) -> None:
-    result = qcec.verify(rz_commute_lhs, rz_commute_rhs_incorrect, timeout=datetime.timedelta(seconds=3600))
+    result = qcec.verify(rz_commute_lhs, rz_commute_rhs_incorrect, timeout=3600)
     assert result.equivalence == qcec.EquivalenceCriterion.not_equivalent
 
 
 def test_non_equivalent_phase_rz_commute(
     rz_commute_lhs: QuantumCircuit, rz_commute_rhs_incorrect: QuantumCircuit
 ) -> None:
-    result = qcec.verify(
-        rz_commute_lhs, rz_commute_rhs_incorrect, additional_instantiations=2, timeout=datetime.timedelta(seconds=3600)
-    )
+    result = qcec.verify(rz_commute_lhs, rz_commute_rhs_incorrect, additional_instantiations=2, timeout=3600)
     assert result.equivalence == qcec.EquivalenceCriterion.not_equivalent
 
 
@@ -172,9 +168,7 @@ def test_verify_compilation_on_optimization_levels(original_circuit: QuantumCirc
     to the 5-qubit IBMQ Athens architecture with various optimization levels.
     """
     compiled_circuit = transpile(original_circuit, backend=FakeAthens(), optimization_level=optimization_level)
-    result = qcec.verify_compilation(
-        original_circuit, compiled_circuit, optimization_level, timeout=datetime.timedelta(seconds=3600)
-    )
+    result = qcec.verify_compilation(original_circuit, compiled_circuit, optimization_level, timeout=3600)
     assert (
         result.equivalence == qcec.EquivalenceCriterion.equivalent
         or result.equivalence == qcec.EquivalenceCriterion.equivalent_up_to_global_phase
