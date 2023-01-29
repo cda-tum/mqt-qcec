@@ -1,12 +1,12 @@
 Verify Compilation
 ==================
 
-QCEC provides a dedicated :code:`verify_compilation` method for verifying that a quantum circuit has been compiled correctly based on the methods proposed in :cite:p:`burgholzer2020verifyingResultsIBM`.
+QCEC provides a dedicated :func:`.verify_compilation` method for verifying that a quantum circuit has been compiled correctly based on the methods proposed in :cite:p:`burgholzer2020verifyingResultsIBM`.
 
     .. currentmodule:: mqt.qcec
-    .. autofunction:: mqt.qcec::verify_compilation
+    .. autofunction:: verify_compilation
 
-    .. autoclass:: mqt.qcec.AncillaMode
+    .. autoclass:: AncillaMode
         :undoc-members:
         :members:
 
@@ -14,6 +14,6 @@ Compilation Flow Profile Generation
 ###################################
 
 QCEC provides dedicated compilation flow profiles for IBM Qiskit which can be used to efficiently verify the results of compilation flow results :cite:p:`burgholzer2020verifyingResultsIBM`.
-These profiles are generated from IBM Qiskit using the :code:`generate_profile` method.
+These profiles are generated from IBM Qiskit using the :func:`.generate_profile` method.
 
-    .. autofunction:: mqt.qcec::generate_profile
+    .. autofunction:: generate_profile
