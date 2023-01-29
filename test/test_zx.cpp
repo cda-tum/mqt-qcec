@@ -78,7 +78,6 @@ TEST_F(ZXTest, NonEquivalent) {
 
 TEST_F(ZXTest, Timeout) {
   using namespace qc::literals;
-  using namespace std::chrono_literals;
 
   // construct large circuit
   constexpr auto numLayers = 10000;
@@ -92,7 +91,7 @@ TEST_F(ZXTest, Timeout) {
     qcAlternative.h(0);
   }
 
-  config.execution.timeout = 1s;
+  config.execution.timeout = 1;
   ecm = std::make_unique<ec::EquivalenceCheckingManager>(qcOriginal,
                                                          qcAlternative, config);
 

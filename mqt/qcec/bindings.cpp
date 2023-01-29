@@ -73,9 +73,8 @@ static std::unique_ptr<EquivalenceCheckingManager> createManagerFromOptions(
     const bool        parallel           = true,
     const std::size_t nthreads           = std::max(2U,
                                                     std::thread::hardware_concurrency()),
-    const std::chrono::seconds timeout   = 0s,
-    const bool                 runConstructionChecker = false,
-    const bool                 runSimulationChecker   = true,
+    const double timeout = 0., const bool runConstructionChecker = false,
+    const bool runSimulationChecker  = true,
     const bool runAlternatingChecker = true, const bool runZXChecker = true,
     // Optimization
     const bool fixOutputPermutationMismatch = false,
@@ -278,7 +277,7 @@ PYBIND11_MODULE(pyqcec, m) {
          "numerical_tolerance"_a = dd::ComplexTable<>::tolerance(),
          "parallel"_a            = true,
          "nthreads"_a = std::max(2U, std::thread::hardware_concurrency()),
-         "timeout"_a = 0s, "run_construction_checker"_a = false,
+         "timeout"_a = 0., "run_construction_checker"_a = false,
          "run_simulation_checker"_a = true, "run_alternating_checker"_a = true,
          "run_zx_checker"_a = true, "fix_output_permutation_mismatch"_a = false,
          "fuse_single_qubit_gates"_a = true, "reconstruct_swaps"_a = true,
@@ -316,10 +315,9 @@ PYBIND11_MODULE(pyqcec, m) {
            "Set the maximum number of :attr:`threads "
            "<.Configuration.Execution.nthreads>` to use.")
       .def("set_timeout", &EquivalenceCheckingManager::setTimeout,
-           "timeout"_a = 0.0,
+           "timeout"_a = 0.,
            "Set a :attr:`timeout <.Configuration.Execution.timeout>` (in "
-           "seconds) for :func:`~EquivalenceCheckingManager.run`. The timeout "
-           "can also be specified by a :class:`float`.")
+           "seconds) for :func:`~EquivalenceCheckingManager.run`.")
       .def("set_construction_checker",
            &EquivalenceCheckingManager::setConstructionChecker,
            "enable"_a = false,
@@ -574,8 +572,7 @@ PYBIND11_MODULE(pyqcec, m) {
       .def_readwrite(
           "timeout", &Configuration::Execution::timeout,
           "Set a timeout for :meth:`~.EquivalenceCheckingManager.run` (in "
-          "seconds). Either a :class:`datetime.timedelta` or :class:`float`. "
-          "Defaults to :code:`0.`, which means no timeout.")
+          "seconds). Defaults to :code:`0.`, which means no timeout.")
       .def_readwrite(
           "run_construction_checker",
           &Configuration::Execution::runConstructionChecker,

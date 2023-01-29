@@ -102,7 +102,7 @@ public:
   void setNThreads(std::size_t nthreads) {
     configuration.execution.nthreads = nthreads;
   }
-  void setTimeout(std::chrono::seconds timeout) {
+  void setTimeout(const double timeout) {
     configuration.execution.timeout = timeout;
   }
   void setConstructionChecker(bool run) {

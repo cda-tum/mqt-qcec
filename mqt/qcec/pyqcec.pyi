@@ -3,8 +3,6 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any, ClassVar, overload
 
 if TYPE_CHECKING:
-    import datetime
-
     from mqt.qcec.types import ApplicationSchemeName, EquivalenceCriterionName, StateTypeName
 
 class ApplicationScheme:
@@ -47,7 +45,7 @@ class Configuration:
         run_construction_checker: bool
         run_simulation_checker: bool
         run_zx_checker: bool
-        timeout: datetime.timedelta
+        timeout: float
         def __init__(self) -> None: ...
 
     class Functionality:
@@ -109,7 +107,7 @@ class EquivalenceCheckingManager:
         numerical_tolerance: float = ...,
         parallel: bool = ...,
         nthreads: int = ...,
-        timeout: datetime.timedelta | float = ...,
+        timeout: float = ...,
         run_construction_checker: bool = ...,
         run_simulation_checker: bool = ...,
         run_alternating_checker: bool = ...,
@@ -163,7 +161,7 @@ class EquivalenceCheckingManager:
     def set_simulation_checker(self, enable: bool = ...) -> None: ...
     def set_simulation_gate_cost_profile(self, profile: str = ...) -> None: ...
     def set_state_type(self, state_type: StateType | StateTypeName = ...) -> None: ...
-    def set_timeout(self, timeout: datetime.timedelta | float = ...) -> None: ...
+    def set_timeout(self, timeout: float = ...) -> None: ...
     def set_tolerance(self, tolerance: float = ...) -> None: ...
     def set_trace_threshold(self, threshold: float = ...) -> None: ...
     def set_zx_checker(self, enable: bool = ...) -> None: ...
