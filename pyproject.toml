@@ -150,6 +150,7 @@ select = [
     "ARG",         # flake8-unused-arguments
     "C4",          # flake8-comprehensions
     "EM",          # flake8-errmsg
+    "EXE",         # flake8-executable
     "ICN",         # flake8-import-conventions
     "ISC",         # flake8-implicit-str-concat
     "PGH",         # pygrep-hooks
@@ -157,6 +158,7 @@ select = [
     "PL",          # pylint
     "PT",          # flake8-pytest-style
     "PTH",         # flake8-use-pathlib
+    "Q",           # flake8-quotes
     "RET",         # flake8-return
     "RUF",         # Ruff-specific
     "SIM",         # flake8-simplify
