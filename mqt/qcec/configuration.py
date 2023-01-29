@@ -2,8 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, TypedDict
 
-if TYPE_CHECKING:
-
+if TYPE_CHECKING:  # pragma: no cover
     from mqt.qcec import ApplicationScheme, Configuration, StateType
     from mqt.qcec.types import ApplicationSchemeName, StateTypeName
 
@@ -64,6 +63,6 @@ def augment_config_from_kwargs(config: Configuration, kwargs: ConfigurationOptio
             setattr(config.parameterized, key, value)
         elif hasattr(config.simulation, key):
             setattr(config.simulation, key, value)
-        else:
+        else:  # pragma: no cover
             msg = f"Invalid keyword argument: {key}"
             raise ValueError(msg)
