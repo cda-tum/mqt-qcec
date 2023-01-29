@@ -24,11 +24,6 @@ def test_constructor_with_configuration(example_circuit: QuantumCircuit) -> None
     qcec.EquivalenceCheckingManager(circ1=example_circuit, circ2=example_circuit, config=config)
 
 
-def test_constructor_with_kwargs(example_circuit: QuantumCircuit) -> None:
-    """Test constructing an instance from circuits and a (random) keyword argument"""
-    qcec.EquivalenceCheckingManager(circ1=example_circuit, circ2=example_circuit, timeout=60.0)
-
-
 def test_default_constructor_with_file(example_circuit: QuantumCircuit) -> None:
     """Test constructing an instance from two circuit files with all default arguments"""
     from pathlib import Path

@@ -46,7 +46,7 @@ static qc::QuantumComputation importCircuit(const py::object& circ) {
 
 static std::unique_ptr<EquivalenceCheckingManager>
 createManagerFromConfiguration(const py::object& circ1, const py::object& circ2,
-                               const Configuration& configuration) {
+                               const Configuration& configuration = {}) {
   qc::QuantumComputation qc1;
   try {
     qc1 = importCircuit(circ1);
@@ -64,94 +64,6 @@ createManagerFromConfiguration(const py::object& circ1, const py::object& circ2,
   }
 
   return std::make_unique<EquivalenceCheckingManager>(qc1, qc2, configuration);
-}
-
-static std::unique_ptr<EquivalenceCheckingManager> createManagerFromOptions(
-    const py::object& circ1, const py::object& circ2,
-    // Execution
-    const dd::fp      numericalTolerance = dd::ComplexTable<>::tolerance(),
-    const bool        parallel           = true,
-    const std::size_t nthreads           = std::max(2U,
-                                                    std::thread::hardware_concurrency()),
-    const double timeout = 0., const bool runConstructionChecker = false,
-    const bool runSimulationChecker  = true,
-    const bool runAlternatingChecker = true, const bool runZXChecker = true,
-    // Optimization
-    const bool fixOutputPermutationMismatch = false,
-    const bool fuseSingleQubitGates = true, const bool reconstructSWAPs = true,
-    const bool removeDiagonalGatesBeforeMeasure = false,
-    const bool transformDynamicCircuit          = false,
-    const bool reorderOperations                = true,
-    // Application
-    const ApplicationSchemeType& constructionScheme =
-        ApplicationSchemeType::Proportional,
-    const ApplicationSchemeType& simulationScheme =
-        ApplicationSchemeType::Proportional,
-    const ApplicationSchemeType& alternatingScheme =
-        ApplicationSchemeType::Proportional,
-    const std::string& profile = {},
-    // Functionality
-    const double traceThreshold = 1e-8,
-    // Simulation
-    const double fidelityThreshold = 1e-8,
-
-    const std::size_t maxSims   = std::max(16U,
-                                           std::thread::hardware_concurrency() -
-                                               2U),
-    const StateType&  stateType = StateType::ComputationalBasis,
-    const std::size_t seed = 0U, const bool storeCEXinput = false,
-    const bool storeCEXoutput = false,
-    // Parameterized
-    const double      parameterizedTol          = 1e-12,
-    const std::size_t nAdditionalInstantiations = 0) {
-  Configuration configuration{};
-  // Execution
-  configuration.execution.numericalTolerance     = numericalTolerance;
-  configuration.execution.parallel               = parallel;
-  configuration.execution.nthreads               = nthreads;
-  configuration.execution.timeout                = timeout;
-  configuration.execution.runConstructionChecker = runConstructionChecker;
-  configuration.execution.runSimulationChecker   = runSimulationChecker;
-  configuration.execution.runAlternatingChecker  = runAlternatingChecker;
-  configuration.execution.runZXChecker           = runZXChecker;
-  // Optimization
-  configuration.optimizations.fixOutputPermutationMismatch =
-      fixOutputPermutationMismatch;
-  configuration.optimizations.fuseSingleQubitGates = fuseSingleQubitGates;
-  configuration.optimizations.reconstructSWAPs     = reconstructSWAPs;
-  configuration.optimizations.removeDiagonalGatesBeforeMeasure =
-      removeDiagonalGatesBeforeMeasure;
-  configuration.optimizations.transformDynamicCircuit = transformDynamicCircuit;
-  configuration.optimizations.reorderOperations       = reorderOperations;
-  // Application
-  configuration.application.profile            = profile;
-  configuration.application.constructionScheme = constructionScheme;
-  if (configuration.application.constructionScheme ==
-      ApplicationSchemeType::Lookahead) {
-    throw std::invalid_argument("Lookahead application scheme must not be used "
-                                "with construction checker.");
-  }
-  configuration.application.simulationScheme = simulationScheme;
-  if (configuration.application.simulationScheme ==
-      ApplicationSchemeType::Lookahead) {
-    throw std::invalid_argument("Lookahead application scheme must not be used "
-                                "with simulation checker.");
-  }
-  configuration.application.alternatingScheme = alternatingScheme;
-  // Functionality
-  configuration.functionality.traceThreshold = traceThreshold;
-  // Simulation
-  configuration.simulation.fidelityThreshold = fidelityThreshold;
-  configuration.simulation.maxSims           = maxSims;
-  configuration.simulation.stateType         = stateType;
-  configuration.simulation.seed              = seed;
-  configuration.simulation.storeCEXinput     = storeCEXinput;
-  configuration.simulation.storeCEXoutput    = storeCEXoutput;
-  // Parameterized
-  configuration.parameterized.parameterizedTol = parameterizedTol;
-  configuration.parameterized.nAdditionalInstantiations =
-      nAdditionalInstantiations;
-  return createManagerFromConfiguration(circ1, circ2, configuration);
 }
 
 PYBIND11_MODULE(pyqcec, m) {
@@ -272,33 +184,11 @@ PYBIND11_MODULE(pyqcec, m) {
       "tool");
 
   // Constructors
-  ecm.def(
-         py::init(&createManagerFromOptions), "circ1"_a, "circ2"_a,
-         "numerical_tolerance"_a = dd::ComplexTable<>::tolerance(),
-         "parallel"_a            = true,
-         "nthreads"_a = std::max(2U, std::thread::hardware_concurrency()),
-         "timeout"_a = 0., "run_construction_checker"_a = false,
-         "run_simulation_checker"_a = true, "run_alternating_checker"_a = true,
-         "run_zx_checker"_a = true, "fix_output_permutation_mismatch"_a = false,
-         "fuse_single_qubit_gates"_a = true, "reconstruct_swaps"_a = true,
-         "remove_diagonal_gates_before_measure"_a = false,
-         "transform_dynamic_circuit"_a = false, "reorder_operations"_a = true,
-         "construction_scheme"_a = "proportional",
-         "simulation_scheme"_a   = "proportional",
-         "alternating_scheme"_a = "proportional", "profile"_a = "",
-         "trace_threshold"_a = 1e-8, "fidelity_threshold"_a = 1e-8,
-         "max_sims"_a = std::max(16U, std::thread::hardware_concurrency() - 2U),
-         "state_type"_a = "computational_basis", "seed"_a = 0U,
-         "store_cex_input"_a = false, "store_cex_output"_a = false,
-         "parameterized_tolerance"_a   = 1e-12,
-         "additional_instantiations"_a = 0U)
-      .def(py::init([](const py::object& circ1, const py::object& circ2,
-                       const Configuration& config) {
-             return createManagerFromConfiguration(circ1, circ2, config);
-           }),
-           "circ1"_a, "circ2"_a, "config"_a)
+  ecm.def(py::init(&createManagerFromConfiguration), "circ1"_a, "circ2"_a,
+          "config"_a = Configuration(),
+          "Create an equivalence checking manager for two circuits and "
+          "configure it with a :class:`Configuration` object.")
       .def("get_configuration", &EquivalenceCheckingManager::getConfiguration)
-
       // Convenience functions
       // Execution
       .def("set_tolerance", &EquivalenceCheckingManager::setTolerance,

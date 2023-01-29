@@ -39,9 +39,18 @@ def test_verify(original_circuit: QuantumCircuit, alternative_circuit: QuantumCi
 
 def test_verify_kwargs(original_circuit: QuantumCircuit, alternative_circuit: QuantumCircuit) -> None:
     """
-    Test the verification of two equivalent circuits with a keyword argument.
+    Test the verification of two equivalent circuits with some keyword arguments (one of each category).
     """
-    result = qcec.verify(original_circuit, alternative_circuit, timeout=3600)
+    result = qcec.verify(
+        original_circuit,
+        alternative_circuit,
+        alternating_scheme="one_to_one",
+        timeout=3600,
+        trace_threshold=1e-6,
+        transform_dynamic_circuit=True,
+        additional_instantiations=2,
+        seed=42,
+    )
     assert result.equivalence == qcec.EquivalenceCriterion.equivalent
 
 
