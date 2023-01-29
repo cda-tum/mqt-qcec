@@ -22,12 +22,12 @@ def __is_parameterized(qc: QuantumCircuit) -> bool:
 
 @overload
 def __adjust_timeout(curr_timeout: float, res: EquivalenceCheckingManager.Results | float) -> float:
-    ...
+    ...  # pragma: no cover
 
 
 @overload
 def __adjust_timeout(curr_timeout: None, res: EquivalenceCheckingManager.Results | float) -> None:
-    ...
+    ...  # pragma: no cover
 
 
 def __adjust_timeout(curr_timeout: float | None, res: EquivalenceCheckingManager.Results | float) -> float | None:
