@@ -1,6 +1,11 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
+
+if TYPE_CHECKING:
+    from mqt.qcec.types import ApplicationSchemeName, StateTypeName
 
 from mqt import qcec
 
@@ -18,7 +23,9 @@ from mqt import qcec
         ("proportional", qcec.ApplicationScheme.proportional),
     ],
 )
-def test_application_scheme(application_scheme_string: str, application_scheme_enum: qcec.ApplicationScheme) -> None:
+def test_application_scheme(
+    application_scheme_string: ApplicationSchemeName, application_scheme_enum: qcec.ApplicationScheme
+) -> None:
     assert qcec.ApplicationScheme(application_scheme_string) == application_scheme_enum
 
     config = qcec.Configuration()
@@ -46,7 +53,7 @@ def test_timeout() -> None:
         ("global_quantum", qcec.StateType.stabilizer),
     ],
 )
-def test_state_type(state_type_string: str, state_type_enum: qcec.StateType) -> None:
+def test_state_type(state_type_string: StateTypeName, state_type_enum: qcec.StateType) -> None:
     assert qcec.StateType(state_type_string) == state_type_enum
 
     config = qcec.Configuration()

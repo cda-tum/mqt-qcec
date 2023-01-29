@@ -106,6 +106,7 @@ filterwarnings = [
 
 [tool.coverage.run]
 source = ["mqt.qcec"]
+omit = ["mqt/qcec/types.py"]
 
 [tool.coverage.report]
 show_missing = true
