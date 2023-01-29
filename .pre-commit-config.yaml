@@ -97,7 +97,7 @@ repos:
     hooks:
       - id: mypy
         files: ^(mqt/qcec|test/python|setup.py)
-        args: []
+        args: ["--enable-incomplete-feature=Unpack"]
         additional_dependencies:
           - importlib_resources
           - numpy

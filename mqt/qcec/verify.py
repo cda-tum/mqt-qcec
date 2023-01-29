@@ -1,53 +1,55 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: no cover
     from qiskit import QuantumCircuit
+    from typing_extensions import Unpack
+
+    from mqt.qcec.configuration import ConfigurationOptions
 
 from mqt.qcec import Configuration, EquivalenceCheckingManager
-
-from .parameterized import __is_parameterized, check_parameterized
+from mqt.qcec.configuration import augment_config_from_kwargs
+from mqt.qcec.parameterized import __is_parameterized, check_parameterized
 
 
 def verify(
     circ1: QuantumCircuit | str,
     circ2: QuantumCircuit | str,
     configuration: Configuration | None = None,
-    **kwargs: Any,
+    **kwargs: Unpack[ConfigurationOptions],
 ) -> EquivalenceCheckingManager.Results:
     """
     Verify that ``circ1`` and ``circ2`` are equivalent.
 
     Wraps creating an instance of :class:`EquivalenceCheckingManager <.EquivalenceCheckingManager>`,
     calling :meth:`EquivalenceCheckingManager.run`,
-    and calling :meth:`EquivalenceCheckingManager.get_result`.
+    and calling :meth:`EquivalenceCheckingManager.get_results`.
 
-    There are two ways of configuring the equivalence checking process:
+    There are two (non-exclusive) ways of configuring the equivalence checking process:
 
     1. Pass a :class:`Configuration <.Configuration>` instance as the ``configuration`` argument.
 
-    2. Pass keyword arguments to this function. These are directly passed to the :meth:`constructor <.EquivalenceCheckingManager.__init__>` of the :class:`EquivalenceCheckingManager`.
+    2. Pass keyword arguments to this function. These are directly incorporated into the :class:`Configuration <.Configuration>`.
+    Any existing configuration is overridden by keyword arguments.
 
     :param circ1: The first circuit.
     :param circ2: The second circuit.
     :param configuration: The configuration to use for the equivalence checking process.
-    :param kwargs: Keyword arguments to pass to the :class:`EquivalenceCheckingManager <.EquivalenceCheckingManager>` constructor.
+    :param kwargs: Keyword arguments to configure the equivalence checking process.
     :return: The results of the equivalence checking process.
     """
+    if configuration is None:
+        configuration = Configuration()
+
+    # prepare the configuration
+    augment_config_from_kwargs(configuration, kwargs)
 
     if __is_parameterized(circ1) or __is_parameterized(circ2):
-        return check_parameterized(circ1, circ2, configuration, **kwargs)
+        return check_parameterized(circ1, circ2, configuration)
 
-    if kwargs:
-        # create the equivalence checker from keyword arguments
-        ecm = EquivalenceCheckingManager(circ1, circ2, **kwargs)
-    else:
-        if configuration is None:
-            configuration = Configuration()
-
-        # create the equivalence checker from configuration
-        ecm = EquivalenceCheckingManager(circ1, circ2, configuration)
+    # create the equivalence checker from configuration
+    ecm = EquivalenceCheckingManager(circ1, circ2, configuration)
 
     # execute the check
     ecm.run()

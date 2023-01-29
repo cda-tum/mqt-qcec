@@ -3,6 +3,8 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any, ClassVar, overload
 
 if TYPE_CHECKING:
+    from qiskit import QuantumCircuit
+
     from mqt.qcec.types import ApplicationSchemeName, EquivalenceCriterionName, StateTypeName
 
 class ApplicationScheme:
@@ -99,41 +101,9 @@ class EquivalenceCheckingManager:
         def json(self) -> dict[str, Any]: ...
         def __repr__(self) -> str: ...
 
-    @overload
     def __init__(
-        self,
-        circ1: object,
-        circ2: object,
-        numerical_tolerance: float = ...,
-        parallel: bool = ...,
-        nthreads: int = ...,
-        timeout: float = ...,
-        run_construction_checker: bool = ...,
-        run_simulation_checker: bool = ...,
-        run_alternating_checker: bool = ...,
-        run_zx_checker: bool = ...,
-        fix_output_permutation_mismatch: bool = ...,
-        fuse_single_qubit_gates: bool = ...,
-        reconstruct_swaps: bool = ...,
-        remove_diagonal_gates_before_measure: bool = ...,
-        transform_dynamic_circuit: bool = ...,
-        reorder_operations: bool = ...,
-        construction_scheme: ApplicationScheme | ApplicationSchemeName = ...,
-        simulation_scheme: ApplicationScheme | ApplicationSchemeName = ...,
-        alternating_scheme: ApplicationScheme | ApplicationSchemeName = ...,
-        profile: str = ...,
-        trace_threshold: float = ...,
-        fidelity_threshold: float = ...,
-        max_sims: int = ...,
-        state_type: StateType | StateTypeName = ...,
-        seed: int = ...,
-        store_cex_input: bool = ...,
-        store_cex_output: bool = ...,
-        parameterized_tolerance: float = ...,
-        additional_instantiations: int = ...,
+        self, circ1: QuantumCircuit | str, circ2: QuantumCircuit | str, config: Configuration = ...
     ) -> None: ...
-    @overload
-    def __init__(self, circ1: object, circ2: object, config: Configuration) -> None: ...
     def disable_all_checkers(self) -> None: ...
     def equivalence(self) -> EquivalenceCriterion: ...
     def fix_output_permutation_mismatch(self) -> None: ...
