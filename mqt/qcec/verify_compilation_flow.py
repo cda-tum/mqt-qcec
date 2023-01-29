@@ -1,7 +1,10 @@
 from __future__ import annotations
 
 import sys
-from typing import Any
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:  # pragma: no cover
+    from qiskit import QuantumCircuit
 
 if sys.version_info < (3, 10, 0):
     import importlib_resources as resources
@@ -10,7 +13,6 @@ else:
 
 from mqt.qcec import ApplicationScheme, Configuration, EquivalenceCheckingManager
 from mqt.qcec.compilation_flow_profiles import AncillaMode, generate_profile_name
-from qiskit import QuantumCircuit
 
 from .parameterized import __is_parameterized, check_parameterized
 

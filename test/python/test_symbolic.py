@@ -3,17 +3,18 @@ from __future__ import annotations
 import datetime
 
 import pytest
-from mqt import qcec
-from mqt.qcec.compilation_flow_profiles import AncillaMode
 from qiskit import QuantumCircuit, transpile
 from qiskit.circuit import Parameter
 from qiskit.providers.fake_provider import FakeAthens
+
+from mqt import qcec
+from mqt.qcec.compilation_flow_profiles import AncillaMode
 
 alpha = Parameter("alpha")
 beta = Parameter("beta")
 
 
-@pytest.fixture
+@pytest.fixture()
 def rz_commute_lhs() -> QuantumCircuit:
     qc = QuantumCircuit(2)
     qc.rz(alpha, 0)
@@ -23,7 +24,7 @@ def rz_commute_lhs() -> QuantumCircuit:
     return qc
 
 
-@pytest.fixture
+@pytest.fixture()
 def rz_commute_rhs_correct() -> QuantumCircuit:
     qc = QuantumCircuit(2)
     qc.cx(1, 0)
@@ -33,7 +34,7 @@ def rz_commute_rhs_correct() -> QuantumCircuit:
     return qc
 
 
-@pytest.fixture
+@pytest.fixture()
 def rz_commute_rhs_incorrect() -> QuantumCircuit:
     qc = QuantumCircuit(2)
     qc.cx(1, 0)
@@ -43,7 +44,7 @@ def rz_commute_rhs_incorrect() -> QuantumCircuit:
     return qc
 
 
-@pytest.fixture
+@pytest.fixture()
 def rotation_gate_fuse_lhs() -> QuantumCircuit:
     qc = QuantumCircuit(1)
     qc.rz(alpha, 0)
@@ -51,28 +52,28 @@ def rotation_gate_fuse_lhs() -> QuantumCircuit:
     return qc
 
 
-@pytest.fixture
+@pytest.fixture()
 def rotation_gate_fuse_rhs_correct() -> QuantumCircuit:
     qc = QuantumCircuit(1)
     qc.rz(alpha + beta, 0)
     return qc
 
 
-@pytest.fixture
+@pytest.fixture()
 def rotation_gate_fuse_rhs_incorrect() -> QuantumCircuit:
     qc = QuantumCircuit(1)
     qc.rz(alpha - beta, 0)
     return qc
 
 
-@pytest.fixture
+@pytest.fixture()
 def rotation_gate_fuse_rhs_approximate() -> QuantumCircuit:
     qc = QuantumCircuit(1)
     qc.rz(alpha + beta + 1e-7, 0)
     return qc
 
 
-@pytest.fixture
+@pytest.fixture()
 def cnot_rx() -> QuantumCircuit:
     qc = QuantumCircuit(2)
     qc.cx(0, 1)
@@ -80,7 +81,7 @@ def cnot_rx() -> QuantumCircuit:
     return qc
 
 
-@pytest.fixture
+@pytest.fixture()
 def cnot_rx_flipped() -> QuantumCircuit:
     qc = QuantumCircuit(2)
     qc.cx(1, 0)
@@ -88,7 +89,7 @@ def cnot_rx_flipped() -> QuantumCircuit:
     return qc
 
 
-@pytest.fixture
+@pytest.fixture()
 def cnot_rx_flipped_approx() -> QuantumCircuit:
     qc = QuantumCircuit(2)
     qc.cx(1, 0)
@@ -96,7 +97,7 @@ def cnot_rx_flipped_approx() -> QuantumCircuit:
     return qc
 
 
-@pytest.fixture
+@pytest.fixture()
 def original_circuit() -> QuantumCircuit:
     qc = QuantumCircuit(3)
     qc.h(0)
@@ -203,7 +204,9 @@ def test_verify_compilation_on_optimization_levels_config(
 def test_performed_instantiations(rz_commute_lhs: QuantumCircuit, rz_commute_rhs_incorrect: QuantumCircuit) -> None:
     result = qcec.verify(rz_commute_lhs, rz_commute_rhs_incorrect, additional_instantiations=10)
     assert result.equivalence == qcec.EquivalenceCriterion.not_equivalent
-    assert 1 < result.performed_instantiations < 10
+    min_instantiations = 1
+    max_instantiations = 10
+    assert min_instantiations < result.performed_instantiations < max_instantiations
 
 
 def test_with_config(rz_commute_lhs: QuantumCircuit, rz_commute_rhs_incorrect: QuantumCircuit) -> None:
@@ -211,4 +214,6 @@ def test_with_config(rz_commute_lhs: QuantumCircuit, rz_commute_rhs_incorrect: Q
     config.parameterized.additional_instantiations = 10
     result = qcec.verify(rz_commute_lhs, rz_commute_rhs_incorrect, config)
     assert result.equivalence == qcec.EquivalenceCriterion.not_equivalent
-    assert 1 < result.performed_instantiations < 10
+    min_instantiations = 1
+    max_instantiations = 10
+    assert min_instantiations < result.performed_instantiations < max_instantiations

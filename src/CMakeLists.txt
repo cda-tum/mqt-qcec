@@ -1,5 +1,6 @@
 # add MQT::qfr library
-add_subdirectory("${PROJECT_SOURCE_DIR}/extern/qfr" "extern/qfr" EXCLUDE_FROM_ALL)
+add_subdirectory("${PROJECT_SOURCE_DIR}/extern/qfr" "extern/qfr"
+                 EXCLUDE_FROM_ALL)
 
 add_library(
   ${PROJECT_NAME}

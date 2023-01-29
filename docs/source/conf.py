@@ -16,7 +16,7 @@ author = "Lukas Burgholzer"
 release = metadata.version("mqt.qcec")
 version = ".".join(release.split(".")[:3])
 language = "en"
-copyright = "Chair for Design Automation, Technical University of Munich"
+project_copyright = "Chair for Design Automation, Technical University of Munich"
 
 # -- General configuration ---------------------------------------------------
 extensions = [
@@ -64,7 +64,7 @@ exclude_patterns = ["_build", "build", "**.ipynb_checkpoints", "Thumbs.db", ".DS
 
 
 class CDAStyle(UnsrtStyle):
-    def format_url(self, e):
+    def format_url(self, _e):
         url = field("url", raw=True)
         return href()[url, "[PDF]"]
 

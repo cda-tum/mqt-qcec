@@ -163,7 +163,8 @@ def create_multi_controlled_gate(
 
     # special handling for recursion mode with less than 5 controls,
     # which does not require ancilla qubits
-    if mode == "recursion" and controls < 5:
+    no_ancilla_threshold = 5
+    if mode == "recursion" and controls < no_ancilla_threshold:
         ancilla_qubits = 0
 
     required_qubits += ancilla_qubits

@@ -1,9 +1,12 @@
 from __future__ import annotations
 
 import os
+from typing import TYPE_CHECKING
 
 import nox
-from nox.sessions import Session
+
+if TYPE_CHECKING:
+    from nox.sessions import Session
 
 nox.options.sessions = ["lint", "tests"]
 
@@ -66,33 +69,6 @@ def lint(session: Session) -> None:
     """
     session.install("pre-commit")
     session.run("pre-commit", "run", "--all-files", *session.posargs)
-
-
-@nox.session
-def pylint(session: Session) -> None:
-    """
-    Run pylint.
-    Simply execute `nox -rs pylint` to run pylint.
-    Run as `nox -rs pylint -- skip-install` to skip installing the package and its dependencies.
-    """
-    session.install("pylint")
-    run_install = True
-    if session.posargs and "skip-install" in session.posargs:
-        run_install = False
-        session.posargs.remove("skip-install")
-    if run_install:
-        session.install("-e", ".")
-    session.run("pylint", "mqt.qcec", "--extension-pkg-allow-list=mqt.qcec.pyqcec", *session.posargs)
-
-
-@nox.session
-def mypy(session: Session) -> None:
-    """
-    Run mypy.
-    Simply execute `nox -rs mypy` to run mypy.
-    """
-    session.install("pre-commit")
-    session.run("pre-commit", "run", "--all-files", "--hook-stage", "manual", "mypy", *session.posargs)
 
 
 @nox.session
