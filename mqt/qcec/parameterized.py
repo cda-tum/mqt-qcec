@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import time
 from itertools import chain
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, overload
 
 if TYPE_CHECKING:  # pragma: no cover
     from numpy.typing import NDArray
@@ -18,6 +18,16 @@ from mqt.qcec import Configuration, EquivalenceCheckingManager, EquivalenceCrite
 
 def __is_parameterized(qc: QuantumCircuit) -> bool:
     return not isinstance(qc, str) and qc.parameters
+
+
+@overload
+def __adjust_timeout(curr_timeout: float, res: EquivalenceCheckingManager.Results | float) -> float:
+    ...
+
+
+@overload
+def __adjust_timeout(curr_timeout: None, res: EquivalenceCheckingManager.Results | float) -> None:
+    ...
 
 
 def __adjust_timeout(curr_timeout: float | None, res: EquivalenceCheckingManager.Results | float) -> float | None:
@@ -172,7 +182,7 @@ def check_parameterized(
 
     update_stats(res)
 
-    timeout = kwargs["timeout"].total_seconds() if kwargs.get("timeout") else None
+    timeout: float | None = kwargs["timeout"].total_seconds() if kwargs.get("timeout") else None
 
     timeout = __adjust_timeout(timeout, res)
 
