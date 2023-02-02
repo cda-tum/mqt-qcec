@@ -15,27 +15,17 @@ void DDAlternatingChecker::initialize() {
   // Only count ancillaries that are present in but not acted upon in both of
   // the circuits. Otherwise, the alternating checker must not be used.
   // Counter-example: H |0><0| H^-1 = [[0.5, 0.5], [0.5, 0.5]] != |0><0|
+  if (!canHandle(qc1, qc2)) {
+    throw std::invalid_argument(
+        "Alternating checker must not be used for "
+        "circuits that both have non-idle ancillary "
+        "qubits. Use the construction checker instead.");
+  }
+
   std::vector<bool> ancillary(nqubits);
-  for (auto qubit = static_cast<std::make_signed_t<qc::Qubit>>(nqubits - 1U);
-       qubit >= 0; --qubit) {
-    const auto q = static_cast<qc::Qubit>(qubit);
-    if (qc1.logicalQubitIsAncillary(q) && qc2.logicalQubitIsAncillary(q)) {
-      const auto [found1, physical1] = qc1.containsLogicalQubit(q);
-      const auto isIdle1             = found1 && qc1.isIdleQubit(*physical1);
-
-      const auto [found2, physical2] = qc2.containsLogicalQubit(q);
-      const auto isIdle2             = found2 && qc2.isIdleQubit(*physical2);
-
-      // qubit only really exists or is acted on in one of the circuits
-      if ((found1 != found2) || (isIdle1 != isIdle2)) {
-        ancillary[static_cast<std::size_t>(q)] = true;
-      } else {
-        throw std::invalid_argument(
-            "Alternating checker must not be used for "
-            "circuits that both have non-idle ancillary "
-            "qubits. Use the construction checker instead.");
-      }
-    }
+  for (qc::Qubit q = 0U; q < nqubits; ++q) {
+    ancillary[static_cast<std::size_t>(q)] =
+        qc1.logicalQubitIsAncillary(q) && qc2.logicalQubitIsAncillary(q);
   }
 
   // reduce the ancillary qubit contributions
