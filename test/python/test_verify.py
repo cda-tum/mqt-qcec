@@ -63,3 +63,19 @@ def test_verify_config(original_circuit: QuantumCircuit, alternative_circuit: Qu
     config.execution.timeout = 3600
     result = qcec.verify(original_circuit, alternative_circuit, config)
     assert result.equivalence == qcec.EquivalenceCriterion.equivalent
+
+
+def test_compiled_circuit_without_measurements() -> None:
+    """
+    This is a regression test for https://github.com/cda-tum/qcec/issues/236.
+    It makes sure that circuits compiled without measurements are handled correctly.
+    """
+    from qiskit import transpile
+    from qiskit.providers.fake_provider import FakeAthens
+
+    qc = QuantumCircuit(1)
+    qc.x(0)
+    qc_compiled = transpile(qc, backend=FakeAthens())
+
+    result = qcec.verify(qc, qc_compiled)
+    assert result.equivalence == qcec.EquivalenceCriterion.equivalent
