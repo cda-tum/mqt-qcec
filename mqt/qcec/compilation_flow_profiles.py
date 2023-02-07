@@ -141,7 +141,7 @@ def create_general_gate(qubits: int, params: int, controls: int, identifier: str
     return qc
 
 
-def create_multi_controlled_gate(
+def create_multi_controlled_gate(  # noqa: PLR0913
     qubits: int,
     params: int,
     controls: int,
@@ -320,7 +320,7 @@ def check_recurrence(seq: list[int], order: int = 2) -> list[int] | None:
     return list(coeffs)
 
 
-def find_continuation(
+def find_continuation(  # noqa: PLR0913
     profile_data: dict[tuple[str, int], int],
     gate: str,
     cutoff: int = 5,
