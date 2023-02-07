@@ -105,7 +105,7 @@ def check_instantiated_random(
     return check_instantiated(circ1_inst, circ2_inst, configuration)
 
 
-def check_parameterized(
+def check_parameterized(  # noqa: PLR0915
     circ1: QuantumCircuit | str, circ2: QuantumCircuit | str, configuration: Configuration
 ) -> EquivalenceCheckingManager.Results:
     """Equivalence checking flow for parameterized circuit."""
