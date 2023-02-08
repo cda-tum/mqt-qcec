@@ -29,3 +29,16 @@ def test_verify_compilation_on_optimization_levels(original_circuit: QuantumCirc
         result.equivalence == qcec.EquivalenceCriterion.equivalent
         or result.equivalence == qcec.EquivalenceCriterion.equivalent_up_to_global_phase
     )
+
+
+def test_warning_on_missing_measurements() -> None:
+    """
+    Tests that a warning is raised when either one of the circuits does not contain measurements.
+    """
+    qc = QuantumCircuit(2)
+    qc.h(0)
+    qc.cx(0, 1)
+
+    with pytest.warns(UserWarning):
+        result = qcec.verify_compilation(qc, qc)
+        assert result.equivalence == qcec.EquivalenceCriterion.equivalent

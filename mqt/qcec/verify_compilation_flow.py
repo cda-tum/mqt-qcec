@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 import sys
+import warnings
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: no cover
-    from qiskit import QuantumCircuit
     from typing_extensions import Unpack
 
     from mqt.qcec.configuration import ConfigurationOptions
@@ -14,10 +14,33 @@ if sys.version_info < (3, 10, 0):
 else:
     from importlib import resources  # type: ignore[no-redef]
 
+from qiskit import QuantumCircuit
+
 from mqt.qcec import ApplicationScheme, Configuration, EquivalenceCheckingManager
 from mqt.qcec.compilation_flow_profiles import AncillaMode, generate_profile_name
 from mqt.qcec.configuration import augment_config_from_kwargs
 from mqt.qcec.verify import verify
+
+
+def __check_if_circuit_contains_measurements(circuit: QuantumCircuit) -> None:
+    """
+    Checks if the circuit contains measurements and emits a warning if it does not.
+
+    :param circuit: The circuit to check.
+    """
+    from qiskit.transpiler.passes import ContainsInstruction
+
+    analysis_pass = ContainsInstruction("measure")
+    analysis_pass(circuit)
+    if not analysis_pass.property_set["contains_measure"]:
+        warnings.warn(
+            UserWarning(
+                "One of the circuits does not contain any measurements. "
+                "This may lead to unexpected results since the measurements are used "
+                "to infer the output qubit permutation at the end of the circuit. "
+                "Please consider adding measurements to the circuit _before_ compilation."
+            )
+        )
 
 
 def verify_compilation(
@@ -52,6 +75,12 @@ def verify_compilation(
 
     # prepare the configuration
     augment_config_from_kwargs(configuration, kwargs)
+
+    if isinstance(original_circuit, QuantumCircuit):
+        __check_if_circuit_contains_measurements(original_circuit)
+
+    if isinstance(compiled_circuit, QuantumCircuit):
+        __check_if_circuit_contains_measurements(compiled_circuit)
 
     # use the gate_cost scheme for the verification
     configuration.application.construction_scheme = ApplicationScheme.gate_cost
