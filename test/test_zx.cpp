@@ -302,17 +302,22 @@ TEST(ZXTestsMisc, IdentityNotHadamard) {
             ec::EquivalenceCriterion::ProbablyNotEquivalent);
 }
 
-TEST_F(ZXTest, NonEquivalentCircuit) {
+TEST_F(ZXTest, NonEquivalentAncillaryCircuit) {
   // ensure that a non-equivalent circuit with ancillas yields no information
-  qcOriginal = qc::QuantumComputation(2);
+  qcOriginal = qc::QuantumComputation(1);
   qcOriginal.x(0);
   qcAlternative = qc::QuantumComputation(2);
   qcAlternative.x(0);
   qcAlternative.swap(0, 1);
-  // emulate the addition of an ancillary register
-  qcAlternative.addAncillaryRegister(3);
+  config.execution.parallel = false;
   ecm = std::make_unique<ec::EquivalenceCheckingManager>(qcOriginal,
                                                          qcAlternative, config);
+  ecm->run();
+  EXPECT_EQ(ecm->getResults().equivalence,
+            ec::EquivalenceCriterion::NoInformation);
+
+  ecm->setParallel(true);
+  ecm->reset();
   ecm->run();
   EXPECT_EQ(ecm->getResults().equivalence,
             ec::EquivalenceCriterion::NoInformation);
@@ -320,7 +325,52 @@ TEST_F(ZXTest, NonEquivalentCircuit) {
   // ensure that enabling another checker allows to detect non-equivalence and
   // does not abort the computation.
   ecm->setAlternatingChecker(true);
+  ecm->setParallel(false);
+  ecm->reset();
+  ecm->run();
+  EXPECT_EQ(ecm->getResults().equivalence,
+            ec::EquivalenceCriterion::NotEquivalent);
+
   ecm->setParallel(true);
+  ecm->reset();
+  ecm->run();
+  EXPECT_EQ(ecm->getResults().equivalence,
+            ec::EquivalenceCriterion::NotEquivalent);
+}
+
+TEST_F(ZXTest, NonEquivalentCircuit) {
+  // ensure that a non-equivalent circuit with ancillas yields no information
+  qcOriginal = qc::QuantumComputation(2);
+  qcOriginal.x(0);
+  qcOriginal.z(1);
+  qcAlternative = qc::QuantumComputation(2);
+  qcAlternative.x(0);
+  qcAlternative.swap(0, 1);
+  qcAlternative.z(0);
+  config.execution.parallel = false;
+  ecm = std::make_unique<ec::EquivalenceCheckingManager>(qcOriginal,
+                                                         qcAlternative, config);
+  ecm->run();
+  EXPECT_EQ(ecm->getResults().equivalence,
+            ec::EquivalenceCriterion::ProbablyNotEquivalent);
+
+  ecm->setParallel(true);
+  ecm->reset();
+  ecm->run();
+  EXPECT_EQ(ecm->getResults().equivalence,
+            ec::EquivalenceCriterion::ProbablyNotEquivalent);
+
+  // ensure that enabling another checker allows to detect non-equivalence and
+  // does not abort the computation.
+  ecm->setAlternatingChecker(true);
+  ecm->setParallel(false);
+  ecm->reset();
+  ecm->run();
+  EXPECT_EQ(ecm->getResults().equivalence,
+            ec::EquivalenceCriterion::NotEquivalent);
+
+  ecm->setParallel(true);
+  ecm->reset();
   ecm->run();
   EXPECT_EQ(ecm->getResults().equivalence,
             ec::EquivalenceCriterion::NotEquivalent);
