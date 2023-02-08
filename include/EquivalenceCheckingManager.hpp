@@ -277,6 +277,10 @@ protected:
     }
   }
 
+  [[nodiscard]] bool simulationsFinished() const {
+    return results.performedSimulations == configuration.simulation.maxSims;
+  }
+
   static void addCircuitDescription(const qc::QuantumComputation& qc,
                                     nlohmann::json&               j) {
     j["name"]     = qc.getName();

@@ -9,6 +9,7 @@
 #include "Expression.hpp"
 #include "zx/FunctionalityConstruction.hpp"
 
+#include <cassert>
 #include <iostream>
 #include <memory>
 #include <string>
@@ -261,8 +262,7 @@ void EquivalenceCheckingManager::checkSequential() {
         std::make_unique<DDSimulationChecker>(qc1, qc2, configuration));
     auto* const simulationChecker =
         dynamic_cast<DDSimulationChecker*>(checkers.back().get());
-    while (results.startedSimulations < configuration.simulation.maxSims &&
-           !done) {
+    while (!simulationsFinished() && !done) {
       // configure simulation based checker
       simulationChecker->setRandomInitialState(stateGenerator);
 
@@ -309,9 +309,8 @@ void EquivalenceCheckingManager::checkSequential() {
 
     // in case only simulations are performed and every single one is done,
     // everything is done
-    if (!configuration.execution.runAlternatingChecker &&
-        !configuration.execution.runConstructionChecker &&
-        results.performedSimulations == configuration.simulation.maxSims) {
+    if (configuration.onlySimulationCheckerConfigured() &&
+        simulationsFinished()) {
       done = true;
       doneCond.notify_one();
     }
@@ -362,20 +361,44 @@ void EquivalenceCheckingManager::checkSequential() {
       if (!done) {
         const auto result = zxChecker->run();
 
-        results.equivalence = result;
-        // break if equivalence has been shown
-        if (result == EquivalenceCriterion::EquivalentUpToGlobalPhase ||
-            result == EquivalenceCriterion::Equivalent) {
-          done = true;
-          doneCond.notify_one();
+        // no matter the result, everything is done as this is the last check
+        done = true;
+        doneCond.notify_one();
+
+        if (result == EquivalenceCriterion::Equivalent ||
+            result == EquivalenceCriterion::EquivalentUpToGlobalPhase) {
+          results.equivalence = result;
+        } else if (result == EquivalenceCriterion::ProbablyNotEquivalent) {
+          if (results.equivalence == EquivalenceCriterion::ProbablyEquivalent) {
+            std::clog << "The ZX checker suggests that the circuits are not "
+                         "equivalent, but the simulation checker suggests that "
+                         "they are probably equivalent. Thus, no conclusion "
+                         "can be drawn.\n";
+            results.equivalence = EquivalenceCriterion::NoInformation;
+          } else {
+            results.equivalence = result;
+          }
+        } else {
+          assert(result == EquivalenceCriterion::NoInformation);
+          if (results.equivalence == EquivalenceCriterion::NoInformation) {
+            // this can only happen if the ZX checker is the only checker
+            assert(configuration.onlyZXCheckerConfigured());
+            std::clog
+                << "Only ZX checker specified, but it was not able to conclude "
+                   "anything about the equivalence of the circuits!\n"
+                << "This can happen since the ZX checker is not complete in "
+                   "general.\n"
+                << "Consider enabling other checkers to get more "
+                   "information.\n";
+          }
         }
       }
     } else if (configuration.onlyZXCheckerConfigured()) {
-      std::clog << "Only ZX checker specified but one of the circuits contains "
-                   "operations not supported by this checker! Exiting!\n";
+      std::clog
+          << "Only ZX checker specified, but one of the circuits contains "
+             "operations not supported by this checker! Exiting!\n";
       checkers.clear();
       results.equivalence = EquivalenceCriterion::NoInformation;
-      return;
     }
   }
 
@@ -426,10 +449,11 @@ void EquivalenceCheckingManager::checkParallel() {
         zx::FunctionalityConstruction::transformableToZX(&qc2)) {
       ++tasksToExecute;
     } else if (configuration.onlyZXCheckerConfigured()) {
-      std::clog << "Only ZX checker specified but one of the circuits contains "
-                   "operations not supported by this checker! Exiting!\n";
-      results.equivalence = EquivalenceCriterion::NoInformation;
+      std::clog
+          << "Only ZX checker specified, but one of the circuits contains "
+             "operations not supported by this checker! Exiting!\n";
       setAndSignalDone();
+      results.equivalence = EquivalenceCriterion::NoInformation;
     } else {
       configuration.execution.runZXChecker = false;
     }
@@ -536,8 +560,24 @@ void EquivalenceCheckingManager::checkParallel() {
     const auto        result  = checker->getEquivalence();
 
     if (result == EquivalenceCriterion::NoInformation) {
+      if (dynamic_cast<const ZXEquivalenceChecker*>(checker) != nullptr) {
+        if (configuration.onlyZXCheckerConfigured()) {
+          std::clog
+              << "Only ZX checker specified, but it was not able to conclude "
+                 "anything about the equivalence of the circuits!\n"
+              << "This can happen since the ZX checker is not complete in "
+                 "general.\n"
+              << "Consider enabling other checkers to get more "
+                 "information.\n";
+          setAndSignalDone();
+          break;
+        }
+        continue;
+      }
       std::clog << "Finished equivalence check provides no information. "
                    "Something probably went wrong. Exiting.\n";
+      setAndSignalDone();
+      results.equivalence = result;
       break;
     }
 
@@ -559,7 +599,6 @@ void EquivalenceCheckingManager::checkParallel() {
           results.cexOutput2 = simulationChecker->getInternalVector2();
         }
       }
-
       break;
     }
 
@@ -573,24 +612,75 @@ void EquivalenceCheckingManager::checkParallel() {
     }
 
     if (dynamic_cast<const ZXEquivalenceChecker*>(checker) != nullptr) {
-      results.equivalence = result;
-      if (result == EquivalenceCriterion::EquivalentUpToGlobalPhase ||
-          result == EquivalenceCriterion::Equivalent ||
-          (result == EquivalenceCriterion::ProbablyNotEquivalent &&
-           configuration.onlyZXCheckerConfigured())) {
+      if (result == EquivalenceCriterion::Equivalent ||
+          result == EquivalenceCriterion::EquivalentUpToGlobalPhase) {
         setAndSignalDone();
+        results.equivalence = result;
         break;
       }
-      // The ZX checker cannot conclude non-equivalence so the run is not
-      // stopped
+
+      if (result == EquivalenceCriterion::ProbablyNotEquivalent) {
+        if (results.equivalence == EquivalenceCriterion::ProbablyEquivalent) {
+          if (simulationsFinished()) {
+            std::clog << "The ZX checker suggests that the circuits are not "
+                         "equivalent, but the simulation checker suggests that "
+                         "they are probably equivalent. Thus, no conclusion "
+                         "can be drawn.\n";
+            setAndSignalDone();
+            results.equivalence = EquivalenceCriterion::NoInformation;
+            break;
+          }
+          results.equivalence = result;
+          continue;
+        }
+
+        // update result if no information is known
+        if (results.equivalence == EquivalenceCriterion::NoInformation) {
+          results.equivalence = result;
+          if (configuration.onlyZXCheckerConfigured()) {
+            setAndSignalDone();
+            break;
+          }
+          // Since the ZX checker is not complete, it cannot conclude
+          // non-equivalence, but only suggest it. If the ZX checker is not the
+          // only checker configured to run, the run continues uninterrupted.
+          continue;
+        }
+      }
     }
 
     // at this point, the only option is that this is a simulation checker
     if (dynamic_cast<const DDSimulationChecker*>(checker) != nullptr) {
-      // if the simulation has not shown the non-equivalence, then both circuits
-      // are considered probably equivalent
-      results.equivalence = EquivalenceCriterion::ProbablyEquivalent;
       ++results.performedSimulations;
+
+      // if no information is known, the successful simulation suggests that
+      // both circuits are likely to be equivalent.
+      if (results.equivalence == EquivalenceCriterion::NoInformation) {
+        results.equivalence = EquivalenceCriterion::ProbablyEquivalent;
+      }
+
+      if (simulationsFinished()) {
+        if (configuration.onlySimulationCheckerConfigured()) {
+          // if only simulations are performed and all of them are successful,
+          // the circuits are most likely equivalent, and the procedure is done.
+          setAndSignalDone();
+          break;
+        }
+
+        if (results.equivalence ==
+            EquivalenceCriterion::ProbablyNotEquivalent) {
+          std::clog
+              << "The ZX checker suggests that the circuits are not "
+                 "equivalent, but the simulation checker suggests that they "
+                 "are probably equivalent. Thus, no conclusion can be drawn.\n";
+          setAndSignalDone();
+          results.equivalence = EquivalenceCriterion::NoInformation;
+          break;
+        }
+        // if all simulations finished and none of them showed non-equivalence,
+        // the run continues uninterrupted.
+        continue;
+      }
 
       // it has to be checked, whether further simulations shall be
       // conducted
@@ -608,13 +698,6 @@ void EquivalenceCheckingManager::checkParallel() {
           queue.push(id);
         });
         ++results.startedSimulations;
-      } else if (configuration.onlySimulationCheckerConfigured() &&
-                 results.performedSimulations ==
-                     configuration.simulation.maxSims) {
-        // in case only simulations are performed and every single one is
-        // done, everything is done
-        setAndSignalDone();
-        break;
       }
     }
   }

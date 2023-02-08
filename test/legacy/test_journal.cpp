@@ -141,6 +141,7 @@ TEST_P(JournalTestNonEQ, PowerOfSimulation) {
   config.execution.runAlternatingChecker  = false;
   config.execution.runConstructionChecker = false;
   config.execution.runSimulationChecker   = true;
+  config.execution.runZXChecker           = false;
   config.execution.parallel               = false;
   config.execution.timeout                = 60.;
   config.simulation.maxSims               = 16U;
