@@ -1,3 +1,5 @@
+"""Setup script for the MQT QCEC package."""
+
 import os
 import re
 import subprocess
@@ -10,13 +12,30 @@ from setuptools.command.build_ext import build_ext
 
 
 class CMakeExtension(Extension):
+    """Class that wraps a CMake extension."""
+
     def __init__(self, name: str, sourcedir: str = "") -> None:
+        """Initialize the CMake extension.
+
+        Args:
+        ----
+        name: The name of the extension.
+        sourcedir: The path to the source directory.
+        """
         Extension.__init__(self, name, sources=[])
         self.sourcedir = str(Path(sourcedir).resolve())
 
 
 class CMakeBuild(build_ext):
+    """Class that builds a CMake extension."""
+
     def build_extension(self, ext: CMakeExtension) -> None:
+        """Build the CMake extension.
+
+        Args:
+        ----
+        ext: The CMake extension to build.
+        """
         from setuptools_scm import get_version  # type: ignore[import]
 
         version = get_version(relative_to=__file__)

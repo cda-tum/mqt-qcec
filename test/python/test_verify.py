@@ -1,3 +1,5 @@
+"""Test the verification of two circuits."""
+
 from __future__ import annotations
 
 import pytest
@@ -8,6 +10,7 @@ from mqt import qcec
 
 @pytest.fixture()
 def original_circuit() -> QuantumCircuit:
+    """Fixture for a simple circuit."""
     qc = QuantumCircuit(3)
     qc.h(0)
     qc.cx(0, 1)
@@ -18,6 +21,7 @@ def original_circuit() -> QuantumCircuit:
 
 @pytest.fixture()
 def alternative_circuit() -> QuantumCircuit:
+    """Fixture for an alternative version of the simple circuit."""
     qc = QuantumCircuit(3, 3)
     qc.h(0)
     qc.cx(0, 1)
@@ -30,17 +34,13 @@ def alternative_circuit() -> QuantumCircuit:
 
 
 def test_verify(original_circuit: QuantumCircuit, alternative_circuit: QuantumCircuit) -> None:
-    """
-    Test the verification of two equivalent circuits.
-    """
+    """Test the verification of two equivalent circuits."""
     result = qcec.verify(original_circuit, alternative_circuit)
     assert result.equivalence == qcec.EquivalenceCriterion.equivalent
 
 
 def test_verify_kwargs(original_circuit: QuantumCircuit, alternative_circuit: QuantumCircuit) -> None:
-    """
-    Test the verification of two equivalent circuits with some keyword arguments (one of each category).
-    """
+    """Test the verification of two equivalent circuits with some keyword arguments (one of each category)."""
     result = qcec.verify(
         original_circuit,
         alternative_circuit,
@@ -55,10 +55,7 @@ def test_verify_kwargs(original_circuit: QuantumCircuit, alternative_circuit: Qu
 
 
 def test_verify_config(original_circuit: QuantumCircuit, alternative_circuit: QuantumCircuit) -> None:
-    """
-    Test the verification of two equivalent circuits with a configuration object.
-    """
-
+    """Test the verification of two equivalent circuits with a configuration object."""
     config = qcec.Configuration()
     config.execution.timeout = 3600
     result = qcec.verify(original_circuit, alternative_circuit, config)
@@ -66,8 +63,8 @@ def test_verify_config(original_circuit: QuantumCircuit, alternative_circuit: Qu
 
 
 def test_compiled_circuit_without_measurements() -> None:
-    """
-    This is a regression test for https://github.com/cda-tum/qcec/issues/236.
+    """Regression test for https://github.com/cda-tum/qcec/issues/236.
+
     It makes sure that circuits compiled without measurements are handled correctly.
     """
     from qiskit import transpile

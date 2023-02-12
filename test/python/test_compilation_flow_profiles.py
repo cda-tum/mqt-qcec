@@ -1,3 +1,5 @@
+"""Test compilation flow profiles."""
+
 from __future__ import annotations
 
 import filecmp
@@ -17,12 +19,14 @@ from mqt.qcec.compilation_flow_profiles import generate_profile_name
 
 
 @pytest.fixture(params=[0, 1, 2, 3])
-def optimization_level(request: Any) -> int:
+def optimization_level(request: Any) -> int:  # noqa: ANN401
+    """Fixture for optimization levels."""
     return cast(int, request.param)
 
 
 @pytest.fixture(params=[qcec.AncillaMode.NO_ANCILLA, qcec.AncillaMode.RECURSION, qcec.AncillaMode.V_CHAIN])
-def ancilla_mode(request: Any) -> qcec.AncillaMode:
+def ancilla_mode(request: Any) -> qcec.AncillaMode:  # noqa: ANN401
+    """Fixture for ancilla modes."""
     return cast(qcec.AncillaMode, request.param)
 
 
@@ -31,11 +35,10 @@ def ancilla_mode(request: Any) -> qcec.AncillaMode:
     reason="Since this check takes quite some time, it is only executed if the current platform is Linux and the Python version is 3.11 or higher.",
 )
 def test_generated_profiles_are_still_valid(optimization_level: int, ancilla_mode: qcec.AncillaMode) -> None:
-    """
-    Test that the generated profiles are still valid.
+    """Test validity of generated profiles.
+
     The main intention of this check is to catch cases where an update in Qiskit changes the respective costs.
     """
-
     # generate the profile
     qcec.generate_profile(optimization_level=optimization_level, mode=ancilla_mode, filepath=Path("."))
 

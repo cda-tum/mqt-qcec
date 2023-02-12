@@ -1,3 +1,5 @@
+"""Types for the QCEC module."""
+
 from typing import Literal
 
 ApplicationSchemeName = Literal["sequential", "one_to_one", "proportional", "lookahead", "gate_cost"]

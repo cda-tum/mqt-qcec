@@ -1,3 +1,5 @@
+"""Test the configuration of the equivalence checker."""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -26,6 +28,7 @@ from mqt import qcec
 def test_application_scheme(
     application_scheme_string: ApplicationSchemeName, application_scheme_enum: qcec.ApplicationScheme
 ) -> None:
+    """Test the application scheme enum."""
     assert qcec.ApplicationScheme(application_scheme_string) == application_scheme_enum
 
     config = qcec.Configuration()
@@ -36,6 +39,7 @@ def test_application_scheme(
 
 
 def test_timeout() -> None:
+    """Test the timeout configuration."""
     config = qcec.Configuration()
     config.execution.timeout = 60
     config.execution.timeout = 60.0
@@ -53,6 +57,7 @@ def test_timeout() -> None:
     ],
 )
 def test_state_type(state_type_string: StateTypeName, state_type_enum: qcec.StateType) -> None:
+    """Test the state type enum."""
     assert qcec.StateType(state_type_string) == state_type_enum
 
     config = qcec.Configuration()

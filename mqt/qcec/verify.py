@@ -1,3 +1,5 @@
+"""The main entry point for the QCEC package."""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -19,8 +21,7 @@ def verify(
     configuration: Configuration | None = None,
     **kwargs: Unpack[ConfigurationOptions],
 ) -> EquivalenceCheckingManager.Results:
-    """
-    Verify that ``circ1`` and ``circ2`` are equivalent.
+    """Verify that ``circ1`` and ``circ2`` are equivalent.
 
     Wraps creating an instance of :class:`EquivalenceCheckingManager <.EquivalenceCheckingManager>`,
     calling :meth:`EquivalenceCheckingManager.run`,

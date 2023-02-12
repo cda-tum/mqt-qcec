@@ -1,3 +1,5 @@
+"""Module for generating compilation flow profiles for the equivalence checking process."""
+
 from __future__ import annotations
 
 import random
@@ -125,10 +127,7 @@ multi_controlled_gates_v_chain = [mcx_v_chain]
 
 
 def create_general_gate(qubits: int, params: int, controls: int, identifier: str) -> QuantumCircuit:
-    """
-    Create a ``QuantumCircuit`` containing a single gate ``identifier``
-    with the given number of ``qubits``, ``params``, and ``controls``.
-    """
+    """Create a ``QuantumCircuit`` containing a single gate ``identifier`` with the given number of ``qubits``, ``params``, and ``controls``."""
     required_qubits = qubits + controls
     qc = QuantumCircuit(required_qubits)
     gate_identifier = "c" * controls + identifier
@@ -141,7 +140,7 @@ def create_general_gate(qubits: int, params: int, controls: int, identifier: str
     return qc
 
 
-def create_multi_controlled_gate(  # noqa: PLR0913
+def create_multi_controlled_gate(
     qubits: int,
     params: int,
     controls: int,
@@ -149,12 +148,7 @@ def create_multi_controlled_gate(  # noqa: PLR0913
     ancilla_qubits: int | None,
     identifier: str,
 ) -> QuantumCircuit:
-    """
-    Create a ``QuantumCircuit`` containing a single multi-controlled gate ``identifier``
-    with the given number of ``qubits``, ``params``, and ``controls``
-    using ``ancilla_qubits`` ancilla qubits and the given ancilla ``mode``.
-    """
-
+    """Create a ``QuantumCircuit`` containing a single multi-controlled gate ``identifier`` with the given number of ``qubits``, ``params``, and ``controls`` using ``ancilla_qubits`` ancilla qubits and the given ancilla ``mode``."""
     required_qubits = qubits + controls
 
     # special handling for v-chain mode which is indicated by the ancilla_qubits being None
@@ -193,10 +187,7 @@ def compute_cost(
     basis_gates: list[str],
     optimization_level: int = 1,
 ) -> int:
-    """
-    Compute the cost of a circuit by transpiling the circuit
-    to a given ``basis_gates`` gate set and a certain ``optimization_level``.
-    """
+    """Compute the cost of a circuit by transpiling the circuit to a given ``basis_gates`` gate set and a certain ``optimization_level``."""
     transpiled_circuit = transpile(
         qc, basis_gates=basis_gates, optimization_level=optimization_level, seed_transpiler=12345
     )
@@ -217,10 +208,7 @@ def create_gate_profile_data(
     basis_gates: list[str] | None = None,
     optimization_level: int = 1,
 ) -> dict[tuple[str, int], int]:
-    """
-    Create a dictionary of gate profile data.
-    """
-
+    """Create a dictionary of gate profile data."""
     if basis_gates is None:
         basis_gates = ["id", "rz", "sx", "x", "cx"]
 
@@ -262,11 +250,7 @@ def add_special_case_data(
     profile_data: dict[tuple[str, int], int],
     special_cases: dict[str, Any] | None = None,
 ) -> None:
-    """
-    Add special case data to the profile data. This is used to extrapolate the cost
-    of specific rotation gates (e.g., S, T, ...) from the cost of the generic phase gate.
-    """
-
+    """Add special case data to the profile data. This is used to extrapolate the cost of specific rotation gates (e.g., S, T, ...) from the cost of the generic phase gate."""
     if special_cases is None:
         special_cases = {
             "gates": ["z", "s", "sdg", "t", "tdg"],
@@ -295,10 +279,7 @@ def write_profile_data_to_file(profile_data: dict[tuple[str, int], int], filenam
 
 
 def check_recurrence(seq: list[int], order: int = 2) -> list[int] | None:
-    """
-    Tries to determine a recurrence relation with a given ``order`` in ``sequence``
-    and returns the corresponding coefficients or ``None`` if no relation was determined.
-    """
+    """Determine a recurrence relation with a given ``order`` in ``sequence`` and return the corresponding coefficients or ``None`` if no relation was determined."""
     if len(seq) < (2 * order + 1):
         return None
 
@@ -320,7 +301,7 @@ def check_recurrence(seq: list[int], order: int = 2) -> list[int] | None:
     return list(coeffs)
 
 
-def find_continuation(  # noqa: PLR0913
+def find_continuation(
     profile_data: dict[tuple[str, int], int],
     gate: str,
     cutoff: int = 5,
@@ -329,7 +310,7 @@ def find_continuation(  # noqa: PLR0913
     max_qubits: int = 128,
     prediction_cutoff: float = 1e6,
 ) -> None:
-    """Tries to extrapolate from the given profile data by finding recurrence relations."""
+    """Extrapolate from the given profile data by finding recurrence relations."""
     sequence = []
     for (g, _), cost in profile_data.items():
         if g is gate:
@@ -374,8 +355,7 @@ def generate_profile(
     mode: AncillaMode = AncillaMode.NO_ANCILLA,
     filepath: Path | None = None,
 ) -> None:
-    """
-    Generate a compilation flow profile for the given optimization level and ancilla mode.
+    """Generate a compilation flow profile for the given optimization level and ancilla mode.
 
     :param optimization_level: The IBM Qiskit optimization level to use for the profile (0, 1, 2, or 3).
     :type optimization_level: int
