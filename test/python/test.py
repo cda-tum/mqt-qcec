@@ -1,3 +1,5 @@
+"""A simple example of using QCEC."""
+
 from __future__ import annotations
 
 from qiskit import QuantumCircuit, transpile

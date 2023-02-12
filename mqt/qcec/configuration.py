@@ -1,3 +1,5 @@
+"""Configuration options for the equivalence checking manager."""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, TypedDict
@@ -8,6 +10,12 @@ if TYPE_CHECKING:  # pragma: no cover
 
 
 class ConfigurationOptions(TypedDict, total=False):
+    """A dictionary of configuration options.
+
+    The keys of this dictionary are the names of the configuration options.
+    The values are the values of the configuration options.
+    """
+
     # Application
     alternating_scheme: ApplicationScheme | ApplicationSchemeName
     construction_scheme: ApplicationScheme | ApplicationSchemeName
@@ -44,8 +52,7 @@ class ConfigurationOptions(TypedDict, total=False):
 
 
 def augment_config_from_kwargs(config: Configuration, kwargs: ConfigurationOptions) -> None:
-    """
-    Augment an existing :class:`~mqt.qcec.Configuration` with options from a collection of keyword arguments.
+    """Augment an existing :class:`~mqt.qcec.Configuration` with options from a collection of keyword arguments.
 
     :param config: The configuration to augment.
     :param kwargs: The arguments to build the configuration from.

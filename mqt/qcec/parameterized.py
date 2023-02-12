@@ -146,14 +146,14 @@ def check_parameterized(  # noqa: PLR0915
     n_checks = configuration.parameterized.additional_instantiations
     tol = configuration.parameterized.parameterized_tolerance
 
-    parameters, A, offsets = extract_params(circ1, circ2)
+    parameters, mat, offsets = extract_params(circ1, circ2)
 
     def instantiate_params(
         qc1: QuantumCircuit, qc2: QuantumCircuit, b: NDArray[np.float64]
     ) -> tuple[QuantumCircuit, QuantumCircuit, float]:
         start_time = time.time()
-        A_pinv = np.linalg.pinv(A)
-        x = np.dot(A_pinv, b)
+        mat_pinv = np.linalg.pinv(mat)
+        x = np.dot(mat_pinv, b)
         param_map = {param: x[i] for i, param in enumerate(parameters)}
         qc1_bound = qc1.bind_parameters(param_map)
         qc2_bound = qc2.bind_parameters(param_map)

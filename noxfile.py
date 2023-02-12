@@ -1,3 +1,5 @@
+"""Nox sessions."""
+
 from __future__ import annotations
 
 import os
@@ -18,8 +20,8 @@ if os.environ.get("CI", None):
 
 @nox.session(python=PYTHON_ALL_VERSIONS)
 def tests(session: Session) -> None:
-    """
-    Run the test suite.
+    """Run the test suite.
+
     Simply execute `nox -rs tests` to run all tests.
     Run as `nox -rs tests -- skip-install` to skip installing the package and its dependencies.
     """
@@ -35,8 +37,8 @@ def tests(session: Session) -> None:
 
 @nox.session(python=PYTHON_ALL_VERSIONS)
 def coverage(session: Session) -> None:
-    """
-    Run the test suite and generate a coverage report.
+    """Run the test suite and generate a coverage report.
+
     Simply execute `nox -rs coverage -- --cov-report=html` to generate a HTML report.
     Run as `nox -rs coverage -- skip-install` to skip installing the package and its dependencies.
     """
@@ -52,9 +54,7 @@ def coverage(session: Session) -> None:
 
 @nox.session()
 def min_qiskit_version(session: Session) -> None:
-    """
-    Installs the minimum supported version of Qiskit, runs the test suite and collects the coverage.
-    """
+    """Installs the minimum supported version of Qiskit, runs the test suite and collects the coverage."""
     session.install("qiskit-terra~=0.20.0")
     session.install("-e", ".[coverage]")
     session.run("pip", "show", "qiskit-terra")
@@ -63,8 +63,8 @@ def min_qiskit_version(session: Session) -> None:
 
 @nox.session
 def lint(session: Session) -> None:
-    """
-    Lint the Python part of the codebase using pre-commit.
+    """Lint the Python part of the codebase using pre-commit.
+
     Simply execute `nox -rs lint` to run all configured hooks.
     """
     session.install("pre-commit")
@@ -73,8 +73,8 @@ def lint(session: Session) -> None:
 
 @nox.session
 def docs(session: Session) -> None:
-    """
-    Build the documentation.
+    """Build the documentation.
+
     Simply execute `nox -rs docs -- serve` to locally build and serve the docs.
     Run as `nox -rs docs -- skip-install` to skip installing the package and its dependencies.
     """

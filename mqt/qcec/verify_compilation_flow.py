@@ -1,3 +1,5 @@
+"""Verify compilation flow results."""
+
 from __future__ import annotations
 
 import sys
@@ -23,8 +25,7 @@ from mqt.qcec.verify import verify
 
 
 def __check_if_circuit_contains_measurements(circuit: QuantumCircuit) -> None:
-    """
-    Checks if the circuit contains measurements and emits a warning if it does not.
+    """Check if the circuit contains measurements and emits a warning if it does not.
 
     :param circuit: The circuit to check.
     """
@@ -51,7 +52,8 @@ def verify_compilation(
     configuration: Configuration | None = None,
     **kwargs: Unpack[ConfigurationOptions],
 ) -> EquivalenceCheckingManager.Results:
-    """
+    """Verify compilation flow results.
+
     Similar to :func:`verify <.verify>`, but uses a dedicated compilation flow profile to guide the equivalence checking process.
     The compilation flow profile is determined by the ``optimization_level`` and ``ancilla_mode`` arguments.
 

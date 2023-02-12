@@ -1,7 +1,8 @@
-#
-# This file is part of the MQT QCEC library released under the MIT license.
-# See README.md or go to https://github.com/cda-tum/qcec for more information.
-#
+"""MQT QCEC library.
+
+This file is part of the MQT QCEC library released under the MIT license.
+See README.md or go to https://github.com/cda-tum/qcec for more information.
+"""
 
 from mqt.qcec.compilation_flow_profiles import AncillaMode, generate_profile
 from mqt.qcec.pyqcec import (

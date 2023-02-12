@@ -1,3 +1,5 @@
+"""Test the compilation flow verification."""
+
 from __future__ import annotations
 
 import pytest
@@ -9,6 +11,7 @@ from mqt import qcec
 
 @pytest.fixture()
 def original_circuit() -> QuantumCircuit:
+    """Fixture for a simple circuit."""
     qc = QuantumCircuit(3)
     qc.h(0)
     qc.cx(0, 1)
@@ -19,10 +22,7 @@ def original_circuit() -> QuantumCircuit:
 
 @pytest.mark.parametrize("optimization_level", [0, 1, 2, 3])
 def test_verify_compilation_on_optimization_levels(original_circuit: QuantumCircuit, optimization_level: int) -> None:
-    """
-    Test the verification of the compilation of a circuit
-    to the 5-qubit IBMQ Athens architecture with various optimization levels.
-    """
+    """Test the verification of the compilation of a circuit to the 5-qubit IBMQ Athens architecture with various optimization levels."""
     compiled_circuit = transpile(original_circuit, backend=FakeAthens(), optimization_level=optimization_level)
     result = qcec.verify_compilation(original_circuit, compiled_circuit, optimization_level=optimization_level)
     assert (
@@ -32,9 +32,7 @@ def test_verify_compilation_on_optimization_levels(original_circuit: QuantumCirc
 
 
 def test_warning_on_missing_measurements() -> None:
-    """
-    Tests that a warning is raised when either one of the circuits does not contain measurements.
-    """
+    """Tests that a warning is raised when either one of the circuits does not contain measurements."""
     qc = QuantumCircuit(2)
     qc.h(0)
     qc.cx(0, 1)
