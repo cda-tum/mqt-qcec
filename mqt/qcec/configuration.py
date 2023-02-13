@@ -54,8 +54,9 @@ class ConfigurationOptions(TypedDict, total=False):
 def augment_config_from_kwargs(config: Configuration, kwargs: ConfigurationOptions) -> None:
     """Augment an existing :class:`~mqt.qcec.Configuration` with options from a collection of keyword arguments.
 
-    :param config: The configuration to augment.
-    :param kwargs: The arguments to build the configuration from.
+    Args:
+        config: The configuration to augment.
+        kwargs: The arguments to build the configuration from.
     """
     for key, value in kwargs.items():
         if hasattr(config.application, key):

@@ -357,12 +357,15 @@ def generate_profile(
 ) -> None:
     """Generate a compilation flow profile for the given optimization level and ancilla mode.
 
-    :param optimization_level: The IBM Qiskit optimization level to use for the profile (0, 1, 2, or 3).
-    :type optimization_level: int
-    :param mode: The `ancilla mode <.AncillaMode>` used for realizing multi-controlled Toffoli gates, as available in Qiskit.
-    :type mode: AncillaMode
-    :param filepath: The path to the directory where the profile should be stored. Defaults to the ``profiles`` directory in the ``mqt.qcec`` package.
-    :type filepath: Path
+    Args:
+        optimization_level:
+            The IBM Qiskit optimization level to use for the profile (0, 1, 2, or 3). Defaults to 1.
+        mode:
+            The `ancilla mode <.AncillaMode>` used for realizing multi-controlled Toffoli gates, as available in Qiskit.
+            Defaults to ``AncillaMode.NO_ANCILLA``.
+        filepath:
+            The path to the directory where the profile should be stored.
+            Defaults to the ``profiles`` directory in the ``mqt.qcec`` package.
     """
     if filepath is None:
         filepath = default_profile_path
