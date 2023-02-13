@@ -34,11 +34,15 @@ def verify(
     2. Pass keyword arguments to this function. These are directly incorporated into the :class:`Configuration <.Configuration>`.
     Any existing configuration is overridden by keyword arguments.
 
-    :param circ1: The first circuit.
-    :param circ2: The second circuit.
-    :param configuration: The configuration to use for the equivalence checking process.
-    :param kwargs: Keyword arguments to configure the equivalence checking process.
-    :return: The results of the equivalence checking process.
+    Args:
+        circ1: The first circuit.
+        circ2: The second circuit.
+        configuration: The configuration to use for the equivalence checking process.
+        **kwargs: Keyword arguments to configure the equivalence checking process.
+
+    Returns:
+    -------
+        The results of the equivalence checking process.
     """
     if configuration is None:
         configuration = Configuration()

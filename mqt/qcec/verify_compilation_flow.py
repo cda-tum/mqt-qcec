@@ -27,7 +27,8 @@ from mqt.qcec.verify import verify
 def __check_if_circuit_contains_measurements(circuit: QuantumCircuit) -> None:
     """Check if the circuit contains measurements and emits a warning if it does not.
 
-    :param circuit: The circuit to check.
+    Args:
+        circuit: The circuit to check.
     """
     from qiskit.transpiler.passes import ContainsInstruction
 
@@ -64,13 +65,19 @@ def verify_compilation(
     2. Pass keyword arguments to this function. These are directly incorporated into the :class:`Configuration <.Configuration>`.
     Any existing configuration is overridden by keyword arguments.
 
-    :param original_circuit: The original circuit.
-    :param compiled_circuit: The compiled circuit.
-    :param optimization_level: The optimization level used for compiling the circuit (0, 1, 2, or 3).
-    :param ancilla_mode: The `ancilla mode <.AncillaMode>` used for realizing multi-controlled Toffoli gates, as available in Qiskit
-    :param configuration: The configuration to use for the equivalence checking process.
-    :param kwargs: Keyword arguments to configure the equivalence checking process.
-    :return: The results of the equivalence checking process.
+    Args:
+        original_circuit: The original circuit.
+        compiled_circuit: The compiled circuit.
+        optimization_level: The optimization level used for compiling the circuit (0, 1, 2, or 3). Defaults to 1.
+        ancilla_mode:
+            The `ancilla mode <.AncillaMode>` used for realizing multi-controlled Toffoli gates, as available in Qiskit.
+            Defaults to :attr:`.AncillaMode.NO_ANCILLA`.
+        configuration: The configuration to use for the equivalence checking process.
+        **kwargs: Keyword arguments to configure the equivalence checking process.
+
+    Returns:
+    -------
+        The results of the equivalence checking process.
     """
     if configuration is None:
         configuration = Configuration()
