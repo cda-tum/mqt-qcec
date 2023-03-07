@@ -16,6 +16,7 @@
 #include <string>
 
 class ZXTest : public testing::TestWithParam<std::string> {
+protected:
   qc::QuantumComputation qcOriginal;
   qc::QuantumComputation qcAlternative;
   ec::Configuration      config{};
@@ -247,6 +248,7 @@ TEST_F(ZXTest, GlobalPhase) {
 }
 
 class ZXTestCompFlow : public testing::TestWithParam<std::string> {
+protected:
   qc::QuantumComputation qcOriginal;
   qc::QuantumComputation qcTranspiled;
   ec::Configuration      config{};
