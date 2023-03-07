@@ -394,4 +394,6 @@ TEST_F(ZXTest, IdleQubit) {
   ecm = std::make_unique<ec::EquivalenceCheckingManager>(qc1, qc2, config);
 
   ecm->run();
+  EXPECT_EQ(ecm->getResults().equivalence,
+            ec::EquivalenceCriterion::Equivalent);
 }
