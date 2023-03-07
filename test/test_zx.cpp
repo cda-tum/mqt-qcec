@@ -16,7 +16,6 @@
 #include <string>
 
 class ZXTest : public testing::TestWithParam<std::string> {
-protected:
   qc::QuantumComputation qcOriginal;
   qc::QuantumComputation qcAlternative;
   ec::Configuration      config{};
@@ -248,7 +247,6 @@ TEST_F(ZXTest, GlobalPhase) {
 }
 
 class ZXTestCompFlow : public testing::TestWithParam<std::string> {
-protected:
   qc::QuantumComputation qcOriginal;
   qc::QuantumComputation qcTranspiled;
   ec::Configuration      config{};
@@ -374,4 +372,24 @@ TEST_F(ZXTest, NonEquivalentCircuit) {
   ecm->run();
   EXPECT_EQ(ecm->getResults().equivalence,
             ec::EquivalenceCriterion::NotEquivalent);
+}
+
+TEST_F(ZXTest, IdleQubit) {
+  auto qc1 = qc::QuantumComputation(1U);
+  qc1.h(0);
+  qc1.measure(0, 0);
+
+  auto qc2 = qc::QuantumComputation(3U);
+  qc2.h(2);
+  qc2.measure(2, 0);
+  qc2.initializeIOMapping();
+
+  config.execution.runZXChecker           = true;
+  config.execution.parallel               = false;
+  config.execution.runSimulationChecker   = false;
+  config.execution.runAlternatingChecker  = false;
+  config.execution.runConstructionChecker = false;
+  ecm = std::make_unique<ec::EquivalenceCheckingManager>(qc1, qc2, config);
+
+  ecm->run();
 }
