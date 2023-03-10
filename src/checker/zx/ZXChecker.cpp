@@ -47,10 +47,6 @@ ZXEquivalenceChecker::ZXEquivalenceChecker(const qc::QuantumComputation& circ1,
 }
 
 EquivalenceCriterion ZXEquivalenceChecker::run() {
-  //  if(earlyTermination) {
-  //    return equivalence;
-  //  }
-
   const auto start = std::chrono::steady_clock::now();
 
   fullReduceApproximate();
