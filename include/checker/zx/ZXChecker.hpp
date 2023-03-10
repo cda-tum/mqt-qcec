@@ -31,7 +31,8 @@ public:
 private:
   zx::ZXDiagram miter;
   zx::fp        tolerance;
-  bool          ancilla = false;
+  bool          ancilla          = false;
+  bool          earlyTermination = false;
 
   // the following methods are adaptations of the core ZX simplification
   // routines that additionally check a criterion for early termination of the

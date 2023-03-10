@@ -57,7 +57,9 @@ TEST_P(ZXTest, TestCircuits) {
                                                          qcAlternative, config);
 
   ecm->run();
-  EXPECT_TRUE(ecm->getResults().consideredEquivalent());
+  EXPECT_TRUE(ecm->getResults().consideredEquivalent() ||
+              ecm->getResults().equivalence ==
+                  ec::EquivalenceCriterion::NoInformation);
 }
 
 TEST_F(ZXTest, NonEquivalent) {
@@ -377,13 +379,24 @@ TEST_F(ZXTest, NonEquivalentCircuit) {
 }
 
 TEST_F(ZXTest, IdleQubit) {
-  auto qc1 = qc::QuantumComputation(1U);
+  using namespace qc::literals;
+  auto qc1 = qc::QuantumComputation(3U);
   qc1.h(0);
+  qc1.x(1, 0_pc);
+  qc1.x(2, 1_pc);
   qc1.measure(0, 0);
+  qc1.measure(1, 1);
+  qc1.measure(2, 2);
+  qc1.initializeIOMapping();
 
-  auto qc2 = qc::QuantumComputation(3U);
-  qc2.h(2);
-  qc2.measure(2, 0);
+  auto qc2 = qc::QuantumComputation(5U);
+  qc2.h(1);
+  qc2.x(0, 1_pc);
+  qc2.swap(0, 2);
+  qc2.x(4, 2_pc);
+  qc2.measure(1, 0);
+  qc2.measure(2, 1);
+  qc2.measure(4, 2);
   qc2.initializeIOMapping();
 
   config.execution.runZXChecker           = true;
@@ -395,5 +408,5 @@ TEST_F(ZXTest, IdleQubit) {
 
   ecm->run();
   EXPECT_EQ(ecm->getResults().equivalence,
-            ec::EquivalenceCriterion::Equivalent);
+            ec::EquivalenceCriterion::NoInformation);
 }

@@ -47,6 +47,10 @@ ZXEquivalenceChecker::ZXEquivalenceChecker(const qc::QuantumComputation& circ1,
 }
 
 EquivalenceCriterion ZXEquivalenceChecker::run() {
+  //  if(earlyTermination) {
+  //    return equivalence;
+  //  }
+
   const auto start = std::chrono::steady_clock::now();
 
   fullReduceApproximate();
@@ -129,6 +133,23 @@ qc::Permutation complete(const qc::Permutation& p, const std::size_t n) {
     mappedTo[v]   = true;
   }
 
+  // Map rest greedily
+
+  for (std::size_t i = 0; i < n; ++i) {
+    if (mappedFrom[i]) {
+      continue;
+    }
+
+    for (std::size_t j = 0; j < n; ++j) {
+      if (!mappedTo[j]) {
+        pComp[static_cast<qc::Qubit>(i)] = static_cast<qc::Qubit>(j);
+        mappedTo[j]                      = true;
+        mappedFrom[i]                    = true;
+        break;
+      }
+    }
+  }
+
   // Try to map identity
   for (std::size_t i = 0; i < n; ++i) {
     if (mappedFrom[i] || mappedTo[i]) {
@@ -162,26 +183,11 @@ qc::Permutation complete(const qc::Permutation& p, const std::size_t n) {
     mappedTo[j.value()]              = true;
   }
 
-  // Map rest greedily
-
-  for (std::size_t i = 0; i < n; ++i) {
-    if (mappedFrom[i]) {
-      continue;
-    }
-
-    for (std::size_t j = 0; j < n; ++j) {
-      if (!mappedTo[j]) {
-        pComp[static_cast<qc::Qubit>(i)] = static_cast<qc::Qubit>(j);
-        mappedTo[j]                      = true;
-        break;
-      }
-    }
-  }
   return pComp;
 }
 
 qc::Permutation invertPermutations(const qc::QuantumComputation& qc) {
-  return concat(invert(complete(qc.outputPermutation, qc.getNqubits())),
+  return concat(complete(invert(qc.outputPermutation), qc.getNqubits()),
                 complete(qc.initialLayout, qc.getNqubits()));
 }
 
