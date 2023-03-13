@@ -129,41 +129,7 @@ qc::Permutation complete(const qc::Permutation& p, const std::size_t n) {
     mappedTo[v]   = true;
   }
 
-  // Try to map identity
-  for (std::size_t i = 0; i < n; ++i) {
-    if (mappedFrom[i] || mappedTo[i]) {
-      continue;
-    }
-    const auto q  = static_cast<qc::Qubit>(i);
-    pComp[q]      = q;
-    mappedFrom[i] = true;
-    mappedTo[i]   = true;
-  }
-
-  // Try to map inverse
-  for (std::size_t i = 0; i < n; ++i) {
-    if (mappedFrom[i]) {
-      continue;
-    }
-    std::optional<qc::Qubit> j;
-    for (const auto [k, v] : p) {
-      if (v == i) {
-        j = k;
-        break;
-      }
-    }
-
-    if (mappedTo[j.value()]) {
-      continue;
-    }
-
-    pComp[static_cast<qc::Qubit>(i)] = j.value();
-    mappedFrom[i]                    = true;
-    mappedTo[j.value()]              = true;
-  }
-
-  // Map rest greedily
-
+  // Map qubits greedily
   for (std::size_t i = 0; i < n; ++i) {
     if (mappedFrom[i]) {
       continue;
@@ -173,6 +139,7 @@ qc::Permutation complete(const qc::Permutation& p, const std::size_t n) {
       if (!mappedTo[j]) {
         pComp[static_cast<qc::Qubit>(i)] = static_cast<qc::Qubit>(j);
         mappedTo[j]                      = true;
+        mappedFrom[i]                    = true;
         break;
       }
     }
