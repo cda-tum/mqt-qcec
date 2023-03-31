@@ -41,7 +41,8 @@ def __check_if_circuit_contains_measurements(circuit: QuantumCircuit) -> None:
                 "This may lead to unexpected results since the measurements are used "
                 "to infer the output qubit permutation at the end of the circuit. "
                 "Please consider adding measurements to the circuit _before_ compilation."
-            )
+            ),
+            stacklevel=2,
         )
 
 
