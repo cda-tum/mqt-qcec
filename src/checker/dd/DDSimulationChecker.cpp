@@ -8,7 +8,7 @@
 namespace ec {
 DDSimulationChecker::DDSimulationChecker(const qc::QuantumComputation& circ1,
                                          const qc::QuantumComputation& circ2,
-                                         Configuration config) noexcept
+                                         Configuration                 config)
     : DDEquivalenceChecker(circ1, circ2, std::move(config)) {
   initialState = dd->makeZeroState(static_cast<dd::QubitCount>(nqubits));
   initializeApplicationScheme(configuration.application.simulationScheme);
