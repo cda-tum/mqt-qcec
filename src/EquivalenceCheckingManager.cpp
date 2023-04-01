@@ -723,11 +723,11 @@ void EquivalenceCheckingManager::checkSymbolic() {
   // sets the `done` flag after the timeout has passed
   std::thread timeoutThread{};
   if (configuration.execution.timeout > 0.) {
-    timeoutThread = std::thread([&, timeout = std::chrono::duration<double>(
-                                        configuration.execution.timeout)] {
+    timeoutThread = std::thread([this, timeout = std::chrono::duration<double>(
+                                           configuration.execution.timeout)] {
       std::unique_lock doneLock(doneMutex);
       auto             finished =
-          doneCond.wait_for(doneLock, timeout, [&] { return done; });
+          doneCond.wait_for(doneLock, timeout, [this] { return done; });
       // if the thread has already finished within the timeout,
       // nothing has to be done
       if (!finished) {
