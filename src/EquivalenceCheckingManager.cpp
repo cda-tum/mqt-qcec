@@ -10,6 +10,7 @@
 #include "zx/FunctionalityConstruction.hpp"
 
 #include <cassert>
+#include <future>
 #include <iostream>
 #include <memory>
 #include <string>
@@ -469,54 +470,54 @@ void EquivalenceCheckingManager::checkParallel() {
   ThreadSafeQueue<std::size_t> queue{};
   std::size_t                  id = 0U;
 
-  // reserve space for the threads
-  std::vector<std::thread> threads{};
-  threads.reserve(effectiveThreads);
+  // reserve space for the futures received from the async calls
+  std::vector<std::future<void>> futures{};
+  futures.reserve(effectiveThreads);
 
   if (configuration.execution.runAlternatingChecker) {
     // start a new thread that constructs and runs the alternating check
-    threads.emplace_back([this, &queue, id] {
+    futures.emplace_back(std::async(std::launch::async, [this, &queue, id] {
       checkers[id] =
           std::make_unique<DDAlternatingChecker>(qc1, qc2, configuration);
       checkers[id]->run();
       queue.push(id);
-    });
+    }));
     ++id;
   }
 
   if (configuration.execution.runConstructionChecker && !done) {
     // start a new thread that constructs and runs the construction check
-    threads.emplace_back([this, &queue, id] {
+    futures.emplace_back(std::async(std::launch::async, [this, &queue, id] {
       checkers[id] =
           std::make_unique<DDConstructionChecker>(qc1, qc2, configuration);
       if (!done) {
         checkers[id]->run();
       }
       queue.push(id);
-    });
+    }));
     ++id;
   }
 
   if (configuration.execution.runZXChecker && !done) {
     // start a new thread that constructs and runs the ZX checker
-    threads.emplace_back([this, &queue, id] {
+    futures.emplace_back(std::async(std::launch::async, [this, &queue, id] {
       checkers[id] =
           std::make_unique<ZXEquivalenceChecker>(qc1, qc2, configuration);
       if (!done) {
         checkers[id]->run();
       }
       queue.push(id);
-    });
+    }));
     ++id;
   }
 
   if (configuration.execution.runSimulationChecker) {
-    const auto effectiveThreadsLeft = effectiveThreads - threads.size();
+    const auto effectiveThreadsLeft = effectiveThreads - futures.size();
     const auto simulationsToStart =
         std::min(effectiveThreadsLeft, configuration.simulation.maxSims);
     // launch as many simulations as possible
     for (std::size_t i = 0; i < simulationsToStart && !done; ++i) {
-      threads.emplace_back([this, &queue, id] {
+      futures.emplace_back(std::async(std::launch::async, [this, &queue, id] {
         checkers[id] =
             std::make_unique<DDSimulationChecker>(qc1, qc2, configuration);
         auto* const checker =
@@ -529,7 +530,7 @@ void EquivalenceCheckingManager::checkParallel() {
           checkers[id]->run();
         }
         queue.push(id);
-      });
+      }));
       ++id;
       ++results.startedSimulations;
     }
@@ -552,8 +553,9 @@ void EquivalenceCheckingManager::checkParallel() {
     }
 
     // otherwise, a checker has finished its execution
-    // join the respective thread (which should return immediately)
-    threads.at(*completedID).join();
+    // get the result of the future (which should be ready)
+    // this makes sure exceptions are thrown if necessary
+    futures.at(*completedID).get();
 
     // in case non-equivalence has been shown, the execution can be stopped
     const auto* const checker = checkers.at(*completedID).get();
@@ -685,18 +687,19 @@ void EquivalenceCheckingManager::checkParallel() {
       // it has to be checked, whether further simulations shall be
       // conducted
       if (results.startedSimulations < configuration.simulation.maxSims) {
-        threads[*completedID] = std::thread([&, this, id = *completedID] {
-          auto* const simChecker =
-              dynamic_cast<DDSimulationChecker*>(checkers[id].get());
-          {
-            const std::lock_guard stateGeneratorLock(stateGeneratorMutex);
-            simChecker->setRandomInitialState(stateGenerator);
-          }
-          if (!done) {
-            checkers[id]->run();
-          }
-          queue.push(id);
-        });
+        futures[*completedID] =
+            std::async(std::launch::async, [this, &queue, id = *completedID] {
+              auto* const simChecker =
+                  dynamic_cast<DDSimulationChecker*>(checkers[id].get());
+              {
+                const std::lock_guard stateGeneratorLock(stateGeneratorMutex);
+                simChecker->setRandomInitialState(stateGenerator);
+              }
+              if (!done) {
+                checkers[id]->run();
+              }
+              queue.push(id);
+            });
         ++results.startedSimulations;
       }
     }
@@ -705,29 +708,13 @@ void EquivalenceCheckingManager::checkParallel() {
   const auto end    = std::chrono::steady_clock::now();
   results.checkTime = std::chrono::duration<double>(end - start).count();
 
-  // cleanup threads that are still running by joining them
-  // start by joining all the completed threads, which should succeed
-  // instantly
-  while (!queue.empty()) {
-    const auto completedID = queue.waitAndPop();
-    auto&      thread      = threads.at(*completedID);
-    if (thread.joinable()) {
-      thread.join();
-    }
-  }
-
-  // afterwards, join all threads that are still (potentially) running.
-  // at the moment there seems to be no solution for prematurely killing
-  // running threads without risking synchronisation issues. on the positive
-  // side, joining should avoid all of these potential issues on the
-  // negative side, one of the threads might still be stuck in a
-  // long-running operation and does not check for the `done` signal until
-  // this operation completes
-  for (auto& thread : threads) {
-    if (thread.joinable()) {
-      thread.join();
-    }
-  }
+  // Futures are not explicitly waited for here, since the destructor of the
+  // `std::future` object will block until the associated thread has finished.
+  // If any thread is still stuck in a long-running operation, this might take a
+  // while, but the program will terminate anyway. C++20 introduces
+  // `std::jthread`, which allows to explicitly cancel a thread. This could be a
+  // solution for the future to avoid this problem (and reduce the number of
+  // `isDone` checks).
 }
 
 void EquivalenceCheckingManager::checkSymbolic() {
