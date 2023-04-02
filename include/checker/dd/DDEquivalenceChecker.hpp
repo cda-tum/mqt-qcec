@@ -21,7 +21,7 @@ class DDEquivalenceChecker : public EquivalenceChecker {
 public:
   DDEquivalenceChecker(const qc::QuantumComputation& circ1,
                        const qc::QuantumComputation& circ2,
-                       Configuration                 config) noexcept
+                       Configuration                 config)
       : EquivalenceChecker(circ1, circ2, std::move(config)),
         dd(std::make_unique<dd::Package<Config>>(nqubits)),
         taskManager1(TaskManager<DDType, Config>(circ1, dd)),
