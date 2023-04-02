@@ -654,7 +654,8 @@ void EquivalenceCheckingManager::checkParallel() {
       // it has to be checked, whether further simulations shall be
       // conducted
       if (results.startedSimulations < configuration.simulation.maxSims) {
-        futures[*completedID] = asyncRunChecker<DDSimulationChecker>(id, queue);
+        futures[*completedID] =
+            asyncRunChecker<DDSimulationChecker>(*completedID, queue);
         ++results.startedSimulations;
       }
     }
