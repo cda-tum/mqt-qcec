@@ -78,8 +78,8 @@ def test_compiled_circuit_without_measurements() -> None:
     assert result.equivalence == qcec.EquivalenceCriterion.equivalent
 
 
-def test_cpp_exception_propagation() -> None:
-    """Test that exceptions thrown in the C++ code are propagated correctly."""
+def test_cpp_exception_propagation_internal() -> None:
+    """Test that C++ exceptions caused by code within QCEC are propagated correctly."""
     qc = QuantumCircuit(1)
     qc.x(0)
 
@@ -89,7 +89,18 @@ def test_cpp_exception_propagation() -> None:
     config.execution.run_construction_checker = False
     config.execution.run_zx_checker = False
     config.application.simulation_scheme = qcec.ApplicationScheme.lookahead
-    config.simulation.max_sims = 1
 
     with pytest.raises(ValueError, match="Lookahead application scheme can only be used for matrices."):
+        qcec.verify(qc, qc, configuration=config)
+
+
+def test_cpp_exception_propagation_external() -> None:
+    """Test that C++ exceptions caused by code outside of QCEC are propagated correctly."""
+    qc = QuantumCircuit(129)
+    qc.x(range(129))
+
+    config = qcec.Configuration()
+    config.execution.run_zx_checker = False
+
+    with pytest.raises(ValueError, match="Requested too many qubits from package."):
         qcec.verify(qc, qc, configuration=config)
