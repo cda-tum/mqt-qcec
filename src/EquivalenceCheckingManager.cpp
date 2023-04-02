@@ -477,10 +477,15 @@ void EquivalenceCheckingManager::checkParallel() {
   if (configuration.execution.runAlternatingChecker) {
     // start a new thread that constructs and runs the alternating check
     futures.emplace_back(std::async(std::launch::async, [this, &queue, id] {
-      checkers[id] =
-          std::make_unique<DDAlternatingChecker>(qc1, qc2, configuration);
-      checkers[id]->run();
-      queue.push(id);
+      try {
+        checkers[id] =
+            std::make_unique<DDAlternatingChecker>(qc1, qc2, configuration);
+        checkers[id]->run();
+        queue.push(id);
+      } catch (const std::exception& e) {
+        queue.push(id);
+        throw;
+      }
     }));
     ++id;
   }
@@ -488,12 +493,17 @@ void EquivalenceCheckingManager::checkParallel() {
   if (configuration.execution.runConstructionChecker && !done) {
     // start a new thread that constructs and runs the construction check
     futures.emplace_back(std::async(std::launch::async, [this, &queue, id] {
-      checkers[id] =
-          std::make_unique<DDConstructionChecker>(qc1, qc2, configuration);
-      if (!done) {
-        checkers[id]->run();
+      try {
+        checkers[id] =
+            std::make_unique<DDConstructionChecker>(qc1, qc2, configuration);
+        if (!done) {
+          checkers[id]->run();
+        }
+        queue.push(id);
+      } catch (const std::exception& e) {
+        queue.push(id);
+        throw;
       }
-      queue.push(id);
     }));
     ++id;
   }
@@ -501,12 +511,17 @@ void EquivalenceCheckingManager::checkParallel() {
   if (configuration.execution.runZXChecker && !done) {
     // start a new thread that constructs and runs the ZX checker
     futures.emplace_back(std::async(std::launch::async, [this, &queue, id] {
-      checkers[id] =
-          std::make_unique<ZXEquivalenceChecker>(qc1, qc2, configuration);
-      if (!done) {
-        checkers[id]->run();
+      try {
+        checkers[id] =
+            std::make_unique<ZXEquivalenceChecker>(qc1, qc2, configuration);
+        if (!done) {
+          checkers[id]->run();
+        }
+        queue.push(id);
+      } catch (const std::exception& e) {
+        queue.push(id);
+        throw;
       }
-      queue.push(id);
     }));
     ++id;
   }
@@ -518,18 +533,23 @@ void EquivalenceCheckingManager::checkParallel() {
     // launch as many simulations as possible
     for (std::size_t i = 0; i < simulationsToStart && !done; ++i) {
       futures.emplace_back(std::async(std::launch::async, [this, &queue, id] {
-        checkers[id] =
-            std::make_unique<DDSimulationChecker>(qc1, qc2, configuration);
-        auto* const checker =
-            dynamic_cast<DDSimulationChecker*>(checkers[id].get());
-        {
-          const std::lock_guard stateGeneratorLock(stateGeneratorMutex);
-          checker->setRandomInitialState(stateGenerator);
+        try {
+          checkers[id] =
+              std::make_unique<DDSimulationChecker>(qc1, qc2, configuration);
+          auto* const checker =
+              dynamic_cast<DDSimulationChecker*>(checkers[id].get());
+          {
+            const std::lock_guard stateGeneratorLock(stateGeneratorMutex);
+            checker->setRandomInitialState(stateGenerator);
+          }
+          if (!done) {
+            checkers[id]->run();
+          }
+          queue.push(id);
+        } catch (const std::exception& e) {
+          queue.push(id);
+          throw;
         }
-        if (!done) {
-          checkers[id]->run();
-        }
-        queue.push(id);
       }));
       ++id;
       ++results.startedSimulations;
@@ -689,16 +709,21 @@ void EquivalenceCheckingManager::checkParallel() {
       if (results.startedSimulations < configuration.simulation.maxSims) {
         futures[*completedID] =
             std::async(std::launch::async, [this, &queue, id = *completedID] {
-              auto* const simChecker =
-                  dynamic_cast<DDSimulationChecker*>(checkers[id].get());
-              {
-                const std::lock_guard stateGeneratorLock(stateGeneratorMutex);
-                simChecker->setRandomInitialState(stateGenerator);
+              try {
+                auto* const simChecker =
+                    dynamic_cast<DDSimulationChecker*>(checkers[id].get());
+                {
+                  const std::lock_guard stateGeneratorLock(stateGeneratorMutex);
+                  simChecker->setRandomInitialState(stateGenerator);
+                }
+                if (!done) {
+                  checkers[id]->run();
+                }
+                queue.push(id);
+              } catch (const std::exception& e) {
+                queue.push(id);
+                throw;
               }
-              if (!done) {
-                checkers[id]->run();
-              }
-              queue.push(id);
             });
         ++results.startedSimulations;
       }
