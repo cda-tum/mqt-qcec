@@ -18,6 +18,7 @@
 
 #include <atomic>
 #include <chrono>
+#include <future>
 #include <memory>
 #include <mutex>
 #include <thread>
@@ -275,6 +276,49 @@ protected:
         checker->signalDone();
       }
     }
+  }
+
+  /// \brief Run an EquivalenceChecker asynchronously
+  ///
+  /// This function is used to asynchronously run an EquivalenceChecker. It also
+  /// takes care of creating the checker if it does not exist yet. Additionally,
+  /// it takes care that the checker signals the main thread when it is done
+  /// (even in case of an exception).
+  ///
+  /// \tparam Checker The type of the checker (must be derived from the
+  /// EquivalenceChecker class).
+  /// \param id The id in the checkers vector where the checker is stored.
+  /// \param queue The queue to which the checker shall push its id
+  /// once it is done.
+  /// \return A future that can be used to wait for the checker to finish.
+  template <class Checker>
+  std::future<void> asyncRunChecker(const std::size_t             id,
+                                    ThreadSafeQueue<std::size_t>& queue) {
+    static_assert(std::is_base_of_v<EquivalenceChecker, Checker>,
+                  "Checker must be derived from EquivalenceChecker");
+    return std::async(std::launch::async, [this, id, &queue]() {
+      try {
+        auto& checker = checkers[id];
+        if (!checker) {
+          checker = std::make_unique<Checker>(qc1, qc2, configuration);
+        }
+
+        if constexpr (std::is_same_v<Checker, DDSimulationChecker>) {
+          auto* const simChecker =
+              dynamic_cast<DDSimulationChecker*>(checker.get());
+          const std::lock_guard stateGeneratorLock(stateGeneratorMutex);
+          simChecker->setRandomInitialState(stateGenerator);
+        }
+
+        if (!done) {
+          checker->run();
+        }
+        queue.push(id);
+      } catch (const std::exception& e) {
+        queue.push(id);
+        throw;
+      }
+    });
   }
 
   [[nodiscard]] bool simulationsFinished() const {

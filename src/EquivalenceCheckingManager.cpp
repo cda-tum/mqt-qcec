@@ -10,7 +10,6 @@
 #include "zx/FunctionalityConstruction.hpp"
 
 #include <cassert>
-#include <future>
 #include <iostream>
 #include <memory>
 #include <string>
@@ -476,53 +475,19 @@ void EquivalenceCheckingManager::checkParallel() {
 
   if (configuration.execution.runAlternatingChecker) {
     // start a new thread that constructs and runs the alternating check
-    futures.emplace_back(std::async(std::launch::async, [this, &queue, id] {
-      try {
-        checkers[id] =
-            std::make_unique<DDAlternatingChecker>(qc1, qc2, configuration);
-        checkers[id]->run();
-        queue.push(id);
-      } catch (const std::exception& e) {
-        queue.push(id);
-        throw;
-      }
-    }));
+    futures.emplace_back(asyncRunChecker<DDAlternatingChecker>(id, queue));
     ++id;
   }
 
   if (configuration.execution.runConstructionChecker && !done) {
     // start a new thread that constructs and runs the construction check
-    futures.emplace_back(std::async(std::launch::async, [this, &queue, id] {
-      try {
-        checkers[id] =
-            std::make_unique<DDConstructionChecker>(qc1, qc2, configuration);
-        if (!done) {
-          checkers[id]->run();
-        }
-        queue.push(id);
-      } catch (const std::exception& e) {
-        queue.push(id);
-        throw;
-      }
-    }));
+    futures.emplace_back(asyncRunChecker<DDConstructionChecker>(id, queue));
     ++id;
   }
 
   if (configuration.execution.runZXChecker && !done) {
     // start a new thread that constructs and runs the ZX checker
-    futures.emplace_back(std::async(std::launch::async, [this, &queue, id] {
-      try {
-        checkers[id] =
-            std::make_unique<ZXEquivalenceChecker>(qc1, qc2, configuration);
-        if (!done) {
-          checkers[id]->run();
-        }
-        queue.push(id);
-      } catch (const std::exception& e) {
-        queue.push(id);
-        throw;
-      }
-    }));
+    futures.emplace_back(asyncRunChecker<ZXEquivalenceChecker>(id, queue));
     ++id;
   }
 
@@ -532,25 +497,7 @@ void EquivalenceCheckingManager::checkParallel() {
         std::min(effectiveThreadsLeft, configuration.simulation.maxSims);
     // launch as many simulations as possible
     for (std::size_t i = 0; i < simulationsToStart && !done; ++i) {
-      futures.emplace_back(std::async(std::launch::async, [this, &queue, id] {
-        try {
-          checkers[id] =
-              std::make_unique<DDSimulationChecker>(qc1, qc2, configuration);
-          auto* const checker =
-              dynamic_cast<DDSimulationChecker*>(checkers[id].get());
-          {
-            const std::lock_guard stateGeneratorLock(stateGeneratorMutex);
-            checker->setRandomInitialState(stateGenerator);
-          }
-          if (!done) {
-            checkers[id]->run();
-          }
-          queue.push(id);
-        } catch (const std::exception& e) {
-          queue.push(id);
-          throw;
-        }
-      }));
+      futures.emplace_back(asyncRunChecker<DDSimulationChecker>(id, queue));
       ++id;
       ++results.startedSimulations;
     }
@@ -707,24 +654,7 @@ void EquivalenceCheckingManager::checkParallel() {
       // it has to be checked, whether further simulations shall be
       // conducted
       if (results.startedSimulations < configuration.simulation.maxSims) {
-        futures[*completedID] =
-            std::async(std::launch::async, [this, &queue, id = *completedID] {
-              try {
-                auto* const simChecker =
-                    dynamic_cast<DDSimulationChecker*>(checkers[id].get());
-                {
-                  const std::lock_guard stateGeneratorLock(stateGeneratorMutex);
-                  simChecker->setRandomInitialState(stateGenerator);
-                }
-                if (!done) {
-                  checkers[id]->run();
-                }
-                queue.push(id);
-              } catch (const std::exception& e) {
-                queue.push(id);
-                throw;
-              }
-            });
+        futures[*completedID] = asyncRunChecker<DDSimulationChecker>(id, queue);
         ++results.startedSimulations;
       }
     }
