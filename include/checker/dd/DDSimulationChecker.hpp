@@ -14,7 +14,7 @@ class DDSimulationChecker final
 public:
   DDSimulationChecker(const qc::QuantumComputation& circ1,
                       const qc::QuantumComputation& circ2,
-                      Configuration                 configuration) noexcept;
+                      Configuration                 configuration);
 
   void setRandomInitialState(StateGenerator& generator);
 

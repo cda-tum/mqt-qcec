@@ -165,3 +165,30 @@ TEST_F(EqualityTest, AutomaticSwitchToConstructionChecker) {
   ecm.setParallel(false);
   EXPECT_THROW(ecm.run(), std::invalid_argument);
 }
+
+TEST_F(EqualityTest, ExceptionInParallelThread) {
+  qc1.x(0);
+
+  config                                  = ec::Configuration{};
+  config.execution.runAlternatingChecker  = false;
+  config.execution.runConstructionChecker = false;
+  config.execution.runSimulationChecker   = true;
+  config.execution.runZXChecker           = false;
+  config.application.simulationScheme = ec::ApplicationSchemeType::Lookahead;
+
+  ec::EquivalenceCheckingManager ecm(qc1, qc1, config);
+  EXPECT_THROW(ecm.run(), std::invalid_argument);
+}
+
+TEST_F(EqualityTest, ExceptionInParallelThread2) {
+  qc1.addQubitRegister(128U);
+  for (auto i = 0U; i <= 128U; ++i) {
+    qc1.x(i);
+  }
+
+  config                        = ec::Configuration{};
+  config.execution.runZXChecker = false;
+
+  ec::EquivalenceCheckingManager ecm(qc1, qc1, config);
+  EXPECT_THROW(ecm.run(), std::invalid_argument);
+}
