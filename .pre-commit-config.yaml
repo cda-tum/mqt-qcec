@@ -50,7 +50,7 @@ repos:
 
   # Run ruff (subsumes pyupgrade, isort, flake8+plugins, and more)
   - repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: v0.0.262
+    rev: v0.0.263
     hooks:
       - id: ruff
         args: ["--fix"]
