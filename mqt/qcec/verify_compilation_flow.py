@@ -77,7 +77,6 @@ def verify_compilation(
         **kwargs: Keyword arguments to configure the equivalence checking process.
 
     Returns:
-    -------
         The results of the equivalence checking process.
     """
     if configuration is None:

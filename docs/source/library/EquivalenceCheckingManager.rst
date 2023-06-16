@@ -29,7 +29,7 @@ This constructs the manager using all the default options. The circuits to be ve
 
 It can be further configured by passing a :class:`~.Configuration` object to the constructor.
 
-.. automethod:: EquivalenceCheckingManager.__init__
+    .. automethod:: EquivalenceCheckingManager.__init__
 
 Configuration after instantiation
 #################################
@@ -88,10 +88,6 @@ In addition, the :class:`~.Configuration` of the manager can be altered after it
 Running the equivalence check
 ##############################
 Once the manager has been constructed and (optionally) configured, the equivalence check can be started by calling :func:`~EquivalenceCheckingManager.run`.
-
-    .. code-block:: python
-
-       ecm.run()
 
     .. automethod:: EquivalenceCheckingManager.run
 
