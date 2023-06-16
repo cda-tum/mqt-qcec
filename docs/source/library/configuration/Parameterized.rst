@@ -1,6 +1,6 @@
 Parameterized
 =============
 
-.. autoclass:: mqt.qcec::Configuration.Parameterized
-    :members:
-    :undoc-members:
+    .. autoclass:: mqt.qcec::Configuration.Parameterized
+        :members:
+        :undoc-members:
