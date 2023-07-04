@@ -53,7 +53,7 @@ repos:
     rev: v0.0.276
     hooks:
       - id: ruff
-        args: ["--fix"]
+        args: ["--fix", "--show-fixes"]
 
   # Run code formatting with Black
   - repo: https://github.com/psf/black
