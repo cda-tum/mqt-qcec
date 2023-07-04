@@ -58,7 +58,7 @@ def extract_params(
         return isinstance(x, (Parameter, ParameterExpression))
 
     symb_params: list[Parameter | ParameterExpression] = [param for param in p if is_expr(param)]
-    symb_params.sort(key=lambda param: param.name)  # type: ignore[no-any-return]
+    symb_params.sort(key=lambda param: param.name)
     symb_exprs = list(filter(is_expr, exprs))
 
     offsets = np.zeros(len(symb_exprs))
