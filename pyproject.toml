@@ -144,6 +144,7 @@ module = ["qiskit.*"]
 ignore_missing_imports = true
 
 [tool.ruff]
+include = ["*.py", "*.pyi", "**/pyproject.toml", "*.ipynb"]
 select = [
     "E", "F", "W", # flake8
     "A",           # flake8-builtins
@@ -187,7 +188,6 @@ extend-ignore = [
     "E501",    # Line too long (Black is enough)
     "PLR",     # Design related pylint codes
 ]
-src = ["src"]
 exclude = []
 flake8-unused-arguments.ignore-variadic-names = true
 isort.required-imports = ["from __future__ import annotations"]

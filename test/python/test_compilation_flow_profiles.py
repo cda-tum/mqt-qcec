@@ -13,6 +13,7 @@ else:
     from importlib import resources
 
 import pytest
+
 from mqt import qcec
 from mqt.qcec.compilation_flow_profiles import generate_profile_name
 

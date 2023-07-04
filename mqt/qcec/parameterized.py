@@ -11,8 +11,9 @@ if TYPE_CHECKING:  # pragma: no cover
     from qiskit import QuantumCircuit
 
 import numpy as np
-from mqt.qcec import Configuration, EquivalenceCheckingManager, EquivalenceCriterion
 from qiskit.circuit import Parameter, ParameterExpression
+
+from mqt.qcec import Configuration, EquivalenceCheckingManager, EquivalenceCriterion
 
 
 def __is_parameterized(qc: QuantumCircuit | str) -> bool:

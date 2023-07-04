@@ -3,11 +3,12 @@
 from __future__ import annotations
 
 import pytest
-from mqt import qcec
-from mqt.qcec.compilation_flow_profiles import AncillaMode
 from qiskit import QuantumCircuit, transpile
 from qiskit.circuit import Parameter
 from qiskit.providers.fake_provider import FakeAthens
+
+from mqt import qcec
+from mqt.qcec.compilation_flow_profiles import AncillaMode
 
 alpha = Parameter("alpha")
 beta = Parameter("beta")

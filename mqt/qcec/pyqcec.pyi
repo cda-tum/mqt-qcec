@@ -1,7 +1,8 @@
 from typing import Any, ClassVar, overload
 
-from mqt.qcec.types import ApplicationSchemeName, EquivalenceCriterionName, StateTypeName
 from qiskit import QuantumCircuit
+
+from mqt.qcec.types import ApplicationSchemeName, EquivalenceCriterionName, StateTypeName
 
 class ApplicationScheme:
     __members__: ClassVar[dict[ApplicationScheme, int]] = ...  # read-only
