@@ -1,6 +1,6 @@
 Application
 ===========
 
-.. autoclass:: mqt.qcec::Configuration.Application
-    :members:
-    :undoc-members:
+    .. autoclass:: mqt.qcec::Configuration.Application
+        :members:
+        :undoc-members:

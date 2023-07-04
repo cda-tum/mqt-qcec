@@ -1,6 +1,6 @@
 Execution
 =========
 
-.. autoclass:: mqt.qcec::Configuration.Execution
-    :members:
-    :undoc-members:
+    .. autoclass:: mqt.qcec::Configuration.Execution
+        :members:
+        :undoc-members:
