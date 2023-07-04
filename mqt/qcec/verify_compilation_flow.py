@@ -7,21 +7,19 @@ import warnings
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: no cover
-    from typing_extensions import Unpack
-
     from mqt.qcec.configuration import ConfigurationOptions
+    from typing_extensions import Unpack
 
 if sys.version_info < (3, 10, 0):
     import importlib_resources as resources
 else:
     from importlib import resources  # type: ignore[no-redef]
 
-from qiskit import QuantumCircuit
-
 from mqt.qcec import ApplicationScheme, Configuration, EquivalenceCheckingManager
 from mqt.qcec.compilation_flow_profiles import AncillaMode, generate_profile_name
 from mqt.qcec.configuration import augment_config_from_kwargs
 from mqt.qcec.verify import verify
+from qiskit import QuantumCircuit
 
 
 def __check_if_circuit_contains_measurements(circuit: QuantumCircuit) -> None:

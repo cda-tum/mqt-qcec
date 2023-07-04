@@ -3,9 +3,8 @@
 from __future__ import annotations
 
 import pytest
-from qiskit import QuantumCircuit
-
 from mqt import qcec
+from qiskit import QuantumCircuit
 
 
 @pytest.fixture()

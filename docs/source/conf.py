@@ -1,4 +1,5 @@
 """Sphinx configuration file."""
+from __future__ import annotations
 
 import sys
 
@@ -7,11 +8,15 @@ if sys.version_info < (3, 10, 0):
 else:
     from importlib import metadata
 
+from typing import TYPE_CHECKING
+
 import pybtex.plugin
-from pybtex.database import Entry
-from pybtex.richtext import HRef
 from pybtex.style.formatting.unsrt import Style as UnsrtStyle
 from pybtex.style.template import field, href
+
+if TYPE_CHECKING:
+    from pybtex.database import Entry
+    from pybtex.richtext import HRef
 
 # -- Project information -----------------------------------------------------
 project = "QCEC"

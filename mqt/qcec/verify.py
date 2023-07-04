@@ -5,10 +5,9 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: no cover
+    from mqt.qcec.configuration import ConfigurationOptions
     from qiskit import QuantumCircuit
     from typing_extensions import Unpack
-
-    from mqt.qcec.configuration import ConfigurationOptions
 
 from mqt.qcec import Configuration, EquivalenceCheckingManager
 from mqt.qcec.configuration import augment_config_from_kwargs
