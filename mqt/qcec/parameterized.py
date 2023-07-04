@@ -58,7 +58,7 @@ def extract_params(
         return isinstance(x, (Parameter, ParameterExpression))
 
     symb_params: list[Parameter | ParameterExpression] = [param for param in p if is_expr(param)]
-    symb_params.sort(key=lambda param: param.name)  # type: ignore[no-any-return]
+    symb_params.sort(key=lambda param: param.name)
     symb_exprs = list(filter(is_expr, exprs))
 
     offsets = np.zeros(len(symb_exprs))
@@ -96,8 +96,9 @@ def check_instantiated_random(
 ) -> EquivalenceCheckingManager.Results:
     """Check whether circuits are equivalent for random instantiation of symbolic parameters."""
     param_map = {}
+    rng = np.random.default_rng()
     for p in params:
-        param_map[p] = np.random.rand() * 2 * np.pi
+        param_map[p] = rng.random() * 2 * np.pi
 
     circ1_inst = circ1.bind_parameters(param_map)
     circ2_inst = circ2.bind_parameters(param_map)
@@ -105,7 +106,7 @@ def check_instantiated_random(
     return check_instantiated(circ1_inst, circ2_inst, configuration)
 
 
-def check_parameterized(  # noqa: PLR0915
+def check_parameterized(
     circ1: QuantumCircuit | str, circ2: QuantumCircuit | str, configuration: Configuration
 ) -> EquivalenceCheckingManager.Results:
     """Equivalence checking flow for parameterized circuit."""
@@ -178,7 +179,8 @@ def check_parameterized(  # noqa: PLR0915
         qc1: QuantumCircuit, qc2: QuantumCircuit
     ) -> tuple[QuantumCircuit, QuantumCircuit, float]:
         phases = [0, np.pi, np.pi / 2, -np.pi / 2, np.pi / 4, -np.pi / 4]
-        b = np.random.choice(phases, size=len(offsets)) + offsets
+        rng = np.random.default_rng()
+        b = rng.choice(phases, size=len(offsets)) + offsets
         return instantiate_params(qc1, qc2, b)
 
     circ1_inst, circ2_inst, runtime = instantiate_params_zero(circ1, circ2)

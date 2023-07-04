@@ -30,6 +30,14 @@ def ancilla_mode(request: Any) -> qcec.AncillaMode:  # noqa: ANN401
     return cast(qcec.AncillaMode, request.param)
 
 
+def test_ancilla_mode_conversion(ancilla_mode: qcec.AncillaMode) -> None:
+    """Test conversion and equality of ancilla modes."""
+    ancilla_str = str(ancilla_mode)
+    assert qcec.AncillaMode(ancilla_str) == ancilla_mode
+    assert ancilla_str == ancilla_mode
+    assert ancilla_mode == ancilla_str
+
+
 @pytest.mark.skipif(
     sys.version_info < (3, 11, 0) or sys.platform != "linux",
     reason="Since this check takes quite some time, it is only executed if the current platform is Linux and the Python version is 3.11 or higher.",

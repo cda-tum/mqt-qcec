@@ -2,8 +2,7 @@
 
 from __future__ import annotations
 
-import random
-from enum import Enum
+from enum import Enum, unique
 from pathlib import Path
 from typing import Any
 
@@ -11,12 +10,29 @@ import numpy as np
 from qiskit import QuantumCircuit, transpile
 
 
-class AncillaMode(str, Enum):
+@unique
+class AncillaMode(Enum):
     """Enum for the ancilla mode."""
 
     NO_ANCILLA = "noancilla"
     RECURSION = "recursion"
     V_CHAIN = "v-chain"
+
+    def __eq__(self, other: object) -> bool:
+        """Check if two AncillaMode objects are equal. Supports string comparison."""
+        if isinstance(other, str):
+            return self.value == other
+        if isinstance(other, self.__class__):
+            return self.value == other.value
+        return False
+
+    def __hash__(self) -> int:
+        """Return the hash of the AncillaMode."""
+        return hash(self.value)
+
+    def __str__(self) -> str:
+        """Return the string representation of the AncillaMode."""
+        return self.value
 
 
 single_qubit_gates_no_params = {
@@ -132,9 +148,8 @@ def create_general_gate(qubits: int, params: int, controls: int, identifier: str
     qc = QuantumCircuit(required_qubits)
     gate_identifier = "c" * controls + identifier
 
-    parameter_list = []
-    for _ in range(params):
-        parameter_list.append(random.uniform(-np.pi, np.pi))
+    rng = np.random.default_rng()
+    parameter_list = [rng.uniform(-np.pi, np.pi) for _ in range(params)]
 
     getattr(qc, gate_identifier)(*parameter_list, *range(required_qubits))
     return qc
@@ -165,9 +180,8 @@ def create_multi_controlled_gate(
     qc = QuantumCircuit(required_qubits)
     gate_identifier = "mc" + identifier
 
-    parameter_list = []
-    for _ in range(params):
-        parameter_list.append(random.uniform(-np.pi, np.pi))
+    rng = np.random.default_rng()
+    parameter_list = [rng.uniform(-np.pi, np.pi) for _ in range(params)]
 
     if mode is not None:
         getattr(qc, gate_identifier)(
@@ -268,7 +282,7 @@ def add_special_case_data(
 
 def generate_profile_name(optimization_level: int = 1, mode: AncillaMode = AncillaMode.NO_ANCILLA) -> str:
     """Generate a profile name based on the given optimization level and ancilla mode."""
-    return "qiskit_O" + str(optimization_level) + "_" + mode + ".profile"
+    return "qiskit_O" + str(optimization_level) + "_" + str(mode) + ".profile"
 
 
 def write_profile_data_to_file(profile_data: dict[tuple[str, int], int], filename: Path) -> None:
@@ -311,10 +325,7 @@ def find_continuation(
     prediction_cutoff: float = 1e6,
 ) -> None:
     """Extrapolate from the given profile data by finding recurrence relations."""
-    sequence = []
-    for (g, _), cost in profile_data.items():
-        if g is gate:
-            sequence.append(cost)
+    sequence = [cost for (g, _), cost in profile_data.items() if g == gate]
 
     # sort the sequence
     sequence = sorted(sequence)
