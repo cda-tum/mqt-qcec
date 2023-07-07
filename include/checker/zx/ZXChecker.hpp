@@ -9,10 +9,10 @@
 #include "Definitions.hpp"
 #include "EquivalenceCriterion.hpp"
 #include "QuantumComputation.hpp"
-#include "Simplify.hpp"
-#include "ZXDiagram.hpp"
 #include "checker/EquivalenceChecker.hpp"
 #include "nlohmann/json.hpp"
+#include "zx/Simplify.hpp"
+#include "zx/ZXDiagram.hpp"
 
 namespace ec {
 class ZXEquivalenceChecker : public EquivalenceChecker {

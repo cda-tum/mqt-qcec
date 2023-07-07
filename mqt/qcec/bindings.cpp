@@ -8,8 +8,8 @@
 #include "pybind11/pybind11.h"
 #include "pybind11/stl.h"
 #include "pybind11_json/pybind11_json.hpp"
-#include "qiskit/QasmQobjExperiment.hpp"
-#include "qiskit/QuantumCircuit.hpp"
+#include "python/qiskit/QasmQobjExperiment.hpp"
+#include "python/qiskit/QuantumCircuit.hpp"
 
 #include <exception>
 #include <memory>
@@ -192,7 +192,7 @@ PYBIND11_MODULE(pyqcec, m) {
       // Convenience functions
       // Execution
       .def("set_tolerance", &EquivalenceCheckingManager::setTolerance,
-           "tolerance"_a = dd::ComplexTable<>::tolerance(),
+           "tolerance"_a = dd::ComplexTable::tolerance(),
            "Set the :attr:`numerical tolerance "
            "<.Configuration.Execution.numerical_tolerance>` of the underlying "
            "decision diagram package.")

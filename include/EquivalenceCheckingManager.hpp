@@ -95,7 +95,7 @@ public:
   // what is executed during `run`
   void setTolerance(dd::fp tol) {
     configuration.execution.numericalTolerance = tol;
-    dd::ComplexTable<>::setTolerance(tol);
+    dd::ComplexTable::setTolerance(tol);
   }
   void setParallel(bool parallel) {
     configuration.execution.parallel = parallel;

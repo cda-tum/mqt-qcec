@@ -20,7 +20,7 @@ class Configuration {
 public:
   // configuration options for execution
   struct Execution {
-    dd::fp numericalTolerance = dd::ComplexTable<>::tolerance();
+    dd::fp numericalTolerance = dd::ComplexTable::tolerance();
 
     bool        parallel = true;
     std::size_t nthreads = std::max(2U, std::thread::hardware_concurrency());
