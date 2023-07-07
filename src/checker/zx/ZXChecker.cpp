@@ -7,9 +7,9 @@
 
 #include "Definitions.hpp"
 #include "QuantumComputation.hpp"
+#include "zx/FunctionalityConstruction.hpp"
 #include "zx/Simplify.hpp"
 #include "zx/ZXDiagram.hpp"
-#include "zx/FunctionalityConstruction.hpp"
 
 #include <chrono>
 #include <optional>
