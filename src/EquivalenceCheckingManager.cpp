@@ -6,7 +6,6 @@
 #include "EquivalenceCheckingManager.hpp"
 
 #include "EquivalenceCriterion.hpp"
-#include "Expression.hpp"
 #include "zx/FunctionalityConstruction.hpp"
 
 #include <cassert>
