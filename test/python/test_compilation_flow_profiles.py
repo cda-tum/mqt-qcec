@@ -48,7 +48,7 @@ def test_generated_profiles_are_still_valid(optimization_level: int, ancilla_mod
     The main intention of this check is to catch cases where an update in Qiskit changes the respective costs.
     """
     # generate the profile
-    qcec.generate_profile(optimization_level=optimization_level, mode=ancilla_mode, filepath=Path("."))
+    qcec.generate_profile(optimization_level=optimization_level, mode=ancilla_mode, filepath=Path())
 
     # get path to the profile from the package resources
     profile_name = generate_profile_name(optimization_level=optimization_level, mode=ancilla_mode)
