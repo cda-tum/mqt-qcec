@@ -6,18 +6,18 @@
 #pragma once
 
 #include "ApplicationScheme.hpp"
-#include "dd/Definitions.hpp"
 #include "operations/OpType.hpp"
 
+#include <cstddef>
 #include <functional>
 #include <stdexcept>
 #include <unordered_map>
 #include <utility>
 
 namespace std {
-template <> struct hash<std::pair<qc::OpType, dd::QubitCount>> {
+template <> struct hash<std::pair<qc::OpType, std::size_t>> {
   std::size_t
-  operator()(pair<qc::OpType, dd::QubitCount> const& key) const noexcept {
+  operator()(pair<qc::OpType, std::size_t> const& key) const noexcept {
     const std::size_t h1 = hash<decltype(key.first)>{}(key.first);
     const std::size_t h2 = hash<decltype(key.second)>{}(key.second);
     return h1 ^ (h2 << 1);
@@ -26,7 +26,7 @@ template <> struct hash<std::pair<qc::OpType, dd::QubitCount>> {
 } // namespace std
 
 namespace ec {
-using GateCostLookupTableKeyType = std::pair<qc::OpType, dd::QubitCount>;
+using GateCostLookupTableKeyType = std::pair<qc::OpType, std::size_t>;
 using GateCostLookupTable =
     std::unordered_map<GateCostLookupTableKeyType, std::size_t>;
 using CostFunction =

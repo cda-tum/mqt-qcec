@@ -10,7 +10,7 @@ DDSimulationChecker::DDSimulationChecker(const qc::QuantumComputation& circ1,
                                          const qc::QuantumComputation& circ2,
                                          Configuration                 config)
     : DDEquivalenceChecker(circ1, circ2, std::move(config)) {
-  initialState = dd->makeZeroState(static_cast<dd::QubitCount>(nqubits));
+  initialState = dd->makeZeroState(nqubits);
   initializeApplicationScheme(configuration.application.simulationScheme);
 }
 
@@ -31,12 +31,11 @@ EquivalenceCriterion DDSimulationChecker::checkEquivalence() {
 }
 
 void DDSimulationChecker::setRandomInitialState(StateGenerator& generator) {
-  const auto nancillary =
-      static_cast<dd::QubitCount>(nqubits - qc1.getNqubitsWithoutAncillae());
-  const auto stateType = configuration.simulation.stateType;
+  const auto nancillary = nqubits - qc1.getNqubitsWithoutAncillae();
+  const auto stateType  = configuration.simulation.stateType;
 
-  initialState = generator.generateRandomState(
-      dd, static_cast<dd::QubitCount>(nqubits), nancillary, stateType);
+  initialState =
+      generator.generateRandomState(dd, nqubits, nancillary, stateType);
 }
 
 } // namespace ec

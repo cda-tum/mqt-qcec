@@ -8,7 +8,6 @@
 #include "checker/dd/applicationscheme/ApplicationScheme.hpp"
 #include "checker/dd/applicationscheme/GateCostApplicationScheme.hpp"
 #include "checker/dd/simulation/StateGenerator.hpp"
-#include "dd/Package.hpp"
 #include "nlohmann/json.hpp"
 
 #include <functional>
@@ -20,7 +19,7 @@ class Configuration {
 public:
   // configuration options for execution
   struct Execution {
-    dd::fp numericalTolerance = dd::ComplexTable::tolerance();
+    dd::fp numericalTolerance = dd::RealNumber::eps;
 
     bool        parallel = true;
     std::size_t nthreads = std::max(2U, std::thread::hardware_concurrency());

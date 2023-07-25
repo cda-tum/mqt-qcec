@@ -9,7 +9,7 @@ namespace ec {
 void DDAlternatingChecker::initialize() {
   DDEquivalenceChecker::initialize();
   // create the full identity matrix
-  functionality = dd->makeIdent(static_cast<dd::QubitCount>(nqubits));
+  functionality = dd->makeIdent(nqubits);
   dd->incRef(functionality);
 
   // Only count ancillaries that are present in but not acted upon in both of
@@ -107,7 +107,7 @@ void DDAlternatingChecker::postprocess() {
 
 EquivalenceCriterion DDAlternatingChecker::checkEquivalence() {
   // create the full identity matrix
-  auto goalMatrix = dd->makeIdent(static_cast<dd::QubitCount>(nqubits));
+  auto goalMatrix = dd->makeIdent(nqubits);
   dd->incRef(goalMatrix);
 
   // account for any garbage
