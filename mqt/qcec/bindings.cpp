@@ -192,7 +192,7 @@ PYBIND11_MODULE(pyqcec, m) {
       // Convenience functions
       // Execution
       .def("set_tolerance", &EquivalenceCheckingManager::setTolerance,
-           "tolerance"_a = dd::ComplexTable::tolerance(),
+           "tolerance"_a = dd::RealNumber::eps,
            "Set the :attr:`numerical tolerance "
            "<.Configuration.Execution.numerical_tolerance>` of the underlying "
            "decision diagram package.")
