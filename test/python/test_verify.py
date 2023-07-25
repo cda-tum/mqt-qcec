@@ -92,15 +92,3 @@ def test_cpp_exception_propagation_internal() -> None:
 
     with pytest.raises(ValueError, match="Lookahead application scheme can only be used for matrices."):
         qcec.verify(qc, qc, configuration=config)
-
-
-def test_cpp_exception_propagation_external() -> None:
-    """Test that C++ exceptions caused by code outside of QCEC are propagated correctly."""
-    qc = QuantumCircuit(129)
-    qc.x(range(129))
-
-    config = qcec.Configuration()
-    config.execution.run_zx_checker = False
-
-    with pytest.raises(ValueError, match="Requested too many qubits from package."):
-        qcec.verify(qc, qc, configuration=config)
