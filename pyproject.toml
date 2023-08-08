@@ -102,6 +102,7 @@ xfail_strict = true
 filterwarnings = [
     "error",
     'ignore:.*`product` is deprecated.*:DeprecationWarning:qiskit:',
+    'ignore:.*qiskit.__qiskit_version__.*:DeprecationWarning:qiskit:',
 ]
 
 [tool.coverage.run]
