@@ -1,6 +1,6 @@
 build_and_store_wheels: &BUILD_AND_STORE_WHEELS
   install_cibuildwheel_script:
-    - python -m pip install cibuildwheel==2.11.2
+    - python -m pip install cibuildwheel~=2.14.0
   run_cibuildwheel_script:
     - cibuildwheel
   wheels_artifacts:
@@ -8,13 +8,13 @@ build_and_store_wheels: &BUILD_AND_STORE_WHEELS
 
 .clone_script: &clone |
   if [ -z "$CIRRUS_PR" ]; then
-    git clone --recursive --branch=$CIRRUS_BRANCH https://x-access-token:${CIRRUS_REPO_CLONE_TOKEN}@github.com/${CIRRUS_REPO_FULL_NAME}.git $CIRRUS_WORKING_DIR
-    git reset --hard $CIRRUS_CHANGE_IN_REPO
+    git clone --branch=$CIRRUS_BRANCH https://x-access-token:${CIRRUS_REPO_CLONE_TOKEN}@github.com/${CIRRUS_REPO_FULL_NAME}.git $CIRRUS_WORKING_DIR
   else
-    git clone --recursive https://x-access-token:${CIRRUS_REPO_CLONE_TOKEN}@github.com/${CIRRUS_REPO_FULL_NAME}.git $CIRRUS_WORKING_DIR
+    git clone https://x-access-token:${CIRRUS_REPO_CLONE_TOKEN}@github.com/${CIRRUS_REPO_FULL_NAME}.git $CIRRUS_WORKING_DIR
     git fetch origin pull/$CIRRUS_PR/head:pull/$CIRRUS_PR
-    git reset --hard $CIRRUS_CHANGE_IN_REPO
   fi
+  git reset --hard $CIRRUS_CHANGE_IN_REPO
+  git submodule update --init --recursive
 
 linux_aarch64_task:
   name: Build Linux aarch64 wheels.
@@ -36,7 +36,7 @@ macos_arm64_task:
   name: Build macOS arm64 wheels.
   clone_script: *clone
   macos_instance:
-    image: ghcr.io/cirruslabs/macos-monterey-xcode
+    image: ghcr.io/cirruslabs/macos-monterey-xcode:latest
 
   env:
     PATH: /opt/homebrew/opt/python@3.10/bin:$PATH
