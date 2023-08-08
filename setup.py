@@ -1,4 +1,5 @@
 """Setup script for the MQT QCEC package."""
+from __future__ import annotations
 
 import os
 import re
@@ -49,6 +50,7 @@ class CMakeBuild(build_ext):
             f"-DPYTHON_EXECUTABLE={sys.executable}",
             f"-DQCEC_VERSION_INFO={version}",
             f"-DCMAKE_BUILD_TYPE={cfg}",
+            "-DBUILD_MQT_CORE_TESTS=OFF",
             "-DBINDINGS=ON",
         ]
         build_args = []
@@ -58,9 +60,9 @@ class CMakeBuild(build_ext):
                 cmake_args += ["-GNinja"]
         else:
             # Single config generators are handled "normally"
-            single_config = any(x in cmake_generator for x in {"NMake", "Ninja"})
+            single_config = any(x in cmake_generator for x in ("NMake", "Ninja"))
             # CMake allows an arch-in-generator style for backward compatibility
-            contains_arch = any(x in cmake_generator for x in {"ARM", "Win64"})
+            contains_arch = any(x in cmake_generator for x in ("ARM", "Win64"))
             # Convert distutils Windows platform specifiers to CMake -A arguments
             plat_to_cmake = {
                 "win32": "Win32",

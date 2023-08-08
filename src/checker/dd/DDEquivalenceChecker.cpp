@@ -130,11 +130,11 @@ EquivalenceCriterion DDEquivalenceChecker<DDType, Config>::run() {
 
   // determine maximum number of nodes used
   if constexpr (std::is_same_v<DDType, qc::MatrixDD>) {
-    maxActiveNodes = dd->mUniqueTable.getMaxActiveNodes();
+    maxActiveNodes = dd->mUniqueTable.getStats().peakActiveEntryCount;
   }
 
   if constexpr (std::is_same_v<DDType, qc::VectorDD>) {
-    maxActiveNodes = dd->vUniqueTable.getMaxActiveNodes();
+    maxActiveNodes = dd->vUniqueTable.getStats().peakActiveEntryCount;
   }
 
   const auto end = std::chrono::steady_clock::now();

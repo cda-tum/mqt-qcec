@@ -1,5 +1,5 @@
 # add MQT::qfr library
-add_subdirectory("${PROJECT_SOURCE_DIR}/extern/qfr" "extern/qfr"
+add_subdirectory("${PROJECT_SOURCE_DIR}/extern/mqt-core" "extern/mqt-core"
                  EXCLUDE_FROM_ALL)
 
 add_library(
@@ -24,7 +24,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC ${PROJECT_SOURCE_DIR}/include
                                                   ${PROJECT_BINARY_DIR}/include)
 
 # link to the MQT::qfr libraries
-target_link_libraries(${PROJECT_NAME} PUBLIC MQT::qfr_dd MQT::qfr_zx)
+target_link_libraries(${PROJECT_NAME} PUBLIC MQT::CoreDD MQT::CoreZX)
 
 # add MQT alias
 add_library(MQT::${PROJECT_NAME} ALIAS ${PROJECT_NAME})

@@ -25,8 +25,8 @@ public:
   template <class DDPackage = dd::Package<>>
   qc::VectorDD
   generateRandomState(std::unique_ptr<DDPackage>& dd,
-                      const dd::QubitCount        totalQubits,
-                      const dd::QubitCount        ancillaryQubits = 0U,
+                      const std::size_t           totalQubits,
+                      const std::size_t           ancillaryQubits = 0U,
                       const StateType type = StateType::ComputationalBasis) {
     switch (type) {
     case ec::StateType::Random1QBasis:
@@ -41,8 +41,8 @@ public:
 
   template <class DDPackage = dd::Package<>>
   qc::VectorDD generateRandomComputationalBasisState(
-      std::unique_ptr<DDPackage>& dd, const dd::QubitCount totalQubits,
-      const dd::QubitCount ancillaryQubits = 0U) {
+      std::unique_ptr<DDPackage>& dd, const std::size_t totalQubits,
+      const std::size_t ancillaryQubits = 0U) {
     // determine how many qubits truly are random
     const std::size_t randomQubits = totalQubits - ancillaryQubits;
     std::vector<bool> stimulusBits(totalQubits, false);
@@ -93,15 +93,15 @@ public:
   template <class DDPackage = dd::Package<>>
   qc::VectorDD
   generateRandom1QBasisState(std::unique_ptr<DDPackage>& dd,
-                             const dd::QubitCount        totalQubits,
-                             const dd::QubitCount        ancillaryQubits = 0U) {
+                             const std::size_t           totalQubits,
+                             const std::size_t           ancillaryQubits = 0U) {
     // determine how many qubits truly are random
-    const dd::QubitCount randomQubits = totalQubits - ancillaryQubits;
+    const std::size_t randomQubits = totalQubits - ancillaryQubits;
 
     // choose a random basis state for each qubit
     auto randomBasisState =
         std::vector<dd::BasisStates>(totalQubits, dd::BasisStates::zero);
-    for (dd::QubitCount i = 0U; i < randomQubits; ++i) {
+    for (std::size_t i = 0U; i < randomQubits; ++i) {
       switch (random1QBasisDistribution(mt)) {
       case static_cast<std::size_t>(dd::BasisStates::zero):
         randomBasisState[i] = dd::BasisStates::zero;
@@ -133,10 +133,10 @@ public:
   template <class DDPackage = dd::Package<>>
   qc::VectorDD
   generateRandomStabilizerState(std::unique_ptr<DDPackage>& dd,
-                                const dd::QubitCount        totalQubits,
-                                const dd::QubitCount ancillaryQubits = 0U) {
+                                const std::size_t           totalQubits,
+                                const std::size_t ancillaryQubits = 0U) {
     // determine how many qubits truly are random
-    const dd::QubitCount randomQubits = totalQubits - ancillaryQubits;
+    const std::size_t randomQubits = totalQubits - ancillaryQubits;
 
     // generate a random Clifford circuit with appropriate depth
     auto rcs = qc::RandomCliffordCircuit(
@@ -152,7 +152,7 @@ public:
 
     // add |0> edges for all the ancillary qubits
     auto initial = stabilizer;
-    for (dd::QubitCount p = randomQubits; p < totalQubits; ++p) {
+    for (std::size_t p = randomQubits; p < totalQubits; ++p) {
       initial = dd->makeDDNode(static_cast<dd::Qubit>(p),
                                std::array{initial, qc::VectorDD::zero});
     }

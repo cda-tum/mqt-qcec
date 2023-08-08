@@ -1,6 +1,6 @@
 Optimizations
 =============
 
-.. autoclass:: mqt.qcec::Configuration.Optimizations
-    :members:
-    :undoc-members:
+    .. autoclass:: mqt.qcec::Configuration.Optimizations
+        :members:
+        :undoc-members:

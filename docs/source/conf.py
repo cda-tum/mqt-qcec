@@ -1,4 +1,5 @@
 """Sphinx configuration file."""
+from __future__ import annotations
 
 import sys
 
@@ -7,11 +8,15 @@ if sys.version_info < (3, 10, 0):
 else:
     from importlib import metadata
 
+from typing import TYPE_CHECKING
+
 import pybtex.plugin
-from pybtex.database import Entry
-from pybtex.richtext import HRef
 from pybtex.style.formatting.unsrt import Style as UnsrtStyle
 from pybtex.style.template import field, href
+
+if TYPE_CHECKING:
+    from pybtex.database import Entry
+    from pybtex.richtext import HRef
 
 # -- Project information -----------------------------------------------------
 project = "QCEC"
@@ -37,7 +42,6 @@ extensions = [
     "hoverxref.extension",
     "nbsphinx",
     "sphinxext.opengraph",
-    "sphinx_rtd_dark_mode",
     "sphinx_autodoc_typehints",
 ]
 
@@ -94,8 +98,14 @@ copybutton_line_continuation_character = "\\"
 autosummary_generate = True
 
 # -- Options for HTML output -------------------------------------------------
-html_theme = "sphinx_rtd_theme"
+html_theme = "furo"
 html_baseurl = "https://qcec.readthedocs.io/en/latest/"
-html_logo = "_static/mqt_light.png"
 html_static_path = ["_static"]
-html_css_files = ["custom.css"]
+html_theme_options = {
+    "light_logo": "mqt_dark.png",
+    "dark_logo": "mqt_light.png",
+    "source_repository": "https://github.com/cda-tum/qcec/",
+    "source_branch": "main",
+    "source_directory": "docs/source",
+    "navigation_with_keys": True,
+}

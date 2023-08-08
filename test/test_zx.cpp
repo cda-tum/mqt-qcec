@@ -6,7 +6,6 @@
 #include "Definitions.hpp"
 #include "EquivalenceCheckingManager.hpp"
 #include "QuantumComputation.hpp"
-#include "dd/Control.hpp"
 
 #include "gtest/gtest.h"
 #include <functional>
@@ -108,7 +107,7 @@ TEST_F(ZXTest, CloseButNotEqual) {
 
   qcAlternative = qc::QuantumComputation(1);
   qcAlternative.x(0);
-  qcAlternative.phase(0, dd::PI / 1024.);
+  qcAlternative.phase(0, qc::PI / 1024.);
 
   config.functionality.traceThreshold = 1e-2;
 
@@ -125,7 +124,7 @@ TEST_F(ZXTest, NotEqual) {
 
   qcAlternative = qc::QuantumComputation(1);
   qcAlternative.x(0);
-  qcAlternative.phase(0, dd::PI / 1024.);
+  qcAlternative.phase(0, qc::PI / 1024.);
 
   config.functionality.traceThreshold = 1e-9;
 
