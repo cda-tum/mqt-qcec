@@ -6,13 +6,13 @@ Ready to contribute to the project? Here is how to set up a local development en
 Initial Setup
 #############
 
-1. Fork the `cda-tum/qcec <https://github.com/cda-tum/qcec>`_ repository on GitHub (see https://docs.github.com/en/get-started/quickstart/fork-a-repo).
+1. Fork the `cda-tum/qcec <https://github.com/cda-tum/mqt-qcec>`_ repository on GitHub (see https://docs.github.com/en/get-started/quickstart/fork-a-repo).
 
 2. Clone your fork locally
 
     .. code-block:: console
 
-        $ git clone git@github.com:your_name_here/qcec --recursive
+        $ git clone git@github.com:your_name_here/mqt-qcec --recursive
 
     .. warning::
 
@@ -23,7 +23,7 @@ Initial Setup
 
     .. code-block:: console
 
-        $ cd qcec
+        $ cd mqt-qcec
 
 4. Create a branch for local development
 
