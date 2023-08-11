@@ -1,7 +1,7 @@
 Installation
 ============
 
-QCEC is mainly developed as a C++ library that builds upon `MQT Core <https://github.com/cda-tum/mqt-core>`_, which forms the backbone of the MQT.
+QCEC is mainly developed as a C++ library that builds upon `MQT Core <https://github.com/cda-tum/mqt-core>`_, which forms the backbone of the `MQT <https://mqt.readthedocs.io>`_.
 In order to make the tool as accessible as possible, it comes with an easy-to-use Python interface.
 
 We encourage installing QCEC via pip (preferably in a `virtual environment <https://docs.python.org/3/library/venv.html>`_):

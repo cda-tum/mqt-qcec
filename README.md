@@ -16,7 +16,7 @@
 
 # MQT QCEC - A tool for Quantum Circuit Equivalence Checking
 
-A tool for quantum circuit equivalence checking developed as part of the _Munich Quantum Toolkit_ (_MQT_)[^1] by the [Chair for Design Automation](https://www.cda.cit.tum.de/) at the [Technical University of Munich](https://www.tum.de/).
+A tool for quantum circuit equivalence checking developed as part of the [_Munich Quantum Toolkit_](https://mqt.readthedocs.io) (_MQT_)[^1] by the [Chair for Design Automation](https://www.cda.cit.tum.de/) at the [Technical University of Munich](https://www.tum.de/).
 It builds upon [MQT Core](https://github.com/cda-tum/mqt-core), which forms the backbone of the MQT.
 
 <p align="center">
