@@ -64,10 +64,10 @@ docs = [
 dev = ["mqt.qcec[coverage, docs]"]
 
 [project.urls]
-Homepage = "https://github.com/cda-tum/qcec"
-Documentation = "https://qcec.readthedocs.io"
-"Bug Tracker" = "https://github.com/cda-tum/qcec/issues"
-Discussions = "https://github.com/cda-tum/qcec/discussions"
+Homepage = "https://github.com/cda-tum/mqt-qcec"
+Documentation = "https://mqt.readthedocs.io/projects/qcec"
+"Bug Tracker" = "https://github.com/cda-tum/mqt-qcec/issues"
+Discussions = "https://github.com/cda-tum/mqt-qcec/discussions"
 Research = "https://www.cda.cit.tum.de/research/quantum_verification/"
 
 [tool.setuptools.packages.find]
