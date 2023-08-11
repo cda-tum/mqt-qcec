@@ -80,6 +80,7 @@ skip = "*-musllinux_*"
 archs = "auto64"
 test-extras = ["test"]
 test-command = "python -c \"from mqt import qcec\""
+test-skip = "cp312-*"  # Qiskit Terra does not support Python 3.12 yet
 environment = { DEPLOY = "ON" }
 build-frontend = "build"
 build-verbosity = 3
