@@ -55,7 +55,7 @@ publish_task:
   env:
     TWINE_REPOSITORY: pypi
     TWINE_USERNAME: __token__
-    TWINE_PASSWORD: ENCRYPTED[963630b0d5f7e9ad0aba1e51f63d69ecc36ea550ccce3a382cee179da6b286ccc644aebd482f97a919f1f6a1810a0d25]
+    TWINE_PASSWORD: ENCRYPTED[853587a6e1033bef6a80fbf7cf11762676107052030566cf1eca86bfaae3452433a1f05c7e6f7690d027b52d22a217c2]
   install_script: pip install twine
   publish_script:
     - curl -L https://api.cirrus-ci.com/v1/artifact/build/$CIRRUS_BUILD_ID/wheels.zip -o wheels.zip
