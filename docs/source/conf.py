@@ -17,7 +17,7 @@ try:
     from mqt.qcec import __version__ as version
 except ModuleNotFoundError:
     try:
-        version = metadata.version("mqt.core")
+        version = metadata.version("mqt.qcec")
     except ModuleNotFoundError:
         msg = (
             "Package should be installed to produce documentation! "
