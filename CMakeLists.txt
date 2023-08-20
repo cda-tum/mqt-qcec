@@ -1,9 +1,5 @@
 # set required cmake version
-cmake_minimum_required(VERSION 3.19)
-
-# This avoids googletest complaining that this (IPO) policy is not set
-cmake_policy(SET CMP0069 NEW)
-set(CMAKE_POLICY_DEFAULT_CMP0069 NEW)
+cmake_minimum_required(VERSION 3.19...3.27)
 
 project(
   qcec
@@ -23,6 +19,14 @@ endmacro()
 
 check_submodule_present(mqt-core)
 
+option(BUILD_MQT_QCEC_BINDINGS "Build the MQT QCEC Python bindings" OFF)
+if(BUILD_MQT_QCEC_BINDINGS)
+	# ensure that the BINDINGS option is set
+	set(BINDINGS
+	    ON
+	    CACHE BOOL "Enable settings related to Python bindings" FORCE)
+endif()
+
 # add main library code
 add_subdirectory(src)
 
@@ -32,10 +36,4 @@ if(BUILD_QCEC_TESTS)
   enable_testing()
   include(GoogleTest)
   add_subdirectory(test)
-endif()
-
-# add Python binding code
-option(BINDINGS "Configure for building Python bindings")
-if(BINDINGS)
-  add_subdirectory(mqt/qcec)
 endif()

@@ -5,16 +5,18 @@ See README.md or go to https://github.com/cda-tum/qcec for more information.
 """
 from __future__ import annotations
 
-from mqt.qcec.compilation_flow_profiles import AncillaMode, generate_profile
-from mqt.qcec.pyqcec import (
+
+from .compilation_flow_profiles import AncillaMode, generate_profile
+from .pyqcec import (
     ApplicationScheme,
     Configuration,
     EquivalenceCheckingManager,
     EquivalenceCriterion,
     StateType,
 )
-from mqt.qcec.verify import verify
-from mqt.qcec.verify_compilation_flow import verify_compilation
+from .verify import verify
+from .verify_compilation_flow import verify_compilation
+from ._version import version as __version__
 
 __all__ = [
     "AncillaMode",
@@ -26,4 +28,5 @@ __all__ = [
     "StateType",
     "verify",
     "verify_compilation",
+    "__version__",
 ]
