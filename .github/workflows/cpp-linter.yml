@@ -20,7 +20,7 @@ jobs:
         with:
           submodules: recursive
       - name: Generate compilation database
-        run: CC=clang-14 CXX=clang++-14 cmake -S . -B build -DBINDINGS=ON -DBUILD_QCEC_TESTS=ON
+        run: CC=clang-14 CXX=clang++-14 cmake -S . -B build -DBUILD_MQT_QCEC_BINDINGS=ON -DBUILD_QCEC_TESTS=ON
       - name: Run cpp-linter
         id: linter
         env:

@@ -21,10 +21,10 @@ check_submodule_present(mqt-core)
 
 option(BUILD_MQT_QCEC_BINDINGS "Build the MQT QCEC Python bindings" OFF)
 if(BUILD_MQT_QCEC_BINDINGS)
-	# ensure that the BINDINGS option is set
-	set(BINDINGS
-	    ON
-	    CACHE BOOL "Enable settings related to Python bindings" FORCE)
+  # ensure that the BINDINGS option is set
+  set(BINDINGS
+      ON
+      CACHE BOOL "Enable settings related to Python bindings" FORCE)
 endif()
 
 # add main library code

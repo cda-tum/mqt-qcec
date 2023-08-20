@@ -30,5 +30,5 @@ target_link_libraries(${PROJECT_NAME} PUBLIC MQT::CoreDD MQT::CoreZX)
 add_library(MQT::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 
 if(BUILD_MQT_QCEC_BINDINGS)
-	add_subdirectory(python)
+  add_subdirectory(python)
 endif()
