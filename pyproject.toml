@@ -121,6 +121,7 @@ git-only = [
     "docs/*",
     "extern/*",
     "test/*",
+    ".idea/*",
 ]
 
 
