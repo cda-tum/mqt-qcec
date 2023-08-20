@@ -70,7 +70,7 @@ def docs(session: nox.Session) -> None:
     Simply execute `nox -rs docs` to locally build and serve the docs.
     """
     session.install("sphinx-autobuild")
-    session.install("nanobind", "scikit-build-core[pyproject]", "setuptools_scm")
+    session.install("scikit-build-core[pyproject]", "setuptools_scm")
     session.install("--no-build-isolation", "-ve.[docs]")
 
     session.run("sphinx-autobuild", "docs/source", "docs/_build/html", "--open-browser")
