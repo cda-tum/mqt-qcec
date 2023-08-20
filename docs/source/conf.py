@@ -1,18 +1,36 @@
 """Sphinx configuration file."""
 from __future__ import annotations
 
-import sys
-
-if sys.version_info < (3, 10, 0):
-    import importlib_metadata as metadata
-else:
-    from importlib import metadata
-
+import warnings
+from importlib import metadata
+from pathlib import Path
 from typing import TYPE_CHECKING
 
 import pybtex.plugin
 from pybtex.style.formatting.unsrt import Style as UnsrtStyle
 from pybtex.style.template import field, href
+
+ROOT = Path(__file__).parent.parent.resolve()
+
+
+try:
+    from mqt.qcec import __version__ as version
+except ModuleNotFoundError:
+    try:
+        version = metadata.version("mqt.core")
+    except ModuleNotFoundError:
+        msg = (
+            "Package should be installed to produce documentation! "
+            "Assuming a modern git archive was used for version discovery."
+        )
+        warnings.warn(msg, stacklevel=1)
+
+        from setuptools_scm import get_version
+
+        version = get_version(root=str(ROOT), fallback_root=ROOT)
+
+# Filter git details from version
+release = version.split("+")[0]
 
 if TYPE_CHECKING:
     from pybtex.database import Entry
@@ -21,9 +39,6 @@ if TYPE_CHECKING:
 # -- Project information -----------------------------------------------------
 project = "QCEC"
 author = "Lukas Burgholzer"
-
-release = metadata.version("mqt.qcec")
-version = ".".join(release.split(".")[:3])
 language = "en"
 project_copyright = "Chair for Design Automation, Technical University of Munich"
 
@@ -44,6 +59,24 @@ extensions = [
     "sphinxext.opengraph",
     "sphinx_autodoc_typehints",
 ]
+
+pygments_style = "colorful"
+
+add_module_names = False
+
+modindex_common_prefix = ["mqt.qcec."]
+
+intersphinx_mapping = {
+    "python": ("https://docs.python.org/3", None),
+    "qiskit": ("https://qiskit.org/documentation/", None),
+    "mqt": ("https://mqt.readthedocs.io/en/latest/", None),
+    "core": ("https://mqt.readthedocs.io/projects/core/en/latest/", None),
+    "ddsim": ("https://mqt.readthedocs.io/projects/ddsim/en/latest/", None),
+    "qmap": ("https://mqt.readthedocs.io/projects/qmap/en/latest/", None),
+    "qecc": ("https://mqt.readthedocs.io/projects/qecc/en/latest/", None),
+    "syrec": ("https://mqt.readthedocs.io/projects/syrec/en/latest/", None),
+}
+intersphinx_disabled_reftypes = ["*"]
 
 nbsphinx_execute = "auto"
 highlight_language = "python3"
