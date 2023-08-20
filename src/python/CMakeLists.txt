@@ -23,6 +23,12 @@ if(NOT SKBUILD)
   after editing C++ files.")
 endif()
 
+# Try to import all Python components potentially needed by pybind11
+find_package(
+  Python 3.8 REQUIRED
+  COMPONENTS Interpreter Development.Module
+  OPTIONAL_COMPONENTS Development.SABIModule)
+
 # We are now ready to compile the actual extension module
 pybind11_add_module(py${PROJECT_NAME} bindings.cpp)
 target_link_libraries(py${PROJECT_NAME} PRIVATE ${PROJECT_NAME} MQT::CorePython)
