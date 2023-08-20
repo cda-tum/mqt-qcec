@@ -40,6 +40,9 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Setup nox
         run: pipx install nox
+      - if: runner.os == 'Windows'
+        name: Set Clang Toolkit for Windows
+        run: echo "CMAKE_ARGS=-T ClangCL" >> "${GITHUB_ENV}"
       - name: Test on 🐍 ${{ matrix.python-version }}
         run: nox -s tests-${{ matrix.python-version }}
 
