@@ -25,7 +25,7 @@ endif()
 
 # Try to import all Python components potentially needed by pybind11
 find_package(
-  Python 3.8 REQUIRED
+  Python3 3.8 REQUIRED
   COMPONENTS Interpreter Development.Module
   OPTIONAL_COMPONENTS Development.SABIModule)
 
