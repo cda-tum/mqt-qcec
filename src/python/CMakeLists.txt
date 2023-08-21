@@ -15,7 +15,7 @@ if(NOT SKBUILD)
   in your environment once and use the following command that avoids
   a costly creation of a new virtual environment at every compilation:
   =====================================================================
-   $ pip install scikit-build-core[pyproject] setuptools_scm
+   $ pip install 'scikit-build-core[pyproject]' setuptools_scm pybind11
    $ pip install --no-build-isolation -ve .
   =====================================================================
   You may optionally add -Ceditable.rebuild=true to auto-rebuild when
@@ -23,11 +23,17 @@ if(NOT SKBUILD)
   after editing C++ files.")
 endif()
 
-# Try to import all Python components potentially needed by pybind11
-find_package(
-  Python3 3.8 REQUIRED
-  COMPONENTS Interpreter Development.Module
-  OPTIONAL_COMPONENTS Development.SABIModule)
+if(NOT SKBUILD)
+  # Manually detect the installed pybind11 package and import it into CMake.
+  execute_process(
+    COMMAND "${Python_EXECUTABLE}" -m pybind11 --cmakedir
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+    OUTPUT_VARIABLE pybind11_DIR)
+  list(APPEND CMAKE_PREFIX_PATH "${pybind11_DIR}")
+endif()
+
+# Import pybind11 through CMake's find_package mechanism
+find_package(pybind11 CONFIG REQUIRED)
 
 # We are now ready to compile the actual extension module
 pybind11_add_module(py${PROJECT_NAME} bindings.cpp)

@@ -31,7 +31,7 @@ def pylint(session: nox.Session) -> None:
 
     Simply execute `nox -rs pylint` to run PyLint.
     """
-    session.install("scikit-build-core[pyproject]", "setuptools_scm")
+    session.install("scikit-build-core[pyproject]", "setuptools_scm", "pybind11")
     session.install("--no-build-isolation", "-ve.[dev]", "pylint")
     session.run("pylint", "mqt.qcec", *session.posargs)
 
@@ -53,7 +53,7 @@ def tests(session: nox.Session) -> None:
     if "--cov" in posargs:
         posargs.append("--cov-config=pyproject.toml")
 
-    session.install("scikit-build-core[pyproject]", "setuptools_scm", env=env)
+    session.install("scikit-build-core[pyproject]", "setuptools_scm", "pybind11", env=env)
     session.install("--no-build-isolation", install_arg, env=env)
     session.run("pip", "show", "qiskit-terra")
     session.run("pytest", *posargs, env=env)
@@ -63,7 +63,7 @@ def tests(session: nox.Session) -> None:
 def min_qiskit_version(session: nox.Session) -> None:
     """Installs the minimum supported version of Qiskit, runs the test suite and collects the coverage."""
     session.install("qiskit-terra~=0.20.0")
-    session.install("scikit-build-core[pyproject]", "setuptools_scm")
+    session.install("scikit-build-core[pyproject]", "setuptools_scm", "pybind11")
     session.install("--no-build-isolation", "-ve.[coverage]")
     session.run("pip", "show", "qiskit-terra")
     session.run("pytest", "--cov", *session.posargs)
@@ -76,7 +76,7 @@ def docs(session: nox.Session) -> None:
     Simply execute `nox -rs docs` to locally build and serve the docs.
     """
     session.install("sphinx-autobuild")
-    session.install("scikit-build-core[pyproject]", "setuptools_scm")
+    session.install("scikit-build-core[pyproject]", "setuptools_scm", "pybind11")
     session.install("--no-build-isolation", "-ve.[docs]")
 
     session.run("sphinx-autobuild", "docs/source", "docs/_build/html", "--open-browser")
