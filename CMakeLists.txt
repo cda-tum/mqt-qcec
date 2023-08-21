@@ -1,5 +1,5 @@
 # set required cmake version
-cmake_minimum_required(VERSION 3.19...3.26)
+cmake_minimum_required(VERSION 3.19...3.27)
 
 project(
   qcec
