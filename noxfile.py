@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+import sys
 
 import nox
 
@@ -44,11 +45,16 @@ def tests(session: nox.Session) -> None:
     posargs = list(session.posargs)
     env = {"PIP_DISABLE_PIP_VERSION_CHECK": "1"}
     install_arg = "-ve.[coverage]" if "--cov" in posargs else "-ve.[test]"
+
+    # add -T ClangCl on Windows to avoid MSVC running out of heap space
+    if sys.platform == "win32":
+        env["CMAKE_ARGS"] = "-T ClangCl"
+
     if "--cov" in posargs:
         posargs.append("--cov-config=pyproject.toml")
 
-    session.install("scikit-build-core[pyproject]", "setuptools_scm")
-    session.install("--no-build-isolation", install_arg)
+    session.install("scikit-build-core[pyproject]", "setuptools_scm", env=env)
+    session.install("--no-build-isolation", install_arg, env=env)
     session.run("pip", "show", "qiskit-terra")
     session.run("pytest", *posargs, env=env)
 
