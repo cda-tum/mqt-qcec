@@ -17,7 +17,7 @@ This constructs the manager using all the default options. The circuits to be ve
 
 * Python objects:
 
-    * `QuantumCircuit` from IBM's `Qiskit <https://github.com/Qiskit/qiskit>`_ **(preferred)**
+    * :class:`qiskit.circuit.QuantumCircuit` from IBM's `Qiskit <https://github.com/Qiskit/qiskit>`_ **(preferred)**
     * `QasmQobjExperiment` from IBM's `Qiskit <https://github.com/Qiskit/qiskit>`_
 
 * Files
