@@ -44,12 +44,12 @@ project_copyright = "Chair for Design Automation, Technical University of Munich
 
 # -- General configuration ---------------------------------------------------
 extensions = [
+    "sphinx.ext.napoleon",
     "sphinx.ext.autodoc",
-    "sphinx.ext.autosectionlabel",
-    "sphinx.ext.intersphinx",
     "sphinx.ext.autosummary",
     "sphinx.ext.mathjax",
-    "sphinx.ext.napoleon",
+    "sphinx.ext.intersphinx",
+    "sphinx.ext.autosectionlabel",
     "sphinx.ext.viewcode",
     "sphinx.ext.githubpages",
     "sphinxcontrib.bibtex",
@@ -68,6 +68,7 @@ modindex_common_prefix = ["mqt.qcec."]
 
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3", None),
+    "typing_extensions": ("https://typing-extensions.readthedocs.io/en/latest/", None),
     "qiskit": ("https://qiskit.org/documentation/", None),
     "mqt": ("https://mqt.readthedocs.io/en/latest/", None),
     "core": ("https://mqt.readthedocs.io/projects/core/en/latest/", None),
@@ -103,11 +104,6 @@ hoverxref_role_types = {
 }
 exclude_patterns = ["_build", "build", "**.ipynb_checkpoints", "Thumbs.db", ".DS_Store", ".env"]
 
-typehints_use_signature = True
-typehints_use_signature_return = True
-typehints_use_rtype = False
-napoleon_use_rtype = False
-
 
 class CDAStyle(UnsrtStyle):
     """Custom style for including PDF links."""
@@ -128,6 +124,11 @@ copybutton_prompt_is_regexp = True
 copybutton_line_continuation_character = "\\"
 
 autosummary_generate = True
+
+typehints_use_rtype = False
+napoleon_use_rtype = False
+napoleon_google_docstring = True
+napoleon_numpy_docstring = False
 
 # -- Options for HTML output -------------------------------------------------
 html_theme = "furo"
