@@ -76,7 +76,6 @@ intersphinx_mapping = {
     "qecc": ("https://mqt.readthedocs.io/projects/qecc/en/latest/", None),
     "syrec": ("https://mqt.readthedocs.io/projects/syrec/en/latest/", None),
 }
-intersphinx_disabled_reftypes = ["*"]
 
 nbsphinx_execute = "auto"
 highlight_language = "python3"
