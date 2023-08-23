@@ -132,12 +132,12 @@ napoleon_numpy_docstring = False
 
 # -- Options for HTML output -------------------------------------------------
 html_theme = "furo"
-html_baseurl = "https://qcec.readthedocs.io/en/latest/"
+html_baseurl = "https://mqt.readthedocs.io/project/qcec/en/latest/"
 html_static_path = ["_static"]
 html_theme_options = {
     "light_logo": "mqt_dark.png",
     "dark_logo": "mqt_light.png",
-    "source_repository": "https://github.com/cda-tum/qcec/",
+    "source_repository": "https://github.com/cda-tum/mqt-qcec/",
     "source_branch": "main",
     "source_directory": "docs/source",
     "navigation_with_keys": True,
