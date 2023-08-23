@@ -4,9 +4,12 @@ from __future__ import annotations
 
 import argparse
 import os
-import sys
+from typing import TYPE_CHECKING
 
 import nox
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
 
 nox.options.sessions = ["lint", "pylint", "tests"]
 
@@ -37,37 +40,42 @@ def pylint(session: nox.Session) -> None:
     session.run("pylint", "mqt.qcec", *session.posargs)
 
 
-@nox.session(reuse_venv=True, python=PYTHON_ALL_VERSIONS)
-def tests(session: nox.Session) -> None:
-    """Run the test suite.
-
-    Simply execute `nox -rs tests` to run all tests.
-    """
+def _run_tests(
+    session: nox.Session,
+    *,
+    install_args: Sequence[str] = (),
+    run_args: Sequence[str] = (),
+    extras: Sequence[str] = (),
+) -> None:
     posargs = list(session.posargs)
     env = {"PIP_DISABLE_PIP_VERSION_CHECK": "1"}
-    install_arg = "-ve.[coverage]" if "--cov" in posargs else "-ve.[test]"
 
-    # add -T ClangCl on Windows to avoid MSVC running out of heap space
-    if sys.platform == "win32":
-        env["CMAKE_ARGS"] = "-T ClangCl"
-
+    _extras = ["test", *extras]
     if "--cov" in posargs:
+        _extras.append("coverage")
         posargs.append("--cov-config=pyproject.toml")
 
-    session.install("scikit-build-core[pyproject]", "setuptools_scm", "pybind11", env=env)
-    session.install("--no-build-isolation", install_arg, env=env)
-    session.run("pip", "show", "qiskit-terra")
-    session.run("pytest", *posargs, env=env)
+    session.install("scikit-build-core[pyproject]", "setuptools_scm", "pybind11", *install_args, env=env)
+    install_arg = f"-ve.[{','.join(_extras)}]"
+    session.install("--no-build-isolation", install_arg, *install_args, env=env)
+    session.run("pytest", *run_args, *posargs, env=env)
 
 
-@nox.session(reuse_venv=True)
-def min_qiskit_version(session: nox.Session) -> None:
-    """Installs the minimum supported version of Qiskit, runs the test suite and collects the coverage."""
-    session.install("qiskit-terra~=0.20.0")
-    session.install("scikit-build-core[pyproject]", "setuptools_scm", "pybind11")
-    session.install("--no-build-isolation", "-ve.[coverage]")
-    session.run("pip", "show", "qiskit-terra")
-    session.run("pytest", "--cov", *session.posargs)
+@nox.session(reuse_venv=True, python=PYTHON_ALL_VERSIONS)
+def tests(session: nox.Session) -> None:
+    """Run the test suite."""
+    _run_tests(session)
+
+
+@nox.session()
+def minimums(session: nox.Session) -> None:
+    """Test the minimum versions of dependencies."""
+    _run_tests(
+        session,
+        install_args=["--constraint=test/python/constraints.txt"],
+        run_args=["-Wdefault"],
+    )
+    session.run("pip", "list")
 
 
 @nox.session(reuse_venv=True)
