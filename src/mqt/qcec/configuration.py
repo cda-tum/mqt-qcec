@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, TypedDict
 
-if TYPE_CHECKING:  # pragma: no cover
+if TYPE_CHECKING:
     from . import ApplicationScheme, Configuration, StateType
     from .types import ApplicationSchemeName, StateTypeName
 

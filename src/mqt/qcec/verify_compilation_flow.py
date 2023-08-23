@@ -6,15 +6,15 @@ import sys
 import warnings
 from typing import TYPE_CHECKING
 
-if TYPE_CHECKING:  # pragma: no cover
+if TYPE_CHECKING:
     from typing_extensions import Unpack
 
     from .configuration import ConfigurationOptions
 
-if sys.version_info < (3, 10, 0):
+if TYPE_CHECKING or sys.version_info < (3, 10, 0):
     import importlib_resources as resources
 else:
-    from importlib import resources  # type: ignore[no-redef]
+    from importlib import resources
 
 from qiskit import QuantumCircuit
 
