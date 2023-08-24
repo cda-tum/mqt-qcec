@@ -138,6 +138,7 @@ filterwarnings = [
     "error",
     'ignore:.*`product` is deprecated.*:DeprecationWarning:qiskit:',
     'ignore:.*qiskit.__qiskit_version__.*:DeprecationWarning:qiskit:',
+    'ignore:.*encountered in det.*:RuntimeWarning:numpy.linalg:',
 ]
 
 [tool.coverage]
