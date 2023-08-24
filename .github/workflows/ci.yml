@@ -24,7 +24,7 @@ jobs:
     secrets:
       token: ${{ secrets.CODECOV_TOKEN }}
     with:
-      cmake-args: -DBUILD_QCEC_TESTS=ON
+      cmake-args: ""
       cmake-args-ubuntu: -G Ninja
       cmake-args-macos: -G Ninja
       cmake-args-windows: -T ClangCL
@@ -34,8 +34,6 @@ jobs:
     needs: change-detection
     if: fromJSON(needs.change-detection.outputs.run-cpp-linter)
     uses: cda-tum/mqt-core/.github/workflows/reusable-cpp-linter.yml@make-reusable-workflows-more-generic
-    with:
-      cmake-args: -DBUILD_QCEC_TESTS=ON
 
   python-tests:
     name: 🐍 Test
@@ -50,9 +48,6 @@ jobs:
     needs: change-detection
     if: fromJSON(needs.change-detection.outputs.run-code-ql)
     uses: cda-tum/mqt-core/.github/workflows/reusable-code-ql.yml@make-reusable-workflows-more-generic
-    with:
-      cmake-args: -DBUILD_QCEC_TESTS=ON
-      build-time-dependencies: "scikit-build-core[pyproject] setuptools-scm pybind11"
 
   required-checks-pass: # This job does nothing and is only used for branch protection
     name: 🚦 Check

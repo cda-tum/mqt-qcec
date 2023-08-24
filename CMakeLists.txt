@@ -46,8 +46,8 @@ endif()
 add_subdirectory(src)
 
 # add test code
-option(BUILD_QCEC_TESTS "Also build tests for QMAP project")
-if(BUILD_QCEC_TESTS)
+option(BUILD_MQT_QCEC_TESTS "Also build tests for the MQT QCEC project" ON)
+if(BUILD_MQT_QCEC_TESTS)
   enable_testing()
   include(GoogleTest)
   add_subdirectory(test)

@@ -109,6 +109,7 @@ sdist.exclude = [
 ]
 
 [tool.scikit-build.cmake.define]
+BUILD_MQT_QCEC_TESTS = "OFF"
 BUILD_MQT_QCEC_BINDINGS = "ON"
 ENABLE_IPO = "ON"
 
