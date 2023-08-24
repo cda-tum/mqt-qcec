@@ -142,10 +142,10 @@ filterwarnings = [
 
 [tool.coverage]
 run.source = ["mqt.qcec"]
-report.exclude_lines = [
-    'pragma: no cover',
+run.omit = ["src/mqt/qcec/types.py"]
+report.exclude_also = [
     '\.\.\.',
-    'if typing.TYPE_CHECKING:',
+    'if TYPE_CHECKING',
 ]
 
 [tool.black]
