@@ -10,7 +10,7 @@ authors = [
     { name = "Lukas Burgholzer", email = "lukas.burgholzer@tum.de"},
     { name = "Tom Peham", email = "tom.peham@tum.de" }
 ]
-keywords = ["MQT", "quantum computing", "design automation", "equivalence checking", "verification"]
+keywords = ["MQT", "quantum-computing", "design-automation", "equivalence-checking", "verification"]
 license = { file = "LICENSE.md" }
 
 classifiers = [
