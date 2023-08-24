@@ -146,7 +146,7 @@ run.source = ["mqt.qcec"]
 run.omit = ["src/mqt/qcec/types.py"]
 report.exclude_also = [
     '\.\.\.',
-    'if TYPE_CHECKING',
+    'if TYPE_CHECKING:',
 ]
 
 [tool.black]
