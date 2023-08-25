@@ -121,8 +121,8 @@ qc::Permutation concat(const qc::Permutation& p1,
 qc::Permutation complete(const qc::Permutation& p, const std::size_t n) {
   qc::Permutation pComp = p;
 
-  std::vector<bool> mappedTo(n, false);
-  std::vector<bool> mappedFrom(n, false);
+  std::unordered_map<std::size_t, bool> mappedTo;
+  std::unordered_map<std::size_t, bool> mappedFrom;
   for (const auto [k, v] : p) {
     mappedFrom[k] = true;
     mappedTo[v]   = true;
