@@ -68,10 +68,8 @@ EquivalenceCriterion ZXEquivalenceChecker::run() {
       const auto& out = edge.to;
       const auto& q1  = miter.getVData(in);
       const auto& q2  = miter.getVData(out);
-      if (!q1.has_value() || !q2.has_value()) {
-        equivalent = false;
-        break;
-      }
+      assert(q1.has_value());
+      assert(q2.has_value());
       if (p1.at(static_cast<qc::Qubit>(q1->qubit)) !=
           p2.at(static_cast<qc::Qubit>(q2->qubit))) {
         equivalent = false;
