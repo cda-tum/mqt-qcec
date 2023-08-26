@@ -26,7 +26,7 @@ add_library(
 target_include_directories(${PROJECT_NAME} PUBLIC ${PROJECT_SOURCE_DIR}/include
                                                   ${PROJECT_BINARY_DIR}/include)
 
-# link to the MQT::qfr libraries
+# link to the MQT::Core libraries
 target_link_libraries(${PROJECT_NAME} PUBLIC MQT::CoreDD MQT::CoreZX)
 
 # add MQT alias
