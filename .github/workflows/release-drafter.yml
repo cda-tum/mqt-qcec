@@ -12,6 +12,7 @@ permissions:
 
 jobs:
   update_release_draft:
+    name: Run
     permissions:
       contents: write
       pull-requests: write
@@ -19,4 +20,4 @@ jobs:
     steps:
       - uses: release-drafter/release-drafter@v5
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}
