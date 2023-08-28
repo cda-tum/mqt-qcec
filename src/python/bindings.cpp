@@ -4,7 +4,6 @@
 //
 
 #include "EquivalenceCheckingManager.hpp"
-#include "pybind11/chrono.h"
 #include "pybind11/pybind11.h"
 #include "pybind11/stl.h"
 #include "pybind11_json/pybind11_json.hpp"
@@ -13,9 +12,6 @@
 
 #include <exception>
 #include <memory>
-
-#define STRINGIFY(x) #x
-#define MACRO_STRINGIFY(x) STRINGIFY(x)
 
 namespace py = pybind11;
 using namespace pybind11::literals;
@@ -675,11 +671,5 @@ PYBIND11_MODULE(pyqcec, m) {
           "to simpler equivalence checking instances as the random "
           "instantiation. This option "
           "changes how many of those additional checks are performed.");
-
-#ifdef VERSION_INFO
-  m.attr("__version__") = MACRO_STRINGIFY(VERSION_INFO);
-#else
-  m.attr("__version__") = "dev";
-#endif
 }
 } // namespace ec
