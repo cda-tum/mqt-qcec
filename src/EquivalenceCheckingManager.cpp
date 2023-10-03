@@ -157,6 +157,12 @@ void EquivalenceCheckingManager::run() {
     return;
   }
 
+  if (qc1.empty() && qc2.empty()) {
+    results.equivalence = EquivalenceCriterion::Equivalent;
+    done                = true;
+    return;
+  }
+
   if (qc1.isVariableFree() && qc2.isVariableFree()) {
     if (!configuration.execution.parallel ||
         configuration.execution.nthreads <= 1 ||
