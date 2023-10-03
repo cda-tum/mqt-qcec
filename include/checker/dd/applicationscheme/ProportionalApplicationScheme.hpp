@@ -32,6 +32,6 @@ private:
                     static_cast<std::size_t>(1U));
   }
 
-  const std::size_t gateRatio;
+  std::size_t gateRatio;
 };
 } // namespace ec
