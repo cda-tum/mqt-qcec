@@ -179,3 +179,83 @@ TEST_F(EqualityTest, ExceptionInParallelThread) {
   ec::EquivalenceCheckingManager ecm(qc1, qc1, config);
   EXPECT_THROW(ecm.run(), std::invalid_argument);
 }
+
+TEST_F(EqualityTest, BothCircuitsEmptyAlternatingChecker) {
+  config.execution.runAlternatingChecker = true;
+  ec::EquivalenceCheckingManager ecm(qc1, qc2, config);
+  ecm.setApplicationScheme(ec::ApplicationSchemeType::Proportional);
+  ecm.run();
+  EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::Equivalent);
+}
+
+TEST_F(EqualityTest, BothCircuitsEmptyConstructionChecker) {
+  config.execution.runConstructionChecker = true;
+  ec::EquivalenceCheckingManager ecm(qc1, qc2, config);
+  ecm.setApplicationScheme(ec::ApplicationSchemeType::Proportional);
+  ecm.run();
+  EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::Equivalent);
+}
+
+TEST_F(EqualityTest, BothCircuitsEmptySimulationChecker) {
+  config.execution.runSimulationChecker = true;
+  ec::EquivalenceCheckingManager ecm(qc1, qc2, config);
+  ecm.setApplicationScheme(ec::ApplicationSchemeType::Proportional);
+  ecm.run();
+  EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::Equivalent);
+}
+
+TEST_F(EqualityTest, BothCircuitsEmptyZXChecker) {
+  config.execution.runZXChecker = true;
+  ec::EquivalenceCheckingManager ecm(qc1, qc2, config);
+  ecm.setApplicationScheme(ec::ApplicationSchemeType::Proportional);
+  ecm.run();
+  EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::Equivalent);
+}
+
+TEST_F(EqualityTest, OneCircuitEmptyAlternatingChecker) {
+  qc2.h(0);
+  qc2.x(0);
+  qc2.h(0);
+  qc2.z(0);
+  config.execution.runAlternatingChecker = true;
+  ec::EquivalenceCheckingManager ecm(qc1, qc2, config);
+  ecm.setApplicationScheme(ec::ApplicationSchemeType::Proportional);
+  ecm.run();
+  EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::Equivalent);
+}
+
+TEST_F(EqualityTest, OneCircuitEmptyConstructionChecker) {
+  qc2.h(0);
+  qc2.x(0);
+  qc2.h(0);
+  qc2.z(0);
+  config.execution.runConstructionChecker = true;
+  ec::EquivalenceCheckingManager ecm(qc1, qc2, config);
+  ecm.setApplicationScheme(ec::ApplicationSchemeType::Proportional);
+  ecm.run();
+  EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::Equivalent);
+}
+
+TEST_F(EqualityTest, OneCircuitEmptySimulationChecker) {
+  qc2.h(0);
+  qc2.x(0);
+  qc2.h(0);
+  qc2.z(0);
+  config.execution.runSimulationChecker = true;
+  ec::EquivalenceCheckingManager ecm(qc1, qc2, config);
+  ecm.setApplicationScheme(ec::ApplicationSchemeType::Proportional);
+  ecm.run();
+  EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::ProbablyEquivalent);
+}
+
+TEST_F(EqualityTest, OneCircuitEmptyZXChecker) {
+  qc2.h(0);
+  qc2.x(0);
+  qc2.h(0);
+  qc2.z(0);
+  config.execution.runZXChecker = true;
+  ec::EquivalenceCheckingManager ecm(qc1, qc2, config);
+  ecm.setApplicationScheme(ec::ApplicationSchemeType::Proportional);
+  ecm.run();
+  EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::Equivalent);
+}
