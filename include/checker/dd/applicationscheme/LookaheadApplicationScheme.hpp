@@ -45,11 +45,11 @@ public:
     // compute both possible applications and measure the resulting size
     auto       saved = *internalState;
     const auto dd1   = package->multiply(op1, saved);
-    const auto size1 = package->size(dd1);
+    const auto size1 = dd1.size();
     const auto dd2   = package->multiply(saved, op2);
 
     // greedily chose the smaller resulting decision diagram
-    if (const auto size2 = package->size(dd2); size1 <= size2) {
+    if (const auto size2 = dd2.size(); size1 <= size2) {
       assert(!this->taskManager1.finished());
       *internalState = dd1;
       package->decRef(op1);

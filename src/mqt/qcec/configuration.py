@@ -4,9 +4,9 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, TypedDict
 
-if TYPE_CHECKING:  # pragma: no cover
-    from mqt.qcec import ApplicationScheme, Configuration, StateType
-    from mqt.qcec.types import ApplicationSchemeName, StateTypeName
+if TYPE_CHECKING:
+    from . import ApplicationScheme, Configuration, StateType
+    from .types import ApplicationSchemeName, StateTypeName
 
 
 class ConfigurationOptions(TypedDict, total=False):

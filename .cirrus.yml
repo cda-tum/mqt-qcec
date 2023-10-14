@@ -1,61 +1,110 @@
+.clone_script: &clone |
+  if [ -z "$CIRRUS_PR" ]; then
+    git clone --recursive --branch=$CIRRUS_BRANCH https://x-access-token:${CIRRUS_REPO_CLONE_TOKEN}@github.com/${CIRRUS_REPO_FULL_NAME}.git $CIRRUS_WORKING_DIR
+    git reset --hard $CIRRUS_CHANGE_IN_REPO
+  else
+    git clone https://x-access-token:${CIRRUS_REPO_CLONE_TOKEN}@github.com/${CIRRUS_REPO_FULL_NAME}.git $CIRRUS_WORKING_DIR
+    git fetch origin pull/$CIRRUS_PR/head:pull/$CIRRUS_PR
+    git checkout $CIRRUS_BASE_BRANCH
+    git -c user.email="you@example.com" merge --no-commit pull/$CIRRUS_PR
+    git submodule update --init --recursive
+  fi
+
+.statistics_script: &statistics |
+  ccache -s -v
+  echo $(python -m pip cache dir)
+  echo $(python -m pip cache list)
+
+macos_arm64_test_task:
+  name: 🐍 Test / 🍎 arm64
+  alias: macos_arm64_test
+  clone_script: *clone
+  macos_instance:
+    image: ghcr.io/cirruslabs/macos-monterey-xcode:latest
+  ccache_cache:
+    folder: .ccache
+    populate_script:
+      - mkdir -p .ccache
+    fingerprint_key: ccache-macosx_arm64
+  pip_cache:
+    folder: /Users/admin/Library/Caches/pip
+  prepare_env_script: |
+    brew install python@3.10 ccache pipx ninja nox
+    ln -s $(which python3.10) python
+    export PATH=/opt/homebrew/opt/python@3.10/libexec/bin:$PATH
+    export PATH=/opt/homebrew/opt/ccache/libexec:$PATH
+    export PATH=/opt/homebrew/opt/pipx/libexec:$PATH
+    export PATH=/opt/homebrew/opt/ninja/libexec:$PATH
+    export PATH=/opt/homebrew/opt/nox/libexec:$PATH
+    echo "PATH=$PATH" >> $CIRRUS_ENV
+    echo "CCACHE_DIR=$PWD/.ccache" >> $CIRRUS_ENV
+  run_nox_script:
+    - nox -s tests-3.10 --verbose
+  statistics_script: *statistics
+
 build_and_store_wheels: &BUILD_AND_STORE_WHEELS
   install_cibuildwheel_script:
-    - python -m pip install cibuildwheel~=2.14.0
+    - python -m pip install cibuildwheel~=2.15.0
   run_cibuildwheel_script:
     - cibuildwheel
   wheels_artifacts:
     path: "wheelhouse/*"
 
-.clone_script: &clone |
-  if [ -z "$CIRRUS_PR" ]; then
-    git clone --branch=$CIRRUS_BRANCH https://x-access-token:${CIRRUS_REPO_CLONE_TOKEN}@github.com/${CIRRUS_REPO_FULL_NAME}.git $CIRRUS_WORKING_DIR
-  else
-    git clone https://x-access-token:${CIRRUS_REPO_CLONE_TOKEN}@github.com/${CIRRUS_REPO_FULL_NAME}.git $CIRRUS_WORKING_DIR
-    git fetch origin pull/$CIRRUS_PR/head:pull/$CIRRUS_PR
-  fi
-  git reset --hard $CIRRUS_CHANGE_IN_REPO
-  git submodule update --init --recursive
-
-linux_aarch64_task:
-  name: Build Linux aarch64 wheels.
+linux_aarch64_wheels_task:
+  only_if: "$CIRRUS_RELEASE != ''"
+  name: 🐍 Packaging / 🎡 🐧 arm64
+  alias: linux_aarch64_wheels
   clone_script: *clone
   compute_engine_instance:
     image_project: cirrus-images
     image: family/docker-builder-arm64
     architecture: arm64
     platform: linux
-    cpu: 4
-  env:
-    CIBW_SKIP: "*-musllinux_*"
-
-  install_pre_requirements_script:
-    - apt install -y python3-venv python-is-python3
+    cpu: 8
+  setup_pyhton_script:
+    - apt-get install -y python3-venv python-is-python3
   <<: *BUILD_AND_STORE_WHEELS
 
-macos_arm64_task:
-  name: Build macOS arm64 wheels.
+macos_arm64_wheels_task:
+  only_if: "$CIRRUS_RELEASE != ''"
+  name: 🐍 Packaging / 🎡 🍎 arm64
+  alias: macos_arm64_wheels
   clone_script: *clone
   macos_instance:
     image: ghcr.io/cirruslabs/macos-monterey-xcode:latest
-
-  env:
-    PATH: /opt/homebrew/opt/python@3.10/bin:$PATH
-  install_pre_requirements_script:
-    - brew install python@3.10
-    - ln -s python3 /opt/homebrew/opt/python@3.10/bin/python
+  ccache_cache:
+    folder: .ccache
+    populate_script:
+      - mkdir -p .ccache
+    fingerprint_key: ccache-macosx_arm64-wheels
+  pip_cache:
+    folder: /Users/admin/Library/Caches/pip
+  prepare_env_script: |
+    brew install python@3.10 ccache pipx ninja nox
+    ln -s $(which python3.10) python
+    export PATH=/opt/homebrew/opt/python@3.10/libexec/bin:$PATH
+    export PATH=/opt/homebrew/opt/ccache/libexec:$PATH
+    export PATH=/opt/homebrew/opt/pipx/libexec:$PATH
+    export PATH=/opt/homebrew/opt/ninja/libexec:$PATH
+    export PATH=/opt/homebrew/opt/nox/libexec:$PATH
+    echo "PATH=$PATH" >> $CIRRUS_ENV
+    echo "CCACHE_DIR=$PWD/.ccache" >> $CIRRUS_ENV
   <<: *BUILD_AND_STORE_WHEELS
+  statistics_script: *statistics
 
 publish_task:
-  name: Upload to PyPI
+  name: 🚀 Deploy to PyPI
   container: { image: "python:3.10-bullseye" }
   depends_on:
-    - Build Linux aarch64 wheels.
-    - Build macOS arm64 wheels.
+    - linux_aarch64_wheels
+    - macos_arm64_wheels
   only_if: "$CIRRUS_RELEASE != ''"
   env:
     TWINE_REPOSITORY: pypi
     TWINE_USERNAME: __token__
-    TWINE_PASSWORD: ENCRYPTED[963630b0d5f7e9ad0aba1e51f63d69ecc36ea550ccce3a382cee179da6b286ccc644aebd482f97a919f1f6a1810a0d25]
+    TWINE_PASSWORD: "ENCRYPTED\
+      [853587a6e1033bef6a80fbf7cf11762676107052030566cf\
+      1eca86bfaae3452433a1f05c7e6f7690d027b52d22a217c2]"
   install_script: pip install twine
   publish_script:
     - curl -L https://api.cirrus-ci.com/v1/artifact/build/$CIRRUS_BUILD_ID/wheels.zip -o wheels.zip

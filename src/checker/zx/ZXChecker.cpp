@@ -66,9 +66,12 @@ EquivalenceCriterion ZXEquivalenceChecker::run() {
         break;
       }
       const auto& out = edge.to;
-
-      if (p1.at(static_cast<qc::Qubit>(miter.getVData(in).value().qubit)) !=
-          p2.at(static_cast<qc::Qubit>(miter.getVData(out).value().qubit))) {
+      const auto& q1  = miter.getVData(in);
+      const auto& q2  = miter.getVData(out);
+      assert(q1.has_value());
+      assert(q2.has_value());
+      if (p1.at(static_cast<qc::Qubit>(q1->qubit)) !=
+          p2.at(static_cast<qc::Qubit>(q2->qubit))) {
         equivalent = false;
         break;
       }
@@ -121,8 +124,8 @@ qc::Permutation concat(const qc::Permutation& p1,
 qc::Permutation complete(const qc::Permutation& p, const std::size_t n) {
   qc::Permutation pComp = p;
 
-  std::vector<bool> mappedTo(n, false);
-  std::vector<bool> mappedFrom(n, false);
+  std::unordered_map<std::size_t, bool> mappedTo;
+  std::unordered_map<std::size_t, bool> mappedFrom;
   for (const auto [k, v] : p) {
     mappedFrom[k] = true;
     mappedTo[v]   = true;
@@ -152,13 +155,15 @@ qc::Permutation invertPermutations(const qc::QuantumComputation& qc) {
 }
 
 std::size_t ZXEquivalenceChecker::fullReduceApproximate() {
-  auto        nSimplifications = fullReduce();
-  std::size_t newSimps{};
-  do {
+  auto nSimplifications = fullReduce();
+  while (!isDone()) {
     miter.approximateCliffords(tolerance);
-    newSimps = fullReduce();
+    const auto newSimps = fullReduce();
+    if (newSimps == 0U) {
+      break;
+    }
     nSimplifications += newSimps;
-  } while (!isDone() && (newSimps > 0U));
+  }
   return nSimplifications;
 }
 

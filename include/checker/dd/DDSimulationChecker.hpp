@@ -19,13 +19,13 @@ public:
   void setRandomInitialState(StateGenerator& generator);
 
   [[nodiscard]] dd::CVec getInitialVector() const {
-    return dd->getVector(initialState);
+    return initialState.getVector();
   }
   [[nodiscard]] dd::CVec getInternalVector1() const {
-    return dd->getVector(taskManager1.getInternalState());
+    return taskManager1.getInternalState().getVector();
   }
   [[nodiscard]] dd::CVec getInternalVector2() const {
-    return dd->getVector(taskManager2.getInternalState());
+    return taskManager2.getInternalState().getVector();
   }
 
   void json(nlohmann::json& j) const noexcept override {

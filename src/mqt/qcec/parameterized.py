@@ -6,14 +6,14 @@ import time
 from itertools import chain
 from typing import TYPE_CHECKING
 
-if TYPE_CHECKING:  # pragma: no cover
+if TYPE_CHECKING:
     from numpy.typing import NDArray
     from qiskit import QuantumCircuit
 
 import numpy as np
 from qiskit.circuit import Parameter, ParameterExpression
 
-from mqt.qcec import Configuration, EquivalenceCheckingManager, EquivalenceCriterion
+from . import Configuration, EquivalenceCheckingManager, EquivalenceCriterion
 
 
 def __is_parameterized(qc: QuantumCircuit | str) -> bool:

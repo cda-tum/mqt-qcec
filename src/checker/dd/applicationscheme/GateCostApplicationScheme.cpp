@@ -35,8 +35,6 @@ legacyCostFunction(const GateCostLookupTableKeyType& key) noexcept {
     case qc::Compound:
     case qc::Measure:
     case qc::Reset:
-    case qc::Snapshot:
-    case qc::ShowProbabilities:
     case qc::Barrier:
     case qc::ClassicControlled:
       return 1U;
