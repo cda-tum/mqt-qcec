@@ -155,21 +155,21 @@ TEST_F(GeneralTest, NoGateCancellation) {
   qc2.x(0);
 
   // two-qubit gates that cannot be cancelled
-  qc1.x(0, 1_pc);
-  qc2.x(1, 0_pc);
-  qc1.x(0, 1_pc);
-  qc2.x(1, 0_pc);
+  qc1.cx(1_pc, 0);
+  qc2.cx(0_pc, 1);
+  qc1.cx(1_pc, 0);
+  qc2.cx(0_pc, 1);
 
   // gates with parameters that cannot be cancelled
-  qc1.phase(0, 2.0);
-  qc2.phase(0, -2.0);
-  qc1.phase(0, -2.0);
-  qc2.phase(0, 2.0);
+  qc1.p(2.0, 0);
+  qc2.p(-2.0, 0);
+  qc1.p(-2.0, 0);
+  qc2.p(2.0, 0);
 
   // gates with different number of controls that cannot be cancelled
   qc1.x(0);
-  qc2.x(0, 1_pc);
-  qc1.x(0, 1_pc);
+  qc2.cx(1_pc, 0);
+  qc1.cx(1_pc, 0);
   qc2.x(0);
 
   auto config                               = ec::Configuration{};

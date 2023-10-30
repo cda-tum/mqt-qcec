@@ -179,8 +179,8 @@ void EquivalenceCheckingManager::run() {
 EquivalenceCheckingManager::EquivalenceCheckingManager(
     const qc::QuantumComputation& circ1, const qc::QuantumComputation& circ2,
     Configuration config)
-    : qc1(circ1.size() > circ2.size() ? circ2.clone() : circ1.clone()),
-      qc2(circ1.size() > circ2.size() ? circ1.clone() : circ2.clone()),
+    : qc1(circ1.size() > circ2.size() ? circ2 : circ1),
+      qc2(circ1.size() > circ2.size() ? circ1 : circ2),
       configuration(std::move(config)) {
   // clones both circuits (the circuit with fewer gates always gets to be qc1)
 

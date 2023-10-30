@@ -22,10 +22,10 @@ public:
 };
 
 TEST_F(SymbolicTest, SymbolicEqu) {
-  symQc1.rx(0, xMonom);
+  symQc1.rx(xMonom, 0);
 
   symQc2.h(0);
-  symQc2.rz(0, xMonom);
+  symQc2.rz(xMonom, 0);
   symQc2.h(0);
 
   auto ecm = ec::EquivalenceCheckingManager(symQc1, symQc2);
@@ -35,10 +35,10 @@ TEST_F(SymbolicTest, SymbolicEqu) {
 }
 
 TEST_F(SymbolicTest, SymbolicNonEqu) {
-  symQc1.rx(0, xMonom);
+  symQc1.rx(xMonom, 0);
 
   symQc2.h(0);
-  symQc2.rz(0, xMonomNeg);
+  symQc2.rx(xMonomNeg, 0);
   symQc2.h(0);
 
   auto ecm = ec::EquivalenceCheckingManager(symQc1, symQc2);
@@ -53,11 +53,11 @@ TEST_F(SymbolicTest, Timeout) {
   symQc1                   = qc::QuantumComputation(2);
   symQc2                   = qc::QuantumComputation(2);
   for (auto i = 0; i < numLayers; ++i) {
-    symQc1.x(0, 1_pc);
-    symQc1.rx(0, xMonom);
+    symQc1.cx(1_pc, 0);
+    symQc1.rx(xMonom, 0);
 
-    symQc2.x(0, 1_pc);
-    symQc2.rx(0, xMonom);
+    symQc2.cx(1_pc, 0);
+    symQc2.rx(xMonom, 0);
   }
   ec::Configuration config{};
   config.execution.timeout = 1;
@@ -70,8 +70,8 @@ TEST_F(SymbolicTest, Timeout) {
 
 TEST_F(SymbolicTest, InvalidCircuit) {
   auto qc = qc::QuantumComputation(4);
-  qc.x(0, {1_pc, 2_pc, 3_pc});
-  qc.rx(0, xMonom);
+  qc.mcx({1_pc, 2_pc, 3_pc}, 0);
+  qc.rx(xMonom, 0);
   auto ecm = ec::EquivalenceCheckingManager(qc, qc);
   ecm.run();
 
