@@ -379,7 +379,7 @@ TEST_F(ZXTest, NonEquivalentCircuit) {
 
 TEST_F(ZXTest, IdleQubit) {
   using namespace qc::literals;
-  auto qc1 = qc::QuantumComputation(3U);
+  auto qc1 = qc::QuantumComputation(3U, 3U);
   qc1.h(0);
   qc1.cx(0_pc, 1);
   qc1.cx(1_pc, 2);
@@ -388,7 +388,7 @@ TEST_F(ZXTest, IdleQubit) {
   qc1.measure(2, 2);
   qc1.initializeIOMapping();
 
-  auto qc2 = qc::QuantumComputation(5U);
+  auto qc2 = qc::QuantumComputation(5U, 5U);
   qc2.h(1);
   qc2.cx(1_pc, 0);
   qc2.swap(0, 2);
@@ -414,24 +414,34 @@ TEST_F(ZXTest, TwoQubitRotations) {
   using namespace qc::literals;
   auto qc1 = qc::QuantumComputation(2U);
   qc1.rzz(0.1, 0, 1);
-  qc1.ryy(0.2, 0, 1);
   qc1.rxx(0.3, 0, 1);
+  qc1.ryy(0.2, 0, 1);
   auto qc2 = qc::QuantumComputation(2U);
-  qc2.cx(1_pc, 0);
-  qc2.rx(0.1, 1);
-  qc2.cx(1_pc, 0);
+  qc2.cx(0_pc, 1);
+  qc2.rz(0.1, 1);
+  qc2.cx(0_pc, 1);
   qc2.h(0);
   qc2.h(1);
-  qc2.cx(1_pc, 0);
+  qc2.cx(0_pc, 1);
+  qc2.rz(0.3, 1);
+  qc2.cx(0_pc, 1);
+  qc2.h(0);
+  qc2.h(1);
+  qc2.rx(qc::PI_2, 0);
+  qc2.rx(qc::PI_2, 1);
+  qc2.cx(0_pc, 1);
   qc2.rz(0.2, 1);
-  qc2.cx(1_pc, 0);
-  qc2.h(0);
-  qc2.h(1);
-  qc2.rx(qc::PI_2, 0);
-  qc2.rx(qc::PI_2, 1);
-  qc2.cx(1_pc, 0);
-  qc2.rz(0.3, 0);
-  qc2.cx(1_pc, 0);
-  qc2.rx(qc::PI_2, 0);
-  qc2.rx(qc::PI_2, 1);
+  qc2.cx(0_pc, 1);
+  qc2.rx(-qc::PI_2, 0);
+  qc2.rx(-qc::PI_2, 1);
+  config.execution.runZXChecker           = true;
+  config.execution.parallel               = false;
+  config.execution.runSimulationChecker   = false;
+  config.execution.runAlternatingChecker  = false;
+  config.execution.runConstructionChecker = false;
+  ecm = std::make_unique<ec::EquivalenceCheckingManager>(qc1, qc2, config);
+
+  ecm->run();
+  EXPECT_EQ(ecm->getResults().equivalence,
+            ec::EquivalenceCriterion::Equivalent);
 }

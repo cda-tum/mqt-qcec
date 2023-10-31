@@ -41,6 +41,7 @@ ZXEquivalenceChecker::ZXEquivalenceChecker(const qc::QuantumComputation& circ1,
     dPrime.makeAncilla(
         anc, static_cast<zx::Qubit>(p2.at(static_cast<qc::Qubit>(anc))));
   }
+
   miter.invert();
   miter.concat(dPrime);
 }
