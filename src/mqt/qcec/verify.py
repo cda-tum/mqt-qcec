@@ -10,6 +10,7 @@ if TYPE_CHECKING:
 
     from .configuration import ConfigurationOptions
 
+
 from . import Configuration, EquivalenceCheckingManager
 from .configuration import augment_config_from_kwargs
 from .parameterized import __is_parameterized, check_parameterized
