@@ -17,6 +17,7 @@ else:
     from importlib import resources
 
 from qiskit import QuantumCircuit
+from qiskit.transpiler.passes import ContainsInstruction
 
 from . import ApplicationScheme, Configuration, EquivalenceCheckingManager
 from .compilation_flow_profiles import AncillaMode, generate_profile_name
@@ -30,8 +31,6 @@ def __check_if_circuit_contains_measurements(circuit: QuantumCircuit) -> None:
     Args:
         circuit: The circuit to check.
     """
-    from qiskit.transpiler.passes import ContainsInstruction
-
     analysis_pass = ContainsInstruction("measure")
     analysis_pass(circuit)
     if not analysis_pass.property_set["contains_measure"]:
