@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from pathlib import Path
+
 import pytest
 from qiskit import QuantumCircuit
 
@@ -29,8 +31,6 @@ def test_constructor_with_configuration(example_circuit: QuantumCircuit) -> None
 
 def test_default_constructor_with_file(example_circuit: QuantumCircuit) -> None:
     """Test constructing an instance from two circuit files with all default arguments."""
-    from pathlib import Path
-
     filename = "test.qasm"
     example_circuit.qasm(filename=filename)
     qcec.EquivalenceCheckingManager(circ1=filename, circ2=filename)

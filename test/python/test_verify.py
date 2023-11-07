@@ -3,7 +3,8 @@
 from __future__ import annotations
 
 import pytest
-from qiskit import QuantumCircuit
+from qiskit import QuantumCircuit, transpile
+from qiskit.providers.fake_provider import FakeAthens
 
 from mqt import qcec
 
@@ -67,9 +68,6 @@ def test_compiled_circuit_without_measurements() -> None:
 
     It makes sure that circuits compiled without measurements are handled correctly.
     """
-    from qiskit import transpile
-    from qiskit.providers.fake_provider import FakeAthens
-
     qc = QuantumCircuit(1)
     qc.x(0)
     qc_compiled = transpile(qc, backend=FakeAthens())
