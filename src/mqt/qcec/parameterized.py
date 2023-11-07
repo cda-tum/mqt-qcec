@@ -100,8 +100,8 @@ def check_instantiated_random(
     for p in params:
         param_map[p] = rng.random() * 2 * np.pi
 
-    circ1_inst = circ1.bind_parameters(param_map)
-    circ2_inst = circ2.bind_parameters(param_map)
+    circ1_inst = circ1.assign_parameters(param_map)
+    circ2_inst = circ2.assign_parameters(param_map)
 
     return check_instantiated(circ1_inst, circ2_inst, configuration)
 
@@ -156,14 +156,15 @@ def check_parameterized(
         mat_pinv = np.linalg.pinv(mat)
         x = np.dot(mat_pinv, b)
         param_map = {param: x[i] for i, param in enumerate(parameters)}
-        qc1_bound = qc1.bind_parameters(param_map)
-        qc2_bound = qc2.bind_parameters(param_map)
+        qc1_bound = qc1.assign_parameters(param_map)
+        qc2_bound = qc2.assign_parameters(param_map)
 
         def round_zero_params(qc: QuantumCircuit) -> QuantumCircuit:
             for instr in qc.data:
-                params = instr[0].params
-                instr[0].params = [float(x) for x in params]
-                instr[0].params = [0 if np.abs(x) < tol else x for x in instr[0].params]
+                if not hasattr(instr[0], "mutable") or instr[0].mutable:
+                    params = instr[0].params
+                    instr[0].params = [float(x) for x in params]
+                    instr[0].params = [0 if np.abs(x) < tol else x for x in instr[0].params]
             return qc
 
         qc1_bound = round_zero_params(qc1_bound)
