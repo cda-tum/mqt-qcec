@@ -12,6 +12,8 @@ if TYPE_CHECKING or sys.version_info < (3, 9, 0):
 else:
     from importlib import resources
 
+import difflib
+
 import pytest
 
 from mqt import qcec
@@ -60,8 +62,6 @@ def test_generated_profiles_are_still_valid(optimization_level: int, ancilla_mod
 
         if equal:
             return
-
-        import difflib
 
         ref_profile = path.read_text().splitlines(keepends=True)
         gen_profile = Path(profile_name).read_text().splitlines(keepends=True)
