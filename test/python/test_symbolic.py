@@ -188,10 +188,10 @@ def test_verify_compilation_on_optimization_levels(original_circuit: QuantumCirc
     """Test the verification of the compilation of a circuit to the 5-qubit IBMQ Athens architecture with various optimization levels."""
     compiled_circuit = transpile(original_circuit, backend=FakeAthens(), optimization_level=optimization_level)
     result = qcec.verify_compilation(original_circuit, compiled_circuit, optimization_level, timeout=3600)
-    assert (
-        result.equivalence == qcec.EquivalenceCriterion.equivalent
-        or result.equivalence == qcec.EquivalenceCriterion.equivalent_up_to_global_phase
-    )
+    assert result.equivalence in {
+        qcec.EquivalenceCriterion.equivalent,
+        qcec.EquivalenceCriterion.equivalent_up_to_global_phase,
+    }
 
 
 @pytest.mark.parametrize("optimization_level", [0, 1, 2, 3])
@@ -205,10 +205,10 @@ def test_verify_compilation_on_optimization_levels_config(
     result = qcec.verify_compilation(
         original_circuit, compiled_circuit, optimization_level, AncillaMode.NO_ANCILLA, config
     )
-    assert (
-        result.equivalence == qcec.EquivalenceCriterion.equivalent
-        or result.equivalence == qcec.EquivalenceCriterion.equivalent_up_to_global_phase
-    )
+    assert result.equivalence in {
+        qcec.EquivalenceCriterion.equivalent,
+        qcec.EquivalenceCriterion.equivalent_up_to_global_phase,
+    }
 
 
 def test_performed_instantiations(rz_commute_lhs: QuantumCircuit, rz_commute_rhs_incorrect: QuantumCircuit) -> None:

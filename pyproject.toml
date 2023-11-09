@@ -210,7 +210,7 @@ extend-select = [
     "SIM",         # flake8-simplify
     "T20",         # flake8-print
     "TCH",         # flake8-type-checking
-    "TID251",      # flake8-tidy-imports.banned-api
+    "TID",         # flake8-tidy-imports
     "TRY",         # tryceratops
     "UP",          # pyupgrade
     "YTT",         # flake8-2020
