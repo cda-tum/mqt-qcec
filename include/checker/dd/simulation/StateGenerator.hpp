@@ -8,7 +8,6 @@
 #include "StateType.hpp"
 #include "algorithms/RandomCliffordCircuit.hpp"
 #include "checker/dd/TaskManager.hpp"
-#include "dd/Node.hpp"
 #include "dd/Package.hpp"
 #include "dd/Simulation.hpp"
 
@@ -154,9 +153,8 @@ public:
     // add |0> edges for all the ancillary qubits
     auto initial = stabilizer;
     for (std::size_t p = randomQubits; p < totalQubits; ++p) {
-      initial = dd->makeDDNode(
-          static_cast<dd::Qubit>(p),
-          std::array<dd::vEdge, 2>{initial, qc::VectorDD::zero()});
+      initial = dd->makeDDNode(static_cast<dd::Qubit>(p),
+                               std::array{initial, qc::VectorDD::zero()});
     }
 
     // return the resulting decision diagram
