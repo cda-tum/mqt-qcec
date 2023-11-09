@@ -7,7 +7,6 @@
 #include "pybind11/pybind11.h"
 #include "pybind11/stl.h"
 #include "pybind11_json/pybind11_json.hpp"
-#include "python/qiskit/QasmQobjExperiment.hpp"
 #include "python/qiskit/QuantumCircuit.hpp"
 
 #include <exception>
@@ -17,7 +16,8 @@ namespace py = pybind11;
 using namespace pybind11::literals;
 
 namespace ec {
-static qc::QuantumComputation importCircuit(const py::object& circ) {
+namespace {
+qc::QuantumComputation importCircuit(const py::object& circ) {
   const py::object quantumCircuit =
       py::module::import("qiskit").attr("QuantumCircuit");
   const py::object pyQasmQobjExperiment =
@@ -30,8 +30,6 @@ static qc::QuantumComputation importCircuit(const py::object& circ) {
     qc.import(file);
   } else if (py::isinstance(circ, quantumCircuit)) {
     qc::qiskit::QuantumCircuit::import(qc, circ);
-  } else if (py::isinstance(circ, pyQasmQobjExperiment)) {
-    qc::qiskit::QasmQobjExperiment::import(qc, circ);
   } else {
     throw std::runtime_error(
         "PyObject is neither py::str, QuantumCircuit, nor QasmQobjExperiment");
@@ -40,7 +38,7 @@ static qc::QuantumComputation importCircuit(const py::object& circ) {
   return qc;
 }
 
-static std::unique_ptr<EquivalenceCheckingManager>
+std::unique_ptr<EquivalenceCheckingManager>
 createManagerFromConfiguration(const py::object& circ1, const py::object& circ2,
                                const Configuration& configuration = {}) {
   qc::QuantumComputation qc1;
@@ -61,6 +59,7 @@ createManagerFromConfiguration(const py::object& circ1, const py::object& circ2,
 
   return std::make_unique<EquivalenceCheckingManager>(qc1, qc2, configuration);
 }
+} // namespace
 
 PYBIND11_MODULE(pyqcec, m) {
   m.doc() = "Python interface for the MQT QCEC quantum circuit equivalence "

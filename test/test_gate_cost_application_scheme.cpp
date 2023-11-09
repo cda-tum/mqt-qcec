@@ -35,7 +35,7 @@ TEST_F(GateCostApplicationSchemeTest, SchemeFromProfile) {
   ofs.close();
 
   // apply Toffoli gate
-  qc.x(0, {1_pc, 2_pc});
+  qc.mcx({1_pc, 2_pc}, 0);
 
   auto tm = ec::TaskManager<qc::MatrixDD>(qc, dd);
 
@@ -71,7 +71,7 @@ TEST_F(GateCostApplicationSchemeTest, iSWAP) {
 TEST_F(GateCostApplicationSchemeTest, Peres) {
   using namespace qc::literals;
 
-  qc.peres(1, 2, 0_pc);
+  qc.cperes(0_pc, 1, 2);
 
   auto tm = ec::TaskManager<qc::MatrixDD>(qc, dd);
 

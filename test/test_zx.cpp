@@ -85,10 +85,10 @@ TEST_F(ZXTest, Timeout) {
   qcOriginal               = qc::QuantumComputation(2);
   qcAlternative            = qc::QuantumComputation(2);
   for (auto i = 0; i < numLayers; ++i) {
-    qcOriginal.x(0, 1_pc);
+    qcOriginal.cx(1_pc, 0);
     qcOriginal.h(0);
 
-    qcAlternative.x(0, 1_pc);
+    qcAlternative.cx(1_pc, 0);
     qcAlternative.h(0);
   }
 
@@ -107,7 +107,7 @@ TEST_F(ZXTest, CloseButNotEqual) {
 
   qcAlternative = qc::QuantumComputation(1);
   qcAlternative.x(0);
-  qcAlternative.phase(0, qc::PI / 1024.);
+  qcAlternative.p(qc::PI / 1024., 0);
 
   config.functionality.traceThreshold = 1e-2;
 
@@ -124,7 +124,7 @@ TEST_F(ZXTest, NotEqual) {
 
   qcAlternative = qc::QuantumComputation(1);
   qcAlternative.x(0);
-  qcAlternative.phase(0, qc::PI / 1024.);
+  qcAlternative.p(qc::PI / 1024., 0);
 
   config.functionality.traceThreshold = 1e-9;
 
@@ -139,10 +139,10 @@ TEST_F(ZXTest, PermutationMismatch) {
   using namespace qc::literals;
 
   qcOriginal = qc::QuantumComputation(2);
-  qcOriginal.x(0, 1_pc);
+  qcOriginal.cx(1_pc, 0);
 
   qcAlternative = qc::QuantumComputation(2);
-  qcAlternative.x(0, 1_pc);
+  qcAlternative.cx(1_pc, 0);
 
   qcAlternative.outputPermutation[0] = 1;
   qcAlternative.outputPermutation[1] = 0;
@@ -180,7 +180,7 @@ TEST_F(ZXTest, Ancilla) {
   auto qc2 = qc::QuantumComputation(2);
 
   qc1.i(0);
-  qc2.x(0, 1_pc);
+  qc2.cx(1_pc, 0);
   qc2.setLogicalQubitAncillary(1);
 
   ecm = std::make_unique<ec::EquivalenceCheckingManager>(qc1, qc2, config);
@@ -197,7 +197,7 @@ TEST_F(ZXTest, ZXWrongAncilla) {
   qc::Permutation p1{};
   p1[0] = 0;
   qc1.x(0);
-  qc2.x(0, 1_nc);
+  qc2.cx(1_nc, 0);
   qc2.setLogicalQubitAncillary(1);
 
   ecm = std::make_unique<ec::EquivalenceCheckingManager>(qc1, qc2, config);
@@ -211,7 +211,7 @@ TEST_F(ZXTest, ZXConfiguredForInvalidCircuitParallel) {
   using namespace qc::literals;
 
   auto qc = qc::QuantumComputation(4);
-  qc.x(0, {1_pc, 2_pc, 3_pc});
+  qc.mcx({1_pc, 2_pc, 3_pc}, 0);
 
   ecm = std::make_unique<ec::EquivalenceCheckingManager>(qc, qc, config);
   ecm->run();
@@ -224,7 +224,7 @@ TEST_F(ZXTest, ZXConfiguredForInvalidCircuitSequential) {
   using namespace qc::literals;
 
   auto qc = qc::QuantumComputation(4);
-  qc.x(0, {1_pc, 2_pc, 3_pc});
+  qc.mcx({1_pc, 2_pc, 3_pc}, 0);
 
   config.execution.parallel = false;
   ecm = std::make_unique<ec::EquivalenceCheckingManager>(qc, qc, config);
@@ -236,10 +236,10 @@ TEST_F(ZXTest, ZXConfiguredForInvalidCircuitSequential) {
 
 TEST_F(ZXTest, GlobalPhase) {
   auto qc = qc::QuantumComputation(1);
-  qc.rz(0, zx::PI / 8);
+  qc.rz(zx::PI / 8, 0);
 
   auto qcPrime = qc::QuantumComputation(1);
-  qcPrime.phase(0, zx::PI / 8);
+  qcPrime.p(zx::PI / 8, 0);
 
   ecm = std::make_unique<ec::EquivalenceCheckingManager>(qc, qcPrime, config);
   ecm->run();
@@ -379,20 +379,20 @@ TEST_F(ZXTest, NonEquivalentCircuit) {
 
 TEST_F(ZXTest, IdleQubit) {
   using namespace qc::literals;
-  auto qc1 = qc::QuantumComputation(3U);
+  auto qc1 = qc::QuantumComputation(3U, 3U);
   qc1.h(0);
-  qc1.x(1, 0_pc);
-  qc1.x(2, 1_pc);
+  qc1.cx(0_pc, 1);
+  qc1.cx(1_pc, 2);
   qc1.measure(0, 0);
   qc1.measure(1, 1);
   qc1.measure(2, 2);
   qc1.initializeIOMapping();
 
-  auto qc2 = qc::QuantumComputation(5U);
+  auto qc2 = qc::QuantumComputation(5U, 5U);
   qc2.h(1);
-  qc2.x(0, 1_pc);
+  qc2.cx(1_pc, 0);
   qc2.swap(0, 2);
-  qc2.x(4, 2_pc);
+  qc2.cx(2_pc, 4);
   qc2.measure(1, 0);
   qc2.measure(2, 1);
   qc2.measure(4, 2);
@@ -408,4 +408,40 @@ TEST_F(ZXTest, IdleQubit) {
   ecm->run();
   EXPECT_EQ(ecm->getResults().equivalence,
             ec::EquivalenceCriterion::NoInformation);
+}
+
+TEST_F(ZXTest, TwoQubitRotations) {
+  using namespace qc::literals;
+  auto qc1 = qc::QuantumComputation(2U);
+  qc1.rzz(0.1, 0, 1);
+  qc1.rxx(0.3, 0, 1);
+  qc1.ryy(0.2, 0, 1);
+  auto qc2 = qc::QuantumComputation(2U);
+  qc2.cx(0_pc, 1);
+  qc2.rz(0.1, 1);
+  qc2.cx(0_pc, 1);
+  qc2.h(0);
+  qc2.h(1);
+  qc2.cx(0_pc, 1);
+  qc2.rz(0.3, 1);
+  qc2.cx(0_pc, 1);
+  qc2.h(0);
+  qc2.h(1);
+  qc2.rx(qc::PI_2, 0);
+  qc2.rx(qc::PI_2, 1);
+  qc2.cx(0_pc, 1);
+  qc2.rz(0.2, 1);
+  qc2.cx(0_pc, 1);
+  qc2.rx(-qc::PI_2, 0);
+  qc2.rx(-qc::PI_2, 1);
+  config.execution.runZXChecker           = true;
+  config.execution.parallel               = false;
+  config.execution.runSimulationChecker   = false;
+  config.execution.runAlternatingChecker  = false;
+  config.execution.runConstructionChecker = false;
+  ecm = std::make_unique<ec::EquivalenceCheckingManager>(qc1, qc2, config);
+
+  ecm->run();
+  EXPECT_EQ(ecm->getResults().equivalence,
+            ec::EquivalenceCriterion::Equivalent);
 }

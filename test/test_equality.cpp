@@ -52,7 +52,7 @@ TEST_F(EqualityTest, CloseButNotEqualAlternating) {
   qc1.x(0);
 
   qc2.x(0);
-  qc2.phase(0, dd::PI / 1024.);
+  qc2.p(dd::PI / 1024., 0);
 
   config.functionality.traceThreshold    = 1e-2;
   config.execution.runAlternatingChecker = true;
@@ -66,7 +66,7 @@ TEST_F(EqualityTest, CloseButNotEqualConstruction) {
   qc1.x(0);
 
   qc2.x(0);
-  qc2.phase(0, dd::PI / 1024.);
+  qc2.p(dd::PI / 1024., 0);
 
   config.functionality.traceThreshold     = 1e-2;
   config.execution.runConstructionChecker = true;
@@ -80,7 +80,7 @@ TEST_F(EqualityTest, CloseButNotEqualAlternatingGlobalPhase) {
   qc1.x(0);
 
   qc2.x(0);
-  qc2.phase(0, dd::PI / 1024.);
+  qc2.p(dd::PI / 1024., 0);
   // add a global phase of -1
   qc2.z(0);
   qc2.x(0);
@@ -100,7 +100,7 @@ TEST_F(EqualityTest, CloseButNotEqualSimulation) {
   qc1.h(0);
 
   qc2.h(0);
-  qc2.phase(0, dd::PI / 1024.);
+  qc2.p(dd::PI / 1024., 0);
 
   config.simulation.fidelityThreshold   = 1e-2;
   config.execution.runSimulationChecker = true;
@@ -116,9 +116,9 @@ TEST_F(EqualityTest, SimulationMoreThan64Qubits) {
   qc1 = qc::QuantumComputation(65U);
   qc1.h(0);
   for (auto i = 0U; i < 64U; ++i) {
-    qc1.x(i + 1, 0_pc);
+    qc1.cx(0_pc, i + 1);
   }
-  qc2                                   = qc1.clone();
+  qc2                                   = qc1;
   config.execution.runSimulationChecker = true;
   ec::EquivalenceCheckingManager ecm(qc1, qc2, config);
   ecm.run();

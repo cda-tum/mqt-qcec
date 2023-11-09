@@ -154,7 +154,7 @@ public:
     auto initial = stabilizer;
     for (std::size_t p = randomQubits; p < totalQubits; ++p) {
       initial = dd->makeDDNode(static_cast<dd::Qubit>(p),
-                               std::array{initial, qc::VectorDD::zero});
+                               std::array{initial, qc::VectorDD::zero()});
     }
 
     // return the resulting decision diagram
