@@ -25,10 +25,10 @@ def test_verify_compilation_on_optimization_levels(original_circuit: QuantumCirc
     """Test the verification of the compilation of a circuit to the 5-qubit IBMQ Athens architecture with various optimization levels."""
     compiled_circuit = transpile(original_circuit, backend=FakeAthens(), optimization_level=optimization_level)
     result = qcec.verify_compilation(original_circuit, compiled_circuit, optimization_level=optimization_level)
-    assert (
-        result.equivalence == qcec.EquivalenceCriterion.equivalent
-        or result.equivalence == qcec.EquivalenceCriterion.equivalent_up_to_global_phase
-    )
+    assert result.equivalence in {
+        qcec.EquivalenceCriterion.equivalent,
+        qcec.EquivalenceCriterion.equivalent_up_to_global_phase,
+    }
 
 
 def test_warning_on_missing_measurements() -> None:

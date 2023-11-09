@@ -413,4 +413,3 @@ def generate_profile(
     filename = generate_profile_name(optimization_level=optimization_level, mode=mode)
     filepath = filepath.joinpath(filename)
     write_profile_data_to_file(profile, filepath)
-    print(f"Wrote profile data to {filepath}")
