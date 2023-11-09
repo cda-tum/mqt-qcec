@@ -4,10 +4,10 @@
 //
 
 #include "EquivalenceCheckingManager.hpp"
-#include "QuantumComputation.hpp"
 #include "pybind11/pybind11.h"
 #include "pybind11/stl.h"
 #include "pybind11_json/pybind11_json.hpp"
+#include "python/qiskit/QuantumCircuit.hpp"
 
 #include <exception>
 #include <memory>
@@ -16,58 +16,50 @@ namespace py = pybind11;
 using namespace pybind11::literals;
 
 namespace ec {
-// static qc::QuantumComputation importCircuit(const py::object& circ) {
-//   const py::object quantumCircuit =
-//       py::module::import("qiskit").attr("QuantumCircuit");
-//   const py::object pyQasmQobjExperiment =
-//       py::module::import("qiskit.qobj").attr("QasmQobjExperiment");
+namespace {
+qc::QuantumComputation importCircuit(const py::object& circ) {
+  const py::object quantumCircuit =
+      py::module::import("qiskit").attr("QuantumCircuit");
+  const py::object pyQasmQobjExperiment =
+      py::module::import("qiskit.qobj").attr("QasmQobjExperiment");
 
-//   auto qc = qc::QuantumComputation();
-
-//   if (py::isinstance<py::str>(circ)) {
-//     const auto file = circ.cast<std::string>();
-//     qc.import(file);
-//   } else if (py::isinstance(circ, quantumCircuit)) {
-//     qc::qiskit::QuantumCircuit::import(qc, circ);
-//   } else if (py::isinstance(circ, pyQasmQobjExperiment)) {
-//     qc::qiskit::QasmQobjExperiment::import(qc, circ);
-//   } else {
-//     throw std::runtime_error(
-//         "PyObject is neither py::str, QuantumCircuit, nor
-//         QasmQobjExperiment");
-//   }
-
-//   return qc;
-// }
-
-static qc::QuantumComputation qcFromPy(const py::object& circ) {
-  if (py::isinstance<qc::QuantumComputation>(circ)) {
-    return circ.cast<qc::QuantumComputation>();
-  }
+  auto qc = qc::QuantumComputation();
 
   if (py::isinstance<py::str>(circ)) {
     const auto file = circ.cast<std::string>();
-    return qc::QuantumComputation(file);
+    qc.import(file);
+  } else if (py::isinstance(circ, quantumCircuit)) {
+    qc::qiskit::QuantumCircuit::import(qc, circ);
+  } else {
+    throw std::runtime_error(
+        "PyObject is neither py::str, QuantumCircuit, nor QasmQobjExperiment");
   }
 
-  py::object qiskit        = py::module_::import("mqt.core.plugins.qiskit");
-  py::object qiskit_to_mqt = qiskit.attr("qiskit_to_mqt");
-  try {
-    return qiskit_to_mqt(circ).cast<qc::QuantumComputation>();
-  } catch (const std::exception& ex) {
-    throw std::runtime_error("Could not import circuit: " +
-                             std::string(ex.what()));
-  }
-  return qc::QuantumComputation();
+  return qc;
 }
-static std::unique_ptr<EquivalenceCheckingManager>
+
+std::unique_ptr<EquivalenceCheckingManager>
 createManagerFromConfiguration(const py::object& circ1, const py::object& circ2,
                                const Configuration& configuration = {}) {
-  auto qc1 = qcFromPy(circ1);
-  auto qc2 = qcFromPy(circ2);
+  qc::QuantumComputation qc1;
+  try {
+    qc1 = importCircuit(circ1);
+  } catch (const std::exception& ex) {
+    throw std::runtime_error("Could not import first circuit: " +
+                             std::string(ex.what()));
+  }
+
+  qc::QuantumComputation qc2;
+  try {
+    qc2 = importCircuit(circ2);
+  } catch (const std::exception& ex) {
+    throw std::runtime_error("Could not import second circuit: " +
+                             std::string(ex.what()));
+  }
 
   return std::make_unique<EquivalenceCheckingManager>(qc1, qc2, configuration);
 }
+} // namespace
 
 PYBIND11_MODULE(pyqcec, m) {
   m.doc() = "Python interface for the MQT QCEC quantum circuit equivalence "
@@ -191,21 +183,6 @@ PYBIND11_MODULE(pyqcec, m) {
           "config"_a = Configuration(),
           "Create an equivalence checking manager for two circuits and "
           "configure it with a :class:`Configuration` object.")
-      // .def(py::init([](const py::object& circ1,
-      //                                                  const py::object&
-      //                                                  circ2, const
-      //                                                  Configuration& config)
-      //                                                  {
-      //             py::object qiskit =
-      //             py::module_::import("mqt.core.plugins.qiskit"); py::object
-      //             qiskit_to_mqt = qiskit.attr("qiskit_to_mqt"); return
-      //             std::make_unique<EquivalenceCheckingManager>(
-      //                 qiskit_to_mqt(circ1).cast<qc::QuantumComputation>(),
-      //                 qiskit_to_mqt(circ2).cast<qc::QuantumComputation>(),
-      //                 config);}),
-      //       "circ1"_a, "circ2"_a, "config"_a = Configuration(),
-      //       "Create an equivalence checking manager for two circuits and "
-      //       "configure it with a :class:`Configuration` object.")
       .def("get_configuration", &EquivalenceCheckingManager::getConfiguration)
       // Convenience functions
       // Execution
