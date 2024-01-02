@@ -246,6 +246,11 @@ PYBIND11_MODULE(pyqcec, m) {
            ":attr:`Reorder operations "
            "<.Configuration.Optimizations.reorder_operations>` to establish "
            "canonical ordering.")
+      .def("backpropagate_output_permutation",
+           &EquivalenceCheckingManager::backpropagateOutputPermutation,
+           ":attr:`Backpropagate the output permutation "
+           "<.Configuration.Optimizations.backpropagate_output_permutation>` "
+           "to the input permutation.")
       // Application
       .def("set_application_scheme",
            &EquivalenceCheckingManager::setApplicationScheme,
@@ -545,7 +550,17 @@ PYBIND11_MODULE(pyqcec, m) {
           "a different order. This optimization pass established a canonical "
           "ordering of operations by, first, constructing a directed, acyclic "
           "graph for the operations and, then, traversing it in a "
-          "breadth-first fashion. Defaults to :code:`True`.");
+          "breadth-first fashion. Defaults to :code:`True`.")
+      .def_readwrite(
+          "backpropagate_output_permutation",
+          &Configuration::Optimizations::backpropagateOutputPermutation,
+          "Backpropagate the output permutation to the input permutation. "
+          "Defaults to :code:`False` since this might mess up the initially "
+          "given input permutation. Can be helpful for dynamic quantum circuits"
+          " that have been transformed to a static circuit by enabling the "
+          ":attr:`transform_dynamic_circuit "
+          "<.Configuration.Optimizations.transform_dynamic_circuit>` "
+          "optimization.");
 
   // application options
   application.def(py::init<>())

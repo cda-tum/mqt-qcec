@@ -142,6 +142,11 @@ void EquivalenceCheckingManager::runOptimizationPasses() {
     qc::CircuitOptimizer::reorderOperations(qc2);
   }
 
+  if (configuration.optimizations.backpropagateOutputPermutation) {
+    qc::CircuitOptimizer::backpropagateOutputPermutation(qc1);
+    qc::CircuitOptimizer::backpropagateOutputPermutation(qc2);
+  }
+
   // remove final measurements from both circuits so that the underlying
   // functionality should be unitary
   qc::CircuitOptimizer::removeFinalMeasurements(qc1);
@@ -746,12 +751,14 @@ nlohmann::json EquivalenceCheckingManager::json() const {
   }
   return res;
 }
+
 void EquivalenceCheckingManager::runFixOutputPermutationMismatch() {
   if (!configuration.optimizations.fixOutputPermutationMismatch) {
     fixOutputPermutationMismatch();
     configuration.optimizations.fixOutputPermutationMismatch = true;
   }
 }
+
 void EquivalenceCheckingManager::fuseSingleQubitGates() {
   if (!configuration.optimizations.fuseSingleQubitGates) {
     qc::CircuitOptimizer::singleQubitGateFusion(qc1);
@@ -759,6 +766,7 @@ void EquivalenceCheckingManager::fuseSingleQubitGates() {
     configuration.optimizations.fuseSingleQubitGates = true;
   }
 }
+
 void EquivalenceCheckingManager::reconstructSWAPs() {
   if (!configuration.optimizations.reconstructSWAPs) {
     qc::CircuitOptimizer::swapReconstruction(qc1);
@@ -766,6 +774,7 @@ void EquivalenceCheckingManager::reconstructSWAPs() {
     configuration.optimizations.reconstructSWAPs = true;
   }
 }
+
 void EquivalenceCheckingManager::reorderOperations() {
   if (!configuration.optimizations.reorderOperations) {
     qc::CircuitOptimizer::reorderOperations(qc1);
@@ -773,6 +782,15 @@ void EquivalenceCheckingManager::reorderOperations() {
     configuration.optimizations.reorderOperations = true;
   }
 }
+
+void EquivalenceCheckingManager::backpropagateOutputPermutation() {
+  if (!configuration.optimizations.backpropagateOutputPermutation) {
+    qc::CircuitOptimizer::backpropagateOutputPermutation(qc1);
+    qc::CircuitOptimizer::backpropagateOutputPermutation(qc2);
+    configuration.optimizations.backpropagateOutputPermutation = true;
+  }
+}
+
 nlohmann::json EquivalenceCheckingManager::Results::json() const {
   nlohmann::json res{};
   res["preprocessing_time"] = preprocessingTime;

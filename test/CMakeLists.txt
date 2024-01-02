@@ -15,6 +15,7 @@ package_add_test(
   legacy/test_compilationflow.cpp
   legacy/test_general.cpp
   legacy/test_simulation.cpp
+  test_dynamic_circuits.cpp
   test_simple_circuit_identities.cpp
   test_gate_cost_application_scheme.cpp
   test_equality.cpp

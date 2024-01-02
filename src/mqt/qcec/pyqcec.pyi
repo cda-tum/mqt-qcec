@@ -2,7 +2,7 @@ from typing import Any, ClassVar, overload
 
 from qiskit import QuantumCircuit
 
-from mqt.qcec.types import ApplicationSchemeName, EquivalenceCriterionName, StateTypeName
+from .types import ApplicationSchemeName, EquivalenceCriterionName, StateTypeName
 
 class ApplicationScheme:
     __members__: ClassVar[dict[ApplicationScheme, int]] = ...  # read-only
@@ -51,6 +51,7 @@ class Configuration:
         def __init__(self) -> None: ...
 
     class Optimizations:
+        backpropagate_output_permutation: bool
         fix_output_permutation_mismatch: bool
         fuse_single_qubit_gates: bool
         reconstruct_swaps: bool
@@ -99,6 +100,7 @@ class EquivalenceCheckingManager:
     def __init__(
         self, circ1: QuantumCircuit | str, circ2: QuantumCircuit | str, config: Configuration = ...
     ) -> None: ...
+    def backpropagate_output_permutation(self) -> None: ...
     def disable_all_checkers(self) -> None: ...
     def equivalence(self) -> EquivalenceCriterion: ...
     def fix_output_permutation_mismatch(self) -> None: ...

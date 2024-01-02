@@ -39,6 +39,7 @@ public:
     bool removeDiagonalGatesBeforeMeasure = false;
     bool transformDynamicCircuit          = false;
     bool reorderOperations                = true;
+    bool backpropagateOutputPermutation   = false;
   };
 
   // configuration options for application schemes
@@ -157,6 +158,8 @@ public:
         optimizations.removeDiagonalGatesBeforeMeasure;
     opt["transform_dynamic_circuit"] = optimizations.transformDynamicCircuit;
     opt["reorder_operations"]        = optimizations.reorderOperations;
+    opt["backpropagate_output_permutation"] =
+        optimizations.backpropagateOutputPermutation;
 
     auto& app = config["application"];
     if (execution.runConstructionChecker) {
