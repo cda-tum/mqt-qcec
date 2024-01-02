@@ -25,7 +25,8 @@ TEST_F(GeneralTest, DynamicCircuit) {
   EXPECT_THROW(ec::EquivalenceCheckingManager(bv, dbv, config),
                std::runtime_error);
 
-  config.optimizations.transformDynamicCircuit = true;
+  config.optimizations.transformDynamicCircuit        = true;
+  config.optimizations.backpropagateOutputPermutation = true;
 
   auto ecm = ec::EquivalenceCheckingManager(bv, dbv, config);
 
