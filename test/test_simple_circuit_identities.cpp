@@ -180,3 +180,10 @@ TEST_P(SimpleCircuitIdentitiesTest, ReconstructSWAPs) {
 
   EXPECT_TRUE(ecm->getResults().consideredEquivalent());
 }
+
+TEST_P(SimpleCircuitIdentitiesTest, BackpropagateOutputPermutation) {
+  ecm->backpropagateOutputPermutation();
+  EXPECT_NO_THROW(ecm->run(););
+
+  EXPECT_TRUE(ecm->getResults().consideredEquivalent());
+}
