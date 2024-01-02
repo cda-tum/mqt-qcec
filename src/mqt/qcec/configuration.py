@@ -33,6 +33,7 @@ class ConfigurationOptions(TypedDict, total=False):
     # Functionality
     trace_threshold: float
     # Optimizations
+    backpropagate_output_permutation: bool
     fix_output_permutation_mismatch: bool
     fuse_single_qubit_gates: bool
     reconstruct_swaps: bool
