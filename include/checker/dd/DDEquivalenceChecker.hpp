@@ -24,8 +24,8 @@ public:
                        Configuration                 config)
       : EquivalenceChecker(circ1, circ2, std::move(config)),
         dd(std::make_unique<dd::Package<Config>>(nqubits)),
-        taskManager1(TaskManager<DDType, Config>(circ1, dd)),
-        taskManager2(TaskManager<DDType, Config>(circ2, dd)) {}
+        taskManager1(TaskManager<DDType, Config>(circ1, *dd)),
+        taskManager2(TaskManager<DDType, Config>(circ2, *dd)) {}
 
   EquivalenceCriterion run() override;
 

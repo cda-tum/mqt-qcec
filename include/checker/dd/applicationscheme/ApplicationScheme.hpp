@@ -92,7 +92,7 @@ protected:
 
 public:
   ApplicationScheme(TM& tm1, TM& tm2) noexcept
-      : taskManager1(tm1), taskManager2(tm2){};
+      : taskManager1(&tm1), taskManager2(&tm2){};
 
   virtual ~ApplicationScheme() = default;
 
@@ -100,8 +100,8 @@ public:
   virtual std::pair<std::size_t, std::size_t> operator()() = 0;
 
 protected:
-  TM& taskManager1;
-  TM& taskManager2;
+  TM* taskManager1;
+  TM* taskManager2;
 };
 
 } // namespace ec
