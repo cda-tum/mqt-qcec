@@ -56,7 +56,7 @@ public:
       return {1U, 1U};
     }
 
-    const auto& op = this->taskManager1();
+    const auto& op = (*this->taskManager1)();
     const auto  key =
         GateCostLookupTableKeyType{op->getType(), op->getNcontrols()};
     std::size_t cost = 1U;

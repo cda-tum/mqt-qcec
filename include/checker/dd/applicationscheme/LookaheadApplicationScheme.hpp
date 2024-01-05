@@ -30,14 +30,14 @@ public:
 
     if (!cached1) {
       // cache the current operation
-      op1 = this->taskManager1.getDD();
+      op1 = this->taskManager1->getDD();
       package->incRef(op1);
       cached1 = true;
     }
 
     if (!cached2) {
       // cache the current operation
-      op2 = this->taskManager2.getInverseDD();
+      op2 = this->taskManager2->getInverseDD();
       package->incRef(op2);
       cached2 = true;
     }
@@ -54,13 +54,13 @@ public:
       *internalState = dd1;
       package->decRef(op1);
       cached1 = false;
-      this->taskManager1.advanceIterator();
+      this->taskManager1->advanceIterator();
     } else {
       assert(!this->taskManager2.finished());
       *internalState = dd2;
       package->decRef(op2);
       cached2 = false;
-      this->taskManager2.advanceIterator();
+      this->taskManager2->advanceIterator();
     }
 
     // properly track reference counts
