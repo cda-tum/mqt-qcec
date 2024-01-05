@@ -65,11 +65,11 @@ TEST_F(ZXTest, NonEquivalent) {
   qcOriginal.import(
       std::stringstream("OPENQASM 2.0;\ninclude \"qelib1.inc\";\nqreg "
                         "q[2];\ncx q[0], q[1];\n"),
-      qc::Format::OpenQASM);
+      qc::Format::OpenQASM2);
   qcAlternative.import(
       std::stringstream("OPENQASM 2.0;\ninclude \"qelib1.inc\";\nqreg q[2];\nh "
                         "q[0]; cx q[1], q[0]; h q[0]; h q[1];\n"),
-      qc::Format::OpenQASM);
+      qc::Format::OpenQASM2);
   ecm = std::make_unique<ec::EquivalenceCheckingManager>(qcOriginal,
                                                          qcAlternative, config);
 

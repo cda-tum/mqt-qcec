@@ -40,10 +40,10 @@ public:
   }
 
   [[nodiscard]] qc::MatrixDD getDD() {
-    return dd::getDD((*iterator).get(), package, permutation);
+    return dd::getDD((*iterator).get(), *package, permutation);
   }
   [[nodiscard]] qc::MatrixDD getInverseDD() {
-    return dd::getInverseDD((*iterator).get(), package, permutation);
+    return dd::getInverseDD((*iterator).get(), *package, permutation);
   }
 
   [[nodiscard]] const qc::QuantumComputation* getCircuit() const noexcept {
@@ -95,7 +95,7 @@ public:
   void finish() { finish(internalState); }
 
   void changePermutation(DDType& state) {
-    dd::changePermutation(state, permutation, qc->outputPermutation, package,
+    dd::changePermutation(state, permutation, qc->outputPermutation, *package,
                           static_cast<bool>(direction));
   }
   void changePermutation() { changePermutation(internalState); }

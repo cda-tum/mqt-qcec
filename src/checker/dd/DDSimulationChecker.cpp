@@ -35,7 +35,7 @@ void DDSimulationChecker::setRandomInitialState(StateGenerator& generator) {
   const auto stateType  = configuration.simulation.stateType;
 
   initialState =
-      generator.generateRandomState(dd, nqubits, nancillary, stateType);
+      generator.generateRandomState(*dd, nqubits, nancillary, stateType);
 }
 
 } // namespace ec
