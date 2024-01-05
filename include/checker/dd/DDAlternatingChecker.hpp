@@ -48,11 +48,6 @@ public:
 private:
   qc::MatrixDD functionality{};
 
-  void initializeTask(
-      [[maybe_unused]] TaskManager<qc::MatrixDD, AlternatingDDPackageConfig>&
-          taskManager) override{
-      // task initialization is conducted separately for this checker
-  };
   void                 initialize() override;
   void                 execute() override;
   void                 finish() override;

@@ -52,7 +52,7 @@ protected:
   // in some form
   EquivalenceCriterion equals(const DDType& e, const DDType& f);
 
-  virtual void initializeTask(TaskManager<DDType, Config>& taskManager) = 0;
+  virtual void initializeTask(TaskManager<DDType, Config>& taskManager);
   virtual void initialize();
   virtual void execute();
   virtual void finish();
