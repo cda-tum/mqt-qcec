@@ -50,13 +50,13 @@ public:
 
     // greedily chose the smaller resulting decision diagram
     if (const auto size2 = dd2.size(); size1 <= size2) {
-      assert(!this->taskManager1.finished());
+      assert(!this->taskManager1->finished());
       *internalState = dd1;
       package->decRef(op1);
       cached1 = false;
       this->taskManager1->advanceIterator();
     } else {
-      assert(!this->taskManager2.finished());
+      assert(!this->taskManager2->finished());
       *internalState = dd2;
       package->decRef(op2);
       cached2 = false;
