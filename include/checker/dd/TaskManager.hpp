@@ -23,6 +23,11 @@ public:
   TaskManager(const qc::QuantumComputation& circ, DDPackage& dd) noexcept
       : TaskManager(circ, dd, Direction::Left) {}
 
+  void reset() noexcept {
+    iterator    = qc->begin();
+    permutation = qc->initialLayout;
+  }
+
   [[nodiscard]] bool finished() const noexcept { return iterator == end; }
 
   const std::unique_ptr<qc::Operation>& operator()() const { return *iterator; }

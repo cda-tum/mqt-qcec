@@ -144,6 +144,12 @@ EquivalenceCriterion DDEquivalenceChecker<DDType, Config>::run() {
 }
 
 template <class DDType, class Config>
+void DDEquivalenceChecker<DDType, Config>::initializeTask(
+    TaskManager<DDType, Config>& taskManager) {
+  taskManager.reset();
+}
+
+template <class DDType, class Config>
 void DDEquivalenceChecker<DDType, Config>::initialize() {
   initializeTask(taskManager1);
   initializeTask(taskManager2);
