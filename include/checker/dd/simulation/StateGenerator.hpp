@@ -22,12 +22,11 @@ public:
   }
   StateGenerator() : StateGenerator(0U) {}
 
-  template <class DDPackage = dd::Package<>>
+  template <class Config = dd::DDPackageConfig>
   qc::VectorDD
-  generateRandomState(std::unique_ptr<DDPackage>& dd,
-                      const std::size_t           totalQubits,
-                      const std::size_t           ancillaryQubits = 0U,
-                      const StateType type = StateType::ComputationalBasis) {
+  generateRandomState(dd::Package<Config>& dd, const std::size_t totalQubits,
+                      const std::size_t ancillaryQubits = 0U,
+                      const StateType   type = StateType::ComputationalBasis) {
     switch (type) {
     case ec::StateType::Random1QBasis:
       return generateRandom1QBasisState(dd, totalQubits, ancillaryQubits);
@@ -39,9 +38,9 @@ public:
     }
   }
 
-  template <class DDPackage = dd::Package<>>
+  template <class Config = dd::DDPackageConfig>
   qc::VectorDD generateRandomComputationalBasisState(
-      std::unique_ptr<DDPackage>& dd, const std::size_t totalQubits,
+      dd::Package<Config>& dd, const std::size_t totalQubits,
       const std::size_t ancillaryQubits = 0U) {
     // determine how many qubits truly are random
     const std::size_t randomQubits = totalQubits - ancillaryQubits;
@@ -87,14 +86,14 @@ public:
     }
 
     // return the appropriate decision diagram
-    return dd->makeBasisState(totalQubits, stimulusBits);
+    return dd.makeBasisState(totalQubits, stimulusBits);
   }
 
-  template <class DDPackage = dd::Package<>>
+  template <class Config = dd::DDPackageConfig>
   qc::VectorDD
-  generateRandom1QBasisState(std::unique_ptr<DDPackage>& dd,
-                             const std::size_t           totalQubits,
-                             const std::size_t           ancillaryQubits = 0U) {
+  generateRandom1QBasisState(dd::Package<Config>& dd,
+                             const std::size_t    totalQubits,
+                             const std::size_t    ancillaryQubits = 0U) {
     // determine how many qubits truly are random
     const std::size_t randomQubits = totalQubits - ancillaryQubits;
 
@@ -127,14 +126,14 @@ public:
     }
 
     // return the appropriate decision diagram
-    return dd->makeBasisState(totalQubits, randomBasisState);
+    return dd.makeBasisState(totalQubits, randomBasisState);
   }
 
-  template <class DDPackage = dd::Package<>>
+  template <class Config = dd::DDPackageConfig>
   qc::VectorDD
-  generateRandomStabilizerState(std::unique_ptr<DDPackage>& dd,
-                                const std::size_t           totalQubits,
-                                const std::size_t ancillaryQubits = 0U) {
+  generateRandomStabilizerState(dd::Package<Config>& dd,
+                                const std::size_t    totalQubits,
+                                const std::size_t    ancillaryQubits = 0U) {
     // determine how many qubits truly are random
     const std::size_t randomQubits = totalQubits - ancillaryQubits;
 
@@ -145,16 +144,16 @@ public:
 
     // generate the associated stabilizer state by simulating the Clifford
     // circuit
-    auto stabilizer = simulate(&rcs, dd->makeZeroState(randomQubits), dd);
+    auto stabilizer = simulate(&rcs, dd.makeZeroState(randomQubits), dd);
 
     // decrease the ref count right after so that it stays correct later on
-    dd->decRef(stabilizer);
+    dd.decRef(stabilizer);
 
     // add |0> edges for all the ancillary qubits
     auto initial = stabilizer;
     for (std::size_t p = randomQubits; p < totalQubits; ++p) {
-      initial = dd->makeDDNode(static_cast<dd::Qubit>(p),
-                               std::array{initial, qc::VectorDD::zero()});
+      initial = dd.makeDDNode(static_cast<dd::Qubit>(p),
+                              std::array{initial, qc::VectorDD::zero()});
     }
 
     // return the resulting decision diagram
