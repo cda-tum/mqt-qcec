@@ -19,7 +19,9 @@ endmacro()
 
 check_submodule_present(mqt-core)
 
+option(BUILD_MQT_QCEC_TESTS "Also build tests for the MQT QCEC project" ON)
 option(BUILD_MQT_QCEC_BINDINGS "Build the MQT QCEC Python bindings" OFF)
+
 if(BUILD_MQT_QCEC_BINDINGS)
   # ensure that the BINDINGS option is set
   set(BINDINGS
@@ -42,11 +44,12 @@ if(BUILD_MQT_QCEC_BINDINGS)
     OPTIONAL_COMPONENTS Development.SABIModule)
 endif()
 
+include(cmake/ExternalDependencies.cmake)
+
 # add main library code
 add_subdirectory(src)
 
 # add test code
-option(BUILD_MQT_QCEC_TESTS "Also build tests for the MQT QCEC project" ON)
 if(BUILD_MQT_QCEC_TESTS)
   enable_testing()
   include(GoogleTest)
