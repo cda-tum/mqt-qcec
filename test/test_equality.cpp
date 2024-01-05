@@ -48,6 +48,32 @@ TEST_F(EqualityTest, GlobalPhase) {
             ec::EquivalenceCriterion::EquivalentUpToGlobalPhase);
 }
 
+/**
+ * @brief The following is a regression test for
+ * https://github.com/cda-tum/mqt-qcec/issues/347
+ */
+TEST_F(EqualityTest, GlobalPhaseSimulation) {
+  qc1.x(0);
+  qc2.x(0);
+
+  // add a global phase of -1
+  qc2.z(0);
+  qc2.x(0);
+  qc2.z(0);
+  qc2.x(0);
+
+  config.execution.runAlternatingChecker  = false;
+  config.execution.runConstructionChecker = false;
+  config.execution.runZXChecker           = false;
+  config.execution.runSimulationChecker   = true;
+  config.execution.parallel               = false;
+  ec::EquivalenceCheckingManager ecm(qc1, qc2, config);
+  ecm.run();
+  const auto json       = ecm.json();
+  const auto simChecker = json["checkers"].front();
+  EXPECT_EQ(simChecker["equivalence"], "equivalent_up_to_phase");
+}
+
 TEST_F(EqualityTest, CloseButNotEqualAlternating) {
   qc1.x(0);
 
