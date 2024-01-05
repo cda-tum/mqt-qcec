@@ -17,8 +17,9 @@ template <class DDType, class Config = dd::DDPackageConfig> class TaskManager {
 public:
   TaskManager(const qc::QuantumComputation& circ,
               std::unique_ptr<DDPackage>& dd, const ec::Direction& dir) noexcept
-      : qc(&circ), package(dd), direction(dir), permutation(circ.initialLayout),
-        iterator(circ.begin()), end(circ.end()) {}
+      : qc(&circ), package(dd.get()), direction(dir),
+        permutation(circ.initialLayout), iterator(circ.begin()),
+        end(circ.end()) {}
   TaskManager(const qc::QuantumComputation& circ,
               std::unique_ptr<DDPackage>&   dd) noexcept
       : TaskManager(circ, dd, Direction::Left) {}
@@ -126,7 +127,7 @@ public:
 
 private:
   const qc::QuantumComputation* qc{};
-  std::unique_ptr<DDPackage>&   package;
+  DDPackage*                    package;
   ec::Direction                 direction = Direction::Left;
   qc::Permutation               permutation{};
   decltype(qc->begin())         iterator;
