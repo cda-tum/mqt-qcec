@@ -79,5 +79,45 @@ if(BUILD_MQT_QCEC_TESTS)
     EXCLUDE_FROM_ALL)
 endif()
 
+if(BINDINGS)
+  if(NOT SKBUILD)
+    # Manually detect the installed mqt-core package.
+    execute_process(
+      COMMAND "${Python_EXECUTABLE}" -m mqt.core --cmake_dir
+      OUTPUT_STRIP_TRAILING_WHITESPACE
+      OUTPUT_VARIABLE mqt-core_DIR)
+
+    # Manually detect the installed pybind11 package.
+    execute_process(
+      COMMAND "${Python_EXECUTABLE}" -m pybind11 --cmakedir
+      OUTPUT_STRIP_TRAILING_WHITESPACE
+      OUTPUT_VARIABLE pybind11_DIR)
+
+    # Add the detected directories to the CMake prefix path.
+    list(APPEND CMAKE_PREFIX_PATH "${pybind11_DIR}" "${mqt-core_DIR}")
+  endif()
+
+  # add pybind11 library
+  find_package(pybind11 CONFIG REQUIRED)
+endif()
+
+if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.24)
+  FetchContent_Declare(
+    mqt-core
+    GIT_REPOSITORY https://github.com/cda-tum/mqt-core.git
+    GIT_TAG origin/project-installation
+    FIND_PACKAGE_ARGS)
+  list(APPEND FETCH_PACKAGES mqt-core)
+else()
+  find_package(mqt-core REQUIRED)
+  if(NOT mqt-core_FOUND)
+    FetchContent_Declare(
+      mqt-core
+      GIT_REPOSITORY https://github.com/cda-tum/mqt-core.git
+      GIT_TAG v2.2.0)
+    list(APPEND FETCH_PACKAGES mqt-core)
+  endif()
+endif()
+
 # Make all declared dependencies available.
 FetchContent_MakeAvailable(${FETCH_PACKAGES})

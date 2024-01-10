@@ -72,8 +72,6 @@ repos:
     hooks:
       - id: cmake-format
         additional_dependencies: [pyyaml]
-      - id: cmake-lint
-        additional_dependencies: [pyyaml]
 
   # Clang-format the C++ part of the code base automatically
   - repo: https://github.com/pre-commit/mirrors-clang-format
@@ -100,6 +98,7 @@ repos:
           - importlib_resources
           - numpy
           - pytest
+          - mqt-core~=2.2.0
 
   # Check for spelling
   - repo: https://github.com/codespell-project/codespell
