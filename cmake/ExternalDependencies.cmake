@@ -80,21 +80,24 @@ if(BUILD_MQT_QCEC_TESTS)
 endif()
 
 if(BINDINGS)
-  if(NOT SKBUILD)
-    # Manually detect the installed mqt-core package.
-    execute_process(
-      COMMAND "${Python_EXECUTABLE}" -m mqt.core --cmake_dir
-      OUTPUT_STRIP_TRAILING_WHITESPACE
-      OUTPUT_VARIABLE mqt-core_DIR)
+  # Manually detect the installed mqt-core package.
+  execute_process(
+    COMMAND "${Python_EXECUTABLE}" -m mqt.core --cmake_dir
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+    OUTPUT_VARIABLE mqt-core_DIR)
 
+  # Add the detected directory to the CMake prefix path.
+  list(APPEND CMAKE_PREFIX_PATH "${mqt-core_DIR}")
+
+  if(NOT SKBUILD)
     # Manually detect the installed pybind11 package.
     execute_process(
       COMMAND "${Python_EXECUTABLE}" -m pybind11 --cmakedir
       OUTPUT_STRIP_TRAILING_WHITESPACE
       OUTPUT_VARIABLE pybind11_DIR)
 
-    # Add the detected directories to the CMake prefix path.
-    list(APPEND CMAKE_PREFIX_PATH "${pybind11_DIR}" "${mqt-core_DIR}")
+    # Add the detected directory to the CMake prefix path.
+    list(APPEND CMAKE_PREFIX_PATH "${pybind11_DIR}")
   endif()
 
   # add pybind11 library
