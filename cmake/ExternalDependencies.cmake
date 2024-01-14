@@ -109,15 +109,15 @@ if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.24)
     mqt-core
     GIT_REPOSITORY https://github.com/cda-tum/mqt-core.git
     GIT_TAG v2.2.0
-    FIND_PACKAGE_ARGS 2.2.0)
+    FIND_PACKAGE_ARGS 2.2.1)
   list(APPEND FETCH_PACKAGES mqt-core)
 else()
-  find_package(mqt-core 2.2.0 QUIET)
+  find_package(mqt-core 2.2.1 QUIET)
   if(NOT mqt-core_FOUND)
     FetchContent_Declare(
       mqt-core
       GIT_REPOSITORY https://github.com/cda-tum/mqt-core.git
-      GIT_TAG v2.2.0)
+      GIT_TAG v2.2.1)
     list(APPEND FETCH_PACKAGES mqt-core)
   endif()
 endif()
