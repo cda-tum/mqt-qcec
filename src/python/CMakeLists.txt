@@ -1,5 +1,6 @@
-pybind11_add_module(py${PROJECT_NAME} bindings.cpp)
-target_link_libraries(py${PROJECT_NAME} PRIVATE ${PROJECT_NAME})
+pybind11_add_module(pyqcec bindings.cpp)
+target_link_libraries(pyqcec PRIVATE pybind11::thin_lto MQT::QCEC
+                                     MQT::ProjectOptions MQT::ProjectWarnings)
 
 # Install directive for scikit-build-core
 install(
