@@ -1,5 +1,10 @@
 [build-system]
-requires = ["scikit-build-core>=0.6.1", "setuptools-scm>=7", "pybind11>=2.11", "mqt.core~=2.2.1"]
+requires = [
+    "scikit-build-core>=0.6.1",
+    "setuptools-scm>=7",
+    "pybind11>=2.11",
+    "mqt.core @ git+https://github.com/cda-tum/mqt-core.git@installation-improvements",
+]
 build-backend = "scikit_build_core.build"
 
 [project]
@@ -35,7 +40,7 @@ classifiers = [
 ]
 requires-python = ">=3.8"
 dependencies = [
-    "mqt.core[qiskit]~=2.2.1",
+    "mqt.core[qiskit] @ git+https://github.com/cda-tum/mqt-core.git@installation-improvements",
     "importlib_resources>=5.0; python_version < '3.10'",
     "typing_extensions>=4.2",
 ]
@@ -103,7 +108,6 @@ sdist.exclude = [
 [tool.scikit-build.cmake.define]
 BUILD_MQT_QCEC_TESTS = "OFF"
 BUILD_MQT_QCEC_BINDINGS = "ON"
-ENABLE_IPO = "ON"
 
 
 [tool.check-sdist]
