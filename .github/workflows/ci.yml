@@ -49,7 +49,7 @@ jobs:
     if: fromJSON(needs.change-detection.outputs.run-code-ql)
     uses: cda-tum/mqt-core/.github/workflows/reusable-code-ql.yml@main
     with:
-      build-time-dependencies: "scikit-build-core[pyproject] setuptools_scm pybind11 mqt.core @ git+https://github.com/cda-tum/mqt-core.git@installation-improvements"
+      build-time-dependencies: 'scikit-build-core[pyproject] setuptools_scm pybind11 "mqt.core @ git+https://github.com/cda-tum/mqt-core.git@installation-improvements"'
 
   required-checks-pass: # This job does nothing and is only used for branch protection
     name: 🚦 Check
