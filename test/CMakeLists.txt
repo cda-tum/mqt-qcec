@@ -1,6 +1,6 @@
 package_add_test(
   ${PROJECT_NAME}_test
-  ${PROJECT_NAME}
+  MQT::QCEC
   legacy/test_functionality.cpp
   legacy/test_journal.cpp
   legacy/test_compilationflow.cpp
