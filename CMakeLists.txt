@@ -26,17 +26,20 @@ if(BUILD_MQT_QCEC_BINDINGS)
   # ensure that the BINDINGS option is set
   set(BINDINGS
       ON
-      CACHE BOOL "Enable settings related to Python bindings" FORCE)
-  # cmake-lint: disable=C0103
+      CACHE INTERNAL "Enable settings related to Python bindings")
+  # Some common settings for finding Python
   set(Python_FIND_VIRTUALENV
       FIRST
       CACHE STRING "Give precedence to virtualenvs when searching for Python")
-  # cmake-lint: disable=C0103
+  set(Python_FIND_FRAMEWORK
+      LAST
+      CACHE STRING "Prefer Brew/Conda to Apple framework Python")
   set(Python_ARTIFACTS_INTERACTIVE
       ON
       CACHE
         BOOL
         "Prevent multiple searches for Python and instead cache the results.")
+
   # top-level call to find Python
   find_package(
     Python 3.8 REQUIRED
