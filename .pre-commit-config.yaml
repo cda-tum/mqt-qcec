@@ -95,7 +95,7 @@ repos:
     hooks:
       - id: mypy
         files: ^(src/mqt|test/python)
-        args: ["--enable-incomplete-feature=Unpack"]
+        args: []
         additional_dependencies:
           - importlib_resources
           - numpy
