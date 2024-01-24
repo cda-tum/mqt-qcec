@@ -4,6 +4,6 @@ target_link_libraries(pyqcec PRIVATE pybind11::thin_lto MQT::QCEC
 
 # Install directive for scikit-build-core
 install(
-  TARGETS py${PROJECT_NAME}
+  TARGETS pyqcec
   DESTINATION .
   COMPONENT MQTQCECPythonModule)
