@@ -15,7 +15,6 @@ if(MQT_QCEC_INSTALL)
   set(MQT_QCEC_CMAKE_PROJECT_TARGETS_FILE
       "${MQT_QCEC_CMAKE_CONFIG_DIR}/mqt-qcec-targets.cmake")
 
-  message(STATUS "CMAKE_INSTALL_RPATH: ${CMAKE_INSTALL_RPATH}")
   if(APPLE)
     set(BASEPOINT @loader_path)
   else()
