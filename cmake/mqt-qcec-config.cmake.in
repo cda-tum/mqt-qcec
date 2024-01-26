@@ -1,0 +1,16 @@
+# A CMake config file for the library, to be used by external projects
+
+@PACKAGE_INIT@
+
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}")
+
+include(CMakeFindDependencyMacro)
+find_dependency(mqt-core)
+
+if(TARGET MQT::QCEC)
+  return()
+endif()
+
+if(NOT mqt-qcec_FIND_QUIETLY)
+  message(STATUS "Found mqt-qcec version ${mqt-qcec_VERSION}")
+endif()

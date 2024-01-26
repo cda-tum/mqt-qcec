@@ -1,5 +1,10 @@
 [build-system]
-requires = ["scikit-build-core>=0.6.1", "setuptools-scm>=7", "pybind11>=2.11"]
+requires = [
+    "scikit-build-core>=0.6.1",
+    "setuptools-scm>=7",
+    "pybind11>=2.11",
+    "mqt.core @ git+https://github.com/cda-tum/mqt-core.git@installation-improvements",
+]
 build-backend = "scikit_build_core.build"
 
 [project]
@@ -35,9 +40,9 @@ classifiers = [
 ]
 requires-python = ">=3.8"
 dependencies = [
+    "mqt.core[qiskit]>=2.2.1,<2.3.0",
     "importlib_resources>=5.0; python_version < '3.10'",
     "typing_extensions>=4.2",
-    "qiskit-terra>=0.22.1",
 ]
 dynamic = ["version"]
 
@@ -72,8 +77,8 @@ Discussions = "https://github.com/cda-tum/mqt-qcec/discussions"
 # Protect the configuration against future changes in scikit-build-core
 minimum-version = "0.6.1"
 
-# Set the target to build
-cmake.targets = ["pyqcec"]
+# Set the wheel install directory
+wheel.install-dir = "mqt/qcec"
 
 # Set required CMake and Ninja versions
 cmake.minimum-version = "3.19"
@@ -81,9 +86,6 @@ ninja.minimum-version = "1.10"
 
 # Setuptools-style build caching in a local directory
 build-dir = "build/{wheel_tag}"
-
-# Build stable ABI wheels for CPython 3.12+
-wheel.py-api = "cp312"
 
 # Explicitly set the package directory
 wheel.packages = ["src/mqt"]
@@ -103,7 +105,6 @@ sdist.exclude = [
 [tool.scikit-build.cmake.define]
 BUILD_MQT_QCEC_TESTS = "OFF"
 BUILD_MQT_QCEC_BINDINGS = "ON"
-ENABLE_IPO = "ON"
 
 
 [tool.check-sdist]
@@ -140,6 +141,8 @@ run.omit = ["src/mqt/qcec/types.py"]
 report.exclude_also = [
     '\.\.\.',
     'if TYPE_CHECKING:',
+    'raise AssertionError',
+    'raise NotImplementedError',
 ]
 
 
@@ -147,12 +150,12 @@ report.exclude_also = [
 files = ["src/mqt", "test/python"]
 mypy_path = ["$MYPY_CONFIG_FILE_DIR/src"]
 python_version = "3.8"
-strict = true
-show_error_codes = true
+warn_unused_configs = true
 enable_error_code = ["ignore-without-code", "redundant-expr", "truthy-bool"]
-warn_unreachable = true
+strict = true
+disallow_untyped_defs = false
 explicit_package_bases = true
-pretty = true
+warn_unreachable = true
 
 [[tool.mypy.overrides]]
 module = ["qiskit.*"]

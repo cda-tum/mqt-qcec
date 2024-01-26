@@ -15,6 +15,7 @@
 #include "checker/dd/DDSimulationChecker.hpp"
 #include "checker/dd/simulation/StateGenerator.hpp"
 #include "checker/zx/ZXChecker.hpp"
+#include "mqt_qcec_export.h"
 
 #include <atomic>
 #include <chrono>
@@ -26,7 +27,7 @@
 
 namespace ec {
 
-class EquivalenceCheckingManager {
+class MQT_QCEC_EXPORT EquivalenceCheckingManager {
 public:
   struct Results {
     double preprocessingTime{};

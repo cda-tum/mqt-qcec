@@ -6,6 +6,7 @@
 #pragma once
 
 #include "ApplicationScheme.hpp"
+#include "mqt_qcec_export.h"
 #include "operations/OpType.hpp"
 
 #include <cstddef>
@@ -106,6 +107,6 @@ private:
   }
 };
 
-[[nodiscard, gnu::pure]] std::size_t
+[[nodiscard, gnu::pure]] MQT_QCEC_EXPORT std::size_t
 legacyCostFunction(const GateCostLookupTableKeyType& key) noexcept;
 } // namespace ec

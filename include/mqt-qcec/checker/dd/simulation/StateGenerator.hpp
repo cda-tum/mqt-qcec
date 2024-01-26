@@ -10,12 +10,13 @@
 #include "checker/dd/TaskManager.hpp"
 #include "dd/Package.hpp"
 #include "dd/Simulation.hpp"
+#include "mqt_qcec_export.h"
 
 #include <functional>
 #include <random>
 
 namespace ec {
-class StateGenerator {
+class MQT_QCEC_EXPORT StateGenerator {
 public:
   explicit StateGenerator(const std::size_t s) : seed(s) {
     seedGenerator(seed);
