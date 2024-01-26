@@ -93,39 +93,30 @@ void DDAlternatingChecker::postprocess() {
   if (isDone()) {
     return;
   }
-
-  // sum up the contributions of garbage qubits
-  taskManager1.reduceGarbage(functionality);
-  if (isDone()) {
-    return;
-  }
-  taskManager2.reduceGarbage(functionality);
-  if (isDone()) {
-    return;
-  }
 }
 
 EquivalenceCriterion DDAlternatingChecker::checkEquivalence() {
-  // create the full identity matrix
-  auto goalMatrix = dd->makeIdent(nqubits);
-  dd->incRef(goalMatrix);
+  std::vector<bool> garbage(nqubits);
+  // is it guaranteed that the two circuits have the same garbage qubits?
+  for (qc::Qubit q = 0U; q < nqubits; ++q) {
+    garbage[static_cast<std::size_t>(q)] =
+        qc1.logicalQubitIsGarbage(q) && qc2.logicalQubitIsGarbage(q);
+  }
 
-  // account for any garbage
-  taskManager1.reduceGarbage(goalMatrix);
-  taskManager2.reduceGarbage(goalMatrix);
+  // if partial equivalence is being checked instead of total equivalence, it
+  // suffices to change the last parameter of isCloseToIdentity to `false`
+  bool isClose = dd->isCloseToIdentity(
+      functionality, configuration.functionality.traceThreshold, garbage, true);
 
-  taskManager1.reduceAncillae(goalMatrix);
-  taskManager2.reduceAncillae(goalMatrix);
-
-  // the resulting goal matrix is
-  // [1 0] if the qubit is no ancillary
-  // [0 1]
-  //
-  // [1 0] (= |0><0>|) for an ancillary that is present in either circuit
-  // [0 0]
-
-  // compare the obtained functionality to the goal matrix
-  return equals(functionality, goalMatrix);
+  if (isClose) {
+    // whenever the top edge weight is not one, both decision diagrams are only
+    // equivalent up to a global phase
+    if (!functionality.w.approximatelyEquals(dd::Complex::one())) {
+      return EquivalenceCriterion::EquivalentUpToGlobalPhase;
+    }
+    return EquivalenceCriterion::Equivalent;
+  }
+  return EquivalenceCriterion::NotEquivalent;
 }
 
 [[nodiscard]] bool DDAlternatingChecker::gatesAreIdentical() const {

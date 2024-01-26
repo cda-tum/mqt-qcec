@@ -11,4 +11,5 @@ package_add_test(
   test_gate_cost_application_scheme.cpp
   test_equality.cpp
   test_zx.cpp
-  test_symbolic.cpp)
+  test_symbolic.cpp
+  test_partial_equivalence.cpp)
