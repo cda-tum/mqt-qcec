@@ -24,9 +24,9 @@ __all__ = [
     "Configuration",
     "EquivalenceCheckingManager",
     "EquivalenceCriterion",
-    "generate_profile",
     "StateType",
+    "__version__",
+    "generate_profile",
     "verify",
     "verify_compilation",
-    "__version__",
 ]
