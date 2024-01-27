@@ -101,7 +101,6 @@ TEST_F(PartialEqualityTest, AlternatingCheckerGarbageAndAncillary) {
   qc1.cx(2, 0);
 
   qc::QuantumComputation qc3(nqubits - 1);
-  qc3.setLogicalQubitGarbage(2);
   qc3.setLogicalQubitGarbage(1);
 
   qc3.h(0);

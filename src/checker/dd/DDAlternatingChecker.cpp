@@ -105,7 +105,7 @@ EquivalenceCriterion DDAlternatingChecker::checkEquivalence() {
 
   // if partial equivalence is being checked instead of total equivalence, it
   // suffices to change the last parameter of isCloseToIdentity to `false`
-  bool isClose = dd->isCloseToIdentity(
+  const bool isClose = dd->isCloseToIdentity(
       functionality, configuration.functionality.traceThreshold, garbage, true);
 
   if (isClose) {
