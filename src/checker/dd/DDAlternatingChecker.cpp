@@ -97,7 +97,6 @@ void DDAlternatingChecker::postprocess() {
 
 EquivalenceCriterion DDAlternatingChecker::checkEquivalence() {
   std::vector<bool> garbage(nqubits);
-  // is it guaranteed that the two circuits have the same garbage qubits?
   for (qc::Qubit q = 0U; q < nqubits; ++q) {
     garbage[static_cast<std::size_t>(q)] =
         qc1.logicalQubitIsGarbage(q) && qc2.logicalQubitIsGarbage(q);
