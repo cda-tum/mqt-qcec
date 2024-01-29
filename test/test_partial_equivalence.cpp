@@ -132,7 +132,6 @@ TEST_F(PartialEqualityTest, AlternatingCheckerGarbageNotEquivalent) {
   qc2.setLogicalQubitGarbage(2);
   qc2.setLogicalQubitGarbage(1);
 
-  std::cout << "qc1:\n";
   config.execution.runAlternatingChecker = true;
   ec::EquivalenceCheckingManager ecm(qc1, qc2, config);
   ecm.setApplicationScheme(ec::ApplicationSchemeType::Proportional);
