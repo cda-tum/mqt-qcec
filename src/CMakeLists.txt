@@ -1,10 +1,3 @@
-# add MQT::Core target
-set(BUILD_MQT_CORE_TESTS
-    OFF
-    CACHE BOOL "Build MQT Core tests")
-add_subdirectory("${PROJECT_SOURCE_DIR}/extern/mqt-core" "extern/mqt-core"
-                 EXCLUDE_FROM_ALL)
-
 add_library(
   ${PROJECT_NAME}
   ${PROJECT_SOURCE_DIR}/include/checker
@@ -28,9 +21,11 @@ target_include_directories(${PROJECT_NAME} PUBLIC ${PROJECT_SOURCE_DIR}/include
 
 # link to the MQT::Core libraries
 target_link_libraries(${PROJECT_NAME} PUBLIC MQT::CoreDD MQT::CoreZX)
+target_link_libraries(${PROJECT_NAME} PRIVATE MQT::ProjectWarnings
+                                              MQT::ProjectOptions)
 
 # add MQT alias
-add_library(MQT::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
+add_library(MQT::QCEC ALIAS ${PROJECT_NAME})
 
 if(BUILD_MQT_QCEC_BINDINGS)
   add_subdirectory(python)
