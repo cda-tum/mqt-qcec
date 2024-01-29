@@ -132,6 +132,7 @@ filterwarnings = [
     'ignore:.*qiskit.utils.algorithm_globals.QiskitAlgorithmGlobals*:DeprecationWarning:qiskit',
     'ignore:.*Building a flow controller with keyword arguments is going to be deprecated*:PendingDeprecationWarning:qiskit',
     'ignore:.*encountered in det.*:RuntimeWarning:numpy.linalg:',
+    'ignore:.*datetime\.datetime\.utcfromtimestamp.*:DeprecationWarning:',
 ]
 
 [tool.coverage]
