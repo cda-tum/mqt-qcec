@@ -5,7 +5,6 @@ from __future__ import annotations
 import pytest
 from qiskit import QuantumCircuit, transpile
 from qiskit.circuit import Parameter
-from qiskit.providers.fake_provider import FakeAthens
 
 from mqt import qcec
 from mqt.qcec.compilation_flow_profiles import AncillaMode
@@ -186,7 +185,12 @@ def test_cnot_rx_non_equ_approx(cnot_rx: QuantumCircuit, cnot_rx_flipped_approx:
 @pytest.mark.parametrize("optimization_level", [0, 1, 2, 3])
 def test_verify_compilation_on_optimization_levels(original_circuit: QuantumCircuit, optimization_level: int) -> None:
     """Test the verification of the compilation of a circuit to the 5-qubit IBMQ Athens architecture with various optimization levels."""
-    compiled_circuit = transpile(original_circuit, backend=FakeAthens(), optimization_level=optimization_level)
+    compiled_circuit = transpile(
+        original_circuit,
+        coupling_map=[[0, 1], [1, 0], [1, 2], [2, 1], [2, 3], [3, 2], [3, 4], [4, 3]],
+        basis_gates=["cx", "x", "id", "u3", "measure", "u2", "rz", "u1", "reset", "sx"],
+        optimization_level=optimization_level,
+    )
     result = qcec.verify_compilation(original_circuit, compiled_circuit, optimization_level, timeout=3600)
     assert result.equivalence in {
         qcec.EquivalenceCriterion.equivalent,
@@ -201,7 +205,12 @@ def test_verify_compilation_on_optimization_levels_config(
     """Test the verification of the compilation of a circuit to the 5-qubit IBMQ Athens architecture with various optimization levels."""
     config = qcec.Configuration()
     config.execution.run_zx_checker = False
-    compiled_circuit = transpile(original_circuit, backend=FakeAthens(), optimization_level=optimization_level)
+    compiled_circuit = transpile(
+        original_circuit,
+        coupling_map=[[0, 1], [1, 0], [1, 2], [2, 1], [2, 3], [3, 2], [3, 4], [4, 3]],
+        basis_gates=["cx", "x", "id", "u3", "measure", "u2", "rz", "u1", "reset", "sx"],
+        optimization_level=optimization_level,
+    )
     result = qcec.verify_compilation(
         original_circuit, compiled_circuit, optimization_level, AncillaMode.NO_ANCILLA, config
     )
