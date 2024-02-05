@@ -63,14 +63,14 @@ def extract_params(
 
     offsets = np.zeros(len(symb_exprs))
     for row, expr in enumerate(symb_exprs):
-        zero_map = {param: 0 for param in expr.parameters}
+        zero_map = dict.fromkeys(expr.parameters, 0)
         offsets[row] = -float(expr.bind(zero_map))
 
     equs = np.zeros((len(symb_exprs), n_params))
 
     for col, param in enumerate(symb_params):
         for row, expr in enumerate(symb_exprs):
-            one_map = {p: 0 for p in expr.parameters}
+            one_map = dict.fromkeys(expr.parameters, 0)
             if param in expr.parameters:
                 one_map[param] = 1
                 val = float((expr + offsets[row]).bind(one_map))
