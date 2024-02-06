@@ -73,6 +73,7 @@ class Configuration:
         store_cex_input: bool
         store_cex_output: bool
         def __init__(self) -> None: ...
+
     application: Configuration.Application
     execution: Configuration.Execution
     functionality: Configuration.Functionality
