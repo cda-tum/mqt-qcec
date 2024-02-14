@@ -10,6 +10,7 @@ if TYPE_CHECKING:
     from typing_extensions import Unpack
 
     from .configuration import ConfigurationOptions
+    from .verify import CircuitInputType
 
 if TYPE_CHECKING or sys.version_info < (3, 10, 0):
     import importlib_resources as resources
@@ -46,8 +47,8 @@ def __check_if_circuit_contains_measurements(circuit: QuantumCircuit) -> None:
 
 
 def verify_compilation(
-    original_circuit: QuantumCircuit | str,
-    compiled_circuit: QuantumCircuit | str,
+    original_circuit: CircuitInputType,
+    compiled_circuit: CircuitInputType,
     optimization_level: int = 1,
     ancilla_mode: AncillaMode = AncillaMode.NO_ANCILLA,
     configuration: Configuration | None = None,
