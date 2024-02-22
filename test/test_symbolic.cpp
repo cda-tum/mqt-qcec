@@ -60,7 +60,7 @@ TEST_F(SymbolicTest, Timeout) {
     symQc2.rx(xMonom, 0);
   }
   ec::Configuration config{};
-  config.execution.timeout = 1;
+  config.execution.timeout = 0.1;
   auto ecm = ec::EquivalenceCheckingManager(symQc1, symQc2, config);
 
   ecm.run();
