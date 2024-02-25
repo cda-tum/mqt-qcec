@@ -16,7 +16,8 @@ enum class EquivalenceCriterion {
   ProbablyEquivalent        = 3,
   EquivalentUpToGlobalPhase = 4,
   EquivalentUpToPhase       = 5,
-  ProbablyNotEquivalent     = 6
+  ProbablyNotEquivalent     = 6,
+  PartiallyEquivalent       = 7
 };
 
 inline std::string toString(const EquivalenceCriterion& criterion) noexcept {
@@ -33,6 +34,8 @@ inline std::string toString(const EquivalenceCriterion& criterion) noexcept {
     return "equivalent_up_to_phase";
   case EquivalenceCriterion::ProbablyNotEquivalent:
     return "probably_not_equivalent";
+  case EquivalenceCriterion::PartiallyEquivalent:
+    return "partially_equivalent";
   default:
     return "no_information";
   }
@@ -59,6 +62,9 @@ inline EquivalenceCriterion fromString(const std::string& criterion) noexcept {
   }
   if ((criterion == "probably_not_equivalent") || (criterion == "6")) {
     return EquivalenceCriterion::ProbablyNotEquivalent;
+  }
+  if ((criterion == "partially_equivalent") || (criterion == "7")) {
+    return EquivalenceCriterion::PartiallyEquivalent;
   }
   std::cerr << "Unknown equivalence criterion: " << criterion
             << ". Defaulting to `no_information`.\n";
