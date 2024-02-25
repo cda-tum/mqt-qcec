@@ -11,6 +11,7 @@ add_library(
   checker/dd/DDConstructionChecker.cpp
   checker/dd/DDSimulationChecker.cpp
   checker/dd/DDAlternatingChecker.cpp
+  checker/dd/DDPartialEquivalence.cpp
   checker/dd/applicationscheme/GateCostApplicationScheme.cpp
   checker/dd/simulation/StateGenerator.cpp
   checker/zx/ZXChecker.cpp)
