@@ -32,6 +32,7 @@ class ConfigurationOptions(TypedDict, total=False):
     timeout: float
     # Functionality
     trace_threshold: float
+    check_partial_equivalence: bool
     # Optimizations
     backpropagate_output_permutation: bool
     fix_output_permutation_mismatch: bool
