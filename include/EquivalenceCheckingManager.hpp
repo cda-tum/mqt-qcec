@@ -47,7 +47,6 @@ public:
       case EquivalenceCriterion::ProbablyEquivalent:
       case EquivalenceCriterion::EquivalentUpToGlobalPhase:
       case EquivalenceCriterion::EquivalentUpToPhase:
-      case EquivalenceCriterion::PartiallyEquivalent:
         return true;
       default:
         return false;

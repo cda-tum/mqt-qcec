@@ -155,20 +155,6 @@ PYBIND11_MODULE(pyqcec, m) {
              "whenever the :ref:`ZX-calculus checker "
              "<EquivalenceChecking:ZX-Calculus Equivalence Checker>` could not "
              "reduce the combined circuit to the identity.")
-      .value(
-          "partially_equivalent", EquivalenceCriterion::PartiallyEquivalent,
-          "Circuits are partially equivalent. Two circuits are partially "
-          "equivalent if, for each possible initial "
-          "input state, they have the same probability for each measurement "
-          "outcome. This result is obtained by the :ref:`construction checker "
-          "<EquivalenceChecking:Construction Equivalence Checker (using "
-          "Decision Diagrams)>` or the :ref:`alternating checker "
-          "<EquivalenceChecking:Alternating Equivalence Checker (using "
-          "Decision Diagrams)>` if the flag :attr:`check_partial_equivalence "
-          "<.Configuration.Functionality.check_partial_equivalence>` is set to "
-          ":code:`True`. If it is set to :code:`False`, the checker will "
-          "output 'not equivalent' for "
-          "circuits that are partially equivalent but not totally equivalent. ")
       // allow construction from a string
       .def(py::init([](const std::string& str) -> EquivalenceCriterion {
         return fromString(str);
@@ -331,9 +317,7 @@ PYBIND11_MODULE(pyqcec, m) {
           "set_check_partial_equivalence",
           &EquivalenceCheckingManager::setCheckPartialEquivalence,
           "enable"_a = false,
-          "Set whether to :attr:`check for partial equivalence "
-          "<.Configuration.Functionality.check_partial_equivalence>`. Two "
-          "circuits are "
+          "Set whether to check for partial equivalence. Two circuits are "
           "partially equivalent if, for each possible initial input state, "
           "they have the same probability for each measurement outcome. "
           "If set to false, the checker will output 'not equivalent' for "
