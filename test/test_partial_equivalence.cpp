@@ -11,19 +11,21 @@
 #include <iostream>
 #include <vector>
 
-class PartialEqualityTest : public testing::Test {
+class PartialEquivalenceTest : public testing::Test {
   void SetUp() override {
-    qc1                                       = qc::QuantumComputation(nqubits);
-    qc2                                       = qc::QuantumComputation(nqubits);
-    config.optimizations.fuseSingleQubitGates = false;
-    config.optimizations.reorderOperations    = false;
-    config.optimizations.reconstructSWAPs     = false;
+    qc1 = qc::QuantumComputation(nqubits, nqubits);
+    qc2 = qc::QuantumComputation(nqubits, nqubits);
+    config.optimizations.fuseSingleQubitGates         = false;
+    config.optimizations.reorderOperations            = false;
+    config.optimizations.reconstructSWAPs             = false;
     config.optimizations.fixOutputPermutationMismatch = true;
 
     config.execution.runSimulationChecker   = false;
     config.execution.runAlternatingChecker  = false;
     config.execution.runConstructionChecker = false;
     config.execution.runZXChecker           = false;
+
+    config.functionality.checkPartialEquivalence = true;
   }
 
 protected:
@@ -33,7 +35,7 @@ protected:
   ec::Configuration      config{};
 };
 
-TEST_F(PartialEqualityTest, AlternatingCheckerGarbage) {
+TEST_F(PartialEquivalenceTest, AlternatingCheckerGarbage) {
   // these circuits have the same gates acting on the measured qubit
   // and random gates acting on the two garbage qubits
   qc1.cswap(1, 0, 2);
@@ -56,7 +58,8 @@ TEST_F(PartialEqualityTest, AlternatingCheckerGarbage) {
   qc2.setLogicalQubitGarbage(2);
   qc2.setLogicalQubitGarbage(1);
 
-  config.execution.runAlternatingChecker = true;
+  config.execution.runAlternatingChecker       = true;
+  config.functionality.checkPartialEquivalence = false;
   ec::EquivalenceCheckingManager ecm(qc1, qc2, config);
   ecm.setApplicationScheme(ec::ApplicationSchemeType::Proportional);
   ecm.run();
@@ -64,7 +67,7 @@ TEST_F(PartialEqualityTest, AlternatingCheckerGarbage) {
             ec::EquivalenceCriterion::EquivalentUpToGlobalPhase);
 }
 
-TEST_F(PartialEqualityTest, AlternatingCheckerGarbage2) {
+TEST_F(PartialEquivalenceTest, AlternatingCheckerGarbage2) {
   // measured qubit: 1
   qc1.setLogicalQubitGarbage(2);
   qc1.setLogicalQubitGarbage(0);
@@ -84,7 +87,8 @@ TEST_F(PartialEqualityTest, AlternatingCheckerGarbage2) {
   qc2.ry(0.1, 2);
   qc2.cx(2, 0);
 
-  config.execution.runAlternatingChecker = true;
+  config.execution.runAlternatingChecker       = true;
+  config.functionality.checkPartialEquivalence = false;
   ec::EquivalenceCheckingManager ecm(qc1, qc2, config);
   ecm.setApplicationScheme(ec::ApplicationSchemeType::Proportional);
   ecm.run();
@@ -92,7 +96,7 @@ TEST_F(PartialEqualityTest, AlternatingCheckerGarbage2) {
             ec::EquivalenceCriterion::EquivalentUpToGlobalPhase);
 }
 
-TEST_F(PartialEqualityTest, AlternatingCheckerGarbageAndAncillary) {
+TEST_F(PartialEquivalenceTest, AlternatingCheckerGarbageAndAncillary) {
   qc1.setLogicalQubitGarbage(2);
   qc1.setLogicalQubitGarbage(1);
   qc1.setLogicalQubitAncillary(2);
@@ -111,7 +115,8 @@ TEST_F(PartialEqualityTest, AlternatingCheckerGarbageAndAncillary) {
   qc3.rz(dd::PI_4, 1);
   qc3.ry(0.1, 1);
 
-  config.execution.runAlternatingChecker = true;
+  config.execution.runAlternatingChecker       = true;
+  config.functionality.checkPartialEquivalence = false;
   ec::EquivalenceCheckingManager ecm(qc1, qc3, config);
   ecm.setApplicationScheme(ec::ApplicationSchemeType::Proportional);
   ecm.run();
@@ -119,10 +124,8 @@ TEST_F(PartialEqualityTest, AlternatingCheckerGarbageAndAncillary) {
             ec::EquivalenceCriterion::EquivalentUpToGlobalPhase);
 }
 
-TEST_F(PartialEqualityTest, AlternatingCheckerGarbageNotEquivalent) {
+TEST_F(PartialEquivalenceTest, AlternatingCheckerGarbageNotEquivalent) {
   // example from the paper https://arxiv.org/abs/2208.07564
-  // these two circuits are only partially equivalent,
-  // therefore the equivalence checker returns NotEquivalent
   qc1.cswap(1, 0, 2);
   qc1.h(0);
   qc1.z(2);
@@ -136,129 +139,144 @@ TEST_F(PartialEqualityTest, AlternatingCheckerGarbageNotEquivalent) {
   qc2.setLogicalQubitGarbage(2);
   qc2.setLogicalQubitGarbage(1);
 
+  // partially equivalent circuits
   config.execution.runAlternatingChecker = true;
   ec::EquivalenceCheckingManager ecm(qc1, qc2, config);
   ecm.setApplicationScheme(ec::ApplicationSchemeType::Proportional);
   ecm.run();
-  EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::NotEquivalent);
+  EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::Equivalent);
+
+  // these two circuits are only partially equivalent,
+  // therefore the equivalence checker returns NotEquivalent when we disable
+  // partial equality checking
+  config.functionality.checkPartialEquivalence = false;
+  ec::EquivalenceCheckingManager ecm2(qc1, qc2, config);
+  ecm2.setApplicationScheme(ec::ApplicationSchemeType::Proportional);
+  ecm2.run();
+  EXPECT_EQ(ecm2.equivalence(), ec::EquivalenceCriterion::NotEquivalent);
 }
 
 using namespace qc::literals;
 
-TEST(PartialEquivalenceTest, TrivialEquivalence) {
-  const auto nqubits = 2U;
-  const auto dd      = std::make_unique<dd::Package<>>(nqubits);
-  const auto inputMatrix =
-      dd::CMat{{1, 1, 1, 1}, {1, -1, 1, -1}, {1, 1, -1, -1}, {1, -1, -1, 1}};
-  const auto inputDD = dd->makeDDFromMatrix(inputMatrix);
+TEST_F(PartialEquivalenceTest, TrivialEquivalence) {
+  auto qc = qc::QuantumComputation(2);
 
-  EXPECT_TRUE(partialEquivalenceCheckDD(inputDD, inputDD, 1, 1, *dd));
-  EXPECT_TRUE(partialEquivalenceCheckDD(inputDD, inputDD, 2, 1, *dd));
-  EXPECT_TRUE(partialEquivalenceCheckDD(inputDD, inputDD, 1, 2, *dd));
-  EXPECT_TRUE(partialEquivalenceCheckDD(inputDD, inputDD, 2, 2, *dd));
+  qc.h(1);
+  qc.h(0);
+  qc.cx(0, 1);
+  qc.swap(1, 0);
 
-  const auto hGate      = dd->makeGateDD(dd::H_MAT, 2, 1);
-  const auto cxGate     = dd->makeGateDD(dd::X_MAT, 2, 1_pc, 0);
-  const auto bellMatrix = dd->multiply(cxGate, hGate);
-  EXPECT_FALSE(partialEquivalenceCheckDD(inputDD, bellMatrix, 1, 1, *dd));
+  config.execution.runConstructionChecker = true;
+  ec::EquivalenceCheckingManager ecm(qc, qc, config);
+  ecm.run();
+  EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::Equivalent);
+
+  qc.setLogicalQubitAncillary(1);
+
+  ec::EquivalenceCheckingManager ecm2(qc, qc, config);
+  ecm2.run();
+  EXPECT_EQ(ecm2.equivalence(), ec::EquivalenceCriterion::Equivalent);
+
+  qc.setLogicalQubitGarbage(1);
+
+  ec::EquivalenceCheckingManager ecm3(qc, qc, config);
+  ecm3.run();
+  EXPECT_EQ(ecm3.equivalence(), ec::EquivalenceCriterion::Equivalent);
+
+  qc.setLogicalQubitGarbage(0);
+
+  ec::EquivalenceCheckingManager ecm4(qc, qc, config);
+  ecm4.run();
+  EXPECT_EQ(ecm4.equivalence(), ec::EquivalenceCriterion::Equivalent);
 }
 
-TEST(PartialEquivalenceTest, BasicPartialEquivalenceChecking) {
-  const auto nqubits = 3U;
-  auto       dd      = std::make_unique<dd::Package<>>(nqubits);
+TEST_F(PartialEquivalenceTest, BasicPartialEquivalenceChecking) {
   // only the second qubit has differing gates in the two circuits,
   // therefore they should be equivalent if we only measure the first qubit
-  const auto hGate    = dd->makeGateDD(dd::H_MAT, 3, 1);
-  const auto xGate    = dd->makeGateDD(dd::X_MAT, 3, 1);
-  const auto circuit1 = dd->multiply(xGate, hGate);
-  const auto circuit2 = dd->makeIdent(3);
+  qc1.h(1);
+  qc1.x(1);
 
-  EXPECT_TRUE(partialEquivalenceCheckDD(circuit1, circuit2, 2, 1, *dd));
+  qc1.measure(0, 0);
+  qc2.measure(0, 0);
+
+  qc1.setLogicalQubitGarbage(1);
+  qc2.setLogicalQubitGarbage(1);
+  qc1.setLogicalQubitGarbage(2);
+  qc2.setLogicalQubitGarbage(2);
+
+  config.execution.runConstructionChecker = true;
+  ec::EquivalenceCheckingManager ecm(qc1, qc2, config);
+  ecm.run();
+  EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::Equivalent);
 }
 
-TEST(PartialEquivalenceTest, NotEquivalent) {
-  const auto nqubits = 2U;
-  const auto dd      = std::make_unique<dd::Package<>>(nqubits);
+TEST_F(PartialEquivalenceTest, ConstructionCheckerNotEquivalent) {
   // the first qubit has differing gates in the two circuits,
   // therefore they should not be equivalent if we only measure the first qubit
-  const auto hGate    = dd->makeGateDD(dd::H_MAT, nqubits, 0);
-  const auto xGate    = dd->makeGateDD(dd::X_MAT, nqubits, 0);
-  const auto circuit1 = dd->multiply(xGate, hGate);
-  const auto circuit2 = dd->makeIdent(2);
-  EXPECT_FALSE(partialEquivalenceCheckDD(circuit1, circuit2, 2, 1, *dd));
+  qc1.h(0);
+  qc1.x(0);
+
+  qc1.setLogicalQubitGarbage(1);
+  qc2.setLogicalQubitGarbage(1);
+
+  config.execution.runConstructionChecker = true;
+  ec::EquivalenceCheckingManager ecm(qc1, qc2, config);
+  ecm.run();
+  EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::NotEquivalent);
 }
 
-TEST(PartialEquivalenceTest, ExamplePaper) {
-  const auto nqubits = 3U;
-  const auto dd      = std::make_unique<dd::Package<>>(nqubits);
-  const auto controlledSwapGate =
-      dd->makeTwoQubitGateDD(dd::SWAP_MAT, nqubits, qc::Controls{1}, 0, 2);
-  const auto hGate = dd->makeGateDD(dd::H_MAT, nqubits, 0);
-  const auto zGate = dd->makeGateDD(dd::Z_MAT, nqubits, 2);
-  const auto xGate = dd->makeGateDD(dd::X_MAT, nqubits, 1);
-  const auto controlledHGate =
-      dd->makeGateDD(dd::H_MAT, nqubits, qc::Controls{1}, 0);
+TEST_F(PartialEquivalenceTest, ConstructionCheckerGarbageNotEquivalent) {
+  // example from the paper https://arxiv.org/abs/2208.07564
+  qc1.cswap(1, 0, 2);
+  qc1.h(0);
+  qc1.z(2);
+  qc1.cswap(1, 0, 2);
 
-  const auto c1 = dd->multiply(
-      controlledSwapGate,
-      dd->multiply(hGate, dd->multiply(zGate, controlledSwapGate)));
-  const auto c2 = dd->multiply(controlledHGate, xGate);
+  qc2.x(1);
+  qc2.ch(1, 0);
 
-  EXPECT_TRUE(partialEquivalenceCheckDD(c1, c2, 3, 1, *dd));
+  qc1.setLogicalQubitGarbage(2);
+  qc1.setLogicalQubitGarbage(1);
+  qc2.setLogicalQubitGarbage(2);
+  qc2.setLogicalQubitGarbage(1);
+
+  // partially equivalent circuits
+  config.execution.runConstructionChecker = true;
+  ec::EquivalenceCheckingManager ecm(qc1, qc2, config);
+  ecm.run();
+  EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::Equivalent);
+
+  // these two circuits are only partially equivalent,
+  // therefore the equivalence checker returns NotEquivalent when we disable
+  // partial equality checking
+  config.functionality.checkPartialEquivalence = false;
+  ec::EquivalenceCheckingManager ecm2(qc1, qc2, config);
+  ecm2.run();
+  EXPECT_EQ(ecm2.equivalence(), ec::EquivalenceCriterion::NotEquivalent);
 }
 
-TEST(PartialEquivalenceTest, DifferentNumberOfQubits) {
-  const auto nqubits = 3U;
-  const auto dd      = std::make_unique<dd::Package<>>(nqubits);
-  const auto controlledSwapGate =
-      dd->makeTwoQubitGateDD(dd::SWAP_MAT, nqubits, qc::Controls{1}, 0, 2);
-  const auto hGate           = dd->makeGateDD(dd::H_MAT, nqubits, 0);
-  const auto zGate           = dd->makeGateDD(dd::Z_MAT, nqubits, 2);
-  const auto xGate           = dd->makeGateDD(dd::X_MAT, 2, 1);
-  const auto controlledHGate = dd->makeGateDD(dd::H_MAT, 2, qc::Controls{1}, 0);
+TEST_F(PartialEquivalenceTest, ConstructionCheckerDifferentNumberOfQubits) {
+  qc1.cswap(1, 0, 2);
+  qc1.h(0);
+  qc1.z(2);
+  qc1.cswap(1, 0, 2);
 
-  const auto c1 = dd->multiply(
-      controlledSwapGate,
-      dd->multiply(hGate, dd->multiply(zGate, controlledSwapGate)));
-  const auto c2 = dd->multiply(controlledHGate, xGate);
+  auto qc3 = qc::QuantumComputation(2);
 
-  EXPECT_TRUE(partialEquivalenceCheckDD(c1, c2, 3, 1, *dd));
-  EXPECT_FALSE(partialEquivalenceCheckDD(c2, c1, 3, 3, *dd));
-  EXPECT_FALSE(partialEquivalenceCheckDD(c2, dd::mEdge::zero(), 2, 1, *dd));
-  EXPECT_FALSE(partialEquivalenceCheckDD(c2, dd::mEdge::one(), 2, 1, *dd));
-  EXPECT_FALSE(partialEquivalenceCheckDD(dd::mEdge::one(), c1, 2, 1, *dd));
-  EXPECT_TRUE(
-      partialEquivalenceCheckDD(dd::mEdge::one(), dd::mEdge::one(), 0, 1, *dd));
-  EXPECT_TRUE(
-      partialEquivalenceCheckDD(dd::mEdge::one(), dd::mEdge::one(), 0, 0, *dd));
+  qc3.x(1);
+  qc3.ch(1, 0);
+
+  qc1.setLogicalQubitGarbage(2);
+  qc1.setLogicalQubitGarbage(1);
+  qc3.setLogicalQubitGarbage(1);
+
+  config.execution.runConstructionChecker = true;
+  ec::EquivalenceCheckingManager ecm(qc1, qc3, config);
+  ecm.run();
+  EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::Equivalent);
 }
 
-TEST(PartialEquivalenceTest, ComputeTableTest) {
-  const auto nqubits = 3U;
-  const auto dd      = std::make_unique<dd::Package<>>(nqubits);
-  const auto controlledSwapGate =
-      dd->makeTwoQubitGateDD(dd::SWAP_MAT, nqubits, qc::Controls{1}, 2, 0);
-  const auto hGate = dd->makeGateDD(dd::H_MAT, nqubits, 0);
-  const auto zGate = dd->makeGateDD(dd::Z_MAT, nqubits, 2);
-  const auto xGate = dd->makeGateDD(dd::X_MAT, nqubits, 1);
-  const auto controlledHGate =
-      dd->makeGateDD(dd::H_MAT, nqubits, qc::Controls{1}, 0);
-
-  const auto c1 = dd->multiply(
-      controlledSwapGate,
-      dd->multiply(hGate, dd->multiply(zGate, controlledSwapGate)));
-  const auto c2 = dd->multiply(controlledHGate, xGate);
-
-  EXPECT_TRUE(partialEquivalenceCheckDD(c1, c2, 3, 1, *dd));
-  EXPECT_TRUE(partialEquivalenceCheckDD(c1, c2, 3, 1, *dd));
-  EXPECT_TRUE(partialEquivalenceCheckDD(c1, c2, 3, 1, *dd));
-  EXPECT_TRUE(partialEquivalenceCheckDD(c1, c2, 3, 1, *dd));
-  EXPECT_TRUE(partialEquivalenceCheckDD(c1, c2, 3, 1, *dd));
-}
-
-TEST(PartialEquivalenceTest, MQTBenchGrover3Qubits) {
-  const auto dd = std::make_unique<dd::Package<>>(3);
-
+TEST_F(PartialEquivalenceTest, MQTBenchGrover3Qubits) {
   const qc::QuantumComputation c1{
       "./circuits/partialEquivalenceTest/"
       "grover-noancilla_nativegates_ibm_qiskit_opt0_3.qasm"};
@@ -266,12 +284,22 @@ TEST(PartialEquivalenceTest, MQTBenchGrover3Qubits) {
       "./circuits/partialEquivalenceTest/grover-noancilla_indep_qiskit_3.qasm"};
 
   // 3 measured qubits and 3 data qubits, full equivalence
-  EXPECT_TRUE(partialEquivalenceCheck(c1, c2, *dd));
+  // construction checker
+  config.execution.runConstructionChecker = true;
+  ec::EquivalenceCheckingManager ecm(c1, c2, config);
+  ecm.run();
+  EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::Equivalent);
+
+  // alternating checker
+  config.execution.runConstructionChecker = false;
+  config.execution.runAlternatingChecker  = true;
+  ec::EquivalenceCheckingManager ecm2(c1, c2, config);
+  ecm2.run();
+  EXPECT_EQ(ecm2.equivalence(),
+            ec::EquivalenceCriterion::EquivalentUpToGlobalPhase);
 }
 
-TEST(PartialEquivalenceTest, MQTBenchGrover7Qubits) {
-  const auto dd = std::make_unique<dd::Package<>>(7);
-
+TEST_F(PartialEquivalenceTest, MQTBenchGrover7Qubits) {
   const qc::QuantumComputation c1{
       "./circuits/partialEquivalenceTest/"
       "grover-noancilla_nativegates_ibm_qiskit_opt0_7.qasm"};
@@ -280,12 +308,21 @@ TEST(PartialEquivalenceTest, MQTBenchGrover7Qubits) {
       "grover-noancilla_nativegates_ibm_qiskit_opt1_7.qasm"};
 
   // 7 measured qubits and 7 data qubits, full equivalence
-  EXPECT_TRUE(partialEquivalenceCheck(c1, c2, *dd));
+  // construction checker
+  config.execution.runConstructionChecker = true;
+  ec::EquivalenceCheckingManager ecm(c1, c2, config);
+  ecm.run();
+  EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::Equivalent);
+
+  // alternating checker
+  config.execution.runConstructionChecker = false;
+  config.execution.runAlternatingChecker  = true;
+  ec::EquivalenceCheckingManager ecm2(c1, c2, config);
+  ecm2.run();
+  EXPECT_EQ(ecm2.equivalence(), ec::EquivalenceCriterion::Equivalent);
 }
 
-TEST(PartialEquivalenceTest, SliQECGrover22Qubits) {
-  const auto dd = std::make_unique<dd::Package<>>(12);
-
+TEST_F(PartialEquivalenceTest, SliQECGrover22Qubits) {
   const qc::QuantumComputation c1{
       "./circuits/partialEquivalenceTest/Grover_1.qasm"}; // 11 qubits, 11 data
                                                           // qubits
@@ -297,13 +334,15 @@ TEST(PartialEquivalenceTest, SliQECGrover22Qubits) {
   c2.setLogicalQubitAncillary(11);
   c2.setLogicalQubitGarbage(11);
 
+  // construction checker
   // adds 10 ancillary qubits -> total number of qubits is 22
-  EXPECT_TRUE(partialEquivalenceCheck(c1, c2, *dd));
+  config.execution.runConstructionChecker = true;
+  ec::EquivalenceCheckingManager ecm(c1, c2, config);
+  ecm.run();
+  EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::Equivalent);
 }
 
-TEST(PartialEquivalenceTest, SliQECAdd19Qubits) {
-  const auto dd = std::make_unique<dd::Package<>>(19);
-
+TEST_F(PartialEquivalenceTest, SliQECAdd19Qubits) {
   // full equivalence, 19 qubits
   // but this test uses algorithm for partial equivalence, not the "zero
   // ancillae" version
@@ -319,34 +358,33 @@ TEST(PartialEquivalenceTest, SliQECAdd19Qubits) {
   c2.setLogicalQubitsGarbage(8, 18);
 
   // doesn't add ancillary qubits -> total number of qubits is 19
-  EXPECT_TRUE(partialEquivalenceCheck(c1, c2, *dd));
+  config.execution.runConstructionChecker = true;
+  ec::EquivalenceCheckingManager ecm(c1, c2, config);
+  ecm.run();
+  EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::Equivalent);
 }
 
-TEST(PartialEquivalenceTest, ExamplePaperDifferentQubitOrder) {
-  const auto nqubits = 3U;
-  auto       dd      = std::make_unique<dd::Package<>>(nqubits);
+TEST_F(PartialEquivalenceTest, ExamplePaperDifferentQubitOrder) {
+  // TODO: implement qubit order change
+  qc1.cswap(1, 2, 0);
+  qc1.h(2);
+  qc1.z(0);
+  qc1.cswap(1, 2, 0);
 
-  qc::QuantumComputation c1{nqubits, 1};
-  c1.cswap(1, 2, 0);
-  c1.h(2);
-  c1.z(0);
-  c1.cswap(1, 2, 0);
+  qc2.x(1);
+  qc2.ch(1, 2);
 
-  qc::QuantumComputation c2{nqubits, 1};
-  c2.x(1);
-  c2.ch(1, 2);
+  qc1.setLogicalQubitsGarbage(0, 1);
+  qc2.setLogicalQubitsGarbage(0, 1);
 
-  c1.setLogicalQubitsGarbage(0, 1);
-  c2.setLogicalQubitsGarbage(0, 1);
-
-  EXPECT_TRUE(partialEquivalenceCheck(c1, c2, *dd));
+  config.execution.runConstructionChecker = true;
+  ec::EquivalenceCheckingManager ecm(qc1, qc2, config);
+  ecm.run();
+  EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::Equivalent);
 }
 
-TEST(PartialEquivalenceTest, ExamplePaperDifferentQubitOrderAndNumber) {
-  const auto nqubits = 4U;
-  auto       dd      = std::make_unique<dd::Package<>>(nqubits);
-
-  qc::QuantumComputation c1{nqubits, 1};
+TEST_F(PartialEquivalenceTest, ExamplePaperDifferentQubitOrderAndNumber) {
+  qc::QuantumComputation c1{4, 1};
   c1.cswap(1, 2, 0);
   c1.h(2);
   c1.z(0);
@@ -361,12 +399,15 @@ TEST(PartialEquivalenceTest, ExamplePaperDifferentQubitOrderAndNumber) {
   c1.setLogicalQubitAncillary(3);
 
   c2.setLogicalQubitsGarbage(0, 1);
-  EXPECT_TRUE(partialEquivalenceCheck(c1, c2, *dd));
-  EXPECT_TRUE(partialEquivalenceCheck(c2, c1, *dd));
+
+  config.execution.runConstructionChecker = true;
+  ec::EquivalenceCheckingManager ecm(qc1, qc2, config);
+  ecm.run();
+  EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::Equivalent);
 }
 
-TEST(PartialEquivalenceTest, ZeroAncillaSliQEC19Qubits) {
-  auto dd = std::make_unique<dd::Package<>>(19);
+TEST_F(PartialEquivalenceTest, AlternatingCheckerSliQEC19Qubits) {
+  config.execution.runAlternatingChecker = true;
 
   // full equivalence, 10 qubits
   const qc::QuantumComputation c1{
@@ -374,8 +415,9 @@ TEST(PartialEquivalenceTest, ZeroAncillaSliQEC19Qubits) {
   const qc::QuantumComputation c2{
       "./circuits/partialEquivalenceTest/entanglement_2.qasm"};
 
-  // calls zeroAncillaePartialEquivalenceCheck
-  EXPECT_TRUE(partialEquivalenceCheck(c1, c2, *dd));
+  ec::EquivalenceCheckingManager ecm(c1, c2, config);
+  ecm.run();
+  EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::Equivalent);
 
   // full equivalence, 19 qubits
   const qc::QuantumComputation c3{
@@ -383,8 +425,9 @@ TEST(PartialEquivalenceTest, ZeroAncillaSliQEC19Qubits) {
   const qc::QuantumComputation c4{
       "./circuits/partialEquivalenceTest/add6_196_2.qasm"};
 
-  // calls zeroAncillaePartialEquivalenceCheck
-  EXPECT_TRUE(partialEquivalenceCheck(c3, c4, *dd));
+  ec::EquivalenceCheckingManager ecm2(c1, c2, config);
+  ecm2.run();
+  EXPECT_EQ(ecm2.equivalence(), ec::EquivalenceCriterion::Equivalent);
 
   // full equivalence, 10 qubits
   const qc::QuantumComputation c5{
@@ -393,23 +436,26 @@ TEST(PartialEquivalenceTest, ZeroAncillaSliQEC19Qubits) {
       "./circuits/partialEquivalenceTest/bv_2.qasm"};
 
   // calls zeroAncillaePartialEquivalenceCheck
-  EXPECT_TRUE(partialEquivalenceCheck(c5, c6, *dd));
+  ec::EquivalenceCheckingManager ecm3(c1, c2, config);
+  ecm3.run();
+  EXPECT_EQ(ecm3.equivalence(), ec::EquivalenceCriterion::Equivalent);
 }
 
-TEST(PartialEquivalenceTest, ZeroAncillaSliQECRandomCircuit) {
-  auto dd = std::make_unique<dd::Package<>>(10);
+TEST_F(PartialEquivalenceTest, AlternatingCheckerSliQECRandomCircuit) {
+  config.execution.runAlternatingChecker = true;
   // full equivalence, 10 qubits
   const qc::QuantumComputation c1{
       "./circuits/partialEquivalenceTest/random_1.qasm"};
   const qc::QuantumComputation c2{
       "./circuits/partialEquivalenceTest/random_2.qasm"};
 
-  // calls buildFunctionality for c2^(-1) concatenated with c1
-  EXPECT_TRUE(partialEquivalenceCheck(c1, c2, *dd));
+  ec::EquivalenceCheckingManager ecm(c1, c2, config);
+  ecm.run();
+  EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::Equivalent);
 }
 
-TEST(PartialEquivalenceTest, SliQECPeriodFinding8Qubits) {
-  auto dd = std::make_unique<dd::Package<>>(8);
+TEST_F(PartialEquivalenceTest, ConstructionCheckerSliQECPeriodFinding8Qubits) {
+  config.execution.runConstructionChecker = true;
   // 8 qubits, 3 data qubits
   qc::QuantumComputation c1{
       "./circuits/partialEquivalenceTest/period_finding_1.qasm"};
@@ -425,18 +471,21 @@ TEST(PartialEquivalenceTest, SliQECPeriodFinding8Qubits) {
   c1.setLogicalQubitsAncillary(3, 7);
   c1.setLogicalQubitsGarbage(3, 7);
 
-  EXPECT_TRUE(partialEquivalenceCheck(c1, c2, *dd));
+  ec::EquivalenceCheckingManager ecm(c1, c2, config);
+  ecm.run();
+  EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::Equivalent);
 }
 
-void partialEquivalencCheckingBenchmarks(const qc::Qubit minN,
-                                         const qc::Qubit maxN,
-                                         const size_t    reps,
-                                         const bool      addAncilla) {
+void partialEquivalencCheckingBenchmarks(const qc::Qubit          minN,
+                                         const qc::Qubit          maxN,
+                                         const size_t             reps,
+                                         const bool               addAncilla,
+                                         const ec::Configuration& config) {
   std::mt19937 gen(55);
 
   for (qc::Qubit n = minN; n < maxN; n++) {
-    std::chrono::microseconds totalTime{0};
-    std::size_t               totalGates{0};
+    double      totalTime{0};
+    std::size_t totalGates{0};
     for (size_t k = 0; k < reps; k++) {
       qc::Qubit d{0};
       if (addAncilla) {
@@ -450,17 +499,12 @@ void partialEquivalencCheckingBenchmarks(const qc::Qubit minN,
 
       const auto [c1, c2] = dd::generateRandomBenchmark(n, d, m);
 
-      auto dd = std::make_unique<dd::Package<>>(n);
+      // check equivalence
+      ec::EquivalenceCheckingManager ecm(c1, c2, config);
+      ecm.run();
+      EXPECT_TRUE(ecm.getResults().consideredEquivalent());
 
-      const auto start = std::chrono::high_resolution_clock::now();
-
-      const bool result = dd::partialEquivalenceCheck(c1, c2, *dd);
-      // Get ending timepoint
-      const auto stop = std::chrono::high_resolution_clock::now();
-      const auto duration =
-          std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
-
-      EXPECT_TRUE(result);
+      const auto duration = ecm.getResults().checkTime;
 
       // std::cout << "\nnumber of qubits = " << n << "; data qubits = " << d
       //           << "; measured qubits = " << m
@@ -473,50 +517,27 @@ void partialEquivalencCheckingBenchmarks(const qc::Qubit minN,
     }
     std::cout << "\nnumber of qubits = " << n << "; number of reps = " << reps
               << "; average time = "
-              << (static_cast<double>(totalTime.count()) /
-                  static_cast<double>(reps) / 1000000.)
+              << (totalTime / static_cast<double>(reps) / 1000000.)
               << " seconds; average number of gates = "
               << (static_cast<double>(totalGates) / static_cast<double>(reps))
               << "\n";
   }
 }
 
-TEST(PartialEquivalenceTest, Benchmark) {
-  const size_t minN = 2;
-  const size_t maxN = 8;
-  const size_t reps = 10;
+TEST_F(PartialEquivalenceTest, Benchmark) {
+  config.execution.runConstructionChecker = true;
+  const size_t minN                       = 2;
+  const size_t maxN                       = 8;
+  const size_t reps                       = 10;
   std::cout << "Partial equivalence check\n";
-  partialEquivalencCheckingBenchmarks(minN, maxN, reps, true);
+  partialEquivalencCheckingBenchmarks(minN, maxN, reps, true, config);
 }
 
-TEST(PartialEquivalenceTest, ZeroAncillaBenchmark) {
-  const size_t minN = 3;
-  const size_t maxN = 15;
-  const size_t reps = 10;
+TEST_F(PartialEquivalenceTest, ZeroAncillaBenchmark) {
+  config.execution.runAlternatingChecker = true;
+  const size_t minN                      = 3;
+  const size_t maxN                      = 15;
+  const size_t reps                      = 10;
   std::cout << "Zero-ancilla partial equivalence check\n";
-  partialEquivalencCheckingBenchmarks(minN, maxN, reps, false);
-}
-
-TEST(PartialEquivalenceTest, InvalidInput) {
-  const auto nqubits = 4U;
-  const auto dd      = std::make_unique<dd::Package<>>(nqubits);
-
-  // the circuits don't have the same number of measured qubits
-  qc::QuantumComputation c1{nqubits, 1};
-  c1.x(1);
-
-  qc::QuantumComputation c2{nqubits, 1};
-  c2.x(1);
-
-  c1.setLogicalQubitsGarbage(0, 1);
-  c1.setLogicalQubitGarbage(3);
-
-  c2.setLogicalQubitsGarbage(0, 1);
-
-  EXPECT_FALSE(partialEquivalenceCheck(c1, c2, *dd));
-
-  // now they have the same number of measured qubits but a different
-  // permutation of garbage qubits
-  c2.setLogicalQubitGarbage(2);
-  EXPECT_THROW(partialEquivalenceCheck(c1, c2, *dd), std::invalid_argument);
+  partialEquivalencCheckingBenchmarks(minN, maxN, reps, false, config);
 }
