@@ -96,6 +96,13 @@ void EquivalenceCheckingManager::fixOutputPermutationMismatch() {
   }
 }
 
+void EquivalenceCheckingManager::moveDataQubitsToFront() {
+  // TODO
+}
+void EquivalenceCheckingManager::moveMeasuredQubitsToFront() {
+  // TODO
+}
+
 void EquivalenceCheckingManager::runOptimizationPasses() {
   if (qc1.empty() && qc2.empty()) {
     return;
@@ -199,6 +206,14 @@ EquivalenceCheckingManager::EquivalenceCheckingManager(
     runOptimizationPasses();
   }
 
+  // bring the data and measured qubits to the front
+  if (configuration.optimizations.moveDataQubitsToFront) {
+    moveDataQubitsToFront();
+  }
+  if (configuration.optimizations.moveMeasuredQubitsToFront) {
+    moveMeasuredQubitsToFront();
+  }
+
   // strip away qubits that are not acted upon
   this->qc1.stripIdleQubits();
   this->qc2.stripIdleQubits();
@@ -212,7 +227,16 @@ EquivalenceCheckingManager::EquivalenceCheckingManager(
     std::clog << "[QCEC] Warning: circuits have different number of primary "
                  "inputs! Proceed with caution!\n";
   }
+  // TODO: remove
+  //  std::cout << "expected output permutation qc1: " << std::endl;
+  //  for (const auto [key_, value_] : qc1.outputPermutation) {
+  //    std::cout << key_ << "->" << value_ << std::endl;
+  //  }
 
+  // std::cout << "expected output permutation qc2: " << std::endl;
+  // for (const auto [key_, value_] : qc2.outputPermutation) {
+  //   std::cout << key_ << "->" << value_ << std::endl;
+  // }
   // try to fix a potential mismatch in the output permutations of both circuits
   if (configuration.optimizations.fixOutputPermutationMismatch) {
     fixOutputPermutationMismatch();
@@ -788,6 +812,20 @@ void EquivalenceCheckingManager::backpropagateOutputPermutation() {
     qc::CircuitOptimizer::backpropagateOutputPermutation(qc1);
     qc::CircuitOptimizer::backpropagateOutputPermutation(qc2);
     configuration.optimizations.backpropagateOutputPermutation = true;
+  }
+}
+
+void EquivalenceCheckingManager::runMoveDataQubitsToFront() {
+  if (!configuration.optimizations.moveDataQubitsToFront) {
+    moveDataQubitsToFront();
+    configuration.optimizations.moveDataQubitsToFront = true;
+  }
+}
+
+void EquivalenceCheckingManager::runMoveMeasuredQubitsToFront() {
+  if (!configuration.optimizations.moveMeasuredQubitsToFront) {
+    moveMeasuredQubitsToFront();
+    configuration.optimizations.moveMeasuredQubitsToFront = true;
   }
 }
 

@@ -41,6 +41,8 @@ class ConfigurationOptions(TypedDict, total=False):
     remove_diagonal_gates_before_measure: bool
     reorder_operations: bool
     transform_dynamic_circuit: bool
+    move_data_qubits_to_front: bool
+    move_measured_qubits_to_front: bool
     # Parameterized
     additional_instantiations: int
     parameterized_tolerance: float
