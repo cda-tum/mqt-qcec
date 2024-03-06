@@ -364,20 +364,47 @@ TEST_F(PartialEquivalenceTest, SliQECAdd19Qubits) {
   EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::Equivalent);
 }
 
-TEST_F(PartialEquivalenceTest, ExamplePaperDifferentQubitOrder) {
-  // TODO: implement qubit order change
+TEST_F(PartialEquivalenceTest, MoveMeasuredQubitsToFrontConstructionChecker) {
   qc1.cswap(1, 2, 0);
   qc1.h(2);
   qc1.z(0);
   qc1.cswap(1, 2, 0);
+  qc1.measure(2, 0);
 
   qc2.x(1);
   qc2.ch(1, 2);
+  qc2.h(0);
+  qc2.measure(2, 0);
 
   qc1.setLogicalQubitsGarbage(0, 1);
   qc2.setLogicalQubitsGarbage(0, 1);
 
-  config.execution.runConstructionChecker = true;
+  config.execution.runConstructionChecker        = true;
+  config.optimizations.moveMeasuredQubitsToFront = true;
+
+  ec::EquivalenceCheckingManager ecm(qc1, qc2, config);
+  ecm.run();
+  EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::Equivalent);
+}
+
+TEST_F(PartialEquivalenceTest, MoveMeasuredQubitsToFrontAlternatingChecker) {
+  qc1.cswap(1, 2, 0);
+  qc1.h(2);
+  qc1.z(0);
+  qc1.cswap(1, 2, 0);
+  qc1.measure(2, 0);
+
+  qc2.x(1);
+  qc2.ch(1, 2);
+  qc2.h(0);
+  qc2.measure(2, 0);
+
+  qc1.setLogicalQubitsGarbage(0, 1);
+  qc2.setLogicalQubitsGarbage(0, 1);
+
+  config.execution.runAlternatingChecker         = true;
+  config.optimizations.moveMeasuredQubitsToFront = true;
+
   ec::EquivalenceCheckingManager ecm(qc1, qc2, config);
   ecm.run();
   EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::Equivalent);

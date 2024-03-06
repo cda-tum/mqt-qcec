@@ -23,7 +23,6 @@ void DDConstructionChecker::postprocessTask(
   if (isDone()) {
     return;
   }
-  // TODO: change permutation for partial equivalence
   if (configuration.functionality.checkPartialEquivalence) {
     // reduce ancillaries and garbage for partial equivalence check
     task.reduceForPartialEquivalence();
@@ -35,6 +34,7 @@ void DDConstructionChecker::postprocessTask(
     if (isDone()) {
       return;
     }
+    task.reduceGarbage();
   }
 }
 
