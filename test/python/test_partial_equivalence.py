@@ -22,17 +22,39 @@ def original_circuit() -> QuantumCircuit:
 
 @pytest.fixture()
 def alternative_circuit() -> QuantumCircuit:
-    """Fixture for an alternative version of the simple circuit."""
+    """Fixture for a partially equivalent version of the simple circuit."""
     qc = QuantumCircuit(3, 1)
     qc.x(1)
-    qc.cx(0, 1)
     qc.ch(1, 0)
     qc.measure(0, 0)
     return qc
 
 
-@pytest.mark.skip()
 def test_configuration_pec(original_circuit: QuantumCircuit, alternative_circuit: QuantumCircuit) -> None:
-    """Test if the flag for partial equivalence checking works. This test is skipped for now, because partial equivalence checking was not implemented yet."""
+    """Test if the flag for partial equivalence checking works."""
+    config = qcec.Configuration()
+    config.functionality.check_partial_equivalence = True
+    result = qcec.verify(original_circuit, alternative_circuit, configuration=config)
+    assert result.equivalence == qcec.EquivalenceCriterion.equivalent
+
+
+def test_verify_argument_pec(original_circuit: QuantumCircuit, alternative_circuit: QuantumCircuit) -> None:
+    """Test if the flag for partial equivalence checking works."""
     result = qcec.verify(original_circuit, alternative_circuit, check_partial_equivalence=True)
+    assert result.equivalence == qcec.EquivalenceCriterion.equivalent
+
+
+def test_verify_argument_move_data_to_front() -> None:
+    """Test if the flag for moving masured qubits to the front works."""
+    qc1 = QuantumCircuit(3, 1)
+    qc1.cswap(1, 2, 0)
+    qc1.h(2)
+    qc1.z(0)
+    qc1.cswap(1, 2, 0)
+    qc1.measure(2, 0)
+    qc2 = QuantumCircuit(3, 1)
+    qc2.x(1)
+    qc2.ch(1, 2)
+    qc2.measure(2, 0)
+    result = qcec.verify(qc1, qc2, check_partial_equivalence=True, move_data_qubits_to_front=True)
     assert result.equivalence == qcec.EquivalenceCriterion.equivalent
