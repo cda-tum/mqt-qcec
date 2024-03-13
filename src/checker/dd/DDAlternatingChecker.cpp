@@ -107,11 +107,11 @@ EquivalenceCriterion DDAlternatingChecker::checkEquivalence() {
   // suffices to change the last parameter of isCloseToIdentity to `false`
   if (configuration.functionality.checkPartialEquivalence) {
     isClose = dd->isCloseToIdentity(functionality,
-                                    configuration.functionality.traceThreshold);
+                                    configuration.functionality.traceThreshold,
+                                    garbage, false);
   } else {
     isClose = dd->isCloseToIdentity(functionality,
-                                    configuration.functionality.traceThreshold,
-                                    garbage, true);
+                                    configuration.functionality.traceThreshold);
   }
 
   if (isClose) {
