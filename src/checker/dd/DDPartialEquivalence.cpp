@@ -85,7 +85,7 @@ void addStandardOperationToCircuit(QuantumComputation&      circuit,
 
 std::vector<qc::Qubit>
 fiveDiffferentRandomNumbers(const qc::Qubit min, const qc::Qubit max,
-                            std::mt19937_64 randomGenerator) {
+                            std::mt19937_64& randomGenerator) {
   std::vector<qc::Qubit> numbers;
 
   for (qc::Qubit i = min; i < max; i++) {
@@ -179,10 +179,10 @@ StandardOperation convertToStandardOperation(
   return {n, randomTarget1, qc::I};
 }
 
-StandardOperation makeRandomStandardOperation(const size_t    n,
-                                              const qc::Qubit nrQubits,
-                                              const qc::Qubit min,
-                                              std::mt19937_64 randomGenerator) {
+StandardOperation
+makeRandomStandardOperation(const size_t n, const qc::Qubit nrQubits,
+                            const qc::Qubit  min,
+                            std::mt19937_64& randomGenerator) {
   const auto randomNumbers =
       fiveDiffferentRandomNumbers(min, min + nrQubits, randomGenerator);
 
