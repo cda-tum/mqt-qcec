@@ -204,7 +204,9 @@ void DDEquivalenceChecker<DDType, Config>::postprocessTask(
     return;
   }
   // sum up the contributions of garbage qubits
-  task.reduceGarbage();
+  if (configuration.functionality.checkPartialEquivalence) {
+    task.reduceGarbage();
+  }
 }
 
 template <class DDType, class Config>

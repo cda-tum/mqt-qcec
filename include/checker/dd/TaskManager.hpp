@@ -114,12 +114,31 @@ public:
   }
   void reduceAncillae() { reduceAncillae(internalState); }
 
+  /**
+   Reduces garbage qubits such that the matrix will be equal to another reduced
+   matrix iff the two underlying circuits are partially equivalent.
+   **/
   void reduceGarbage(DDType& state) {
     if constexpr (std::is_same_v<DDType, qc::VectorDD>) {
-      state = package->reduceGarbage(state, qc->garbage);
+      state = package->reduceGarbage(state, qc->garbage, true);
     } else if constexpr (std::is_same_v<DDType, qc::MatrixDD>) {
+      // version of the paper
+      // const auto d = static_cast<dd::Qubit>(qc->getNqubitsWithoutAncillae());
+      // const auto m = static_cast<dd::Qubit>(qc->getNmeasuredQubits());
+
+      // const dd::Qubit n = state.p->v + 1;
+      // dd::Qubit       k = n - d;
+      // dd::Qubit       extra{0};
+      // if (m > k) {
+      //   extra = m - k;
+      // }
+      // k = k + extra;
+      // state = partialEquivalenceCheckDDSubroutine(state, m, k, extra,
+      // *package);
+
+      // version with reduceGarbage
       state = package->reduceGarbage(state, qc->garbage,
-                                     static_cast<bool>(direction));
+                                     static_cast<bool>(direction), true);
     }
   }
   void reduceGarbage() { reduceGarbage(internalState); }
@@ -129,31 +148,6 @@ public:
 
   void decRef(DDType& state) { package->decRef(state); }
   void decRef() { decRef(internalState); }
-
-  /**
-   Reduces ancillaries and garbage according to the number of garbage and
-   ancillary qubits such that the matrix will be equal to another reduced matrix
-   iff the two underlying circuits are partially equivalent.
-   Assumption: the measured and data qubits are the first qubits.
-   **/
-  void reduceForPartialEquivalence(dd::mEdge& state) {
-    const auto d = static_cast<dd::Qubit>(qc->getNqubitsWithoutAncillae());
-    const auto m = static_cast<dd::Qubit>(qc->getNmeasuredQubits());
-
-    const dd::Qubit n = state.p->v + 1;
-    dd::Qubit       k = n - d;
-    dd::Qubit       extra{0};
-    if (m > k) {
-      extra = m - k;
-    }
-    k = k + extra;
-
-    state = partialEquivalenceCheckDDSubroutine(state, m, k, extra, *package);
-  }
-
-  void reduceForPartialEquivalence() {
-    reduceForPartialEquivalence(internalState);
-  }
 
 private:
   const qc::QuantumComputation* qc{};

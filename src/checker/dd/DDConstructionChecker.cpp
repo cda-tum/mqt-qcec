@@ -23,17 +23,16 @@ void DDConstructionChecker::postprocessTask(
   if (isDone()) {
     return;
   }
-  if (configuration.functionality.checkPartialEquivalence) {
-    // reduce ancillaries and garbage for partial equivalence check
-    task.reduceForPartialEquivalence();
+  // reduce ancillaries for total equivalence check
+  // eliminate the superfluous contributions of ancillary qubits (this only
+  // has an effect on matrices)
+  task.reduceAncillae();
 
-  } else { // reduce ancillaries for total equivalence check
-    // eliminate the superfluous contributions of ancillary qubits (this only
-    // has an effect on matrices)
-    task.reduceAncillae();
-    if (isDone()) {
-      return;
-    }
+  if (isDone()) {
+    return;
+  }
+  if (configuration.functionality.checkPartialEquivalence) {
+    // reduce garbage for partial equivalence check
     task.reduceGarbage();
   }
 }
