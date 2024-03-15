@@ -68,6 +68,29 @@ TEST_F(PartialEquivalenceTest, AlternatingCheckerGarbage) {
   EXPECT_EQ(ecm2.equivalence(), ec::EquivalenceCriterion::NotEquivalent);
 }
 
+TEST_F(PartialEquivalenceTest, AlternatingCheckerGarbageNotEquivalent) {
+  qc1.cswap(1, 0, 2);
+  qc1.cx(2, 0);
+  qc1.h(0);
+  qc1.tdg(1);
+  qc1.s(1);
+  qc1.z(2);
+
+  qc2.cswap(1, 0, 2);
+  qc2.cx(2, 0);
+  qc2.h(0);
+  qc2.h(2);
+  qc2.rz(dd::PI_4, 1);
+  qc2.ry(0.1, 1);
+  qc2.cx(1, 2);
+
+  config.execution.runAlternatingChecker = true;
+
+  ec::EquivalenceCheckingManager ecm(qc1, qc2, config);
+  ecm.run();
+  EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::NotEquivalent);
+}
+
 TEST_F(PartialEquivalenceTest, AlternatingCheckerGarbage2) {
   // measured qubit: 1
   qc1.setLogicalQubitGarbage(2);
@@ -132,7 +155,7 @@ TEST_F(PartialEquivalenceTest, AlternatingCheckerGarbageAndAncillary) {
   EXPECT_EQ(ecm2.equivalence(), ec::EquivalenceCriterion::NotEquivalent);
 }
 
-TEST_F(PartialEquivalenceTest, AlternatingCheckerGarbageNotEquivalent) {
+TEST_F(PartialEquivalenceTest, AlternatingCheckerGarbageNotEquivalent2) {
   // example from the paper https://arxiv.org/abs/2208.07564
   qc1.cswap(1, 0, 2);
   qc1.h(0);
@@ -150,7 +173,6 @@ TEST_F(PartialEquivalenceTest, AlternatingCheckerGarbageNotEquivalent) {
   // partially equivalent circuits
   config.execution.runAlternatingChecker = true;
   ec::EquivalenceCheckingManager ecm(qc1, qc2, config);
-  ecm.setApplicationScheme(ec::ApplicationSchemeType::Proportional);
   ecm.run();
   EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::Equivalent);
 
@@ -159,9 +181,24 @@ TEST_F(PartialEquivalenceTest, AlternatingCheckerGarbageNotEquivalent) {
   // partial equality checking
   config.functionality.checkPartialEquivalence = false;
   ec::EquivalenceCheckingManager ecm2(qc1, qc2, config);
-  ecm2.setApplicationScheme(ec::ApplicationSchemeType::Proportional);
   ecm2.run();
   EXPECT_EQ(ecm2.equivalence(), ec::EquivalenceCriterion::NotEquivalent);
+}
+
+TEST_F(PartialEquivalenceTest, AlternatingCheckerGarbageNotEquivalent3) {
+  qc1.cswap(1, 0, 2);
+  qc1.h(0);
+  qc1.z(2);
+  qc1.cswap(1, 0, 2);
+
+  qc2.x(1);
+  qc2.ch(1, 0);
+
+  config.execution.runAlternatingChecker = true;
+  ec::EquivalenceCheckingManager ecm(qc1, qc2, config);
+  ecm.run();
+
+  EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::NotEquivalent);
 }
 
 TEST_F(PartialEquivalenceTest, TrivialEquivalence) {
@@ -260,6 +297,27 @@ TEST_F(PartialEquivalenceTest, ConstructionCheckerGarbageNotEquivalent) {
   ec::EquivalenceCheckingManager ecm2(qc1, qc2, config);
   ecm2.run();
   EXPECT_EQ(ecm2.equivalence(), ec::EquivalenceCriterion::NotEquivalent);
+}
+
+TEST_F(PartialEquivalenceTest, ConstructionCheckerNotEquivalent2) {
+  // check that garbage reduction still recognizes non equivalent circuits
+  qc1.cswap(1, 0, 2);
+  qc1.h(0);
+  qc1.z(2);
+  qc1.cswap(1, 0, 2);
+
+  qc2.x(1);
+  qc2.ch(1, 0);
+  qc2.h(2);
+
+  qc1.setLogicalQubitGarbage(2);
+  qc2.setLogicalQubitGarbage(2);
+  // partially equivalent circuits
+  config.execution.runConstructionChecker = true;
+  ec::EquivalenceCheckingManager ecm(qc1, qc2, config);
+  ecm.run();
+
+  EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::NotEquivalent);
 }
 
 TEST_F(PartialEquivalenceTest, SimulationCheckerGarbageNotEquivalent) {
