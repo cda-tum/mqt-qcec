@@ -92,7 +92,7 @@ TEST_F(ZXTest, Timeout) {
     qcAlternative.h(0);
   }
 
-  config.execution.timeout = 1;
+  config.execution.timeout = 0.1;
   ecm = std::make_unique<ec::EquivalenceCheckingManager>(qcOriginal,
                                                          qcAlternative, config);
 
