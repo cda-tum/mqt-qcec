@@ -131,8 +131,6 @@ public:
   void reconstructSWAPs();
   void reorderOperations();
   void backpropagateOutputPermutation();
-  void runMoveDataQubitsToFront();
-  void runMoveMeasuredQubitsToFront();
 
   // Application: These settings may be changed to influence the sequence in
   // which gates are applied during the equivalence check
@@ -253,15 +251,6 @@ protected:
   /// qubits. This function tries to correct such mismatches. Note that this is
   /// still highly experimental!
   void fixOutputPermutationMismatch();
-
-  /// partial equivalence checking assumes that all the data qubits are the
-  /// first qubits. This functions modifies the initial permutation in order to
-  /// bring all the data (= not ancillary) qubits to the front
-  void moveDataQubitsToFront();
-  /// partial equivalence checking assumes that all the measured qubits are the
-  /// first qubits. This functions modifies the output permutation in order to
-  /// bring all the measured (= not garbage) qubits to the front
-  void moveMeasuredQubitsToFront();
 
   /// Run all configured optimization passes
   void runOptimizationPasses();

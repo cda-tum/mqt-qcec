@@ -96,83 +96,6 @@ void EquivalenceCheckingManager::fixOutputPermutationMismatch() {
   }
 }
 
-void EquivalenceCheckingManager::moveDataQubitsToFront() {
-  // TODO
-}
-
-// get next garbage qubit after n
-qc::Qubit getNextGarbage(qc::Qubit n, const std::vector<bool>& garbage) {
-  while (n < static_cast<qc::Qubit>(garbage.size()) && !garbage.at(n)) {
-    n++;
-  }
-  return n;
-}
-
-void swapQubits(qc::Permutation& p, qc::Qubit garbage, qc::Qubit measured,
-                std::vector<bool>& garbageVector) {
-  auto mappedGarbageIt  = p.find(garbage);
-  auto mappedGarbage    = mappedGarbageIt == p.end()
-                              ? std::nullopt
-                              : std::optional<qc::Qubit>{mappedGarbageIt->second};
-  auto mappedMeasuredIt = p.find(measured);
-  auto mappedMeasured =
-      mappedMeasuredIt == p.end()
-          ? std::nullopt
-          : std::optional<qc::Qubit>{mappedMeasuredIt->second};
-  p.erase(measured);
-  p.erase(garbage);
-  if (mappedMeasured.has_value()) {
-    p.emplace(garbage, *mappedMeasured);
-  }
-  if (mappedGarbage.has_value()) {
-    p.emplace(measured, *mappedGarbage);
-  }
-
-  // update garbage vector accordingly
-  auto temp               = garbageVector[measured];
-  garbageVector[measured] = garbageVector[garbage];
-  garbageVector[garbage]  = temp;
-}
-
-void EquivalenceCheckingManager::moveMeasuredQubitsToFront() {
-  const auto m1 = qc1.getNmeasuredQubits();
-  const auto m2 = qc2.getNmeasuredQubits();
-  if (m1 != m2) {
-    std::cerr << "Warning! Number of measured qubit doesn't match in the two "
-                 "circuits.\n";
-  }
-  const auto n1      = static_cast<qc::Qubit>(qc1.getNqubits());
-  const auto n2      = static_cast<qc::Qubit>(qc2.getNqubits());
-  const auto nqubits = std::max(n1, n2);
-
-  // modify output permutation in order to put the measured (= not garbage)
-  // qubits in the end
-  std::vector<bool> garbage(nqubits);
-  for (qc::Qubit q = 0U; q < nqubits; ++q) {
-    garbage[static_cast<std::size_t>(q)] =
-        qc1.logicalQubitIsGarbage(q) && qc2.logicalQubitIsGarbage(q);
-  }
-
-  auto nextGarbage = getNextGarbage(0, garbage);
-
-  auto& permutation1 = qc1.outputPermutation;
-  auto& permutation2 = qc2.outputPermutation;
-
-  // find the first garbage qubit at the end
-  for (std::int64_t i = std::min(n1, n2) - 1;
-       i >= static_cast<std::int64_t>(m1); i--) {
-    if (!garbage.at(static_cast<qc::Qubit>(i))) {
-      // swap it to the beginning
-      swapQubits(permutation1, nextGarbage, static_cast<qc::Qubit>(i),
-                 qc1.garbage);
-      swapQubits(permutation2, nextGarbage, static_cast<qc::Qubit>(i),
-                 qc2.garbage);
-      ++nextGarbage;
-      nextGarbage = getNextGarbage(nextGarbage, garbage);
-    }
-  }
-}
-
 void EquivalenceCheckingManager::runOptimizationPasses() {
   if (qc1.empty() && qc2.empty()) {
     return;
@@ -274,14 +197,6 @@ EquivalenceCheckingManager::EquivalenceCheckingManager(
   if (qc1.isVariableFree() && qc2.isVariableFree()) {
     // run all configured optimization passes
     runOptimizationPasses();
-  }
-
-  // bring the data and measured qubits to the front
-  if (configuration.optimizations.moveDataQubitsToFront) {
-    moveDataQubitsToFront();
-  }
-  if (configuration.optimizations.moveMeasuredQubitsToFront) {
-    moveMeasuredQubitsToFront();
   }
 
   // strip away qubits that are not acted upon
@@ -873,20 +788,6 @@ void EquivalenceCheckingManager::backpropagateOutputPermutation() {
     qc::CircuitOptimizer::backpropagateOutputPermutation(qc1);
     qc::CircuitOptimizer::backpropagateOutputPermutation(qc2);
     configuration.optimizations.backpropagateOutputPermutation = true;
-  }
-}
-
-void EquivalenceCheckingManager::runMoveDataQubitsToFront() {
-  if (!configuration.optimizations.moveDataQubitsToFront) {
-    moveDataQubitsToFront();
-    configuration.optimizations.moveDataQubitsToFront = true;
-  }
-}
-
-void EquivalenceCheckingManager::runMoveMeasuredQubitsToFront() {
-  if (!configuration.optimizations.moveMeasuredQubitsToFront) {
-    moveMeasuredQubitsToFront();
-    configuration.optimizations.moveMeasuredQubitsToFront = true;
   }
 }
 

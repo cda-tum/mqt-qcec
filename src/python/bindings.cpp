@@ -251,20 +251,6 @@ PYBIND11_MODULE(pyqcec, m) {
            ":attr:`Backpropagate the output permutation "
            "<.Configuration.Optimizations.backpropagate_output_permutation>` "
            "to the input permutation.")
-      .def(
-          "move_data_qubits_to_front",
-          &EquivalenceCheckingManager::runMoveDataQubitsToFront,
-          "Partial equivalence checking assumes that all the data qubits are "
-          "the first qubits. This functions modifies the initial permutation "
-          "in order to :attr:`bring all the data (= not ancillary) qubits to "
-          "the front <.Configuration.Optimizations.move_data_qubits_to_front>`")
-      .def("move_measured_qubits_to_front",
-           &EquivalenceCheckingManager::runMoveMeasuredQubitsToFront,
-           "partial equivalence checking assumes that all the measured qubits "
-           "are the first qubits. This functions modifies the output "
-           "permutation in order to :attr:`bring all the measured (= not "
-           "garbage) qubits to the front "
-           "<.Configuration.Optimizations.move_measured_qubits_to_front>`")
       // Application
       .def("set_application_scheme",
            &EquivalenceCheckingManager::setApplicationScheme,
@@ -583,17 +569,7 @@ PYBIND11_MODULE(pyqcec, m) {
           " that have been transformed to a static circuit by enabling the "
           ":attr:`transform_dynamic_circuit "
           "<.Configuration.Optimizations.transform_dynamic_circuit>` "
-          "optimization.")
-      .def_readwrite("move_data_qubits_to_front",
-                     &Configuration::Optimizations::moveDataQubitsToFront,
-                     "Moves all data (= not ancillary) qubits to the front. "
-                     "This is only used for partial equivalence checking. It "
-                     "defaults to :code:`False`.")
-      .def_readwrite("move_measured_qubits_to_front",
-                     &Configuration::Optimizations::moveMeasuredQubitsToFront,
-                     "Moves all measured (= not garbage) qubits to the front. "
-                     "This is only used for partial equivalence checking. It "
-                     "defaults to :code:`False`.");
+          "optimization.");
 
   // application options
   application.def(py::init<>())

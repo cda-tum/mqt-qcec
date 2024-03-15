@@ -40,8 +40,6 @@ public:
     bool transformDynamicCircuit          = false;
     bool reorderOperations                = true;
     bool backpropagateOutputPermutation   = false;
-    bool moveDataQubitsToFront            = false;
-    bool moveMeasuredQubitsToFront        = false;
   };
 
   // configuration options for application schemes
@@ -163,9 +161,6 @@ public:
     opt["reorder_operations"]        = optimizations.reorderOperations;
     opt["backpropagate_output_permutation"] =
         optimizations.backpropagateOutputPermutation;
-    opt["move_data_qubits_to_front"] = optimizations.moveDataQubitsToFront;
-    opt["move_measured_qubits_to_front"] =
-        optimizations.moveMeasuredQubitsToFront;
 
     auto& app = config["application"];
     if (execution.runConstructionChecker) {
