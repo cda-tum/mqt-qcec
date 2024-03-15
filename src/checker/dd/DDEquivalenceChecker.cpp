@@ -200,10 +200,12 @@ void DDEquivalenceChecker<DDType, Config>::postprocessTask(
   // eliminate the superfluous contributions of ancillary qubits (this only has
   // an effect on matrices)
   task.reduceAncillae();
+
   if (isDone()) {
     return;
   }
-  // sum up the contributions of garbage qubits
+  // sum up the contributions of garbage qubits if we want to check for partial
+  // equivalence
   if (configuration.functionality.checkPartialEquivalence) {
     task.reduceGarbage();
   }

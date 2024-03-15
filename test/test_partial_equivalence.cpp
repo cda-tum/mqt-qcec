@@ -5,11 +5,8 @@
 
 #include "EquivalenceCheckingManager.hpp"
 #include "checker/dd/DDPartialEquivalenceBenchmarks.hpp"
-#include "dd/Package.hpp"
 
 #include "gtest/gtest.h"
-#include <iostream>
-#include <vector>
 
 class PartialEquivalenceTest : public testing::Test {
   void SetUp() override {

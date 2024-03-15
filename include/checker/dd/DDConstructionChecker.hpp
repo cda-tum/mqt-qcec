@@ -36,8 +36,5 @@ private:
     taskManager.incRef();
     taskManager.reduceAncillae();
   }
-
-  void postprocessTask(
-      TaskManager<qc::MatrixDD, ConstructionDDPackageConfig>& task) override;
 };
 } // namespace ec

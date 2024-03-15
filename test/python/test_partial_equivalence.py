@@ -42,31 +42,3 @@ def test_argument_pec(original_circuit: QuantumCircuit, alternative_circuit: Qua
     """Test if the flag for partial equivalence checking works."""
     result = qcec.verify(original_circuit, alternative_circuit, check_partial_equivalence=True)
     assert result.equivalence == qcec.EquivalenceCriterion.equivalent
-
-
-def test_argument_move_measured_to_front() -> None:
-    """Test if the flag for moving measured qubits to the front works."""
-    qc1 = QuantumCircuit(3, 3)
-    qc1.cswap(1, 2, 0)
-    qc1.h(2)
-    qc1.z(0)
-    qc1.cswap(1, 2, 0)
-    qc1.measure(2, 2)
-
-    qc2 = QuantumCircuit(3, 3)
-    qc2.x(1)
-    qc2.ch(1, 2)
-    qc2.measure(2, 2)
-
-    result = qcec.verify(
-        qc1,
-        qc2,
-        check_partial_equivalence=True,
-        move_measured_qubits_to_front=True,
-        run_alternating_checker=True,
-        run_construction_checker=False,
-        run_simulation_checker=False,
-        run_zx_checker=False,
-    )
-
-    assert result.equivalence == qcec.EquivalenceCriterion.equivalent

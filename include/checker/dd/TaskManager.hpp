@@ -121,21 +121,6 @@ public:
     if constexpr (std::is_same_v<DDType, qc::VectorDD>) {
       state = package->reduceGarbage(state, qc->garbage, true);
     } else if constexpr (std::is_same_v<DDType, qc::MatrixDD>) {
-      // version of the paper
-      // const auto d = static_cast<dd::Qubit>(qc->getNqubitsWithoutAncillae());
-      // const auto m = static_cast<dd::Qubit>(qc->getNmeasuredQubits());
-
-      // const dd::Qubit n = state.p->v + 1;
-      // dd::Qubit       k = n - d;
-      // dd::Qubit       extra{0};
-      // if (m > k) {
-      //   extra = m - k;
-      // }
-      // k = k + extra;
-      // state = partialEquivalenceCheckDDSubroutine(state, m, k, extra,
-      // *package);
-
-      // version with reduceGarbage
       state = package->reduceGarbage(state, qc->garbage,
                                      static_cast<bool>(direction), true);
     }
