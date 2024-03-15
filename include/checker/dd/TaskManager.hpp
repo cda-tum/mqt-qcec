@@ -6,7 +6,6 @@
 #pragma once
 
 #include "QuantumComputation.hpp"
-#include "checker/dd/DDPartialEquivalence.hpp"
 #include "dd/Operations.hpp"
 
 namespace ec {

@@ -4,7 +4,7 @@
 //
 
 #include "EquivalenceCheckingManager.hpp"
-#include "checker/dd/DDPartialEquivalence.hpp"
+#include "checker/dd/DDPartialEquivalenceBenchmarks.hpp"
 #include "dd/Package.hpp"
 
 #include "gtest/gtest.h"
@@ -529,12 +529,6 @@ void partialEquivalencCheckingBenchmarks(const qc::Qubit          minN,
       ecm.run();
       EXPECT_TRUE(ecm.getResults().consideredEquivalent());
 
-      // if (!ecm.getResults().consideredEquivalent()) {
-      //   std::cout << "c1:\n";
-      //   c1.print(std::cout);
-      //   std::cout << "c2:\n";
-      //   c2.print(std::cout);
-      // }
       const auto duration = ecm.getResults().checkTime;
 
       totalTime += duration;

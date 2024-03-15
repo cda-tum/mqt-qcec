@@ -1,4 +1,4 @@
-#include "checker/dd/DDPartialEquivalence.hpp"
+#include "checker/dd/DDPartialEquivalenceBenchmarks.hpp"
 
 #include "QuantumComputation.hpp"
 #include "operations/OpType.hpp"
@@ -214,16 +214,6 @@ makeRandomStandardOperation(const size_t n, const qc::Qubit nrQubits,
   const fp randomParameter1 = randomDistrParameters(randomGenerator);
   const fp randomParameter2 = randomDistrParameters(randomGenerator);
   const fp randomParameter3 = randomDistrParameters(randomGenerator);
-  // const std::vector<fp> randomParameters{PI, PI_2, PI_4};
-  // const fp randomParameter1 =
-  //     randomParameters[static_cast<size_t>(rand()) %
-  //     randomParameters.size()];
-  // const fp randomParameter2 =
-  //     randomParameters[static_cast<size_t>(rand()) %
-  //     randomParameters.size()];
-  // const fp randomParameter3 =
-  //     randomParameters[static_cast<size_t>(rand()) %
-  //     randomParameters.size()];
   return convertToStandardOperation(
       n, nrQubits, randomOpType, randomTarget1, randomTarget2, randomParameter1,
       randomParameter2, randomParameter3, randomControls);
