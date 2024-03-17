@@ -628,14 +628,12 @@ PYBIND11_MODULE(pyqcec, m) {
           "Two circuits are partially equivalent if, for each possible initial "
           "input state, they have the same probability for each measurement "
           "outcome. If set to :code:`True`, a check for partial equivalence "
-          "will be performed in the :ref:`construction checker "
-          "<EquivalenceChecking:Construction Equivalence Checker (using "
-          "Decision Diagrams)>` and in the :ref:`alternating checker "
-          "<EquivalenceChecking:Alternating Equivalence Checker (using "
-          "Decision Diagrams)>` (if they are enabled). If set to "
-          ":code:`False`, the checker will output 'not equivalent' for "
-          "circuits that are partially equivalent but not totally equivalent. "
-          "Defaults to :code:`False`.");
+          "will be performed and the contributions of garbage qubits to the "
+          "circuit are ignored. If set to :code:`False`, the checker will "
+          "output 'not equivalent' for circuits that are partially equivalent "
+          "but not totally equivalent. In particular, garbage qubits will be "
+          "treated as if they were measured qubits. Defaults to "
+          ":code:`False`.");
 
   // simulation options
   simulation.def(py::init<>())
