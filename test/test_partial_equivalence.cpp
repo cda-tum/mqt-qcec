@@ -578,7 +578,7 @@ void partialEquivalencCheckingBenchmarks(const qc::Qubit          minN,
       std::uniform_int_distribution<qc::Qubit> nrDataQubits(1, d);
       const qc::Qubit                          m = nrDataQubits(gen);
 
-      const auto [c1, c2] = dd::generateRandomBenchmark(n, d, m);
+      const auto [c1, c2] = dd::generatePartiallyEquivalentCircuits(n, d, m);
 
       ec::EquivalenceCheckingManager ecm(c1, c2, config);
       ecm.run();

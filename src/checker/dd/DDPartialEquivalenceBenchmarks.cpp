@@ -220,7 +220,8 @@ makeRandomStandardOperation(const size_t n, const qc::Qubit nrQubits,
 }
 
 std::pair<qc::QuantumComputation, qc::QuantumComputation>
-generateRandomBenchmark(const size_t n, const qc::Qubit d, const qc::Qubit m) {
+generatePartiallyEquivalentCircuits(const size_t n, const qc::Qubit d,
+                                    const qc::Qubit m) {
   if (d > n || m > n) {
     throw std::runtime_error("The number of data or measured qubits can't be "
                              "bigger than the total number of qubits. n = " +
