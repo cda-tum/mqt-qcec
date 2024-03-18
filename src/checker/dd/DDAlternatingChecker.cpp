@@ -101,18 +101,13 @@ EquivalenceCriterion DDAlternatingChecker::checkEquivalence() {
     garbage[static_cast<std::size_t>(q)] =
         qc1.logicalQubitIsGarbage(q) && qc2.logicalQubitIsGarbage(q);
   }
-  bool isClose{};
-
-  // if partial equivalence is being checked instead of total equivalence, it
-  // suffices to change the last parameter of isCloseToIdentity to `false`
-  if (configuration.functionality.checkPartialEquivalence) {
-    isClose = dd->isCloseToIdentity(functionality,
-                                    configuration.functionality.traceThreshold,
-                                    garbage, false);
-  } else {
-    isClose = dd->isCloseToIdentity(functionality,
-                                    configuration.functionality.traceThreshold);
-  }
+  bool isClose =
+      configuration.functionality.checkPartialEquivalence
+          ? dd->isCloseToIdentity(functionality,
+                                  configuration.functionality.traceThreshold,
+                                  garbage, false)
+          : dd->isCloseToIdentity(functionality,
+                                  configuration.functionality.traceThreshold);
 
   if (isClose) {
     // whenever the top edge weight is not one, both decision diagrams are only
