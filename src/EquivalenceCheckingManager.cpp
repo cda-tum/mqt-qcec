@@ -187,8 +187,9 @@ void EquivalenceCheckingManager::run() {
       equivalence() == EquivalenceCriterion::NotEquivalent) {
     std::clog << "[QCEC] Warning: at least one of the circuits has garbage "
                  "qubits, but partial equivalence checking is turned off. In "
-                 "order to take into account the garbage qubits, set "
-                 "checkPartialEquivalence to true.\n";
+                 "order to take into account the garbage qubits, enable partial"
+                 " equivalence checking. Consult the documentation for more"
+                 "information.\n";
   }
 }
 
