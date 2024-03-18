@@ -156,7 +156,7 @@ void EquivalenceCheckingManager::runOptimizationPasses() {
 void EquivalenceCheckingManager::run() {
   done                = false;
   results.equivalence = EquivalenceCriterion::NoInformation;
-  bool garbageQubitsPresent =
+  const bool garbageQubitsPresent =
       qc1.getNgarbageQubits() > 0 || qc2.getNgarbageQubits() > 0;
 
   if (!configuration.anythingToExecute()) {

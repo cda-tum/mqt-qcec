@@ -101,7 +101,7 @@ EquivalenceCriterion DDAlternatingChecker::checkEquivalence() {
     garbage[static_cast<std::size_t>(q)] =
         qc1.logicalQubitIsGarbage(q) && qc2.logicalQubitIsGarbage(q);
   }
-  bool isClose =
+  const bool isClose =
       configuration.functionality.checkPartialEquivalence
           ? dd->isCloseToIdentity(functionality,
                                   configuration.functionality.traceThreshold,

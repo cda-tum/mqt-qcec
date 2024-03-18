@@ -129,11 +129,11 @@ INSTANTIATE_TEST_SUITE_P(
         testing::Range(static_cast<unsigned short>(1U),
                        static_cast<unsigned short>(4U), 2)),
     [](const testing::TestParamInfo<JournalTestNonEQ::ParamType>& inf) {
-      std::string    name            = std::get<0>(inf.param);
-      unsigned short gates_to_remove = std::get<1>(inf.param);
+      std::string          name          = std::get<0>(inf.param);
+      const unsigned short gatesToRemove = std::get<1>(inf.param);
       std::replace(name.begin(), name.end(), '-', '_');
       std::stringstream ss{};
-      ss << name << "_removed_" << gates_to_remove;
+      ss << name << "_removed_" << gatesToRemove;
       return ss.str();
     });
 
@@ -153,7 +153,7 @@ TEST_P(JournalTestNonEQ, PowerOfSimulation) {
 
     // generate non-eq circuit
     std::set<std::uint64_t> removed{};
-    do {
+    do { // NOLINT(cppcoreguidelines-avoid-do-while)
       qcTranspiled.import(transpiledFile);
       removed.clear();
       for (std::uint16_t j = 0U; j < gatesToRemove; ++j) {
@@ -207,7 +207,7 @@ TEST_P(JournalTestNonEQ, PowerOfSimulationParallel) {
 
     // generate non-eq circuit
     std::set<std::uint64_t> removed{};
-    do {
+    do { // NOLINT(cppcoreguidelines-avoid-do-while)
       qcTranspiled.import(transpiledFile);
       removed.clear();
       for (std::uint16_t j = 0U; j < gatesToRemove; ++j) {
