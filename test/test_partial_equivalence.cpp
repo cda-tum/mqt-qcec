@@ -209,7 +209,7 @@ makeRandomStandardOperation(const size_t n, const qc::Qubit nrQubits,
     nrControls = 0;
   }
   if (nrControls == 2) {
-    // otherwise toffoli gates are almost never generated
+    // otherwise Toffoli gates are almost never generated
     randomOpType = qc::X;
   }
   Controls randomControls{};
@@ -767,7 +767,6 @@ TEST_F(PartialEquivalenceTest, SliQECGrover22Qubits) {
   c2.setLogicalQubitGarbage(11);
 
   // construction checker
-  // adds 10 ancillary qubits -> total number of qubits is 22
   config.execution.runConstructionChecker = true;
   ec::EquivalenceCheckingManager ecm(c1, c2, config);
   ecm.run();
@@ -789,7 +788,6 @@ TEST_F(PartialEquivalenceTest, SliQECAdd19Qubits) {
   c1.setLogicalQubitsGarbage(8, 18);
   c2.setLogicalQubitsGarbage(8, 18);
 
-  // doesn't add ancillary qubits -> total number of qubits is 19
   config.execution.runConstructionChecker = true;
   ec::EquivalenceCheckingManager ecm(c1, c2, config);
   ecm.run();

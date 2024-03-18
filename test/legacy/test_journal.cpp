@@ -146,6 +146,7 @@ TEST_P(JournalTestNonEQ, PowerOfSimulation) {
   config.execution.timeout                = 60.;
   config.simulation.maxSims               = 16U;
   config.application.simulationScheme = ec::ApplicationSchemeType::Sequential;
+  config.functionality.checkPartialEquivalence = true;
 
   for (std::uint16_t i = 0U; i < tries; ++i) {
     qcOriginal.import(testOriginalDir + std::get<0>(GetParam()) + ".real");
@@ -199,6 +200,7 @@ TEST_P(JournalTestNonEQ, PowerOfSimulationParallel) {
   config.execution.timeout                = 60.;
   config.simulation.maxSims               = 16U;
   config.application.simulationScheme = ec::ApplicationSchemeType::Sequential;
+  config.functionality.checkPartialEquivalence = true;
 
   for (std::uint16_t i = 0; i < tries; ++i) {
     qcOriginal.import(testOriginalDir + std::get<0>(GetParam()) + ".real");
