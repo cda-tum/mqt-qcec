@@ -313,6 +313,15 @@ PYBIND11_MODULE(pyqcec, m) {
            "Set the :attr:`trace threshold "
            "<.Configuration.Functionality.trace_threshold>` used for comparing "
            "two unitaries or functionality matrices.")
+      .def(
+          "set_check_partial_equivalence",
+          &EquivalenceCheckingManager::setCheckPartialEquivalence,
+          "enable"_a = false,
+          "Set whether to check for partial equivalence. Two circuits are "
+          "partially equivalent if, for each possible initial input state, "
+          "they have the same probability for each measurement outcome. "
+          "If set to false, the checker will output 'not equivalent' for "
+          "circuits that are partially equivalent but not totally equivalent. ")
       // Simulation
       .def("set_fidelity_threshold",
            &EquivalenceCheckingManager::setFidelityThreshold,
@@ -612,7 +621,19 @@ PYBIND11_MODULE(pyqcec, m) {
           "while the second and third successor have weights close to zero). "
           "Whenever any decision diagram node differs from this structure by "
           "more than the configured threshold, the circuits are concluded to "
-          "be non-equivalent. Defaults to :code:`1e-8`.");
+          "be non-equivalent. Defaults to :code:`1e-8`.")
+      .def_readwrite(
+          "check_partial_equivalence",
+          &Configuration::Functionality::checkPartialEquivalence,
+          "Two circuits are partially equivalent if, for each possible initial "
+          "input state, they have the same probability for each measurement "
+          "outcome. If set to :code:`True`, a check for partial equivalence "
+          "will be performed and the contributions of garbage qubits to the "
+          "circuit are ignored. If set to :code:`False`, the checker will "
+          "output 'not equivalent' for circuits that are partially equivalent "
+          "but not totally equivalent. In particular, garbage qubits will be "
+          "treated as if they were measured qubits. Defaults to "
+          ":code:`False`.");
 
   // simulation options
   simulation.def(py::init<>())

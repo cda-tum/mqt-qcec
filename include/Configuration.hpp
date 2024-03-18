@@ -57,7 +57,8 @@ public:
   };
 
   struct Functionality {
-    double traceThreshold = 1e-8;
+    double traceThreshold          = 1e-8;
+    bool   checkPartialEquivalence = false;
   };
 
   // configuration options for the simulation scheme
@@ -186,8 +187,9 @@ public:
     par["additional_instantiations"] = parameterized.nAdditionalInstantiations;
 
     if (execution.runConstructionChecker || execution.runAlternatingChecker) {
-      auto& fun              = config["functionality"];
-      fun["trace_threshold"] = functionality.traceThreshold;
+      auto& fun                        = config["functionality"];
+      fun["trace_threshold"]           = functionality.traceThreshold;
+      fun["check_partial_equivalence"] = functionality.checkPartialEquivalence;
     }
 
     if (execution.runSimulationChecker) {

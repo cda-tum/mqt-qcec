@@ -178,8 +178,9 @@ TEST_F(EqualityTest, AutomaticSwitchToConstructionChecker) {
   // run the equivalence checker
   ecm.run();
 
-  // both circuits should be equivalent since their action only differs on an
-  // ancillary and garbage qubit
+  // both circuits should be partially equivalent since their action only
+  // differs on an ancillary and garbage qubit
+  ecm.setCheckPartialEquivalence(true);
   const auto result = ecm.equivalence();
   EXPECT_EQ(result, ec::EquivalenceCriterion::Equivalent);
 

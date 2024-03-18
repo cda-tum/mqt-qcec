@@ -196,6 +196,9 @@ public:
   void setTraceThreshold(double traceThreshold) {
     configuration.functionality.traceThreshold = traceThreshold;
   }
+  void setCheckPartialEquivalence(bool checkPE) {
+    configuration.functionality.checkPartialEquivalence = checkPE;
+  }
 
   // Simulation: These setting may be changed to adjust the kinds of simulations
   // that are performed

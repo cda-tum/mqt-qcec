@@ -113,12 +113,16 @@ public:
   }
   void reduceAncillae() { reduceAncillae(internalState); }
 
+  /**
+   Reduces garbage qubits such that the matrix will be equal to another reduced
+   matrix iff the two underlying circuits are partially equivalent.
+   **/
   void reduceGarbage(DDType& state) {
     if constexpr (std::is_same_v<DDType, qc::VectorDD>) {
-      state = package->reduceGarbage(state, qc->garbage);
+      state = package->reduceGarbage(state, qc->garbage, true);
     } else if constexpr (std::is_same_v<DDType, qc::MatrixDD>) {
       state = package->reduceGarbage(state, qc->garbage,
-                                     static_cast<bool>(direction));
+                                     static_cast<bool>(direction), true);
     }
   }
   void reduceGarbage() { reduceGarbage(internalState); }

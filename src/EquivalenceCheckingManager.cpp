@@ -156,6 +156,8 @@ void EquivalenceCheckingManager::runOptimizationPasses() {
 void EquivalenceCheckingManager::run() {
   done                = false;
   results.equivalence = EquivalenceCriterion::NoInformation;
+  bool garbageQubitsPresent =
+      qc1.getNgarbageQubits() > 0 || qc2.getNgarbageQubits() > 0;
 
   if (!configuration.anythingToExecute()) {
     std::clog << "Nothing to be executed. Check your configuration!\n";
@@ -178,6 +180,16 @@ void EquivalenceCheckingManager::run() {
     }
   } else {
     checkSymbolic();
+  }
+
+  if (!configuration.functionality.checkPartialEquivalence &&
+      garbageQubitsPresent &&
+      equivalence() == EquivalenceCriterion::NotEquivalent) {
+    std::clog << "[QCEC] Warning: at least one of the circuits has garbage "
+                 "qubits, but partial equivalence checking is turned off. In "
+                 "order to take into account the garbage qubits, enable partial"
+                 " equivalence checking. Consult the documentation for more"
+                 "information.\n";
   }
 }
 
