@@ -200,7 +200,6 @@ void DDEquivalenceChecker<DDType, Config>::postprocessTask(
   // eliminate the superfluous contributions of ancillary qubits (this only has
   // an effect on matrices)
   task.reduceAncillae();
-
   if (isDone()) {
     return;
   }
