@@ -7,6 +7,7 @@ Checks: |
   boost-*,
   bugprone-*,
   -bugprone-easily-swappable-parameters,
+  -bugprone-unchecked-optional-access,
   clang-analyzer-*,
   cppcoreguidelines-*,
   -cppcoreguidelines-non-private-member-variables-in-classes,
