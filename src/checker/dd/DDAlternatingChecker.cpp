@@ -9,7 +9,7 @@ namespace ec {
 void DDAlternatingChecker::initialize() {
   DDEquivalenceChecker::initialize();
   // create the full identity matrix
-  functionality = dd->makeIdent(nqubits);
+  functionality = dd->makeIdent();
   dd->incRef(functionality);
 
   // Only count ancillaries that are present in but not acted upon in both of
@@ -50,7 +50,7 @@ void DDAlternatingChecker::execute() {
 
       // whenever the current functionality resembles the identity, identical
       // gates on both sides cancel
-      if (functionality.p->isIdentity() &&
+      if (functionality.isIdentity() &&
           (configuration.application.alternatingScheme !=
            ApplicationSchemeType::Lookahead) &&
           gatesAreIdentical()) {
