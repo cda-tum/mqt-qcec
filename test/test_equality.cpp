@@ -168,6 +168,7 @@ TEST_F(EqualityTest, AutomaticSwitchToConstructionChecker) {
   // setup default configuration
   config = ec::Configuration{};
   ec::EquivalenceCheckingManager ecm(qc1, qc2, config);
+  ecm.setCheckPartialEquivalence(true);
 
   // this should notice that the alternating checker is not capable of running
   // the circuit and should switch to the construction checker
@@ -180,7 +181,6 @@ TEST_F(EqualityTest, AutomaticSwitchToConstructionChecker) {
 
   // both circuits should be partially equivalent since their action only
   // differs on an ancillary and garbage qubit
-  ecm.setCheckPartialEquivalence(true);
   const auto result = ecm.equivalence();
   EXPECT_EQ(result, ec::EquivalenceCriterion::Equivalent);
 
