@@ -25,9 +25,9 @@ const std::vector<std::vector<OpType>> PRE_GENERATED_CIRCUITS_SIZE_2_2{
     {Z}, {Tdg}, {S}, {Sdg}, {X, Z}, {Z, X}};
 
 void addPreGeneratedCircuits(QuantumComputation& circuit1,
-                             QuantumComputation& circuit2, const size_t n,
-                             const qc::Qubit groupBeginIndex,
-                             const qc::Qubit groupSize) {
+                             QuantumComputation& circuit2,
+                             const qc::Qubit     groupBeginIndex,
+                             const qc::Qubit     groupSize) {
   const auto& circuits1       = groupSize == 1 ? PRE_GENERATED_CIRCUITS_SIZE_1_1
                                                : PRE_GENERATED_CIRCUITS_SIZE_2_1;
   const auto& circuits2       = groupSize == 1 ? PRE_GENERATED_CIRCUITS_SIZE_1_2
@@ -41,18 +41,18 @@ void addPreGeneratedCircuits(QuantumComputation& circuit1,
   const auto x2          = circuits2[randomIndex];
   for (auto gateType : x1) {
     if (gateType == X) { // add CNOT
-      circuit1.emplace_back<StandardOperation>(n, groupBeginIndex,
+      circuit1.emplace_back<StandardOperation>(groupBeginIndex,
                                                groupBeginIndex + 1, gateType);
     } else {
-      circuit1.emplace_back<StandardOperation>(n, groupBeginIndex, gateType);
+      circuit1.emplace_back<StandardOperation>(groupBeginIndex, gateType);
     }
   }
   for (auto gateType : x2) {
     if (gateType == X) { // add CNOT
-      circuit2.emplace_back<StandardOperation>(n, groupBeginIndex,
+      circuit2.emplace_back<StandardOperation>(groupBeginIndex,
                                                groupBeginIndex + 1, gateType);
     } else {
-      circuit2.emplace_back<StandardOperation>(n, groupBeginIndex, gateType);
+      circuit2.emplace_back<StandardOperation>(groupBeginIndex, gateType);
     }
   }
 }
@@ -108,7 +108,7 @@ fiveDiffferentRandomNumbers(const qc::Qubit min, const qc::Qubit max,
 }
 
 StandardOperation convertToStandardOperation(
-    const size_t n, const size_t nrQubits, const OpType randomOpType,
+    const size_t nrQubits, const OpType randomOpType,
     const qc::Qubit randomTarget1, const qc::Qubit randomTarget2,
     const fp randomParameter1, const fp randomParameter2,
     const fp randomParameter3, const Controls& randomControls) {
@@ -122,7 +122,7 @@ StandardOperation convertToStandardOperation(
   case qc::DCX:
   case qc::ECR:
     if (nrQubits > 1) {
-      return {n, randomControls, Targets{randomTarget1, randomTarget2},
+      return {randomControls, Targets{randomTarget1, randomTarget2},
               randomOpType};
     }
     break;
@@ -133,7 +133,7 @@ StandardOperation convertToStandardOperation(
   case qc::RZZ:
   case qc::RZX:
     if (nrQubits > 1) {
-      return {n, randomControls, Targets{randomTarget1, randomTarget2},
+      return {randomControls, Targets{randomTarget1, randomTarget2},
               randomOpType, std::vector<fp>{randomParameter1}};
     }
     break;
@@ -142,7 +142,7 @@ StandardOperation convertToStandardOperation(
   case qc::XXminusYY:
   case qc::XXplusYY:
     if (nrQubits > 1) {
-      return {n, randomControls, Targets{randomTarget1, randomTarget2},
+      return {randomControls, Targets{randomTarget1, randomTarget2},
               randomOpType,
               std::vector<fp>{randomParameter1, randomParameter2}};
     }
@@ -162,32 +162,31 @@ StandardOperation convertToStandardOperation(
   case qc::Vdg:
   case qc::SX:
   case qc::SXdg:
-    return {n, randomControls, randomTarget1, randomOpType};
+    return {randomControls, randomTarget1, randomOpType};
     // one target and three parameters
   case qc::U:
     return {
-        n, randomControls, randomTarget1, randomOpType,
+        randomControls, randomTarget1, randomOpType,
         std::vector<fp>{randomParameter1, randomParameter2, randomParameter3}};
     // one target and two parameters
   case qc::U2:
-    return {n, randomControls, randomTarget1, randomOpType,
+    return {randomControls, randomTarget1, randomOpType,
             std::vector<fp>{randomParameter1, randomParameter2}};
     // one target and one parameter
   case qc::P:
   case qc::RX:
   case qc::RY:
   case qc::RZ:
-    return {n, randomControls, randomTarget1, randomOpType,
+    return {randomControls, randomTarget1, randomOpType,
             std::vector<fp>{randomParameter1}};
   default:
-    return {n, randomTarget1, qc::I};
+    return {randomTarget1, qc::I};
   }
-  return {n, randomTarget1, qc::I};
+  return {randomTarget1, qc::I};
 }
 
 StandardOperation
-makeRandomStandardOperation(const size_t n, const qc::Qubit nrQubits,
-                            const qc::Qubit  min,
+makeRandomStandardOperation(const qc::Qubit nrQubits, const qc::Qubit min,
                             std::mt19937_64& randomGenerator) {
   const auto randomNumbers =
       fiveDiffferentRandomNumbers(min, min + nrQubits, randomGenerator);
@@ -221,7 +220,7 @@ makeRandomStandardOperation(const size_t n, const qc::Qubit nrQubits,
   const fp randomParameter2 = randomDistrParameters(randomGenerator);
   const fp randomParameter3 = randomDistrParameters(randomGenerator);
   return convertToStandardOperation(
-      n, nrQubits, randomOpType, randomTarget1, randomTarget2, randomParameter1,
+      nrQubits, randomOpType, randomTarget1, randomTarget2, randomParameter1,
       randomParameter2, randomParameter3, randomControls);
 }
 
@@ -263,7 +262,7 @@ generatePartiallyEquivalentCircuits(const size_t n, const qc::Qubit d,
   // Generate a random subcircuit with d qubits and 3*d gates to apply
   // on both circuits, but all the Toffoli gates in circuit2 are decomposed
   for (qc::Qubit i = 0U; i < 3 * d; i++) {
-    const auto op = makeRandomStandardOperation(n, d, 0, randomGenerator);
+    const auto op = makeRandomStandardOperation(d, 0, randomGenerator);
     addStandardOperationToCircuit(circuit1, op, false);
     addStandardOperationToCircuit(circuit2, op, true);
   }
@@ -282,7 +281,7 @@ generatePartiallyEquivalentCircuits(const size_t n, const qc::Qubit d,
       groupSize = randomDistrGroupSize(randomGenerator);
     }
 
-    addPreGeneratedCircuits(circuit1, circuit2, n, groupBeginIndex, groupSize);
+    addPreGeneratedCircuits(circuit1, circuit2, groupBeginIndex, groupSize);
 
     groupBeginIndex += groupSize;
   }
@@ -296,12 +295,10 @@ generatePartiallyEquivalentCircuits(const size_t n, const qc::Qubit d,
     const qc::Qubit notMQubits = d - m;
     for (qc::Qubit i = 0U; i < notMQubits; i++) {
       addStandardOperationToCircuit(
-          circuit1,
-          makeRandomStandardOperation(n, notMQubits, m, randomGenerator),
+          circuit1, makeRandomStandardOperation(notMQubits, m, randomGenerator),
           false);
       addStandardOperationToCircuit(
-          circuit2,
-          makeRandomStandardOperation(n, notMQubits, m, randomGenerator),
+          circuit2, makeRandomStandardOperation(notMQubits, m, randomGenerator),
           false);
     }
   }

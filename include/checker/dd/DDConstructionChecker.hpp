@@ -31,7 +31,7 @@ private:
   void initializeTask(TaskManager<qc::MatrixDD, ConstructionDDPackageConfig>&
                           taskManager) override {
     DDEquivalenceChecker::initializeTask(taskManager);
-    const auto initial = dd->makeIdent(nqubits);
+    const auto initial = dd->makeIdent();
     taskManager.setInternalState(initial);
     taskManager.incRef();
     taskManager.reduceAncillae();
