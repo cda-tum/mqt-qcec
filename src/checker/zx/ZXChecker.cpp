@@ -154,98 +154,85 @@ qc::Permutation invertPermutations(const qc::QuantumComputation& qc) {
                 complete(qc.initialLayout, qc.getNqubits()));
 }
 
-std::size_t ZXEquivalenceChecker::fullReduceApproximate() {
-  auto nSimplifications = fullReduce();
+bool ZXEquivalenceChecker::fullReduceApproximate() {
+  auto simplified = fullReduce();
   while (!isDone()) {
     miter.approximateCliffords(tolerance);
-    const auto newSimps = fullReduce();
-    if (newSimps == 0U) {
+    if (!fullReduce()) {
       break;
     }
-    nSimplifications += newSimps;
+    simplified = true;
   }
-  return nSimplifications;
+  return simplified;
 }
 
-std::size_t ZXEquivalenceChecker::fullReduce() {
+bool ZXEquivalenceChecker::fullReduce() {
   if (!isDone()) {
     miter.toGraphlike();
   }
-  interiorCliffordSimp();
-
-  bool        newMatches       = true;
-  std::size_t nSimplifications = 0U;
-  while (!isDone() && newMatches) {
-    newMatches = false;
-    cliffordSimp();
-    const auto nGadget = gadgetSimp();
-    interiorCliffordSimp();
-    const auto nPivot = pivotGadgetSimp();
-    if ((nGadget + nPivot) != 0U) {
-      newMatches = true;
-      ++nSimplifications;
+  auto simplified = interiorCliffordSimp();
+  while (!isDone()) {
+    auto moreSimplified = cliffordSimp();
+    moreSimplified |= gadgetSimp();
+    moreSimplified |= interiorCliffordSimp();
+    moreSimplified |= pivotGadgetSimp();
+    if (!moreSimplified) {
+      break;
     }
+    simplified = true;
   }
   if (!isDone()) {
     miter.removeDisconnectedSpiders();
   }
-
-  return nSimplifications;
+  return simplified;
 }
 
-std::size_t ZXEquivalenceChecker::gadgetSimp() {
-  std::size_t nSimplifications = 0U;
-  bool        newMatches       = true;
-
-  while (!isDone() && newMatches) {
-    newMatches = false;
+bool ZXEquivalenceChecker::gadgetSimp() {
+  auto simplified = false;
+  while (!isDone()) {
+    auto moreSimplified = false;
     for (const auto& [v, _] : miter.getVertices()) {
       if (miter.isDeleted(v)) {
         continue;
       }
-
-      if (!isDone() && checkAndFuseGadget(miter, v)) {
-        newMatches = true;
-        ++nSimplifications;
+      if (checkAndFuseGadget(miter, v)) {
+        moreSimplified = true;
       }
     }
+    if (!moreSimplified) {
+      break;
+    }
+    simplified = true;
   }
-  return nSimplifications;
+  return simplified;
 }
 
-std::size_t ZXEquivalenceChecker::interiorCliffordSimp() {
-  spiderSimp();
-
-  bool        newMatches       = true;
-  std::size_t nSimplifications = 0U;
-  while (!isDone() && newMatches) {
-    newMatches            = false;
-    const auto nId        = idSimp();
-    const auto nSpider    = spiderSimp();
-    const auto nPivot     = pivotPauliSimp();
-    const auto nLocalComp = localCompSimp();
-
-    if ((nId + nSpider + nPivot + nLocalComp) != 0U) {
-      newMatches = true;
-      ++nSimplifications;
+bool ZXEquivalenceChecker::interiorCliffordSimp() {
+  auto simplified = spiderSimp();
+  while (!isDone()) {
+    auto moreSimplified = idSimp();
+    moreSimplified |= spiderSimp();
+    moreSimplified |= pivotPauliSimp();
+    moreSimplified |= localCompSimp();
+    if (!moreSimplified) {
+      break;
     }
+    simplified = true;
   }
-  return nSimplifications;
+  return simplified;
 }
 
-std::size_t ZXEquivalenceChecker::cliffordSimp() {
-  bool        newMatches       = true;
-  std::size_t nSimplifications = 0U;
-  while (!isDone() && newMatches) {
-    newMatches           = false;
-    const auto nClifford = interiorCliffordSimp();
-    const auto nPivot    = pivotSimp();
-    if ((nClifford + nPivot) != 0U) {
-      newMatches = true;
-      ++nSimplifications;
+bool ZXEquivalenceChecker::cliffordSimp() {
+  auto simplified = false;
+  while (!isDone()) {
+    auto moreSimplified = interiorCliffordSimp();
+    moreSimplified |= pivotSimp();
+    if (!moreSimplified) {
+      break;
     }
+    simplified = true;
   }
-  return nSimplifications;
+  return simplified;
 }
 
 } // namespace ec

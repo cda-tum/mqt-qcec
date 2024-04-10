@@ -36,72 +36,72 @@ private:
   // the following methods are adaptations of the core ZX simplification
   // routines that additionally check a criterion for early termination of the
   // simplification.
-  std::size_t fullReduceApproximate();
-  std::size_t fullReduce();
+  bool fullReduceApproximate();
+  bool fullReduce();
 
-  std::size_t gadgetSimp();
-  std::size_t interiorCliffordSimp();
-  std::size_t cliffordSimp();
+  bool gadgetSimp();
+  bool interiorCliffordSimp();
+  bool cliffordSimp();
 
-  std::size_t idSimp() {
-    return simplifyVertices(zx::checkIdSimp, zx::removeId);
-  }
+  bool idSimp() { return simplifyVertices(zx::checkIdSimp, zx::removeId); }
 
-  std::size_t spiderSimp() {
+  bool spiderSimp() {
     return simplifyEdges(zx::checkSpiderFusion, zx::fuseSpiders);
   }
 
-  std::size_t localCompSimp() {
+  bool localCompSimp() {
     return simplifyVertices(zx::checkLocalComp, zx::localComp);
   }
 
-  std::size_t pivotPauliSimp() {
+  bool pivotPauliSimp() {
     return simplifyEdges(zx::checkPivotPauli, zx::pivotPauli);
   }
 
-  std::size_t pivotSimp() { return simplifyEdges(zx::checkPivot, zx::pivot); }
+  bool pivotSimp() { return simplifyEdges(zx::checkPivot, zx::pivot); }
 
-  std::size_t pivotGadgetSimp() {
+  bool pivotGadgetSimp() {
     return simplifyEdges(zx::checkPivotGadget, zx::pivotGadget);
   }
 
   template <class CheckFun, class RuleFun>
-  std::size_t simplifyVertices(CheckFun check, RuleFun rule) {
-    std::size_t nSimplifications = 0U;
-    bool        newMatches       = true;
-
-    while (!isDone() && newMatches) {
-      newMatches = false;
+  bool simplifyVertices(CheckFun check, RuleFun rule) {
+    bool simplified = false;
+    while (!isDone()) {
+      auto moreSimplified = false;
       for (const auto& [v, _] : miter.getVertices()) {
         if (isDone() || !check(miter, v)) {
           continue;
         }
         rule(miter, v);
-        newMatches = true;
-        ++nSimplifications;
+        moreSimplified = true;
       }
+      if (!moreSimplified) {
+        break;
+      }
+      simplified |= true;
     }
-    return nSimplifications;
+    return simplified;
   }
 
   template <class CheckFun, class RuleFun>
-  std::size_t simplifyEdges(CheckFun check, RuleFun rule) {
-    std::size_t nSimplifications = 0U;
-    bool        newMatches       = true;
-
-    while (!isDone() && newMatches) {
-      newMatches = false;
+  bool simplifyEdges(CheckFun check, RuleFun rule) {
+    bool simplified = false;
+    while (!isDone()) {
+      auto moreSimplified = false;
       for (const auto& [v0, v1] : miter.getEdges()) {
         if (isDone() || miter.isDeleted(v0) || miter.isDeleted(v1) ||
             !check(miter, v0, v1)) {
           continue;
         }
         rule(miter, v0, v1);
-        newMatches = true;
-        ++nSimplifications;
+        moreSimplified = true;
       }
+      if (!moreSimplified) {
+        break;
+      }
+      simplified |= true;
     }
-    return nSimplifications;
+    return simplified;
   }
 };
 
