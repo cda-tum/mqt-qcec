@@ -171,19 +171,17 @@ void DDEquivalenceChecker<DDType, Config>::execute() {
     taskManager1.applySwapOperations();
     taskManager2.applySwapOperations();
 
-    if (!taskManager1.finished() && !taskManager2.finished()) {
+    if (!taskManager1.finished() && !taskManager2.finished() && !isDone()) {
       // query application scheme on how to proceed
       const auto [apply1, apply2] = (*applicationScheme)();
 
       // advance both tasks correspondingly
-      if (isDone()) {
-        return;
+      if (!isDone()) {
+        taskManager1.advance(apply1);
       }
-      taskManager1.advance(apply1);
-      if (isDone()) {
-        return;
+      if (!isDone()) {
+        taskManager2.advance(apply2);
       }
-      taskManager2.advance(apply2);
     }
   }
 }
@@ -191,10 +189,9 @@ void DDEquivalenceChecker<DDType, Config>::execute() {
 template <class DDType, class Config>
 void DDEquivalenceChecker<DDType, Config>::finish() {
   taskManager1.finish();
-  if (isDone()) {
-    return;
+  if (!isDone()) {
+    taskManager2.finish();
   }
-  taskManager2.finish();
 }
 
 template <class DDType, class Config>
@@ -222,10 +219,9 @@ void DDEquivalenceChecker<DDType, Config>::postprocessTask(
 template <class DDType, class Config>
 void DDEquivalenceChecker<DDType, Config>::postprocess() {
   postprocessTask(taskManager1);
-  if (isDone()) {
-    return;
+  if (!isDone()) {
+    postprocessTask(taskManager2);
   }
-  postprocessTask(taskManager2);
 }
 
 template <class DDType, class Config>

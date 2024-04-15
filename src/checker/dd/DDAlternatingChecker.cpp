@@ -55,11 +55,7 @@ void DDAlternatingChecker::execute() {
     taskManager1.applySwapOperations(functionality);
     taskManager2.applySwapOperations(functionality);
 
-    if (!taskManager1.finished() && !taskManager2.finished()) {
-      if (isDone()) {
-        return;
-      }
-
+    if (!taskManager1.finished() && !taskManager2.finished() && !isDone()) {
       // whenever the current functionality resembles the identity, identical
       // gates on both sides cancel
       if (functionality.isIdentity() &&
@@ -74,36 +70,29 @@ void DDAlternatingChecker::execute() {
       const auto [apply1, apply2] = (*applicationScheme)();
 
       // advance both tasks correspondingly
-      if (isDone()) {
-        return;
+      if (!isDone()) {
+        taskManager1.advance(functionality, apply1);
       }
-      taskManager1.advance(functionality, apply1);
-      if (isDone()) {
-        return;
+      if (!isDone()) {
+        taskManager2.advance(functionality, apply2);
       }
-      taskManager2.advance(functionality, apply2);
     }
   }
 }
 
 void DDAlternatingChecker::finish() {
   taskManager1.finish(functionality);
-  if (isDone()) {
-    return;
+  if (!isDone()) {
+    taskManager2.finish(functionality);
   }
-  taskManager2.finish(functionality);
 }
 
 void DDAlternatingChecker::postprocess() {
   // ensure that the permutations that were tracked throughout the circuit match
   // the expected output permutations
   taskManager1.changePermutation(functionality);
-  if (isDone()) {
-    return;
-  }
-  taskManager2.changePermutation(functionality);
-  if (isDone()) {
-    return;
+  if (!isDone()) {
+    taskManager2.changePermutation(functionality);
   }
 }
 
