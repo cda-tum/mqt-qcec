@@ -67,8 +67,8 @@ public:
     [[nodiscard]] std::string toString() const { return json().dump(2); }
   };
 
-  EquivalenceCheckingManager(qc::QuantumComputation circ1,
-                             qc::QuantumComputation circ2,
+  EquivalenceCheckingManager(const qc::QuantumComputation& circ1,
+                             const qc::QuantumComputation& circ2,
                              Configuration configuration = Configuration{});
 
   void run();

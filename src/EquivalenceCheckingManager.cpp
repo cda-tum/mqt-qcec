@@ -219,10 +219,11 @@ void EquivalenceCheckingManager::run() {
 }
 
 EquivalenceCheckingManager::EquivalenceCheckingManager(
-    qc::QuantumComputation circ1, qc::QuantumComputation circ2,
+    // Circuits not passed by value and moved because this would cause slicing.
+    // NOLINTNEXTLINE(modernize-pass-by-value)
+    const qc::QuantumComputation& circ1, const qc::QuantumComputation& circ2,
     Configuration config)
-    : qc1(std::move(circ1)), qc2(std::move(circ2)),
-      configuration(std::move(config)) {
+    : qc1(circ1), qc2(circ2), configuration(std::move(config)) {
   const auto start = std::chrono::steady_clock::now();
 
   // set numeric tolerance used throughout the check
