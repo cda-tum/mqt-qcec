@@ -1,5 +1,5 @@
 x 0 1
-y 0 5
+y 0 2
 z 0 1
 h 0 3
 s 0 1
@@ -15,13 +15,19 @@ rz 0 1
 u 0 5
 swap 0 3
 iswap 0 10
+dcx 0 2
+ecr 0 4
+rxx 0 15
+ryy 0 19
+rzz 0 3
+rzx 0 9
 x 1 1
 y 1 3
 z 1 7
 h 1 11
 sx 1 11
 p 1 5
-rx 1 13
+rx 1 10
 ry 1 12
 rz 1 4
 u 1 15
