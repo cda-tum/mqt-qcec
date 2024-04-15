@@ -5,6 +5,18 @@
 
 #include "checker/dd/DDAlternatingChecker.hpp"
 
+#include "Definitions.hpp"
+#include "EquivalenceCriterion.hpp"
+#include "checker/dd/DDEquivalenceChecker.hpp"
+#include "checker/dd/applicationscheme/ApplicationScheme.hpp"
+
+#include <cassert>
+#include <cstddef>
+#include <nlohmann/json.hpp>
+#include <stdexcept>
+#include <type_traits>
+#include <vector>
+
 namespace ec {
 void DDAlternatingChecker::initialize() {
   DDEquivalenceChecker::initialize();
@@ -159,6 +171,11 @@ bool DDAlternatingChecker::canHandle(const qc::QuantumComputation& qc1,
     }
   }
   return true;
+}
+
+void DDAlternatingChecker::json(nlohmann::json& j) const noexcept {
+  DDEquivalenceChecker::json(j);
+  j["checker"] = "decision_diagram_alternating";
 }
 
 } // namespace ec

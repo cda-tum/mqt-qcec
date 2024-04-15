@@ -5,10 +5,20 @@
 
 #pragma once
 
+#include "Configuration.hpp"
 #include "DDEquivalenceChecker.hpp"
 #include "DDPackageConfigs.hpp"
+#include "EquivalenceCriterion.hpp"
+#include "QuantumComputation.hpp"
+#include "checker/dd/TaskManager.hpp"
+#include "dd/DDDefinitions.hpp"
+#include "dd/Package_fwd.hpp"
+
+#include <nlohmann/json_fwd.hpp>
 
 namespace ec {
+class StateGenerator;
+
 class DDSimulationChecker final
     : public DDEquivalenceChecker<qc::VectorDD, SimulationDDPackageConfig> {
 public:
@@ -28,10 +38,7 @@ public:
     return taskManager2.getInternalState().getVector();
   }
 
-  void json(nlohmann::json& j) const noexcept override {
-    DDEquivalenceChecker::json(j);
-    j["checker"] = "decision_diagram_simulation";
-  }
+  void json(nlohmann::json& j) const noexcept override;
 
 private:
   // the initial state used for simulation. defaults to the all-zero state

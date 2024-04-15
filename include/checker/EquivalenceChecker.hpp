@@ -9,7 +9,10 @@
 #include "EquivalenceCriterion.hpp"
 #include "QuantumComputation.hpp"
 
+#include <algorithm>
 #include <atomic>
+#include <cstddef>
+#include <nlohmann/json_fwd.hpp>
 #include <utility>
 
 namespace ec {

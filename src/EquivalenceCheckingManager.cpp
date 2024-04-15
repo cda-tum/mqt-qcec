@@ -5,14 +5,27 @@
 
 #include "EquivalenceCheckingManager.hpp"
 
+#include "CircuitOptimizer.hpp"
+#include "Definitions.hpp"
 #include "EquivalenceCriterion.hpp"
+#include "checker/dd/DDAlternatingChecker.hpp"
+#include "checker/dd/DDConstructionChecker.hpp"
+#include "checker/dd/DDSimulationChecker.hpp"
+#include "checker/dd/simulation/StateType.hpp"
+#include "checker/zx/ZXChecker.hpp"
 #include "zx/FunctionalityConstruction.hpp"
 
 #include <cassert>
+#include <chrono>
+#include <cstddef>
 #include <iostream>
 #include <memory>
+#include <mutex>
+#include <optional>
 #include <string>
+#include <thread>
 #include <utility>
+#include <vector>
 
 namespace ec {
 void EquivalenceCheckingManager::setupAncillariesAndGarbage() {

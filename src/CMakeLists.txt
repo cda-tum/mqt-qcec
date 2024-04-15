@@ -5,6 +5,7 @@ add_library(
   ${PROJECT_SOURCE_DIR}/include/EquivalenceCriterion.hpp
   ${PROJECT_SOURCE_DIR}/include/EquivalenceCheckingManager.hpp
   ${PROJECT_SOURCE_DIR}/include/ThreadSafeQueue.hpp
+  Configuration.cpp
   EquivalenceCheckingManager.cpp
   checker/EquivalenceChecker.cpp
   checker/dd/DDEquivalenceChecker.cpp

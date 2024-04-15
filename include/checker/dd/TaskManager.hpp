@@ -6,7 +6,15 @@
 #pragma once
 
 #include "QuantumComputation.hpp"
+#include "dd/DDpackageConfig.hpp"
 #include "dd/Operations.hpp"
+#include "dd/Package.hpp"
+#include "dd/Package_fwd.hpp"
+#include "operations/OpType.hpp"
+#include "operations/Operation.hpp"
+
+#include <cstddef>
+#include <memory>
 
 namespace ec {
 enum class Direction : bool { Left = true, Right = false };

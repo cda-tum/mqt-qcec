@@ -5,13 +5,22 @@
 
 #include "checker/dd/DDEquivalenceChecker.hpp"
 
-#include "CircuitOptimizer.hpp"
+#include "EquivalenceCriterion.hpp"
+#include "checker/EquivalenceChecker.hpp"
 #include "checker/dd/DDPackageConfigs.hpp"
+#include "checker/dd/TaskManager.hpp"
+#include "checker/dd/applicationscheme/ApplicationScheme.hpp"
 #include "checker/dd/applicationscheme/GateCostApplicationScheme.hpp"
 #include "checker/dd/applicationscheme/LookaheadApplicationScheme.hpp"
 #include "checker/dd/applicationscheme/OneToOneApplicationScheme.hpp"
 #include "checker/dd/applicationscheme/ProportionalApplicationScheme.hpp"
 #include "checker/dd/applicationscheme/SequentialApplicationScheme.hpp"
+#include "dd/DDpackageConfig.hpp"
+#include "dd/Package_fwd.hpp"
+
+#include <chrono>
+#include <nlohmann/json.hpp>
+#include <stdexcept>
 
 namespace ec {
 
@@ -266,6 +275,13 @@ void DDEquivalenceChecker<DDType, Config>::initializeApplicationScheme(
             taskManager1, taskManager2);
     break;
   }
+}
+
+template <class DDType, class Config>
+void DDEquivalenceChecker<DDType, Config>::json(
+    nlohmann::json& j) const noexcept {
+  EquivalenceChecker::json(j);
+  j["max_nodes"] = maxActiveNodes;
 }
 
 template class DDEquivalenceChecker<qc::VectorDD, dd::DDPackageConfig>;
