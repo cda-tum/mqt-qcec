@@ -11,8 +11,11 @@
 #include "TaskManager.hpp"
 #include "applicationscheme/ApplicationScheme.hpp"
 #include "checker/EquivalenceChecker.hpp"
+#include "dd/Package.hpp"
 
+#include <cstddef>
 #include <memory>
+#include <nlohmann/json_fwd.hpp>
 #include <utility>
 
 namespace ec {
@@ -29,10 +32,7 @@ public:
 
   EquivalenceCriterion run() override;
 
-  void json(nlohmann::json& j) const noexcept override {
-    EquivalenceChecker::json(j);
-    j["max_nodes"] = maxActiveNodes;
-  }
+  void json(nlohmann::json& j) const noexcept override;
 
 protected:
   using DDPackage = typename dd::Package<Config>;

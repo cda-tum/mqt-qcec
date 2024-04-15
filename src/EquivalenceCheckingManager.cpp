@@ -5,14 +5,27 @@
 
 #include "EquivalenceCheckingManager.hpp"
 
+#include "CircuitOptimizer.hpp"
+#include "Definitions.hpp"
 #include "EquivalenceCriterion.hpp"
+#include "checker/dd/DDAlternatingChecker.hpp"
+#include "checker/dd/DDConstructionChecker.hpp"
+#include "checker/dd/DDSimulationChecker.hpp"
+#include "checker/dd/simulation/StateType.hpp"
+#include "checker/zx/ZXChecker.hpp"
 #include "zx/FunctionalityConstruction.hpp"
 
 #include <cassert>
+#include <chrono>
+#include <cstddef>
 #include <iostream>
 #include <memory>
+#include <mutex>
+#include <optional>
 #include <string>
+#include <thread>
 #include <utility>
+#include <vector>
 
 namespace ec {
 void EquivalenceCheckingManager::setupAncillariesAndGarbage() {
@@ -122,29 +135,41 @@ void EquivalenceCheckingManager::runOptimizationPasses() {
     }
   }
 
-  if (configuration.optimizations.removeDiagonalGatesBeforeMeasure) {
-    qc::CircuitOptimizer::removeDiagonalGatesBeforeMeasure(qc1);
-    qc::CircuitOptimizer::removeDiagonalGatesBeforeMeasure(qc2);
-  }
-
+  // first, make sure any potential SWAPs are reconstructed
   if (configuration.optimizations.reconstructSWAPs) {
     qc::CircuitOptimizer::swapReconstruction(qc1);
     qc::CircuitOptimizer::swapReconstruction(qc2);
   }
 
+  // then, optionally backpropagate the output permutation
+  if (configuration.optimizations.backpropagateOutputPermutation) {
+    qc::CircuitOptimizer::backpropagateOutputPermutation(qc1);
+    qc::CircuitOptimizer::backpropagateOutputPermutation(qc2);
+  }
+
+  // based on the above, all SWAPs should be reconstructed and accounted for,
+  // so we can elide them.
+  if (configuration.optimizations.elidePermutations) {
+    qc::CircuitOptimizer::elidePermutations(qc1);
+    qc::CircuitOptimizer::elidePermutations(qc2);
+  }
+
+  // fuse consecutive single qubit gates into compound operations (includes some
+  // simple cancellation rules).
   if (configuration.optimizations.fuseSingleQubitGates) {
     qc::CircuitOptimizer::singleQubitGateFusion(qc1);
     qc::CircuitOptimizer::singleQubitGateFusion(qc2);
   }
 
+  // optionally remove diagonal gates before measurements
+  if (configuration.optimizations.removeDiagonalGatesBeforeMeasure) {
+    qc::CircuitOptimizer::removeDiagonalGatesBeforeMeasure(qc1);
+    qc::CircuitOptimizer::removeDiagonalGatesBeforeMeasure(qc2);
+  }
+
   if (configuration.optimizations.reorderOperations) {
     qc::CircuitOptimizer::reorderOperations(qc1);
     qc::CircuitOptimizer::reorderOperations(qc2);
-  }
-
-  if (configuration.optimizations.backpropagateOutputPermutation) {
-    qc::CircuitOptimizer::backpropagateOutputPermutation(qc1);
-    qc::CircuitOptimizer::backpropagateOutputPermutation(qc2);
   }
 
   // remove final measurements from both circuits so that the underlying
@@ -194,13 +219,11 @@ void EquivalenceCheckingManager::run() {
 }
 
 EquivalenceCheckingManager::EquivalenceCheckingManager(
+    // Circuits not passed by value and moved because this would cause slicing.
+    // NOLINTNEXTLINE(modernize-pass-by-value)
     const qc::QuantumComputation& circ1, const qc::QuantumComputation& circ2,
     Configuration config)
-    : qc1(circ1.size() > circ2.size() ? circ2 : circ1),
-      qc2(circ1.size() > circ2.size() ? circ1 : circ2),
-      configuration(std::move(config)) {
-  // clones both circuits (the circuit with fewer gates always gets to be qc1)
-
+    : qc1(circ1), qc2(circ2), configuration(std::move(config)) {
   const auto start = std::chrono::steady_clock::now();
 
   // set numeric tolerance used throughout the check
@@ -800,6 +823,14 @@ void EquivalenceCheckingManager::backpropagateOutputPermutation() {
     qc::CircuitOptimizer::backpropagateOutputPermutation(qc1);
     qc::CircuitOptimizer::backpropagateOutputPermutation(qc2);
     configuration.optimizations.backpropagateOutputPermutation = true;
+  }
+}
+
+void EquivalenceCheckingManager::elidePermutations() {
+  if (!configuration.optimizations.elidePermutations) {
+    qc::CircuitOptimizer::elidePermutations(qc1);
+    qc::CircuitOptimizer::elidePermutations(qc2);
+    configuration.optimizations.elidePermutations = true;
   }
 }
 

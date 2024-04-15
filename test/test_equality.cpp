@@ -12,11 +12,8 @@
 
 class EqualityTest : public testing::Test {
   void SetUp() override {
-    qc1                                       = qc::QuantumComputation(nqubits);
-    qc2                                       = qc::QuantumComputation(nqubits);
-    config.optimizations.fuseSingleQubitGates = false;
-    config.optimizations.reorderOperations    = false;
-    config.optimizations.reconstructSWAPs     = false;
+    qc1 = qc::QuantumComputation(nqubits);
+    qc2 = qc::QuantumComputation(nqubits);
 
     config.execution.runSimulationChecker   = false;
     config.execution.runAlternatingChecker  = false;
@@ -285,4 +282,32 @@ TEST_F(EqualityTest, OneCircuitEmptyZXChecker) {
   ecm.setApplicationScheme(ec::ApplicationSchemeType::Proportional);
   ecm.run();
   EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::Equivalent);
+}
+
+TEST_F(EqualityTest, onlySingleTask) {
+  qc1.h(0);
+  qc2.h(0);
+  config.execution.runSimulationChecker = true;
+  config.simulation.maxSims             = 1U;
+  ec::EquivalenceCheckingManager ecm(qc1, qc2, config);
+  ecm.run();
+  EXPECT_TRUE(ecm.getConfiguration().onlySingleTask());
+
+  ecm.reset();
+  ecm.disableAllCheckers();
+  ecm.setConstructionChecker(true);
+  ecm.run();
+  EXPECT_TRUE(ecm.getConfiguration().onlySingleTask());
+
+  ecm.reset();
+  ecm.disableAllCheckers();
+  ecm.setZXChecker(true);
+  ecm.run();
+  EXPECT_TRUE(ecm.getConfiguration().onlySingleTask());
+
+  ecm.reset();
+  ecm.disableAllCheckers();
+  ecm.setAlternatingChecker(true);
+  ecm.run();
+  EXPECT_TRUE(ecm.getConfiguration().onlySingleTask());
 }

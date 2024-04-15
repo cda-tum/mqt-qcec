@@ -5,8 +5,12 @@
 
 #include "checker/dd/DDConstructionChecker.hpp"
 
+#include "checker/dd/DDEquivalenceChecker.hpp"
+
+#include <nlohmann/json.hpp>
+
 // this function is mainly placed here in order to have an out-of-line
-// virtual method definition which avoids emitting the classe's vtable in
+// virtual method definition which avoids emitting the classes' vtable in
 // every translation unit.
 void ec::DDConstructionChecker::json(nlohmann::json& j) const noexcept {
   DDEquivalenceChecker::json(j);

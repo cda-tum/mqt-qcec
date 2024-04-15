@@ -3,12 +3,13 @@
 // See README.md or go to https://github.com/cda-tum/qcec for more information.
 //
 
+#include "Configuration.hpp"
 #include "Definitions.hpp"
 #include "EquivalenceCheckingManager.hpp"
 #include "QuantumComputation.hpp"
+#include "zx/ZXDefinitions.hpp"
 
 #include "gtest/gtest.h"
-#include <functional>
 #include <iostream>
 #include <memory>
 #include <sstream>

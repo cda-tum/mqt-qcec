@@ -9,6 +9,8 @@
 #include "DDPackageConfigs.hpp"
 #include "applicationscheme/LookaheadApplicationScheme.hpp"
 
+#include <nlohmann/json_fwd.hpp>
+
 namespace ec {
 class DDAlternatingChecker final
     : public DDEquivalenceChecker<qc::MatrixDD, AlternatingDDPackageConfig> {
@@ -34,10 +36,7 @@ public:
     }
   }
 
-  void json(nlohmann::json& j) const noexcept override {
-    DDEquivalenceChecker::json(j);
-    j["checker"] = "decision_diagram_alternating";
-  }
+  void json(nlohmann::json& j) const noexcept override;
 
   /// a function to determine whether the alternating checker can handle
   /// checking both circuits. In particular, it checks whether both circuits

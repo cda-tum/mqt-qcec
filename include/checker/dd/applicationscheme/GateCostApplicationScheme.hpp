@@ -38,16 +38,20 @@ class GateCostApplicationScheme final
 public:
   GateCostApplicationScheme(TaskManager<DDType, Config>& tm1,
                             TaskManager<DDType, Config>& tm2,
-                            const CostFunction&          costFunction)
-      : ApplicationScheme<DDType, Config>(tm1, tm2) {
+                            const CostFunction&          costFunction,
+                            const bool                   singleQubitGateFusion)
+      : ApplicationScheme<DDType, Config>(tm1, tm2),
+        singleQubitGateFusionEnabled(singleQubitGateFusion) {
     populateLookupTable(costFunction, tm1.getCircuit());
     populateLookupTable(costFunction, tm2.getCircuit());
   }
 
   GateCostApplicationScheme(TaskManager<DDType, Config>& tm1,
                             TaskManager<DDType, Config>& tm2,
-                            const std::string&           filename)
-      : ApplicationScheme<DDType, Config>(tm1, tm2) {
+                            const std::string&           filename,
+                            const bool                   singleQubitGateFusion)
+      : ApplicationScheme<DDType, Config>(tm1, tm2),
+        singleQubitGateFusionEnabled(singleQubitGateFusion) {
     populateLookupTable(filename);
   }
 
@@ -57,7 +61,13 @@ public:
     }
 
     const auto& op = (*this->taskManager1)();
-    const auto  key =
+    if (singleQubitGateFusionEnabled && op->getUsedQubits().size() == 1U) {
+      // when single qubit gates are fused, any single-qubit gate should have a
+      // single (compound) gate in the other circuit as a counterpart.
+      return {1U, 1U};
+    }
+
+    const auto key =
         GateCostLookupTableKeyType{op->getType(), op->getNcontrols()};
     std::size_t cost = 1U;
     if (auto it = gateCostLookupTable.find(key);
@@ -68,7 +78,8 @@ public:
   }
 
 private:
-  GateCostLookupTable gateCostLookupTable{};
+  GateCostLookupTable gateCostLookupTable;
+  bool                singleQubitGateFusionEnabled;
 
   template <class CostFun>
   void populateLookupTable(CostFun                       costFunction,

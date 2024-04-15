@@ -39,7 +39,7 @@ TEST_F(GateCostApplicationSchemeTest, SchemeFromProfile) {
 
   auto tm = ec::TaskManager<qc::MatrixDD>(qc, *dd);
 
-  auto scheme = ec::GateCostApplicationScheme(tm, tm, filename);
+  auto scheme = ec::GateCostApplicationScheme(tm, tm, filename, false);
 
   const auto [left, right] = scheme();
 
@@ -60,7 +60,8 @@ TEST_F(GateCostApplicationSchemeTest, iSWAP) {
 
   auto tm = ec::TaskManager<qc::MatrixDD>(qc, *dd);
 
-  auto scheme = ec::GateCostApplicationScheme(tm, tm, &ec::legacyCostFunction);
+  auto scheme =
+      ec::GateCostApplicationScheme(tm, tm, &ec::legacyCostFunction, false);
 
   const auto [left, right] = scheme();
 
@@ -75,7 +76,8 @@ TEST_F(GateCostApplicationSchemeTest, Peres) {
 
   auto tm = ec::TaskManager<qc::MatrixDD>(qc, *dd);
 
-  auto scheme = ec::GateCostApplicationScheme(tm, tm, &ec::legacyCostFunction);
+  auto scheme =
+      ec::GateCostApplicationScheme(tm, tm, &ec::legacyCostFunction, false);
 
   const auto [left, right] = scheme();
 

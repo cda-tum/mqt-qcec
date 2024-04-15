@@ -5,7 +5,9 @@
 
 #pragma once
 
-#include "dd/Package.hpp"
+#include "dd/DDpackageConfig.hpp"
+
+#include <cstddef>
 
 namespace ec {
 struct SimulationDDPackageConfig : public dd::DDPackageConfig {

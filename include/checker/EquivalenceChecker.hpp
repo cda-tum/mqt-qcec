@@ -9,7 +9,10 @@
 #include "EquivalenceCriterion.hpp"
 #include "QuantumComputation.hpp"
 
+#include <algorithm>
 #include <atomic>
+#include <cstddef>
+#include <nlohmann/json_fwd.hpp>
 #include <utility>
 
 namespace ec {
@@ -18,8 +21,8 @@ public:
   EquivalenceChecker(const qc::QuantumComputation& circ1,
                      const qc::QuantumComputation& circ2,
                      Configuration                 config) noexcept
-      : qc1(circ1), qc2(circ2),
-        nqubits(std::max(qc1.getNqubits(), qc2.getNqubits())),
+      : qc1(&circ1), qc2(&circ2),
+        nqubits(std::max(qc1->getNqubits(), qc2->getNqubits())),
         configuration(std::move(config)){};
 
   virtual ~EquivalenceChecker() = default;
@@ -39,8 +42,8 @@ public:
   }
 
 protected:
-  const qc::QuantumComputation& qc1;
-  const qc::QuantumComputation& qc2;
+  qc::QuantumComputation const* qc1;
+  qc::QuantumComputation const* qc2;
 
   std::size_t nqubits{};
 

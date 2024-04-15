@@ -341,10 +341,6 @@ class PartialEquivalenceTest : public testing::Test {
   void SetUp() override {
     qc1 = qc::QuantumComputation(nqubits, nqubits);
     qc2 = qc::QuantumComputation(nqubits, nqubits);
-    config.optimizations.fuseSingleQubitGates         = false;
-    config.optimizations.reorderOperations            = false;
-    config.optimizations.reconstructSWAPs             = false;
-    config.optimizations.fixOutputPermutationMismatch = false;
 
     config.execution.runSimulationChecker   = false;
     config.execution.runAlternatingChecker  = false;

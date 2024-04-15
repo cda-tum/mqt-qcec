@@ -5,6 +5,17 @@
 
 #include "checker/dd/DDSimulationChecker.hpp"
 
+#include "Configuration.hpp"
+#include "EquivalenceCriterion.hpp"
+#include "QuantumComputation.hpp"
+#include "checker/dd/DDEquivalenceChecker.hpp"
+#include "checker/dd/DDPackageConfigs.hpp"
+#include "checker/dd/TaskManager.hpp"
+#include "checker/dd/simulation/StateGenerator.hpp"
+
+#include <nlohmann/json.hpp>
+#include <utility>
+
 namespace ec {
 DDSimulationChecker::DDSimulationChecker(const qc::QuantumComputation& circ1,
                                          const qc::QuantumComputation& circ2,
@@ -32,11 +43,16 @@ EquivalenceCriterion DDSimulationChecker::checkEquivalence() {
 }
 
 void DDSimulationChecker::setRandomInitialState(StateGenerator& generator) {
-  const auto nancillary = nqubits - qc1.getNqubitsWithoutAncillae();
+  const auto nancillary = nqubits - qc1->getNqubitsWithoutAncillae();
   const auto stateType  = configuration.simulation.stateType;
 
   initialState =
       generator.generateRandomState(*dd, nqubits, nancillary, stateType);
+}
+
+void DDSimulationChecker::json(nlohmann::json& j) const noexcept {
+  DDEquivalenceChecker::json(j);
+  j["checker"] = "decision_diagram_simulation";
 }
 
 } // namespace ec
