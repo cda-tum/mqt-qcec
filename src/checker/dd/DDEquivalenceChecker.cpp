@@ -257,12 +257,14 @@ void DDEquivalenceChecker<DDType, Config>::initializeApplicationScheme(
     if (!configuration.application.profile.empty()) {
       applicationScheme =
           std::make_unique<GateCostApplicationScheme<DDType, Config>>(
-              taskManager1, taskManager2, configuration.application.profile);
+              taskManager1, taskManager2, configuration.application.profile,
+              configuration.optimizations.fuseSingleQubitGates);
     } else {
       applicationScheme =
           std::make_unique<GateCostApplicationScheme<DDType, Config>>(
               taskManager1, taskManager2,
-              configuration.application.costFunction);
+              configuration.application.costFunction,
+              configuration.optimizations.fuseSingleQubitGates);
     }
     break;
   default:
