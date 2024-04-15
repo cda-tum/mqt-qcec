@@ -251,6 +251,10 @@ PYBIND11_MODULE(pyqcec, m) {
            ":attr:`Backpropagate the output permutation "
            "<.Configuration.Optimizations.backpropagate_output_permutation>` "
            "to the input permutation.")
+      .def("elide_permutations", &EquivalenceCheckingManager::elidePermutations,
+           ":attr:`Elide permutations "
+           "<.Configuration.Optimizations.elide_permutations>`"
+           " from the circuit.")
       // Application
       .def("set_application_scheme",
            &EquivalenceCheckingManager::setApplicationScheme,
@@ -569,7 +573,13 @@ PYBIND11_MODULE(pyqcec, m) {
           " that have been transformed to a static circuit by enabling the "
           ":attr:`transform_dynamic_circuit "
           "<.Configuration.Optimizations.transform_dynamic_circuit>` "
-          "optimization.");
+          "optimization.")
+      .def_readwrite(
+          "elide_permutations",
+          &Configuration::Optimizations::elidePermutations,
+          "Elide permutations from the circuit by permuting the qubits in the "
+          "circuit and eliminating SWAP gates from the circuits. Defaults to "
+          ":code:`True` as this typically boosts performance.");
 
   // application options
   application.def(py::init<>())

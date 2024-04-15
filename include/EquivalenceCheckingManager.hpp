@@ -134,6 +134,7 @@ public:
   void reconstructSWAPs();
   void reorderOperations();
   void backpropagateOutputPermutation();
+  void elidePermutations();
 
   // Application: These settings may be changed to influence the sequence in
   // which gates are applied during the equivalence check

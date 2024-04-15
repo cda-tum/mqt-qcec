@@ -44,6 +44,7 @@ public:
     bool transformDynamicCircuit          = false;
     bool reorderOperations                = true;
     bool backpropagateOutputPermutation   = false;
+    bool elidePermutations                = true;
   };
 
   // configuration options for application schemes

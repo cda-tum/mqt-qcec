@@ -70,6 +70,7 @@ nlohmann::json Configuration::json() const {
   opt["reorder_operations"]        = optimizations.reorderOperations;
   opt["backpropagate_output_permutation"] =
       optimizations.backpropagateOutputPermutation;
+  opt["elide_permutations"] = optimizations.elidePermutations;
 
   auto& app = config["application"];
   if (execution.runConstructionChecker) {

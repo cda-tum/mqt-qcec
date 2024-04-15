@@ -135,29 +135,41 @@ void EquivalenceCheckingManager::runOptimizationPasses() {
     }
   }
 
-  if (configuration.optimizations.removeDiagonalGatesBeforeMeasure) {
-    qc::CircuitOptimizer::removeDiagonalGatesBeforeMeasure(qc1);
-    qc::CircuitOptimizer::removeDiagonalGatesBeforeMeasure(qc2);
-  }
-
+  // first, make sure any potential SWAPs are reconstructed
   if (configuration.optimizations.reconstructSWAPs) {
     qc::CircuitOptimizer::swapReconstruction(qc1);
     qc::CircuitOptimizer::swapReconstruction(qc2);
   }
 
+  // then, optionally backpropagate the output permutation
+  if (configuration.optimizations.backpropagateOutputPermutation) {
+    qc::CircuitOptimizer::backpropagateOutputPermutation(qc1);
+    qc::CircuitOptimizer::backpropagateOutputPermutation(qc2);
+  }
+
+  // based on the above, all SWAPs should be reconstructed and accounted for,
+  // so we can elide them.
+  if (configuration.optimizations.elidePermutations) {
+    qc::CircuitOptimizer::elidePermutations(qc1);
+    qc::CircuitOptimizer::elidePermutations(qc2);
+  }
+
+  // fuse consecutive single qubit gates into compound operations (includes some
+  // simple cancellation rules).
   if (configuration.optimizations.fuseSingleQubitGates) {
     qc::CircuitOptimizer::singleQubitGateFusion(qc1);
     qc::CircuitOptimizer::singleQubitGateFusion(qc2);
   }
 
+  // optionally remove diagonal gates before measurements
+  if (configuration.optimizations.removeDiagonalGatesBeforeMeasure) {
+    qc::CircuitOptimizer::removeDiagonalGatesBeforeMeasure(qc1);
+    qc::CircuitOptimizer::removeDiagonalGatesBeforeMeasure(qc2);
+  }
+
   if (configuration.optimizations.reorderOperations) {
     qc::CircuitOptimizer::reorderOperations(qc1);
     qc::CircuitOptimizer::reorderOperations(qc2);
-  }
-
-  if (configuration.optimizations.backpropagateOutputPermutation) {
-    qc::CircuitOptimizer::backpropagateOutputPermutation(qc1);
-    qc::CircuitOptimizer::backpropagateOutputPermutation(qc2);
   }
 
   // remove final measurements from both circuits so that the underlying
@@ -813,6 +825,14 @@ void EquivalenceCheckingManager::backpropagateOutputPermutation() {
     qc::CircuitOptimizer::backpropagateOutputPermutation(qc1);
     qc::CircuitOptimizer::backpropagateOutputPermutation(qc2);
     configuration.optimizations.backpropagateOutputPermutation = true;
+  }
+}
+
+void EquivalenceCheckingManager::elidePermutations() {
+  if (!configuration.optimizations.elidePermutations) {
+    qc::CircuitOptimizer::elidePermutations(qc1);
+    qc::CircuitOptimizer::elidePermutations(qc2);
+    configuration.optimizations.elidePermutations = true;
   }
 }
 
