@@ -9,6 +9,7 @@
 #include "checker/dd/TaskManager.hpp"
 
 #include <algorithm>
+#include <cassert>
 #include <cstddef>
 #include <utility>
 
@@ -31,13 +32,7 @@ public:
     const auto size2 = static_cast<std::size_t>(
         std::distance(this->taskManager2->getIterator(),
                       this->taskManager2->getCircuit()->cend()));
-
-    if (size1 == 0U) {
-      return {0U, size2};
-    }
-    if (size2 == 0U) {
-      return {size1, 0U};
-    }
+    assert(size1 > 0U && size2 > 0U);
 
     if (singleQubitGateFusionEnabled) {
       // when single qubit gates are fused, any single-qubit gate should have a
