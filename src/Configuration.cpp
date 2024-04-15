@@ -18,13 +18,19 @@ bool Configuration::anythingToExecute() const noexcept {
 bool Configuration::onlySingleTask() const noexcept {
   // only a single simulation shall be performed
   if (execution.runSimulationChecker && (simulation.maxSims == 1U) &&
-      !execution.runAlternatingChecker && !execution.runConstructionChecker) {
+      !execution.runAlternatingChecker && !execution.runConstructionChecker &&
+      !execution.runZXChecker) {
     return true;
   }
 
   // no simulations and only one of the other checks shall be performed
   if (!execution.runSimulationChecker &&
-      (execution.runAlternatingChecker != execution.runConstructionChecker)) {
+      ((execution.runAlternatingChecker && !execution.runConstructionChecker &&
+        !execution.runZXChecker) ||
+       (!execution.runAlternatingChecker && execution.runConstructionChecker &&
+        !execution.runZXChecker) ||
+       (!execution.runAlternatingChecker && !execution.runConstructionChecker &&
+        execution.runZXChecker))) {
     return true;
   }
 
