@@ -189,6 +189,6 @@ TEST_F(GeneralTest, Configuration) {
   auto config = ec::Configuration{};
   // fix number of simulations
   config.simulation.maxSims = 1U;
-  ec::EquivalenceCheckingManager ecm(qc1, qc2, config);
+  const ec::EquivalenceCheckingManager ecm(qc1, qc2, config);
   EXPECT_EQ(config.toString(), ecm.getConfiguration().toString());
 }
