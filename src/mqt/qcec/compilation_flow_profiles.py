@@ -156,7 +156,7 @@ def create_general_gate(qubits: int, params: int, controls: int, identifier: str
     qc = QuantumCircuit(required_qubits)
     gate_identifier = "c" * controls + identifier
 
-    rng = np.random.default_rng()
+    rng = np.random.default_rng(seed=12345)
     parameter_list = [rng.uniform(-np.pi, np.pi) for _ in range(params)]
 
     getattr(qc, gate_identifier)(*parameter_list, *range(required_qubits))
