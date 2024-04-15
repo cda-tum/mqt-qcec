@@ -19,22 +19,21 @@ ZXEquivalenceChecker::ZXEquivalenceChecker(const qc::QuantumComputation& circ1,
                                            const qc::QuantumComputation& circ2,
                                            Configuration config) noexcept
     : EquivalenceChecker(circ1, circ2, std::move(config)),
-      miter(zx::FunctionalityConstruction::buildFunctionality(&qc1)),
+      miter(zx::FunctionalityConstruction::buildFunctionality(qc1)),
       tolerance(configuration.functionality.traceThreshold) {
-  zx::ZXDiagram dPrime =
-      zx::FunctionalityConstruction::buildFunctionality(&qc2);
+  zx::ZXDiagram dPrime = zx::FunctionalityConstruction::buildFunctionality(qc2);
 
-  if ((qc1.getNancillae() != 0U) || (qc2.getNancillae() != 0U)) {
+  if ((qc1->getNancillae() != 0U) || (qc2->getNancillae() != 0U)) {
     ancilla = true;
   }
 
-  const auto& p1 = invertPermutations(qc1);
-  const auto& p2 = invertPermutations(qc2);
+  const auto& p1 = invertPermutations(*qc1);
+  const auto& p2 = invertPermutations(*qc2);
 
   // fix ancillaries to |0>
   const auto nQubitsWithoutAncillae =
-      static_cast<zx::Qubit>(qc1.getNqubitsWithoutAncillae());
-  for (auto anc = static_cast<zx::Qubit>(qc1.getNqubits() - 1U);
+      static_cast<zx::Qubit>(qc1->getNqubitsWithoutAncillae());
+  for (auto anc = static_cast<zx::Qubit>(qc1->getNqubits() - 1U);
        anc >= nQubitsWithoutAncillae; --anc) {
     miter.makeAncilla(
         anc, static_cast<zx::Qubit>(p1.at(static_cast<qc::Qubit>(anc))));
@@ -53,8 +52,8 @@ EquivalenceCriterion ZXEquivalenceChecker::run() {
   bool equivalent = true;
 
   if (miter.getNEdges() == miter.getNQubits()) {
-    const auto& p1 = invert(invertPermutations(qc1));
-    const auto& p2 = invert(invertPermutations(qc2));
+    const auto& p1 = invert(invertPermutations(*qc1));
+    const auto& p2 = invert(invertPermutations(*qc2));
 
     const auto nQubits = miter.getNQubits();
     for (std::size_t i = 0U; i < nQubits; ++i) {

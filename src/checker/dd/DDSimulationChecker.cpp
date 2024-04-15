@@ -43,7 +43,7 @@ EquivalenceCriterion DDSimulationChecker::checkEquivalence() {
 }
 
 void DDSimulationChecker::setRandomInitialState(StateGenerator& generator) {
-  const auto nancillary = nqubits - qc1.getNqubitsWithoutAncillae();
+  const auto nancillary = nqubits - qc1->getNqubitsWithoutAncillae();
   const auto stateType  = configuration.simulation.stateType;
 
   initialState =

@@ -27,7 +27,7 @@ void DDAlternatingChecker::initialize() {
   // Only count ancillaries that are present in but not acted upon in both of
   // the circuits. Otherwise, the alternating checker must not be used.
   // Counter-example: H |0><0| H^-1 = [[0.5, 0.5], [0.5, 0.5]] != |0><0|
-  if (!canHandle(qc1, qc2)) {
+  if (!canHandle(*qc1, *qc2)) {
     throw std::invalid_argument(
         "Alternating checker must not be used for "
         "circuits that both have non-idle ancillary "
@@ -37,7 +37,7 @@ void DDAlternatingChecker::initialize() {
   std::vector<bool> ancillary(nqubits);
   for (qc::Qubit q = 0U; q < nqubits; ++q) {
     ancillary[static_cast<std::size_t>(q)] =
-        qc1.logicalQubitIsAncillary(q) && qc2.logicalQubitIsAncillary(q);
+        qc1->logicalQubitIsAncillary(q) && qc2->logicalQubitIsAncillary(q);
   }
 
   // reduce the ancillary qubit contributions
@@ -100,7 +100,7 @@ EquivalenceCriterion DDAlternatingChecker::checkEquivalence() {
   std::vector<bool> garbage(nqubits);
   for (qc::Qubit q = 0U; q < nqubits; ++q) {
     garbage[static_cast<std::size_t>(q)] =
-        qc1.logicalQubitIsGarbage(q) && qc2.logicalQubitIsGarbage(q);
+        qc1->logicalQubitIsGarbage(q) && qc2->logicalQubitIsGarbage(q);
   }
   const bool isClose =
       configuration.functionality.checkPartialEquivalence
