@@ -23,6 +23,11 @@ public:
         gateRatio(computeGateRatio()) {}
 
   std::pair<size_t, size_t> operator()() noexcept override {
+    const std::size_t size1 = this->taskManager1->getCircuit()->size();
+    const std::size_t size2 = this->taskManager2->getCircuit()->size();
+    if (size1 >= size2) {
+      return {gateRatio, 1U};
+    }
     return {1U, gateRatio};
   }
 
@@ -30,11 +35,12 @@ private:
   [[nodiscard]] std::size_t computeGateRatio() const noexcept {
     const std::size_t size1 = this->taskManager1->getCircuit()->size();
     const std::size_t size2 = this->taskManager2->getCircuit()->size();
-    if (size1 == 0U) {
-      return size2;
+
+    const auto [min, max] = std::minmax(size1, size2);
+    if (min == 0U) {
+      return max;
     }
-    return std::max((size2 + (size1 / 2U)) / size1,
-                    static_cast<std::size_t>(1U));
+    return std::max((max + (min / 2U)) / min, static_cast<std::size_t>(1U));
   }
 
   std::size_t gateRatio;
