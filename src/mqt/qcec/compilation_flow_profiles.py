@@ -54,7 +54,14 @@ single_qubit_gates_three_params = {
     "gates": ["u"],
 }
 
-two_qubit_gates = {"qubits": 2, "params": 0, "controls": 0, "gates": ["swap", "iswap"]}
+two_qubit_gates_no_params = {"qubits": 2, "params": 0, "controls": 0, "gates": ["swap", "iswap", "dcx", "ecr"]}
+
+two_qubit_gates_one_param = {
+    "qubits": 2,
+    "params": 1,
+    "controls": 0,
+    "gates": ["rxx", "ryy", "rzz", "rzx"],
+}
 
 single_controlled_single_qubit_gates_no_params = {
     "qubits": 1,
@@ -128,7 +135,8 @@ general_gates = [
     single_qubit_gates_no_params,
     single_qubit_gates_one_param,
     single_qubit_gates_three_params,
-    two_qubit_gates,
+    two_qubit_gates_no_params,
+    two_qubit_gates_one_param,
     single_controlled_single_qubit_gates_no_params,
     single_controlled_single_qubit_gates_one_param,
     single_controlled_single_qubit_gates_three_params,
