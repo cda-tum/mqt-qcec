@@ -12,11 +12,8 @@
 
 class EqualityTest : public testing::Test {
   void SetUp() override {
-    qc1                                       = qc::QuantumComputation(nqubits);
-    qc2                                       = qc::QuantumComputation(nqubits);
-    config.optimizations.fuseSingleQubitGates = false;
-    config.optimizations.reorderOperations    = false;
-    config.optimizations.reconstructSWAPs     = false;
+    qc1 = qc::QuantumComputation(nqubits);
+    qc2 = qc::QuantumComputation(nqubits);
 
     config.execution.runSimulationChecker   = false;
     config.execution.runAlternatingChecker  = false;
