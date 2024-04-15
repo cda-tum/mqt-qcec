@@ -109,23 +109,11 @@ EquivalenceCriterion DDEquivalenceChecker<DDType, Config>::run() {
   // etc.)
   initialize();
 
-  if (isDone()) {
-    return equivalence;
-  }
-
   // execute the equivalence checking scheme
   execute();
 
-  if (isDone()) {
-    return equivalence;
-  }
-
   // finish off both circuits
   finish();
-
-  if (isDone()) {
-    return equivalence;
-  }
 
   // postprocess the result
   postprocess();
@@ -188,7 +176,9 @@ void DDEquivalenceChecker<DDType, Config>::execute() {
 
 template <class DDType, class Config>
 void DDEquivalenceChecker<DDType, Config>::finish() {
-  taskManager1.finish();
+  if (!isDone()) {
+    taskManager1.finish();
+  }
   if (!isDone()) {
     taskManager2.finish();
   }
@@ -218,7 +208,9 @@ void DDEquivalenceChecker<DDType, Config>::postprocessTask(
 
 template <class DDType, class Config>
 void DDEquivalenceChecker<DDType, Config>::postprocess() {
-  postprocessTask(taskManager1);
+  if (!isDone()) {
+    postprocessTask(taskManager1);
+  }
   if (!isDone()) {
     postprocessTask(taskManager2);
   }
