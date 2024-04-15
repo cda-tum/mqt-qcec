@@ -63,6 +63,8 @@ public:
     return qc;
   }
 
+  qc::QuantumComputation::const_iterator getIterator() { return iterator; }
+
   void advanceIterator() { ++iterator; }
 
   void applyGate(DDType& to) {

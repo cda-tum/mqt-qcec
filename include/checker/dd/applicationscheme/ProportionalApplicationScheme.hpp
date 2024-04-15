@@ -18,13 +18,39 @@ class ProportionalApplicationScheme final
     : public ApplicationScheme<DDType, Config> {
 public:
   ProportionalApplicationScheme(TaskManager<DDType, Config>& tm1,
-                                TaskManager<DDType, Config>& tm2)
+                                TaskManager<DDType, Config>& tm2,
+                                const bool singleQubitGateFusion) noexcept
       : ApplicationScheme<DDType, Config>(tm1, tm2),
-        gateRatio(computeGateRatio()) {}
+        singleQubitGateFusionEnabled(singleQubitGateFusion) {}
 
   std::pair<size_t, size_t> operator()() noexcept override {
-    const std::size_t size1 = this->taskManager1->getCircuit()->size();
-    const std::size_t size2 = this->taskManager2->getCircuit()->size();
+    // compute the remaining size of the circuits
+    const auto size1 = static_cast<std::size_t>(
+        std::distance(this->taskManager1->getIterator(),
+                      this->taskManager1->getCircuit()->cend()));
+    const auto size2 = static_cast<std::size_t>(
+        std::distance(this->taskManager2->getIterator(),
+                      this->taskManager2->getCircuit()->cend()));
+
+    if (size1 == 0U) {
+      return {0U, size2};
+    }
+    if (size2 == 0U) {
+      return {size1, 0U};
+    }
+
+    if (singleQubitGateFusionEnabled) {
+      // when single qubit gates are fused, any single-qubit gate should have a
+      // single (compound) gate in the other circuit as a counterpart.
+      if (const auto& op = (*this->taskManager1)();
+          op->getUsedQubits().size() == 1U) {
+        return {1U, 1U};
+      }
+    }
+
+    const auto [min, max] = std::minmax(size1, size2);
+    const auto gateRatio =
+        std::max((max + (min / 2U)) / min, static_cast<std::size_t>(1U));
     if (size1 >= size2) {
       return {gateRatio, 1U};
     }
@@ -32,17 +58,6 @@ public:
   }
 
 private:
-  [[nodiscard]] std::size_t computeGateRatio() const noexcept {
-    const std::size_t size1 = this->taskManager1->getCircuit()->size();
-    const std::size_t size2 = this->taskManager2->getCircuit()->size();
-
-    const auto [min, max] = std::minmax(size1, size2);
-    if (min == 0U) {
-      return max;
-    }
-    return std::max((max + (min / 2U)) / min, static_cast<std::size_t>(1U));
-  }
-
-  std::size_t gateRatio;
+  bool singleQubitGateFusionEnabled;
 };
 } // namespace ec

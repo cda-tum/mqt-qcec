@@ -268,7 +268,8 @@ void DDEquivalenceChecker<DDType, Config>::initializeApplicationScheme(
   default:
     applicationScheme =
         std::make_unique<ProportionalApplicationScheme<DDType, Config>>(
-            taskManager1, taskManager2);
+            taskManager1, taskManager2,
+            configuration.optimizations.fuseSingleQubitGates);
     break;
   }
 }
