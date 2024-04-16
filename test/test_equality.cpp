@@ -66,7 +66,7 @@ TEST_F(EqualityTest, GlobalPhaseSimulation) {
   config.execution.parallel               = false;
   ec::EquivalenceCheckingManager ecm(qc1, qc2, config);
   ecm.run();
-  const auto json       = ecm.json();
+  const auto json       = ecm.getResults().json();
   const auto simChecker = json["checkers"].front();
   EXPECT_EQ(simChecker["equivalence"], "equivalent_up_to_phase");
 }
@@ -81,7 +81,7 @@ TEST_F(EqualityTest, CloseButNotEqualAlternating) {
   config.execution.runAlternatingChecker = true;
   ec::EquivalenceCheckingManager ecm(qc1, qc2, config);
   ecm.run();
-  std::cout << ecm << std::endl;
+  std::cout << ecm.getResults() << "\n";
   EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::Equivalent);
 }
 
@@ -95,7 +95,7 @@ TEST_F(EqualityTest, CloseButNotEqualConstruction) {
   config.execution.runConstructionChecker = true;
   ec::EquivalenceCheckingManager ecm(qc1, qc2, config);
   ecm.run();
-  std::cout << ecm << std::endl;
+  std::cout << ecm.getResults() << "\n";
   EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::Equivalent);
 }
 
@@ -114,7 +114,7 @@ TEST_F(EqualityTest, CloseButNotEqualAlternatingGlobalPhase) {
   config.execution.runAlternatingChecker = true;
   ec::EquivalenceCheckingManager ecm(qc1, qc2, config);
   ecm.run();
-  std::cout << ecm << std::endl;
+  std::cout << ecm.getResults() << "\n";
   EXPECT_EQ(ecm.equivalence(),
             ec::EquivalenceCriterion::EquivalentUpToGlobalPhase);
 }
@@ -129,7 +129,7 @@ TEST_F(EqualityTest, CloseButNotEqualSimulation) {
   config.execution.runSimulationChecker = true;
   ec::EquivalenceCheckingManager ecm(qc1, qc2, config);
   ecm.run();
-  std::cout << ecm << std::endl;
+  std::cout << ecm.getResults() << "\n";
   EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::ProbablyEquivalent);
 }
 
@@ -145,7 +145,7 @@ TEST_F(EqualityTest, SimulationMoreThan64Qubits) {
   config.execution.runSimulationChecker = true;
   ec::EquivalenceCheckingManager ecm(qc1, qc2, config);
   ecm.run();
-  std::cout << ecm << std::endl;
+  std::cout << ecm.getResults() << "\n";
   EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::ProbablyEquivalent);
 }
 

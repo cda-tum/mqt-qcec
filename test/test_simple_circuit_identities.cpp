@@ -41,7 +41,7 @@ protected:
                         qcOriginal, qcAlternative, config););
   }
 
-  void TearDown() override { std::cout << ecm->toString() << "\n"; }
+  void TearDown() override { std::cout << ecm->getResults() << "\n"; }
 };
 
 INSTANTIATE_TEST_SUITE_P(

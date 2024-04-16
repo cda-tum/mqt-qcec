@@ -105,8 +105,4 @@ After the run has completed, several results can be obtained:
 
 * A JSON-style dictionary containing all available information.
 
-    .. automethod:: EquivalenceCheckingManager.json
-
-* Printing the representation of the :class:`EquivalenceCheckingManager` also produces JSON-formatted output of all the available information.
-
-    .. automethod:: EquivalenceCheckingManager.__repr__
+    .. automethod:: EquivalenceCheckingManager.Results.json

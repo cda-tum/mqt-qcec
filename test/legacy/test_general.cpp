@@ -34,7 +34,7 @@ TEST_F(GeneralTest, DynamicCircuit) {
 
   EXPECT_TRUE(ecm.getResults().consideredEquivalent());
 
-  std::cout << ecm.toString() << "\n";
+  std::cout << ecm.getResults() << "\n";
 
   auto ecm2 = ec::EquivalenceCheckingManager(dbv, dbv, config);
 
@@ -42,7 +42,7 @@ TEST_F(GeneralTest, DynamicCircuit) {
 
   EXPECT_TRUE(ecm2.getResults().consideredEquivalent());
 
-  std::cout << ecm2.toString() << "\n";
+  std::cout << ecm2.getResults() << "\n";
 }
 
 TEST_F(GeneralTest, FixOutputPermutationMismatch) {
@@ -96,7 +96,7 @@ TEST_F(GeneralTest, RemoveDiagonalGatesBeforeMeasure) {
   auto ecm = ec::EquivalenceCheckingManager(qc1, qc2);
   ecm.run();
   EXPECT_FALSE(ecm.getResults().consideredEquivalent());
-  std::cout << ecm.toString() << "\n";
+  std::cout << ecm.getResults() << "\n";
 
   // simulations should suggest both circuits to be equivalent
   ecm.reset();
@@ -104,7 +104,7 @@ TEST_F(GeneralTest, RemoveDiagonalGatesBeforeMeasure) {
   ecm.setZXChecker(false);
   ecm.run();
   EXPECT_TRUE(ecm.getResults().consideredEquivalent());
-  std::cout << ecm.toString() << "\n";
+  std::cout << ecm.getResults() << "\n";
 
   // if configured to remove diagonal gates before measurements, the circuits
   // are equivalent
@@ -113,7 +113,7 @@ TEST_F(GeneralTest, RemoveDiagonalGatesBeforeMeasure) {
   auto ecm2 = ec::EquivalenceCheckingManager(qc1, qc2, config);
   ecm2.run();
   EXPECT_TRUE(ecm2.getResults().consideredEquivalent());
-  std::cout << ecm2.toString() << "\n";
+  std::cout << ecm2.getResults() << "\n";
 }
 
 TEST_F(GeneralTest, NothingToDo) {
@@ -182,7 +182,7 @@ TEST_F(GeneralTest, NoGateCancellation) {
   ec::EquivalenceCheckingManager ecm(qc1, qc2, config);
   ecm.run();
   EXPECT_TRUE(ecm.getResults().consideredEquivalent());
-  std::cout << ecm.toString() << "\n";
+  std::cout << ecm.getResults() << "\n";
 }
 
 TEST_F(GeneralTest, Configuration) {

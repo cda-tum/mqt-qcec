@@ -309,7 +309,7 @@ TEST_P(JournalTestEQ, EQReference) {
 
   ec::EquivalenceCheckingManager ecm(qcOriginal, qcTranspiled, config);
   ecm.run();
-  std::cout << ecm.toString() << std::endl;
+  std::cout << ecm.getResults() << "\n";
   EXPECT_TRUE(ecm.getResults().consideredEquivalent());
 }
 
@@ -319,7 +319,7 @@ TEST_P(JournalTestEQ, EQNaive) {
 
   ec::EquivalenceCheckingManager ecm(qcOriginal, qcTranspiled, config);
   ecm.run();
-  std::cout << ecm.toString() << std::endl;
+  std::cout << ecm.getResults() << "\n";
   EXPECT_TRUE(ecm.getResults().consideredEquivalent());
 }
 
@@ -330,7 +330,7 @@ TEST_P(JournalTestEQ, EQProportional) {
 
   ec::EquivalenceCheckingManager ecm(qcOriginal, qcTranspiled, config);
   ecm.run();
-  std::cout << ecm.toString() << std::endl;
+  std::cout << ecm.getResults() << "\n";
   EXPECT_TRUE(ecm.getResults().consideredEquivalent());
 }
 
@@ -340,7 +340,7 @@ TEST_P(JournalTestEQ, EQLookahead) {
 
   ec::EquivalenceCheckingManager ecm(qcOriginal, qcTranspiled, config);
   ecm.run();
-  std::cout << ecm.toString() << std::endl;
+  std::cout << ecm.getResults() << "\n";
   EXPECT_TRUE(ecm.getResults().consideredEquivalent());
 }
 
@@ -349,7 +349,7 @@ TEST_P(JournalTestEQ, EQPowerOfSimulation) {
 
   ec::EquivalenceCheckingManager ecm(qcOriginal, qcTranspiled, config);
   ecm.run();
-  std::cout << ecm.toString() << std::endl;
+  std::cout << ecm.getResults() << "\n";
   EXPECT_TRUE(ecm.getResults().consideredEquivalent());
 }
 
@@ -361,7 +361,7 @@ TEST_P(JournalTestEQ, EQReferenceParallel) {
 
   ec::EquivalenceCheckingManager ecm(qcOriginal, qcTranspiled, config);
   ecm.run();
-  std::cout << ecm.toString() << std::endl;
+  std::cout << ecm.getResults() << "\n";
   EXPECT_TRUE(ecm.getResults().consideredEquivalent());
 }
 
@@ -372,7 +372,7 @@ TEST_P(JournalTestEQ, EQNaiveParallel) {
 
   ec::EquivalenceCheckingManager ecm(qcOriginal, qcTranspiled, config);
   ecm.run();
-  std::cout << ecm.toString() << std::endl;
+  std::cout << ecm.getResults() << "\n";
   EXPECT_TRUE(ecm.getResults().consideredEquivalent());
 }
 
@@ -384,7 +384,7 @@ TEST_P(JournalTestEQ, EQProportionalParallel) {
 
   ec::EquivalenceCheckingManager ecm(qcOriginal, qcTranspiled, config);
   ecm.run();
-  std::cout << ecm.toString() << std::endl;
+  std::cout << ecm.getResults() << "\n";
   EXPECT_TRUE(ecm.getResults().consideredEquivalent());
 }
 
@@ -395,7 +395,7 @@ TEST_P(JournalTestEQ, EQLookaheadParallel) {
 
   ec::EquivalenceCheckingManager ecm(qcOriginal, qcTranspiled, config);
   ecm.run();
-  std::cout << ecm.toString() << std::endl;
+  std::cout << ecm.getResults() << "\n";
   EXPECT_TRUE(ecm.getResults().consideredEquivalent());
 }
 
@@ -405,6 +405,6 @@ TEST_P(JournalTestEQ, EQPowerOfSimulationParallel) {
 
   ec::EquivalenceCheckingManager ecm(qcOriginal, qcTranspiled, config);
   ecm.run();
-  std::cout << ecm.toString() << std::endl;
+  std::cout << ecm.getResults() << "\n";
   EXPECT_TRUE(ecm.getResults().consideredEquivalent());
 }
