@@ -34,7 +34,7 @@ protected:
     config.execution.runZXChecker           = true;
   }
 
-  void TearDown() override { std::cout << ecm->toString() << std::endl; }
+  void TearDown() override { std::cout << ecm->getResults() << "\n"; }
 };
 
 INSTANTIATE_TEST_SUITE_P(
@@ -286,7 +286,7 @@ TEST_P(ZXTestCompFlow, EquivalenceCompilationFlow) {
   ecm = std::make_unique<ec::EquivalenceCheckingManager>(qcOriginal,
                                                          qcTranspiled, config);
   ecm->run();
-  std::cout << ecm->toString() << std::endl;
+  std::cout << ecm->getResults() << "\n";
   EXPECT_TRUE(ecm->getResults().consideredEquivalent());
 }
 

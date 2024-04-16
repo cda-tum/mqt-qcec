@@ -179,8 +179,19 @@ void EquivalenceCheckingManager::runOptimizationPasses() {
 }
 
 void EquivalenceCheckingManager::run() {
-  done                = false;
+  done = false;
+
+  results.name1      = qc1.getName();
+  results.name2      = qc2.getName();
+  results.numQubits1 = qc1.getNqubits();
+  results.numQubits2 = qc2.getNqubits();
+  results.numGates1  = qc1.getNops();
+  results.numGates2  = qc2.getNops();
+
+  results.configuration = configuration;
+
   results.equivalence = EquivalenceCriterion::NoInformation;
+
   const bool garbageQubitsPresent =
       qc1.getNgarbageQubits() > 0 || qc2.getNgarbageQubits() > 0;
 
@@ -205,6 +216,12 @@ void EquivalenceCheckingManager::run() {
     }
   } else {
     checkSymbolic();
+  }
+
+  for (const auto& checker : checkers) {
+    nlohmann::json j{};
+    checker->json(j);
+    results.checkerResults.emplace_back(j);
   }
 
   if (!configuration.functionality.checkPartialEquivalence &&
@@ -767,26 +784,6 @@ void EquivalenceCheckingManager::checkSymbolic() {
   }
 }
 
-nlohmann::json EquivalenceCheckingManager::json() const {
-  nlohmann::json res{};
-
-  addCircuitDescription(qc1, res["circuit1"]);
-  addCircuitDescription(qc2, res["circuit2"]);
-  res["configuration"] = configuration.json();
-  res["results"]       = results.json();
-
-  if (!checkers.empty()) {
-    res["checkers"]      = nlohmann::json::array();
-    auto& checkerResults = res["checkers"];
-    for (const auto& checker : checkers) {
-      nlohmann::json j{};
-      checker->json(j);
-      checkerResults.push_back(j);
-    }
-  }
-  return res;
-}
-
 void EquivalenceCheckingManager::runFixOutputPermutationMismatch() {
   if (!configuration.optimizations.fixOutputPermutationMismatch) {
     fixOutputPermutationMismatch();
@@ -836,6 +833,19 @@ void EquivalenceCheckingManager::elidePermutations() {
 
 nlohmann::json EquivalenceCheckingManager::Results::json() const {
   nlohmann::json res{};
+
+  auto& circuit1         = res["circuit1"];
+  circuit1["name"]       = name1;
+  circuit1["num_qubits"] = numQubits1;
+  circuit1["num_gates"]  = numGates1;
+
+  auto& circuit2         = res["circuit2"];
+  circuit2["name"]       = name2;
+  circuit2["num_qubits"] = numQubits2;
+  circuit2["num_gates"]  = numGates2;
+
+  res["configuration"] = configuration.json();
+
   res["preprocessing_time"] = preprocessingTime;
   res["check_time"]         = checkTime;
   res["equivalence"]        = ec::toString(equivalence);
@@ -860,6 +870,8 @@ nlohmann::json EquivalenceCheckingManager::Results::json() const {
   }
   auto& par                       = res["parameterized"];
   par["performed_instantiations"] = performedInstantiations;
+
+  res["checkers"] = checkerResults;
 
   return res;
 }

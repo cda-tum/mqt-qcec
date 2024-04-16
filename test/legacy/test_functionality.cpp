@@ -55,7 +55,7 @@ TEST_P(FunctionalityTest, Reference) {
 
   ec::EquivalenceCheckingManager ecm(qcOriginal, qcAlternative, config);
   ecm.run();
-  std::cout << ecm << std::endl;
+  std::cout << ecm.getResults() << "\n";
   EXPECT_TRUE(ecm.getResults().consideredEquivalent());
 }
 
@@ -68,7 +68,7 @@ TEST_P(FunctionalityTest, Proportional) {
 
   ec::EquivalenceCheckingManager ecm(qcOriginal, qcAlternative, config);
   ecm.run();
-  std::cout << ecm << std::endl;
+  std::cout << ecm.getResults() << "\n";
   EXPECT_TRUE(ecm.getResults().consideredEquivalent());
 }
 
@@ -80,7 +80,7 @@ TEST_P(FunctionalityTest, Lookahead) {
 
   ec::EquivalenceCheckingManager ecm(qcOriginal, qcAlternative, config);
   ecm.run();
-  std::cout << ecm << std::endl;
+  std::cout << ecm.getResults() << "\n";
   EXPECT_TRUE(ecm.getResults().consideredEquivalent());
 }
 
@@ -92,7 +92,7 @@ TEST_P(FunctionalityTest, Naive) {
 
   ec::EquivalenceCheckingManager ecm(qcOriginal, qcAlternative, config);
   ecm.run();
-  std::cout << ecm << std::endl;
+  std::cout << ecm.getResults() << "\n";
   EXPECT_TRUE(ecm.getResults().consideredEquivalent());
 }
 
@@ -105,7 +105,7 @@ TEST_P(FunctionalityTest, CompilationFlow) {
 
   ec::EquivalenceCheckingManager ecm(qcOriginal, qcAlternative, config);
   ecm.run();
-  std::cout << ecm << std::endl;
+  std::cout << ecm.getResults() << "\n";
   EXPECT_TRUE(ecm.getResults().consideredEquivalent());
 }
 
@@ -116,7 +116,7 @@ TEST_P(FunctionalityTest, Simulation) {
 
   ec::EquivalenceCheckingManager ecm(qcOriginal, qcAlternative, config);
   ecm.run();
-  std::cout << ecm << std::endl;
+  std::cout << ecm.getResults() << "\n";
   EXPECT_TRUE(ecm.getResults().consideredEquivalent());
 }
 
@@ -128,7 +128,7 @@ TEST_P(FunctionalityTest, SimulationRandom1QBasis) {
 
   ec::EquivalenceCheckingManager ecm(qcOriginal, qcAlternative, config);
   ecm.run();
-  std::cout << ecm << std::endl;
+  std::cout << ecm.getResults() << "\n";
   EXPECT_TRUE(ecm.getResults().consideredEquivalent());
 }
 
@@ -140,7 +140,7 @@ TEST_P(FunctionalityTest, SimulationStabilizer) {
 
   ec::EquivalenceCheckingManager ecm(qcOriginal, qcAlternative, config);
   ecm.run();
-  std::cout << ecm << std::endl;
+  std::cout << ecm.getResults() << "\n";
   EXPECT_TRUE(ecm.getResults().consideredEquivalent());
 }
 
@@ -154,7 +154,7 @@ TEST_P(FunctionalityTest, SimulationParallel) {
 
   ec::EquivalenceCheckingManager ecm(qcOriginal, qcAlternative, config);
   ecm.run();
-  std::cout << ecm << std::endl;
+  std::cout << ecm.getResults() << "\n";
   EXPECT_TRUE(ecm.getResults().consideredEquivalent());
 }
 
@@ -167,7 +167,7 @@ TEST_F(FunctionalityTest, test2) {
 
   ec::EquivalenceCheckingManager ecm(qcOriginal, qcAlternative, config);
   ecm.run();
-  std::cout << ecm << std::endl;
+  std::cout << ecm.getResults() << "\n";
   EXPECT_TRUE(ecm.getResults().consideredEquivalent());
 
   config.execution.runConstructionChecker = false;
@@ -177,21 +177,21 @@ TEST_F(FunctionalityTest, test2) {
 
   ec::EquivalenceCheckingManager ecm2(qcOriginal, qcAlternative, config);
   ecm2.run();
-  std::cout << ecm2.toString() << std::endl;
+  std::cout << ecm2.getResults() << "\n";
   EXPECT_TRUE(ecm2.getResults().consideredEquivalent());
 
   config.application.alternatingScheme = ec::ApplicationSchemeType::Lookahead;
 
   ec::EquivalenceCheckingManager ecm3(qcOriginal, qcAlternative, config);
   ecm3.run();
-  std::cout << ecm3.toString() << std::endl;
+  std::cout << ecm3.getResults() << "\n";
   EXPECT_TRUE(ecm3.getResults().consideredEquivalent());
 
   config.application.alternatingScheme = ec::ApplicationSchemeType::OneToOne;
 
   ec::EquivalenceCheckingManager ecm4(qcOriginal, qcAlternative, config);
   ecm4.run();
-  std::cout << ecm4.toString() << std::endl;
+  std::cout << ecm4.getResults() << "\n";
   EXPECT_TRUE(ecm4.getResults().consideredEquivalent());
 
   config.application.alternatingScheme = ec::ApplicationSchemeType::GateCost;
@@ -199,6 +199,6 @@ TEST_F(FunctionalityTest, test2) {
 
   ec::EquivalenceCheckingManager ecm5(qcOriginal, qcAlternative, config);
   ecm5.run();
-  std::cout << ecm5.toString() << std::endl;
+  std::cout << ecm5.getResults() << "\n";
   EXPECT_TRUE(ecm5.getResults().consideredEquivalent());
 }

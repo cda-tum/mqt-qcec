@@ -49,7 +49,7 @@ INSTANTIATE_TEST_SUITE_P(
 TEST_P(CompilationFlowTest, EquivalenceCompilationFlow) {
   ec::EquivalenceCheckingManager ecm(qcOriginal, qcTranspiled, configuration);
   ecm.run();
-  std::cout << ecm.toString() << "\n";
+  std::cout << ecm.getResults() << "\n";
   EXPECT_TRUE(ecm.getResults().consideredEquivalent());
 }
 
@@ -57,7 +57,7 @@ TEST_P(CompilationFlowTest, EquivalenceCompilationFlowNoElidePermutations) {
   configuration.optimizations.elidePermutations = false;
   ec::EquivalenceCheckingManager ecm(qcOriginal, qcTranspiled, configuration);
   ecm.run();
-  std::cout << ecm.toString() << "\n";
+  std::cout << ecm.getResults() << "\n";
   EXPECT_TRUE(ecm.getResults().consideredEquivalent());
 }
 
@@ -67,6 +67,6 @@ TEST_P(CompilationFlowTest, EquivalenceCompilationFlowParallel) {
 
   ec::EquivalenceCheckingManager ecm(qcOriginal, qcTranspiled, configuration);
   ecm.run();
-  std::cout << ecm.toString() << "\n";
+  std::cout << ecm.getResults() << "\n";
   EXPECT_TRUE(ecm.getResults().consideredEquivalent());
 }

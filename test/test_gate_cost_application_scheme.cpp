@@ -52,7 +52,7 @@ TEST_F(GateCostApplicationSchemeTest, SchemeFromProfile) {
   ec::EquivalenceCheckingManager ecm(qc, qc, config);
   ecm.run();
   EXPECT_TRUE(ecm.getResults().consideredEquivalent());
-  std::cout << ecm.toString() << "\n";
+  std::cout << ecm.getResults() << "\n";
 }
 
 TEST_F(GateCostApplicationSchemeTest, iSWAP) {

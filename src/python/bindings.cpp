@@ -372,15 +372,32 @@ PYBIND11_MODULE(pyqcec, m) {
       .def("get_results", &EquivalenceCheckingManager::getResults,
            "Returns the :class:`.EquivalenceCheckingManager.Results` of the "
            "equivalence check including statistics.")
-      .def("json", &EquivalenceCheckingManager::json,
-           "Returns a JSON-style dictionary of all the information present in "
-           "the :class:`.EquivalenceCheckingManager`")
-      .def("__repr__", &EquivalenceCheckingManager::toString,
-           "Prints a JSON-formatted representation of all the information "
-           "present in the :class:`.EquivalenceCheckingManager`");
+      .def("__repr__", [](const EquivalenceCheckingManager& ecm) {
+        return "<EquivalenceCheckingManager: " + toString(ecm.equivalence()) +
+               ">";
+      });
 
   // EquivalenceCheckingManager::Results bindings
   results.def(py::init<>())
+      .def_readwrite("name1", &EquivalenceCheckingManager::Results::name1,
+                     "Name of the first circuit.")
+      .def_readwrite("name2", &EquivalenceCheckingManager::Results::name2,
+                     "Name of the second circuit.")
+      .def_readwrite("num_qubits1",
+                     &EquivalenceCheckingManager::Results::numQubits1,
+                     "Number of qubits of the first circuit.")
+      .def_readwrite("num_qubits2",
+                     &EquivalenceCheckingManager::Results::numQubits2,
+                     "Number of qubits of the second circuit.")
+      .def_readwrite("num_gates1",
+                     &EquivalenceCheckingManager::Results::numGates1,
+                     "Number of gates of the first circuit.")
+      .def_readwrite("num_gates2",
+                     &EquivalenceCheckingManager::Results::numGates2,
+                     "Number of gates of the second circuit.")
+      .def_readwrite("configuration",
+                     &EquivalenceCheckingManager::Results::configuration,
+                     ":class:`.Configuration` used for the equivalence check.")
       .def_readwrite("preprocessing_time",
                      &EquivalenceCheckingManager::Results::preprocessingTime,
                      "Time spent during preprocessing (in seconds).")
@@ -413,14 +430,21 @@ PYBIND11_MODULE(pyqcec, m) {
           &EquivalenceCheckingManager::Results::performedInstantiations,
           "Number of circuit instantiations that have been performed during "
           "equivalence checking of parameterized quantum circuits.")
+      .def_readwrite("checker_results",
+                     &EquivalenceCheckingManager::Results::checkerResults,
+                     "Dictionary of the results of the individual checkers.")
       .def("considered_equivalent",
            &EquivalenceCheckingManager::Results::consideredEquivalent,
            "Convenience function to check whether the obtained result is to be "
            "considered equivalent.")
       .def("json", &EquivalenceCheckingManager::Results::json,
            "Returns a JSON-style dictionary of the results.")
-      .def("__repr__", &EquivalenceCheckingManager::Results::toString,
-           "Prints a JSON-formatted representation of the results.");
+      .def("__str__", &EquivalenceCheckingManager::Results::toString,
+           "Prints a JSON-formatted representation of the results.")
+      .def("__repr__", [](const EquivalenceCheckingManager::Results& res) {
+        return "<EquivalenceCheckingManager.Results: " +
+               toString(res.equivalence) + ">";
+      });
 
   // Configuration sub-classes
   py::class_<Configuration::Execution> execution(
