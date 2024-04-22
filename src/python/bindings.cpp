@@ -372,9 +372,9 @@ PYBIND11_MODULE(pyqcec, m) {
       .def("get_results", &EquivalenceCheckingManager::getResults,
            "Returns the :class:`.EquivalenceCheckingManager.Results` of the "
            "equivalence check including statistics.")
-      .def("__repr__", [](const EquivalenceCheckingManager& ecm) {
-        return "<EquivalenceCheckingManager: " + toString(ecm.equivalence()) +
-               ">";
+      .def("__repr__", [](const EquivalenceCheckingManager& manager) {
+        return "<EquivalenceCheckingManager: " +
+               toString(manager.equivalence()) + ">";
       });
 
   // EquivalenceCheckingManager::Results bindings
