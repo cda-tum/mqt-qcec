@@ -92,7 +92,7 @@ protected:
 
 public:
   ApplicationScheme(TM& tm1, TM& tm2) noexcept
-      : taskManager1(&tm1), taskManager2(&tm2){};
+      : taskManager1(&tm1), taskManager2(&tm2) {};
 
   virtual ~ApplicationScheme() = default;
 
