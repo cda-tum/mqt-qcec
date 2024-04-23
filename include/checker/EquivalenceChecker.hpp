@@ -23,7 +23,7 @@ public:
                      Configuration                 config) noexcept
       : qc1(&circ1), qc2(&circ2),
         nqubits(std::max(qc1->getNqubits(), qc2->getNqubits())),
-        configuration(std::move(config)){};
+        configuration(std::move(config)) {};
 
   virtual ~EquivalenceChecker() = default;
 
