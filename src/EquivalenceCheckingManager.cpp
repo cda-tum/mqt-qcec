@@ -8,6 +8,8 @@
 #include "CircuitOptimizer.hpp"
 #include "Definitions.hpp"
 #include "EquivalenceCriterion.hpp"
+#include "Permutation.hpp"
+#include "QuantumComputation.hpp"
 #include "checker/dd/DDAlternatingChecker.hpp"
 #include "checker/dd/DDConstructionChecker.hpp"
 #include "checker/dd/DDSimulationChecker.hpp"
@@ -28,6 +30,80 @@
 #include <vector>
 
 namespace ec {
+
+void EquivalenceCheckingManager::decrementLogicalQubitsInLayoutAboveIndex(
+    qc::Permutation& layout, qc::Qubit& logicalQubitIndex) {
+  for (auto& [physical, logical] : layout) {
+    if (logical > logicalQubitIndex) {
+      --logical;
+    }
+  }
+}
+
+void EquivalenceCheckingManager::stripIdleQubits(bool reduceIOpermutations) {
+  auto& largerCircuit =
+      qc1.getNqubits() > qc2.getNqubits() ? this->qc1 : this->qc2;
+  auto& smallerCircuit =
+      qc1.getNqubits() > qc2.getNqubits() ? this->qc2 : this->qc1;
+  auto qubitDifference =
+      largerCircuit.getNqubits() - smallerCircuit.getNqubits();
+  auto largerCircuitLayoutCopy = largerCircuit.initialLayout;
+
+  // Iterate over the initialLayout of largerCircuit and remove an idle logical
+  // qubit together with the physical qubit it is mapped to
+  for (auto physicalQubitIt = largerCircuitLayoutCopy.rbegin();
+       physicalQubitIt != largerCircuitLayoutCopy.rend(); ++physicalQubitIt) {
+    auto physicalQubitIndex = physicalQubitIt->first;
+    auto logicalQubitIndex = largerCircuit.initialLayout.at(physicalQubitIndex);
+
+    bool removedFromSmallerCircuit = false;
+    bool removedFromLargerCircuit  = false;
+
+    if (largerCircuit.isIdleQubit(physicalQubitIndex)) {
+      // Remove idle logical qubit present exclusively in largerCircuit,
+      // potentially mapped to physical qubit present in both circuits. Logical
+      // qubit indices unique to largerCircuit remain greater than the highest
+      // logical qubit index in the smaller circuit, as only jointly occurring
+      // logical qubits are removed otherwise.
+      if (qubitDifference > 0 &&
+          logicalQubitIndex >
+              qc::QuantumComputation::getHighestLogicalQubitIndex(
+                  smallerCircuit.initialLayout)) {
+        largerCircuit.removeQubit(logicalQubitIndex);
+        removedFromLargerCircuit = true;
+        --qubitDifference;
+
+        // Remove logical qubit that is idle in both circuits
+      } else {
+        for (const auto& [physical, logical] : smallerCircuit.initialLayout) {
+          if (logical == logicalQubitIndex &&
+              smallerCircuit.isIdleQubit(physical)) {
+            smallerCircuit.removeQubit(logicalQubitIndex);
+            removedFromSmallerCircuit = true;
+            largerCircuit.removeQubit(logicalQubitIndex);
+            removedFromLargerCircuit = true;
+            break;
+          }
+        }
+      }
+      if (reduceIOpermutations) {
+        if (removedFromLargerCircuit) {
+          decrementLogicalQubitsInLayoutAboveIndex(largerCircuit.initialLayout,
+                                                   logicalQubitIndex);
+          decrementLogicalQubitsInLayoutAboveIndex(
+              largerCircuit.outputPermutation, logicalQubitIndex);
+        }
+        if (removedFromSmallerCircuit) {
+          decrementLogicalQubitsInLayoutAboveIndex(smallerCircuit.initialLayout,
+                                                   logicalQubitIndex);
+          decrementLogicalQubitsInLayoutAboveIndex(
+              smallerCircuit.outputPermutation, logicalQubitIndex);
+        }
+      }
+    }
+  }
+}
+
 void EquivalenceCheckingManager::setupAncillariesAndGarbage() {
   auto& largerCircuit =
       qc1.getNqubits() > qc2.getNqubits() ? this->qc1 : this->qc2;
@@ -252,8 +328,7 @@ EquivalenceCheckingManager::EquivalenceCheckingManager(
   }
 
   // strip away qubits that are not acted upon
-  this->qc1.stripIdleQubits();
-  this->qc2.stripIdleQubits();
+  stripIdleQubits();
 
   // given that one circuit has more qubits than the other, the difference is
   // assumed to arise from ancillary qubits. adjust both circuits accordingly

@@ -103,6 +103,10 @@ public:
   [[nodiscard]] Configuration getConfiguration() const { return configuration; }
   [[nodiscard]] Results       getResults() const { return results; }
 
+  // Getter functions provided for testing purposes
+  std::size_t getNumAncillae1() { return qc1.getNancillae(); }
+  std::size_t getNumAncillae2() { return qc2.getNancillae(); }
+
   // convenience functions for changing the configuration after the manager has
   // been constructed: Execution: These settings may be changed to influence
   // what is executed during `run`
@@ -254,6 +258,16 @@ protected:
   std::vector<std::unique_ptr<EquivalenceChecker>> checkers;
 
   Results results{};
+
+  // Decrement logical qubit indices in the layout that exceed logicalQubitIndex
+  static void
+  decrementLogicalQubitsInLayoutAboveIndex(qc::Permutation& layout,
+                                           qc::Qubit&       logicalQubitIndex);
+
+  /// Strip away qubits with no operations applied to them and which do not
+  /// occur in the output permutation if they are either idle in both circuits
+  /// or idle in one and do not exist (logically) in the other circuit.
+  void stripIdleQubits(bool reduceIOpermutations = true);
 
   /// Given that one circuit has more qubits than the other, the difference is
   /// assumed to arise from ancillary qubits. This function changes the
