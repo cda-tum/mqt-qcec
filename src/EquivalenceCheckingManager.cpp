@@ -17,6 +17,7 @@
 #include "checker/zx/ZXChecker.hpp"
 #include "zx/FunctionalityConstruction.hpp"
 
+#include <algorithm>
 #include <cassert>
 #include <chrono>
 #include <cstddef>
@@ -70,23 +71,22 @@ void EquivalenceCheckingManager::stripIdleQubits(bool force,
         bool physicalUsedInOutputPermutation =
             largerCircuit.outputPermutation.find(physicalQubitIndex) !=
             largerCircuit.outputPermutation.end();
-        bool logicalUsedInOutputPermutation = false;
-        for (const auto& [physical, logical] :
-             largerCircuit.outputPermutation) {
-          if (logical == logicalQubitIndex) {
-            logicalUsedInOutputPermutation = true;
-            break;
-          }
-        }
+        bool logicalUsedInOutputPermutation =
+            std::any_of(largerCircuit.outputPermutation.begin(),
+                        largerCircuit.outputPermutation.end(),
+                        [logicalQubitIndex](const auto& pair) {
+                          return pair.second == logicalQubitIndex;
+                        });
+        bool notInOutputPermutation =
+            !physicalUsedInOutputPermutation && !logicalUsedInOutputPermutation;
+        bool initialAndOutputPermutationEquivalent =
+            physicalUsedInOutputPermutation && logicalUsedInOutputPermutation &&
+            (logicalQubitIndex ==
+             largerCircuit.outputPermutation.at(physicalQubitIndex));
         // remove qubit if physical and logical qubit do not occur in output
         // permutation or if initial and output permutation are equal for this
         // qubit or force
-        if ((!physicalUsedInOutputPermutation &&
-             !logicalUsedInOutputPermutation) ||
-            (physicalUsedInOutputPermutation &&
-             logicalUsedInOutputPermutation &&
-             (logicalQubitIndex ==
-              largerCircuit.outputPermutation.at(physicalQubitIndex))) ||
+        if (notInOutputPermutation || initialAndOutputPermutationEquivalent ||
             force) {
           largerCircuit.removeQubit(logicalQubitIndex);
           removedFromLargerCircuit = true;
@@ -106,38 +106,37 @@ void EquivalenceCheckingManager::stripIdleQubits(bool force,
               bool physicalSmallerUsedInOutputPermutation =
                   (smallerCircuit.outputPermutation.find(physicalSmaller) !=
                    smallerCircuit.outputPermutation.end());
-              bool logicalLargerUsedInOutputPermutation = false;
-              for (const auto& [physical, logical] :
-                   largerCircuit.outputPermutation) {
-                if (logical == logicalQubitIndex) {
-                  logicalLargerUsedInOutputPermutation = true;
-                  break;
-                }
-              }
-              bool logicalSmallerUsedInOutputPermutation = false;
-              for (const auto& [physical, logical] :
-                   smallerCircuit.outputPermutation) {
-                if (logical == logicalQubitIndex) {
-                  logicalSmallerUsedInOutputPermutation = true;
-                  break;
-                }
-              }
+              bool logicalLargerUsedInOutputPermutation =
+                  std::any_of(largerCircuit.outputPermutation.begin(),
+                              largerCircuit.outputPermutation.end(),
+                              [logicalQubitIndex](const auto& pair) {
+                                return pair.second == logicalQubitIndex;
+                              });
+              bool logicalSmallerUsedInOutputPermutation =
+                  std::any_of(smallerCircuit.outputPermutation.begin(),
+                              smallerCircuit.outputPermutation.end(),
+                              [logicalQubitIndex](const auto& pair) {
+                                return pair.second == logicalQubitIndex;
+                              });
+              bool notInOutputPermutation =
+                  !physicalLargerUsedInOutputPermutation &&
+                  !physicalSmallerUsedInOutputPermutation &&
+                  !logicalLargerUsedInOutputPermutation &&
+                  !logicalSmallerUsedInOutputPermutation;
+              bool initialAndOutputPermutationEquivalent =
+                  physicalLargerUsedInOutputPermutation &&
+                  physicalSmallerUsedInOutputPermutation &&
+                  logicalLargerUsedInOutputPermutation &&
+                  logicalSmallerUsedInOutputPermutation &&
+                  (logicalQubitIndex ==
+                   largerCircuit.outputPermutation.at(physicalQubitIndex)) &&
+                  (logicalQubitIndex ==
+                   smallerCircuit.outputPermutation.at(physicalSmaller));
               // remove qubit if physical and logical qubit do not occur in
               // output permutation of both circuits or if initial and output
               // permutations are equal for this qubit in both circuits or force
-              if ((!physicalLargerUsedInOutputPermutation &&
-                   !physicalSmallerUsedInOutputPermutation &&
-                   !logicalLargerUsedInOutputPermutation &&
-                   !logicalSmallerUsedInOutputPermutation) ||
-                  (physicalLargerUsedInOutputPermutation &&
-                   physicalSmallerUsedInOutputPermutation &&
-                   logicalLargerUsedInOutputPermutation &&
-                   logicalSmallerUsedInOutputPermutation &&
-                   (logicalQubitIndex ==
-                    largerCircuit.outputPermutation.at(physicalQubitIndex)) &&
-                   (logicalQubitIndex ==
-                    smallerCircuit.outputPermutation.at(physicalSmaller))) ||
-                  force) {
+              if (notInOutputPermutation ||
+                  initialAndOutputPermutationEquivalent || force) {
                 smallerCircuit.removeQubit(logicalQubitIndex);
                 removedFromSmallerCircuit = true;
                 largerCircuit.removeQubit(logicalQubitIndex);
