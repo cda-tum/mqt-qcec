@@ -312,7 +312,7 @@ TEST_F(EqualityTest, onlySingleTask) {
   EXPECT_TRUE(ecm.getConfiguration().onlySingleTask());
 }
 
-TEST_F(EqualityTest, RemoveIdleQubitPresentInBothCircuits) {
+TEST_F(EqualityTest, StripIdleQubitPresentInBothCircuits) {
   //  Remove an idle qubit that is present in both circuits
   qc1 = qc::QuantumComputation(2, 1);
   qc1.h(0);
@@ -396,7 +396,7 @@ TEST_F(EqualityTest, EqualDueToNoSeparateIdleQubitStripping) {
 }
 
 TEST_F(EqualityTest,
-       RemoveIdleQubitPresentInBothCircuitsWithDifferentInitialLayout) {
+       StripIdleQubitPresentInBothCircuitsWithDifferentInitialLayout) {
   // Test that idle qubits are removed correctly even if the initial layout is
   // different
   qc1                  = qc::QuantumComputation(3, 2);
@@ -427,7 +427,7 @@ TEST_F(EqualityTest,
   EXPECT_EQ(ecm.getResults().numQubits2, qc2.getNqubits() - 1);
 }
 
-TEST_F(EqualityTest, RemoveIdleQubitPresentOnlyInOneCircuit) {
+TEST_F(EqualityTest, StripIdleQubitPresentOnlyInOneCircuit) {
   //  Remove an idle logical qubit that is present only in one circuit
   qc1 = qc::QuantumComputation(2, 2);
   qc1.h(0);
@@ -451,7 +451,7 @@ TEST_F(EqualityTest, RemoveIdleQubitPresentOnlyInOneCircuit) {
   EXPECT_EQ(ecm.getResults().numQubits2, qc2.getNqubits() - 1);
 }
 
-TEST_F(EqualityTest, RemoveQubitLogicalOnlyInOnePhysicalInBothCircuits) {
+TEST_F(EqualityTest, StripIdleQubitLogicalOnlyInOnePhysicalInBothCircuits) {
   //  Remove an idle logical qubit that is present only in one circuit, but
   //  which is mapped to a physical qubit that is present in both circuits
   qc1 = qc::QuantumComputation(2, 2);
@@ -479,4 +479,119 @@ TEST_F(EqualityTest, RemoveQubitLogicalOnlyInOnePhysicalInBothCircuits) {
   ecm.run();
   EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::Equivalent);
   EXPECT_EQ(ecm.getResults().numQubits2, qc2.getNqubits() - 1);
+}
+
+TEST_F(EqualityTest, StripIdleQubitOutputPermutationDifferent) {
+  // Test that qubits are not removed if they occur in the output permutation
+  // and input and output permutation are not equivalent
+  qc1 = qc::QuantumComputation(2);
+  // Simulating Qiskit Import, where no measurements are included but
+  // outputPermutation is set
+  qc1.swap(0, 1);
+  qc1.initializeIOMapping();
+
+  qc2                      = qc::QuantumComputation(2);
+  qc2.outputPermutation[0] = 1;
+  qc2.outputPermutation[1] = 0;
+  qc2.initializeIOMapping();
+
+  config.execution.runConstructionChecker = true;
+  config.optimizations.elidePermutations  = true;
+  ec::EquivalenceCheckingManager ecm(qc1, qc2, config);
+  ecm.run();
+  EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::Equivalent);
+  // Check that no qubits were removed as the initial and output permutation are
+  // not equivalent for the idle qubits
+  EXPECT_EQ(ecm.getResults().numQubits1, ecm.getResults().numQubits2);
+  EXPECT_EQ(ecm.getResults().numQubits2, qc2.getNqubits());
+  EXPECT_EQ(ecm.getNumAncillae1(), 0);
+  EXPECT_EQ(ecm.getNumAncillae2(), 0);
+}
+
+TEST_F(EqualityTest, StripIdleQubitOutputPermutationEquivalent) {
+  // Test that idle qubits are removed if they occur in the output permutation
+  // and input and output permutation are equivalent
+  qc1 = qc::QuantumComputation(2);
+  qc1.initializeIOMapping();
+
+  qc2                      = qc::QuantumComputation(2);
+  qc2.initialLayout[0]     = 1;
+  qc2.initialLayout[1]     = 0;
+  qc2.outputPermutation[0] = 1;
+  qc2.outputPermutation[1] = 0;
+  qc2.initializeIOMapping();
+
+  config.execution.runConstructionChecker = true;
+  ec::EquivalenceCheckingManager ecm(qc1, qc2, config);
+  ecm.run();
+  EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::Equivalent);
+  // Check that qubits were removed as the initial and output permutation are
+  // equivalent
+  EXPECT_EQ(ecm.getResults().numQubits1, ecm.getResults().numQubits2);
+  EXPECT_EQ(ecm.getResults().numQubits2, 0);
+}
+
+TEST_F(EqualityTest, StripQubitIdleInOneCircuitOnlyOutputPermutationDifferent) {
+  // Test that qubits, idle in one circuit only, are not removed if they occur
+  // in the output permutation and input and output permutation are not
+  // equivalent
+  qc1 = qc::QuantumComputation(1);
+  qc1.initializeIOMapping();
+
+  qc2                      = qc::QuantumComputation(2);
+  qc2.outputPermutation[0] = 1;
+  qc2.outputPermutation[1] = 0;
+  qc2.initializeIOMapping();
+
+  config.execution.runConstructionChecker = true;
+  ec::EquivalenceCheckingManager ecm(qc1, qc2, config);
+  ecm.run();
+  EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::Equivalent);
+  // Check that no qubits were removed as the initial and output permutation are
+  // not equivalent for the idle qubits
+  EXPECT_EQ(ecm.getResults().numQubits1, 2);
+  EXPECT_EQ(ecm.getResults().numQubits2, 2);
+  EXPECT_EQ(ecm.getNumAncillae1(), 1);
+  EXPECT_EQ(ecm.getNumAncillae2(), 1);
+}
+
+TEST_F(EqualityTest,
+       StripQubitIdleInOneCircuitOnlyOutputPermutationEquivalent) {
+  // Test that qubits, idle in one circuit only, are removed if they occur in
+  // the output permutation and input and output permutation are equivalent
+  qc1 = qc::QuantumComputation(0);
+  qc1.initializeIOMapping();
+
+  qc2 = qc::QuantumComputation(1);
+  qc1.initializeIOMapping();
+  config.execution.runConstructionChecker = true;
+  ec::EquivalenceCheckingManager ecm(qc1, qc2, config);
+  ecm.run();
+  EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::Equivalent);
+  // Check that qubits were removed as the initial and output permutation are
+  // equivalent
+  EXPECT_EQ(ecm.getResults().numQubits1, ecm.getResults().numQubits2);
+  EXPECT_EQ(ecm.getResults().numQubits2, 0);
+}
+
+TEST_F(EqualityTest, StripIdleQubitInOutputPermutationWithAncilla) {
+  // Test that idle qubits, which are present in the output permutation of one
+  // circuit and match the initial layout, are retained if they do not appear in
+  // the output permutation of the other circuit
+  qc1 = qc::QuantumComputation(0);
+  qc1.addAncillaryRegister(2);
+  // Here, qubits that are ancillary and idle are removed from output
+  // permutation
+  qc1.initializeIOMapping();
+
+  qc2 = qc::QuantumComputation(2);
+  qc2.initializeIOMapping();
+
+  config.execution.runConstructionChecker = true;
+  ec::EquivalenceCheckingManager ecm(qc1, qc2, config);
+  ecm.run();
+  EXPECT_EQ(ecm.getResults().numQubits1, ecm.getResults().numQubits2);
+  EXPECT_EQ(ecm.getResults().numQubits2, 2);
+  EXPECT_EQ(ecm.getNumAncillae1(), 2);
+  EXPECT_EQ(ecm.getNumAncillae2(), 0);
 }
