@@ -13,6 +13,7 @@ else:
     from importlib import resources
 
 import difflib
+import locale
 
 import pytest
 
@@ -64,7 +65,9 @@ def test_generated_profiles_are_still_valid(optimization_level: int, ancilla_mod
             return
 
         ref_profile = path.read_text().splitlines(keepends=True)
-        gen_profile = Path(profile_name).read_text().splitlines(keepends=True)
+        gen_profile = (
+            Path(profile_name).read_text(encoding=locale.getpreferredencoding(False)).splitlines(keepends=True)
+        )
         diff = difflib.unified_diff(ref_profile, gen_profile, fromfile="reference", tofile="generated", n=0)
         num_diffs = sum(
             1
