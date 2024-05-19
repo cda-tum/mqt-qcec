@@ -111,7 +111,7 @@ void EquivalenceCheckingManager::stripIdleQubits(bool force,
       // the logical qubit has to be present in the smaller circuit, otherwise
       // this would indicate a bug in the circuit IO initialization.
       assert(it != smallerCircuit.initialLayout.end());
-      const auto& [physicalSmaller, logicalSmaller] = *it;
+      const auto physicalSmaller = it->first;
 
       // if the qubit is not idle in the second circuit, it cannot be removed
       // from either circuit.
