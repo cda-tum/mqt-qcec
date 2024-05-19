@@ -130,9 +130,13 @@ qc::Permutation concat(const qc::Permutation& p1,
 }
 
 qc::Permutation complete(const qc::Permutation& p, const std::size_t n) {
+  if (p.size() == n) {
+    return p;
+  }
+
   qc::Permutation pComp = p;
 
-  std::unordered_map<std::size_t, bool> mappedTo;
+  std::vector<bool>                     mappedTo(n, false);
   std::unordered_map<std::size_t, bool> mappedFrom;
   for (const auto [k, v] : p) {
     mappedFrom[k] = true;
@@ -141,15 +145,16 @@ qc::Permutation complete(const qc::Permutation& p, const std::size_t n) {
 
   // Map qubits greedily
   for (std::size_t i = 0; i < n; ++i) {
-    if (mappedFrom[i]) {
+    // If qubit is already mapped, skip
+    if (mappedTo[i]) {
       continue;
     }
 
     for (std::size_t j = 0; j < n; ++j) {
-      if (!mappedTo[j]) {
-        pComp[static_cast<qc::Qubit>(i)] = static_cast<qc::Qubit>(j);
-        mappedTo[j]                      = true;
-        mappedFrom[i]                    = true;
+      if (mappedFrom.find(j) == mappedFrom.end()) {
+        pComp[static_cast<qc::Qubit>(j)] = static_cast<qc::Qubit>(i);
+        mappedTo[i]                      = true;
+        mappedFrom[j]                    = true;
         break;
       }
     }
