@@ -576,8 +576,8 @@ TEST_F(EqualityTest,
 
 TEST_F(EqualityTest, StripIdleQubitInOutputPermutationWithAncilla) {
   // Test that idle qubits, which are present in the output permutation of one
-  // circuit and match the initial layout, are retained if they do not appear in
-  // the output permutation of the other circuit
+  // circuit and match the initial layout, are eliminated even if they do not
+  // appear in the output permutation of the other circuit
   qc1 = qc::QuantumComputation(0);
   qc1.addAncillaryRegister(2);
   // Here, qubits that are ancillary and idle are removed from output
@@ -591,7 +591,7 @@ TEST_F(EqualityTest, StripIdleQubitInOutputPermutationWithAncilla) {
   ec::EquivalenceCheckingManager ecm(qc1, qc2, config);
   ecm.run();
   EXPECT_EQ(ecm.getResults().numQubits1, ecm.getResults().numQubits2);
-  EXPECT_EQ(ecm.getResults().numQubits2, 2);
-  EXPECT_EQ(ecm.getNumAncillae1(), 2);
+  EXPECT_EQ(ecm.getResults().numQubits2, 0);
+  EXPECT_EQ(ecm.getNumAncillae1(), 0);
   EXPECT_EQ(ecm.getNumAncillae2(), 0);
 }

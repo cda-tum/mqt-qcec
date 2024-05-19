@@ -32,8 +32,9 @@
 
 namespace ec {
 
-void EquivalenceCheckingManager::decrementLogicalQubitsInLayoutAboveIndex(
-    qc::Permutation& layout, qc::Qubit& logicalQubitIndex) {
+// Decrement logical qubit indices in the layout that exceed logicalQubitIndex
+void decrementLogicalQubitsInLayoutAboveIndex(
+    qc::Permutation& layout, const qc::Qubit logicalQubitIndex) {
   for (auto& [physical, logical] : layout) {
     if (logical > logicalQubitIndex) {
       --logical;
@@ -43,11 +44,9 @@ void EquivalenceCheckingManager::decrementLogicalQubitsInLayoutAboveIndex(
 
 void EquivalenceCheckingManager::stripIdleQubits(bool force,
                                                  bool reduceIOpermutations) {
-  auto& largerCircuit =
-      qc1.getNqubits() > qc2.getNqubits() ? this->qc1 : this->qc2;
-  auto& smallerCircuit =
-      qc1.getNqubits() > qc2.getNqubits() ? this->qc2 : this->qc1;
-  auto qubitDifference =
+  auto& largerCircuit  = qc1.getNqubits() > qc2.getNqubits() ? qc1 : qc2;
+  auto& smallerCircuit = qc1.getNqubits() > qc2.getNqubits() ? qc2 : qc1;
+  auto  qubitDifference =
       largerCircuit.getNqubits() - smallerCircuit.getNqubits();
   auto largerCircuitLayoutCopy = largerCircuit.initialLayout;
 
@@ -55,111 +54,133 @@ void EquivalenceCheckingManager::stripIdleQubits(bool force,
   // qubit together with the physical qubit it is mapped to
   for (auto physicalQubitIt = largerCircuitLayoutCopy.rbegin();
        physicalQubitIt != largerCircuitLayoutCopy.rend(); ++physicalQubitIt) {
-    auto physicalQubitIndex = physicalQubitIt->first;
-    auto logicalQubitIndex = largerCircuit.initialLayout.at(physicalQubitIndex);
+    const auto physicalQubitIndex = physicalQubitIt->first;
+
+    if (!largerCircuit.isIdleQubit(physicalQubitIndex)) {
+      continue;
+    }
+
+    const auto logicalQubitIndex =
+        largerCircuit.initialLayout.at(physicalQubitIndex);
 
     bool removedFromSmallerCircuit = false;
-    bool removedFromLargerCircuit  = false;
 
-    if (largerCircuit.isIdleQubit(physicalQubitIndex)) {
-      // Remove idle logical qubit present exclusively in largerCircuit
-      if (qubitDifference > 0 &&
-          (logicalQubitIndex >
-               qc::QuantumComputation::getHighestLogicalQubitIndex(
-                   smallerCircuit.initialLayout) ||
-           (smallerCircuit.getNqubits() == 0))) {
-        bool physicalUsedInOutputPermutation =
-            largerCircuit.outputPermutation.find(physicalQubitIndex) !=
-            largerCircuit.outputPermutation.end();
-        bool logicalUsedInOutputPermutation =
-            std::any_of(largerCircuit.outputPermutation.begin(),
-                        largerCircuit.outputPermutation.end(),
-                        [logicalQubitIndex](const auto& pair) {
-                          return pair.second == logicalQubitIndex;
-                        });
-        bool notInOutputPermutation =
-            !physicalUsedInOutputPermutation && !logicalUsedInOutputPermutation;
-        bool initialAndOutputPermutationEquivalent =
-            physicalUsedInOutputPermutation && logicalUsedInOutputPermutation &&
-            (logicalQubitIndex ==
-             largerCircuit.outputPermutation.at(physicalQubitIndex));
-        // remove qubit if physical and logical qubit do not occur in output
-        // permutation or if initial and output permutation are equal for this
-        // qubit or force
-        if (notInOutputPermutation || initialAndOutputPermutationEquivalent ||
-            force) {
-          largerCircuit.removeQubit(logicalQubitIndex);
-          removedFromLargerCircuit = true;
-          --qubitDifference;
-        } else {
-          continue;
-        }
-        // Remove logical qubit that is idle in both circuits
-      } else {
-        for (const auto& [physicalSmaller, logicalSmaller] :
-             smallerCircuit.initialLayout) {
-          if (logicalSmaller == logicalQubitIndex) {
-            if (smallerCircuit.isIdleQubit(physicalSmaller)) {
-              bool physicalLargerUsedInOutputPermutation =
-                  (largerCircuit.outputPermutation.find(physicalQubitIndex) !=
-                   largerCircuit.outputPermutation.end());
-              bool physicalSmallerUsedInOutputPermutation =
-                  (smallerCircuit.outputPermutation.find(physicalSmaller) !=
-                   smallerCircuit.outputPermutation.end());
-              bool logicalLargerUsedInOutputPermutation =
-                  std::any_of(largerCircuit.outputPermutation.begin(),
-                              largerCircuit.outputPermutation.end(),
-                              [logicalQubitIndex](const auto& pair) {
-                                return pair.second == logicalQubitIndex;
-                              });
-              bool logicalSmallerUsedInOutputPermutation =
-                  std::any_of(smallerCircuit.outputPermutation.begin(),
-                              smallerCircuit.outputPermutation.end(),
-                              [logicalQubitIndex](const auto& pair) {
-                                return pair.second == logicalQubitIndex;
-                              });
-              bool notInOutputPermutation =
-                  !physicalLargerUsedInOutputPermutation &&
-                  !physicalSmallerUsedInOutputPermutation &&
-                  !logicalLargerUsedInOutputPermutation &&
-                  !logicalSmallerUsedInOutputPermutation;
-              bool initialAndOutputPermutationEquivalent =
-                  physicalLargerUsedInOutputPermutation &&
-                  physicalSmallerUsedInOutputPermutation &&
-                  logicalLargerUsedInOutputPermutation &&
-                  logicalSmallerUsedInOutputPermutation &&
-                  (logicalQubitIndex ==
-                   largerCircuit.outputPermutation.at(physicalQubitIndex)) &&
-                  (logicalQubitIndex ==
-                   smallerCircuit.outputPermutation.at(physicalSmaller));
-              // remove qubit if physical and logical qubit do not occur in
-              // output permutation of both circuits or if initial and output
-              // permutations are equal for this qubit in both circuits or force
-              if (notInOutputPermutation ||
-                  initialAndOutputPermutationEquivalent || force) {
-                smallerCircuit.removeQubit(logicalQubitIndex);
-                removedFromSmallerCircuit = true;
-                largerCircuit.removeQubit(logicalQubitIndex);
-                removedFromLargerCircuit = true;
-              }
-            }
-            break;
-          }
-        }
+    // Remove idle logical qubit present exclusively in largerCircuit
+    if (qubitDifference > 0 &&
+        ((smallerCircuit.getNqubits() == 0) ||
+         logicalQubitIndex >
+             qc::QuantumComputation::getHighestLogicalQubitIndex(
+                 smallerCircuit.initialLayout))) {
+      const bool physicalUsedInOutputPermutation =
+          largerCircuit.outputPermutation.find(physicalQubitIndex) !=
+          largerCircuit.outputPermutation.end();
+      const bool logicalUsedInOutputPermutation =
+          std::any_of(largerCircuit.outputPermutation.begin(),
+                      largerCircuit.outputPermutation.end(),
+                      [logicalQubitIndex](const auto& pair) {
+                        return pair.second == logicalQubitIndex;
+                      });
+
+      // a qubit can only be removed if it is not used in the output permutation
+      // or if it is used in the output permutation and the logical qubit index
+      // matches the logical qubit index in the output permutation for the
+      // physical qubit index in question, which indicates that nothing has
+      // happened to the qubit in the larger circuit.
+      const bool safeToRemoveInLargerCircuit =
+          force ||
+          (!physicalUsedInOutputPermutation &&
+           !logicalUsedInOutputPermutation) ||
+          (physicalUsedInOutputPermutation &&
+           largerCircuit.outputPermutation.at(physicalQubitIndex) ==
+               logicalQubitIndex);
+      if (!safeToRemoveInLargerCircuit) {
+        continue;
       }
-      if (reduceIOpermutations) {
-        if (removedFromLargerCircuit) {
-          decrementLogicalQubitsInLayoutAboveIndex(largerCircuit.initialLayout,
-                                                   logicalQubitIndex);
-          decrementLogicalQubitsInLayoutAboveIndex(
-              largerCircuit.outputPermutation, logicalQubitIndex);
-        }
-        if (removedFromSmallerCircuit) {
-          decrementLogicalQubitsInLayoutAboveIndex(smallerCircuit.initialLayout,
-                                                   logicalQubitIndex);
-          decrementLogicalQubitsInLayoutAboveIndex(
-              smallerCircuit.outputPermutation, logicalQubitIndex);
-        }
+      largerCircuit.removeQubit(logicalQubitIndex);
+      --qubitDifference;
+
+    } else {
+      // Remove logical qubit that is idle in both circuits
+
+      // find the corresponding logical qubit in the smaller circuit
+      const auto it = std::find_if(smallerCircuit.initialLayout.begin(),
+                                   smallerCircuit.initialLayout.end(),
+                                   [logicalQubitIndex](const auto& pair) {
+                                     return pair.second == logicalQubitIndex;
+                                   });
+      // the logical qubit has to be present in the smaller circuit, otherwise
+      // this would indicate a bug in the circuit IO initialization.
+      assert(it != smallerCircuit.initialLayout.end());
+      const auto& [physicalSmaller, logicalSmaller] = *it;
+
+      // if the qubit is not idle in the second circuit, it cannot be removed
+      // from either circuit.
+      if (!smallerCircuit.isIdleQubit(physicalSmaller)) {
+        continue;
+      }
+
+      const bool physicalLargerUsedInOutputPermutation =
+          (largerCircuit.outputPermutation.find(physicalQubitIndex) !=
+           largerCircuit.outputPermutation.end());
+
+      const bool logicalLargerUsedInOutputPermutation =
+          std::any_of(largerCircuit.outputPermutation.begin(),
+                      largerCircuit.outputPermutation.end(),
+                      [logicalQubitIndex](const auto& pair) {
+                        return pair.second == logicalQubitIndex;
+                      });
+
+      const bool safeToRemoveInLargerCircuit =
+          force ||
+          (!physicalLargerUsedInOutputPermutation &&
+           !logicalLargerUsedInOutputPermutation) ||
+          (physicalLargerUsedInOutputPermutation &&
+           largerCircuit.outputPermutation.at(physicalQubitIndex) ==
+               logicalQubitIndex);
+      if (!safeToRemoveInLargerCircuit) {
+        continue;
+      }
+
+      const bool physicalSmallerUsedInOutputPermutation =
+          (smallerCircuit.outputPermutation.find(physicalSmaller) !=
+           smallerCircuit.outputPermutation.end());
+
+      const bool logicalSmallerUsedInOutputPermutation =
+          std::any_of(smallerCircuit.outputPermutation.begin(),
+                      smallerCircuit.outputPermutation.end(),
+                      [logicalQubitIndex](const auto& pair) {
+                        return pair.second == logicalQubitIndex;
+                      });
+
+      const bool safeToRemoveInSmallerCircuit =
+          force ||
+          (!physicalSmallerUsedInOutputPermutation &&
+           !logicalSmallerUsedInOutputPermutation) ||
+          (physicalSmallerUsedInOutputPermutation &&
+           smallerCircuit.outputPermutation.at(physicalSmaller) ==
+               logicalQubitIndex);
+      if (!safeToRemoveInSmallerCircuit) {
+        continue;
+      }
+
+      // only remove the qubit from both circuits if it is safe to do so in both
+      // circuits (i.e., the qubit is not used in the output permutation or if
+      // it is used, the logical qubit index matches the logical qubit index in
+      // the output permutation for the physical qubit index in question).
+      largerCircuit.removeQubit(logicalQubitIndex);
+      smallerCircuit.removeQubit(logicalQubitIndex);
+      removedFromSmallerCircuit = true;
+    }
+    if (reduceIOpermutations) {
+      decrementLogicalQubitsInLayoutAboveIndex(largerCircuit.initialLayout,
+                                               logicalQubitIndex);
+      decrementLogicalQubitsInLayoutAboveIndex(largerCircuit.outputPermutation,
+                                               logicalQubitIndex);
+      if (removedFromSmallerCircuit) {
+        decrementLogicalQubitsInLayoutAboveIndex(smallerCircuit.initialLayout,
+                                                 logicalQubitIndex);
+        decrementLogicalQubitsInLayoutAboveIndex(
+            smallerCircuit.outputPermutation, logicalQubitIndex);
       }
     }
   }
