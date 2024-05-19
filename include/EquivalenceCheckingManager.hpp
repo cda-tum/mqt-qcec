@@ -259,11 +259,6 @@ protected:
 
   Results results{};
 
-  // Decrement logical qubit indices in the layout that exceed logicalQubitIndex
-  static void
-  decrementLogicalQubitsInLayoutAboveIndex(qc::Permutation& layout,
-                                           qc::Qubit&       logicalQubitIndex);
-
   /// Strip away qubits with no operations applied to them and which do not
   /// occur in the output permutation if they are either idle in both circuits
   /// or idle in one and do not exist (logically) in the other circuit.
