@@ -228,45 +228,6 @@ void EquivalenceCheckingManager::setupAncillariesAndGarbage() {
   }
 }
 
-void EquivalenceCheckingManager::fixOutputPermutationMismatch() {
-  // Try to fix potential mismatches in output permutations
-  auto& smallerCircuit = qc1.getNqubits() > qc2.getNqubits() ? qc2 : qc1;
-  auto& largerCircuit  = qc1.getNqubits() > qc2.getNqubits() ? qc1 : qc2;
-
-  auto& smallerGarbage = smallerCircuit.garbage;
-
-  const auto& largerOutput  = largerCircuit.outputPermutation;
-  auto&       largerGarbage = largerCircuit.garbage;
-
-  for (const auto& [lPhysical, lLogical] : largerOutput) {
-    const qc::Qubit outputQubitInLargerCircuit = lLogical;
-    qc::Qubit       nout                       = 1;
-    for (qc::Qubit i = 0; i < outputQubitInLargerCircuit; ++i) {
-      if (!largerGarbage[i]) {
-        ++nout;
-      }
-    }
-
-    bool       existsInSmaller = false;
-    const auto nqubits         = smallerCircuit.getNqubits();
-    for (std::size_t i = 0U; i < nqubits; ++i) {
-      if (!smallerGarbage[i]) {
-        --nout;
-      }
-      if (nout == 0) {
-        existsInSmaller = true;
-        break;
-      }
-    }
-    // algorithm has logical qubit that does not exist in the smaller circuit
-    if (!existsInSmaller) {
-      continue;
-    }
-
-    std::cerr << "Uncorrected mismatch in output qubits!\n";
-  }
-}
-
 void EquivalenceCheckingManager::runOptimizationPasses() {
   if (qc1.empty() && qc2.empty()) {
     return;
@@ -420,11 +381,6 @@ EquivalenceCheckingManager::EquivalenceCheckingManager(
       this->qc2.getNqubitsWithoutAncillae()) {
     std::clog << "[QCEC] Warning: circuits have different number of primary "
                  "inputs! Proceed with caution!\n";
-  }
-
-  // try to fix a potential mismatch in the output permutations of both circuits
-  if (configuration.optimizations.fixOutputPermutationMismatch) {
-    fixOutputPermutationMismatch();
   }
 
   // check whether the alternating checker is configured and can handle the
@@ -938,13 +894,6 @@ void EquivalenceCheckingManager::checkSymbolic() {
   // appropriately join the timeout thread, if it was launched
   if (timeoutThread.joinable()) {
     timeoutThread.join();
-  }
-}
-
-void EquivalenceCheckingManager::runFixOutputPermutationMismatch() {
-  if (!configuration.optimizations.fixOutputPermutationMismatch) {
-    fixOutputPermutationMismatch();
-    configuration.optimizations.fixOutputPermutationMismatch = true;
   }
 }
 

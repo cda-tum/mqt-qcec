@@ -229,11 +229,6 @@ PYBIND11_MODULE(pyqcec, m) {
            &EquivalenceCheckingManager::disableAllCheckers,
            "Disable all equivalence checkers.")
       // Optimization
-      .def("fix_output_permutation_mismatch",
-           &EquivalenceCheckingManager::runFixOutputPermutationMismatch,
-           "Try to :attr:`fix potential mismatches in output permutations "
-           "<.Configuration.Optimizations.fix_output_permutation_mismatch>`. "
-           "This is experimental.")
       .def("fuse_single_qubit_gates",
            &EquivalenceCheckingManager::fuseSingleQubitGates,
            ":attr:`Fuse consecutive single qubit gates "
@@ -537,11 +532,6 @@ PYBIND11_MODULE(pyqcec, m) {
 
   // optimization options
   optimizations.def(py::init<>())
-      .def_readwrite(
-          "fix_output_permutation_mismatch",
-          &Configuration::Optimizations::fixOutputPermutationMismatch,
-          "Try to fix potential mismatches in output permutations. This is "
-          "experimental and, hence, defaults to :code:`False`.")
       .def_readwrite(
           "fuse_single_qubit_gates",
           &Configuration::Optimizations::fuseSingleQubitGates,

@@ -65,8 +65,6 @@ nlohmann::json Configuration::json() const {
     exe["timeout"] = execution.timeout;
   }
   auto& opt = config["optimizations"];
-  opt["fix_output_permutation_mismatch"] =
-      optimizations.fixOutputPermutationMismatch;
   opt["fuse_consecutive_single_qubit_gates"] =
       optimizations.fuseSingleQubitGates;
   opt["reconstruct_swaps"] = optimizations.reconstructSWAPs;

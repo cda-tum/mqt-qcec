@@ -45,37 +45,6 @@ TEST_F(GeneralTest, DynamicCircuit) {
   std::cout << ecm2.getResults() << "\n";
 }
 
-TEST_F(GeneralTest, FixOutputPermutationMismatch) {
-  qc1.addQubitRegister(2U);
-  qc1.x(0);
-  qc1.x(1);
-  qc1.setLogicalQubitAncillary(1);
-  std::cout << qc1 << "\n";
-
-  qc2.addQubitRegister(3U);
-  qc2.x(0);
-  qc2.i(1);
-  qc2.x(2);
-
-  qc2.outputPermutation.erase(1);
-  qc2.setLogicalQubitAncillary(1);
-  qc2.setLogicalQubitGarbage(1);
-  std::cout << static_cast<int>(qc2.getNqubits()) << "\n";
-  std::cout << qc2 << "\n";
-
-  auto config                                       = ec::Configuration{};
-  config.optimizations.fixOutputPermutationMismatch = true;
-  ec::EquivalenceCheckingManager ecm(qc1, qc2, config);
-  ecm.run();
-  EXPECT_TRUE(ecm.getResults().consideredEquivalent());
-
-  // also try post initialization routine
-  ec::EquivalenceCheckingManager ecm2(qc1, qc2);
-  ecm2.runFixOutputPermutationMismatch();
-  ecm2.run();
-  EXPECT_TRUE(ecm2.getResults().consideredEquivalent());
-}
-
 TEST_F(GeneralTest, RemoveDiagonalGatesBeforeMeasure) {
   qc1.addQubitRegister(1U);
   qc1.addClassicalRegister(1U);
