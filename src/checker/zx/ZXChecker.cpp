@@ -11,8 +11,12 @@
 #include "zx/Simplify.hpp"
 #include "zx/ZXDiagram.hpp"
 
+#include <cassert>
 #include <chrono>
+#include <cstddef>
 #include <optional>
+#include <unordered_map>
+#include <vector>
 
 namespace ec {
 ZXEquivalenceChecker::ZXEquivalenceChecker(const qc::QuantumComputation& circ1,
@@ -57,6 +61,11 @@ EquivalenceCriterion ZXEquivalenceChecker::run() {
 
     const auto nQubits = miter.getNQubits();
     for (std::size_t i = 0U; i < nQubits; ++i) {
+      if (qc1->logicalQubitIsGarbage(static_cast<qc::Qubit>(i)) &&
+          qc2->logicalQubitIsGarbage(static_cast<qc::Qubit>(i))) {
+        continue;
+      }
+
       const auto& in   = miter.getInput(i);
       const auto& edge = miter.incidentEdge(in, 0U);
 
