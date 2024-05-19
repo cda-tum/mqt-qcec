@@ -93,7 +93,7 @@ public:
 
   void reset() {
     stateGenerator.clear();
-    results = Results{};
+    results = {};
     checkers.clear();
   }
 
