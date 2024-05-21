@@ -42,8 +42,7 @@ void decrementLogicalQubitsInLayoutAboveIndex(
   }
 }
 
-void EquivalenceCheckingManager::stripIdleQubits(bool force,
-                                                 bool reduceIOpermutations) {
+void EquivalenceCheckingManager::stripIdleQubits() {
   auto& largerCircuit  = qc1.getNqubits() > qc2.getNqubits() ? qc1 : qc2;
   auto& smallerCircuit = qc1.getNqubits() > qc2.getNqubits() ? qc2 : qc1;
   auto  qubitDifference =
@@ -87,7 +86,6 @@ void EquivalenceCheckingManager::stripIdleQubits(bool force,
       // physical qubit index in question, which indicates that nothing has
       // happened to the qubit in the larger circuit.
       const bool safeToRemoveInLargerCircuit =
-          force ||
           (!physicalUsedInOutputPermutation &&
            !logicalUsedInOutputPermutation) ||
           (physicalUsedInOutputPermutation &&
@@ -131,7 +129,6 @@ void EquivalenceCheckingManager::stripIdleQubits(bool force,
                       });
 
       const bool safeToRemoveInLargerCircuit =
-          force ||
           (!physicalLargerUsedInOutputPermutation &&
            !logicalLargerUsedInOutputPermutation) ||
           (physicalLargerUsedInOutputPermutation &&
@@ -153,7 +150,6 @@ void EquivalenceCheckingManager::stripIdleQubits(bool force,
                       });
 
       const bool safeToRemoveInSmallerCircuit =
-          force ||
           (!physicalSmallerUsedInOutputPermutation &&
            !logicalSmallerUsedInOutputPermutation) ||
           (physicalSmallerUsedInOutputPermutation &&
@@ -171,17 +167,15 @@ void EquivalenceCheckingManager::stripIdleQubits(bool force,
       smallerCircuit.removeQubit(logicalQubitIndex);
       removedFromSmallerCircuit = true;
     }
-    if (reduceIOpermutations) {
-      decrementLogicalQubitsInLayoutAboveIndex(largerCircuit.initialLayout,
+    decrementLogicalQubitsInLayoutAboveIndex(largerCircuit.initialLayout,
+                                             logicalQubitIndex);
+    decrementLogicalQubitsInLayoutAboveIndex(largerCircuit.outputPermutation,
+                                             logicalQubitIndex);
+    if (removedFromSmallerCircuit) {
+      decrementLogicalQubitsInLayoutAboveIndex(smallerCircuit.initialLayout,
                                                logicalQubitIndex);
-      decrementLogicalQubitsInLayoutAboveIndex(largerCircuit.outputPermutation,
+      decrementLogicalQubitsInLayoutAboveIndex(smallerCircuit.outputPermutation,
                                                logicalQubitIndex);
-      if (removedFromSmallerCircuit) {
-        decrementLogicalQubitsInLayoutAboveIndex(smallerCircuit.initialLayout,
-                                                 logicalQubitIndex);
-        decrementLogicalQubitsInLayoutAboveIndex(
-            smallerCircuit.outputPermutation, logicalQubitIndex);
-      }
     }
   }
 }

@@ -261,9 +261,7 @@ protected:
   /// Strip away qubits with no operations applied to them and which do not
   /// occur in the output permutation if they are either idle in both circuits
   /// or idle in one and do not exist (logically) in the other circuit.
-  /// \param force if true, also strip away idle
-  /// qubits occurring in the output permutation
-  void stripIdleQubits(bool force = false, bool reduceIOpermutations = true);
+  void stripIdleQubits();
 
   /// Given that one circuit has more qubits than the other, the difference is
   /// assumed to arise from ancillary qubits. This function changes the
