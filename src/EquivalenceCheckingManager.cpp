@@ -294,12 +294,16 @@ void EquivalenceCheckingManager::runOptimizationPasses() {
 void EquivalenceCheckingManager::run() {
   done = false;
 
-  results.name1      = qc1.getName();
-  results.name2      = qc2.getName();
-  results.numQubits1 = qc1.getNqubits();
-  results.numQubits2 = qc2.getNqubits();
-  results.numGates1  = qc1.getNops();
-  results.numGates2  = qc2.getNops();
+  results.name1              = qc1.getName();
+  results.name2              = qc2.getName();
+  results.numQubits1         = qc1.getNqubits();
+  results.numQubits2         = qc2.getNqubits();
+  results.numMeasuredQubits1 = qc1.getNmeasuredQubits();
+  results.numMeasuredQubits2 = qc2.getNmeasuredQubits();
+  results.numAncillae1       = qc1.getNancillae();
+  results.numAncillae2       = qc2.getNancillae();
+  results.numGates1          = qc1.getNops();
+  results.numGates2          = qc2.getNops();
 
   results.configuration = configuration;
 

@@ -38,6 +38,12 @@ public:
     std::size_t numQubits1{};
     std::size_t numQubits2{};
 
+    std::size_t numMeasuredQubits1{};
+    std::size_t numMeasuredQubits2{};
+
+    std::size_t numAncillae1{};
+    std::size_t numAncillae2{};
+
     std::size_t numGates1{};
     std::size_t numGates2{};
 
@@ -102,10 +108,6 @@ public:
   }
   [[nodiscard]] Configuration getConfiguration() const { return configuration; }
   [[nodiscard]] Results       getResults() const { return results; }
-
-  // Getter functions provided for testing purposes
-  std::size_t getNumAncillae1() { return qc1.getNancillae(); }
-  std::size_t getNumAncillae2() { return qc2.getNancillae(); }
 
   // convenience functions for changing the configuration after the manager has
   // been constructed: Execution: These settings may be changed to influence

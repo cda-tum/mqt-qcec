@@ -384,6 +384,18 @@ PYBIND11_MODULE(pyqcec, m) {
       .def_readwrite("num_qubits2",
                      &EquivalenceCheckingManager::Results::numQubits2,
                      "Number of qubits of the second circuit.")
+      .def_readwrite("num_measured_qubits1",
+                     &EquivalenceCheckingManager::Results::numMeasuredQubits1,
+                     "Number of measured qubits of the first circuit.")
+      .def_readwrite("num_measured_qubits2",
+                     &EquivalenceCheckingManager::Results::numMeasuredQubits2,
+                     "Number of measured qubits of the second circuit.")
+      .def_readwrite("num_ancillae1",
+                     &EquivalenceCheckingManager::Results::numAncillae1,
+                     "Number of ancillary qubits in the first circuit.")
+      .def_readwrite("num_ancillae2",
+                     &EquivalenceCheckingManager::Results::numAncillae2,
+                     "Number of ancillary qubits in the second circuit.")
       .def_readwrite("num_gates1",
                      &EquivalenceCheckingManager::Results::numGates1,
                      "Number of gates of the first circuit.")

@@ -332,6 +332,8 @@ TEST_F(EqualityTest, StripIdleQubitPresentInBothCircuits) {
   EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::NotEquivalent);
   EXPECT_EQ(ecm.getResults().numQubits1, ecm.getResults().numQubits2);
   EXPECT_EQ(ecm.getResults().numQubits2, qc2.getNqubits() - 1);
+  EXPECT_EQ(ecm.getResults().numMeasuredQubits1, 1);
+  EXPECT_EQ(ecm.getResults().numMeasuredQubits2, 1);
 }
 
 TEST_F(EqualityTest, NotEqualDueToNoSeparateIdleQubitStripping) {
@@ -360,9 +362,11 @@ TEST_F(EqualityTest, NotEqualDueToNoSeparateIdleQubitStripping) {
   // Check that idle qubits have not been removed and re-added as ancillary
   // qubits
   EXPECT_EQ(ecm.getResults().numQubits1, qc1.getNqubits());
-  EXPECT_EQ(ecm.getNumAncillae1(), 0);
+  EXPECT_EQ(ecm.getResults().numAncillae1, 0);
   EXPECT_EQ(ecm.getResults().numQubits2, qc2.getNqubits());
-  EXPECT_EQ(ecm.getNumAncillae2(), 0);
+  EXPECT_EQ(ecm.getResults().numAncillae2, 0);
+  EXPECT_EQ(ecm.getResults().numMeasuredQubits1, 2);
+  EXPECT_EQ(ecm.getResults().numMeasuredQubits2, 2);
 }
 
 TEST_F(EqualityTest, EqualDueToNoSeparateIdleQubitStripping) {
@@ -391,8 +395,8 @@ TEST_F(EqualityTest, EqualDueToNoSeparateIdleQubitStripping) {
   EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::Equivalent);
   EXPECT_EQ(ecm.getResults().numQubits1, ecm.getResults().numQubits2);
   EXPECT_EQ(ecm.getResults().numQubits2, qc2.getNqubits());
-  EXPECT_EQ(ecm.getNumAncillae1(), 0);
-  EXPECT_EQ(ecm.getNumAncillae2(), 0);
+  EXPECT_EQ(ecm.getResults().numAncillae1, 0);
+  EXPECT_EQ(ecm.getResults().numAncillae2, 0);
 }
 
 TEST_F(EqualityTest,
@@ -504,8 +508,8 @@ TEST_F(EqualityTest, StripIdleQubitOutputPermutationDifferent) {
   // not equivalent for the idle qubits
   EXPECT_EQ(ecm.getResults().numQubits1, ecm.getResults().numQubits2);
   EXPECT_EQ(ecm.getResults().numQubits2, qc2.getNqubits());
-  EXPECT_EQ(ecm.getNumAncillae1(), 0);
-  EXPECT_EQ(ecm.getNumAncillae2(), 0);
+  EXPECT_EQ(ecm.getResults().numAncillae1, 0);
+  EXPECT_EQ(ecm.getResults().numAncillae2, 0);
 }
 
 TEST_F(EqualityTest, StripIdleQubitOutputPermutationEquivalent) {
@@ -551,8 +555,8 @@ TEST_F(EqualityTest, StripQubitIdleInOneCircuitOnlyOutputPermutationDifferent) {
   // not equivalent for the idle qubits
   EXPECT_EQ(ecm.getResults().numQubits1, 2);
   EXPECT_EQ(ecm.getResults().numQubits2, 2);
-  EXPECT_EQ(ecm.getNumAncillae1(), 1);
-  EXPECT_EQ(ecm.getNumAncillae2(), 1);
+  EXPECT_EQ(ecm.getResults().numAncillae1, 1);
+  EXPECT_EQ(ecm.getResults().numAncillae2, 1);
 }
 
 TEST_F(EqualityTest,
@@ -592,6 +596,6 @@ TEST_F(EqualityTest, StripIdleQubitInOutputPermutationWithAncilla) {
   ecm.run();
   EXPECT_EQ(ecm.getResults().numQubits1, ecm.getResults().numQubits2);
   EXPECT_EQ(ecm.getResults().numQubits2, 0);
-  EXPECT_EQ(ecm.getNumAncillae1(), 0);
-  EXPECT_EQ(ecm.getNumAncillae2(), 0);
+  EXPECT_EQ(ecm.getResults().numAncillae1, 0);
+  EXPECT_EQ(ecm.getResults().numAncillae2, 0);
 }

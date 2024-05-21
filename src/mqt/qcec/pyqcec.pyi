@@ -91,6 +91,10 @@ class EquivalenceCheckingManager:
         name2: str
         num_qubits1: int
         num_qubits2: int
+        num_measured_qubits1: int
+        num_measured_qubits2: int
+        num_ancillae1: int
+        num_ancillae2: int
         num_gates1: int
         num_gates2: int
         checker_results: dict[str, Any]
