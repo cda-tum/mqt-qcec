@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import filecmp
+import os
 import sys
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, cast
@@ -41,8 +42,8 @@ def test_ancilla_mode_conversion(ancilla_mode: qcec.AncillaMode) -> None:
 
 
 @pytest.mark.skipif(
-    sys.version_info < (3, 11, 0) or sys.platform != "linux",
-    reason="Since this check takes quite some time, it is only executed if the current platform is Linux and the Python version is 3.11 or higher.",
+    os.environ.get("CHECK_PROFILES") is None,
+    reason="This test is only executed if the CHECK_PROFILES environment variable is set.",
 )
 def test_generated_profiles_are_still_valid(optimization_level: int, ancilla_mode: qcec.AncillaMode) -> None:
     """Test validity of generated profiles.

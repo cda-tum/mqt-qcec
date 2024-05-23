@@ -78,6 +78,10 @@ def _run_tests(
 @nox.session(reuse_venv=True, python=PYTHON_ALL_VERSIONS)
 def tests(session: nox.Session) -> None:
     """Run the test suite."""
+    # enable profile check when running locally or when running on Linux with Python 3.12 in CI
+    if os.environ.get("CI", None) is None or (sys.platform == "linux" and session.python == "3.12"):
+        session.env["CHECK_PROFILES"] = "1"
+
     _run_tests(session)
 
 
