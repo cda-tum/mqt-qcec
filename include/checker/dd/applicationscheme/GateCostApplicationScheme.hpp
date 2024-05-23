@@ -6,11 +6,17 @@
 #pragma once
 
 #include "ApplicationScheme.hpp"
+#include "QuantumComputation.hpp"
+#include "checker/dd/TaskManager.hpp"
 #include "operations/OpType.hpp"
 
 #include <cstddef>
+#include <fstream>
 #include <functional>
+#include <istream>
+#include <sstream>
 #include <stdexcept>
+#include <string>
 #include <unordered_map>
 #include <utility>
 
@@ -111,8 +117,16 @@ private:
     qc::OpType  opType    = qc::OpType::None;
     std::size_t nControls = 0U;
     std::size_t cost      = 1U;
-    while (is.good() && (is >> opType >> nControls >> cost)) {
-      gateCostLookupTable.emplace(std::pair{opType, nControls}, cost);
+
+    std::string line;
+    while (std::getline(is, line)) {
+      if (line.empty() || line[0] == '#') {
+        continue;
+      }
+      std::istringstream iss(line);
+      if (iss >> opType >> nControls >> cost) {
+        gateCostLookupTable.emplace(std::pair{opType, nControls}, cost);
+      }
     }
   }
 };
