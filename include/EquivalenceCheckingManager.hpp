@@ -38,6 +38,12 @@ public:
     std::size_t numQubits1{};
     std::size_t numQubits2{};
 
+    std::size_t numMeasuredQubits1{};
+    std::size_t numMeasuredQubits2{};
+
+    std::size_t numAncillae1{};
+    std::size_t numAncillae2{};
+
     std::size_t numGates1{};
     std::size_t numGates2{};
 
@@ -93,7 +99,7 @@ public:
 
   void reset() {
     stateGenerator.clear();
-    results = Results{};
+    results = {};
     checkers.clear();
   }
 
@@ -139,7 +145,6 @@ public:
 
   // Optimization: Optimizations are applied during initialization. Already
   // configured and applied optimizations cannot be reverted.
-  void runFixOutputPermutationMismatch();
   void fuseSingleQubitGates();
   void reconstructSWAPs();
   void reorderOperations();
@@ -255,16 +260,16 @@ protected:
 
   Results results{};
 
+  /// Strip away qubits with no operations applied to them and which do not
+  /// occur in the output permutation if they are either idle in both circuits
+  /// or idle in one and do not exist (logically) in the other circuit.
+  void stripIdleQubits();
+
   /// Given that one circuit has more qubits than the other, the difference is
   /// assumed to arise from ancillary qubits. This function changes the
   /// additional qubits in the larger circuit to ancillary qubits. Furthermore
   /// it adds corresponding ancillaries in the smaller circuit
   void setupAncillariesAndGarbage();
-
-  /// In some cases both circuits calculate the same function, but on different
-  /// qubits. This function tries to correct such mismatches. Note that this is
-  /// still highly experimental!
-  void fixOutputPermutationMismatch();
 
   /// Run all configured optimization passes
   void runOptimizationPasses();

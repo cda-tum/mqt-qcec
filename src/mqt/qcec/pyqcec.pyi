@@ -54,7 +54,6 @@ class Configuration:
     class Optimizations:
         backpropagate_output_permutation: bool
         elide_permutations: bool
-        fix_output_permutation_mismatch: bool
         fuse_single_qubit_gates: bool
         reconstruct_swaps: bool
         remove_diagonal_gates_before_measure: bool
@@ -92,6 +91,10 @@ class EquivalenceCheckingManager:
         name2: str
         num_qubits1: int
         num_qubits2: int
+        num_measured_qubits1: int
+        num_measured_qubits2: int
+        num_ancillae1: int
+        num_ancillae2: int
         num_gates1: int
         num_gates2: int
         checker_results: dict[str, Any]
@@ -115,7 +118,6 @@ class EquivalenceCheckingManager:
     def disable_all_checkers(self) -> None: ...
     def elide_permutations(self) -> None: ...
     def equivalence(self) -> EquivalenceCriterion: ...
-    def fix_output_permutation_mismatch(self) -> None: ...
     def fuse_single_qubit_gates(self) -> None: ...
     def get_configuration(self) -> Configuration: ...
     def get_results(self) -> EquivalenceCheckingManager.Results: ...

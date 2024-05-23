@@ -36,7 +36,6 @@ class ConfigurationOptions(TypedDict, total=False):
     # Optimizations
     backpropagate_output_permutation: bool
     elide_permutations: bool
-    fix_output_permutation_mismatch: bool
     fuse_single_qubit_gates: bool
     reconstruct_swaps: bool
     remove_diagonal_gates_before_measure: bool

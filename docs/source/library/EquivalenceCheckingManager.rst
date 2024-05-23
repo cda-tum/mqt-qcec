@@ -53,7 +53,6 @@ In addition, the :class:`~.Configuration` of the manager can be altered after it
         .. automethod:: EquivalenceCheckingManager.fuse_single_qubit_gates
         .. automethod:: EquivalenceCheckingManager.reconstruct_swaps
         .. automethod:: EquivalenceCheckingManager.reorder_operations
-        .. automethod:: EquivalenceCheckingManager.fix_output_permutation_mismatch
 
 * :class:`Application Options <Configuration.Application>`
     These options describe the :class:`Application Scheme <ApplicationScheme>` that is used for the individual equivalence checkers (based on decision diagrams). The scheme can either be set collectively for all checkers at once or individually.

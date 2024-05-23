@@ -8,6 +8,7 @@ from typing import Any
 
 import numpy as np
 from qiskit import QuantumCircuit, transpile
+from qiskit import __version__ as qiskit_version
 
 
 @unique
@@ -188,7 +189,7 @@ def create_multi_controlled_gate(
     qc = QuantumCircuit(required_qubits)
     gate_identifier = "mc" + identifier
 
-    rng = np.random.default_rng()
+    rng = np.random.default_rng(seed=12345)
     parameter_list = [rng.uniform(-np.pi, np.pi) for _ in range(params)]
 
     if mode is not None:
@@ -296,6 +297,7 @@ def generate_profile_name(optimization_level: int = 1, mode: AncillaMode = Ancil
 def write_profile_data_to_file(profile_data: dict[tuple[str, int], int], filename: Path) -> None:
     """Write the profile data to a file."""
     with Path(filename).open("w+", encoding="utf-8") as f:
+        f.write(f"# {filename}, Qiskit version: {qiskit_version}\n")
         for (gate, controls), cost in profile_data.items():
             f.write(f"{gate} {controls} {cost}\n")
 

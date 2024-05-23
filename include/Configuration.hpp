@@ -37,7 +37,6 @@ public:
 
   // configuration options for pre-check optimizations
   struct Optimizations {
-    bool fixOutputPermutationMismatch     = false;
     bool fuseSingleQubitGates             = true;
     bool reconstructSWAPs                 = true;
     bool removeDiagonalGatesBeforeMeasure = false;

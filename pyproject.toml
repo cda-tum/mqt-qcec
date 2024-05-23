@@ -127,6 +127,7 @@ filterwarnings = [
     "error",
     'ignore:.*encountered in det.*:RuntimeWarning:numpy.linalg:',
     'ignore:.*datetime\.datetime\.utcfromtimestamp.*:DeprecationWarning:',
+    'ignore:.*Qiskit with Python 3.8.*:DeprecationWarning:',
 ]
 
 [tool.coverage]
