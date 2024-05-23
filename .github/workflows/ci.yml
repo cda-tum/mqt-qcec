@@ -26,7 +26,7 @@ jobs:
     with:
       cmake-args: ""
       cmake-args-ubuntu: -G Ninja
-      cmake-args-macos: -G Ninja
+      cmake-args-macos: -G Ninja -DMQT_CORE_WITH_GMP=ON
       cmake-args-windows: -T ClangCL
 
   cpp-linter:
