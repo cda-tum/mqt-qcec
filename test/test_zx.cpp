@@ -6,10 +6,14 @@
 #include "Configuration.hpp"
 #include "Definitions.hpp"
 #include "EquivalenceCheckingManager.hpp"
+#include "EquivalenceCriterion.hpp"
+#include "Permutation.hpp"
 #include "QuantumComputation.hpp"
+#include "operations/Control.hpp"
 #include "zx/ZXDefinitions.hpp"
 
-#include "gtest/gtest.h"
+#include <algorithm>
+#include <gtest/gtest.h>
 #include <iostream>
 #include <memory>
 #include <sstream>
@@ -21,7 +25,7 @@ protected:
   qc::QuantumComputation qcAlternative;
   ec::Configuration      config{};
 
-  std::unique_ptr<ec::EquivalenceCheckingManager> ecm{};
+  std::unique_ptr<ec::EquivalenceCheckingManager> ecm;
 
   std::string testOriginal       = "./circuits/test/test.real";
   std::string testAlternativeDir = "./circuits/test/";
@@ -63,14 +67,13 @@ TEST_P(ZXTest, TestCircuits) {
 }
 
 TEST_F(ZXTest, NonEquivalent) {
-  qcOriginal.import(
-      std::stringstream("OPENQASM 2.0;\ninclude \"qelib1.inc\";\nqreg "
-                        "q[2];\ncx q[0], q[1];\n"),
-      qc::Format::OpenQASM2);
-  qcAlternative.import(
+  auto ss = std::stringstream("OPENQASM 2.0;\ninclude \"qelib1.inc\";\nqreg "
+                              "q[2];\ncx q[0], q[1];\n");
+  qcOriginal.import(ss, qc::Format::OpenQASM2);
+  auto ss2 =
       std::stringstream("OPENQASM 2.0;\ninclude \"qelib1.inc\";\nqreg q[2];\nh "
-                        "q[0]; cx q[1], q[0]; h q[0]; h q[1];\n"),
-      qc::Format::OpenQASM2);
+                        "q[0]; cx q[1], q[0]; h q[0]; h q[1];\n");
+  qcAlternative.import(ss2, qc::Format::OpenQASM2);
   ecm = std::make_unique<ec::EquivalenceCheckingManager>(qcOriginal,
                                                          qcAlternative, config);
 
@@ -86,10 +89,10 @@ TEST_F(ZXTest, Timeout) {
   qcOriginal               = qc::QuantumComputation(2);
   qcAlternative            = qc::QuantumComputation(2);
   for (auto i = 0; i < numLayers; ++i) {
-    qcOriginal.cx(1_pc, 0);
+    qcOriginal.cx(1, 0);
     qcOriginal.h(0);
 
-    qcAlternative.cx(1_pc, 0);
+    qcAlternative.cx(1, 0);
     qcAlternative.h(0);
   }
 
@@ -140,10 +143,10 @@ TEST_F(ZXTest, PermutationMismatch) {
   using namespace qc::literals;
 
   qcOriginal = qc::QuantumComputation(2);
-  qcOriginal.cx(1_pc, 0);
+  qcOriginal.cx(1, 0);
 
   qcAlternative = qc::QuantumComputation(2);
-  qcAlternative.cx(1_pc, 0);
+  qcAlternative.cx(1, 0);
 
   qcAlternative.outputPermutation[0] = 1;
   qcAlternative.outputPermutation[1] = 0;
@@ -181,7 +184,7 @@ TEST_F(ZXTest, Ancilla) {
   auto qc2 = qc::QuantumComputation(2);
 
   qc1.i(0);
-  qc2.cx(1_pc, 0);
+  qc2.cx(1, 0);
   qc2.setLogicalQubitAncillary(1);
 
   ecm = std::make_unique<ec::EquivalenceCheckingManager>(qc1, qc2, config);
@@ -212,7 +215,7 @@ TEST_F(ZXTest, ZXConfiguredForInvalidCircuitParallel) {
   using namespace qc::literals;
 
   auto qc = qc::QuantumComputation(4);
-  qc.mcx({1_pc, 2_pc, 3_pc}, 0);
+  qc.mcx({1, 2, 3}, 0);
 
   ecm = std::make_unique<ec::EquivalenceCheckingManager>(qc, qc, config);
   ecm->run();
@@ -225,7 +228,7 @@ TEST_F(ZXTest, ZXConfiguredForInvalidCircuitSequential) {
   using namespace qc::literals;
 
   auto qc = qc::QuantumComputation(4);
-  qc.mcx({1_pc, 2_pc, 3_pc}, 0);
+  qc.mcx({1, 2, 3}, 0);
 
   config.execution.parallel = false;
   ecm = std::make_unique<ec::EquivalenceCheckingManager>(qc, qc, config);
@@ -255,7 +258,7 @@ protected:
   qc::QuantumComputation qcTranspiled;
   ec::Configuration      config{};
 
-  std::unique_ptr<ec::EquivalenceCheckingManager> ecm{};
+  std::unique_ptr<ec::EquivalenceCheckingManager> ecm;
 
   std::string testOriginalDir   = "./circuits/original/";
   std::string testTranspiledDir = "./circuits/transpiled/";
@@ -382,8 +385,8 @@ TEST_F(ZXTest, IdleQubit) {
   using namespace qc::literals;
   auto qc1 = qc::QuantumComputation(3U, 3U);
   qc1.h(0);
-  qc1.cx(0_pc, 1);
-  qc1.cx(1_pc, 2);
+  qc1.cx(0, 1);
+  qc1.cx(1, 2);
   qc1.measure(0, 0);
   qc1.measure(1, 1);
   qc1.measure(2, 2);
@@ -391,9 +394,9 @@ TEST_F(ZXTest, IdleQubit) {
 
   auto qc2 = qc::QuantumComputation(5U, 5U);
   qc2.h(1);
-  qc2.cx(1_pc, 0);
+  qc2.cx(1, 0);
   qc2.swap(0, 2);
-  qc2.cx(2_pc, 4);
+  qc2.cx(2, 4);
   qc2.measure(1, 0);
   qc2.measure(2, 1);
   qc2.measure(4, 2);
@@ -418,21 +421,21 @@ TEST_F(ZXTest, TwoQubitRotations) {
   qc1.rxx(0.3, 0, 1);
   qc1.ryy(0.2, 0, 1);
   auto qc2 = qc::QuantumComputation(2U);
-  qc2.cx(0_pc, 1);
+  qc2.cx(0, 1);
   qc2.rz(0.1, 1);
-  qc2.cx(0_pc, 1);
+  qc2.cx(0, 1);
   qc2.h(0);
   qc2.h(1);
-  qc2.cx(0_pc, 1);
+  qc2.cx(0, 1);
   qc2.rz(0.3, 1);
-  qc2.cx(0_pc, 1);
+  qc2.cx(0, 1);
   qc2.h(0);
   qc2.h(1);
   qc2.rx(qc::PI_2, 0);
   qc2.rx(qc::PI_2, 1);
-  qc2.cx(0_pc, 1);
+  qc2.cx(0, 1);
   qc2.rz(0.2, 1);
-  qc2.cx(0_pc, 1);
+  qc2.cx(0, 1);
   qc2.rx(-qc::PI_2, 0);
   qc2.rx(-qc::PI_2, 1);
   config.execution.runZXChecker           = true;
