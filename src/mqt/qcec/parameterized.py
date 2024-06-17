@@ -116,20 +116,14 @@ def check_parameterized(
     total_simulations_finished = 0
 
     def update_stats(res: EquivalenceCheckingManager.Results) -> None:
-        nonlocal total_preprocessing_time
-        nonlocal total_runtime
-        nonlocal total_simulations_started
-        nonlocal total_simulations_finished
+        nonlocal total_preprocessing_time, total_runtime, total_simulations_started, total_simulations_finished
         total_preprocessing_time += res.preprocessing_time
         total_runtime += res.check_time
         total_simulations_started += res.started_simulations
         total_simulations_finished += res.performed_simulations
 
     def write_stats(i: int, res: EquivalenceCheckingManager.Results) -> None:
-        nonlocal total_preprocessing_time
-        nonlocal total_runtime
-        nonlocal total_simulations_started
-        nonlocal total_simulations_finished
+        nonlocal total_preprocessing_time, total_runtime, total_simulations_started, total_simulations_finished
         res.check_time = total_runtime
         res.preprocessing_time = total_preprocessing_time
         res.started_simulations = total_simulations_started
