@@ -5,6 +5,12 @@
 
 #include "checker/dd/simulation/StateGenerator.hpp"
 
+#include <algorithm>
+#include <array>
+#include <cstddef>
+#include <functional>
+#include <random>
+
 namespace ec {
 
 void StateGenerator::seedGenerator(const std::size_t s) {

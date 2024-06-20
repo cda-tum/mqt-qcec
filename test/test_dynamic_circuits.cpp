@@ -1,20 +1,30 @@
+#include "Configuration.hpp"
+#include "Definitions.hpp"
 #include "EquivalenceCheckingManager.hpp"
+#include "EquivalenceCriterion.hpp"
+#include "QuantumComputation.hpp"
 #include "algorithms/BernsteinVazirani.hpp"
 #include "algorithms/QFT.hpp"
 #include "algorithms/QPE.hpp"
+#include "dd/DDDefinitions.hpp"
+#include "dd/Package.hpp"
 
 #include <bitset>
+#include <cstddef>
+#include <cstdlib>
+#include <fstream>
 #include <gtest/gtest.h>
-#include <iomanip>
+#include <iostream>
+#include <memory>
+#include <sstream>
 #include <string>
-#include <utility>
 
 class DynamicCircuitTestExactQPE : public testing::TestWithParam<std::size_t> {
 protected:
   std::size_t precision{};
   qc::fp theta{};
   std::size_t expectedResult{};
-  std::string expectedResultRepresentation{};
+  std::string expectedResultRepresentation;
   std::unique_ptr<qc::QuantumComputation> qpe;
   std::unique_ptr<qc::QuantumComputation> iqpe;
   std::unique_ptr<dd::Package<>> dd;
@@ -104,9 +114,9 @@ protected:
   std::size_t precision{};
   dd::fp theta{};
   std::size_t expectedResult{};
-  std::string expectedResultRepresentation{};
+  std::string expectedResultRepresentation;
   std::size_t secondExpectedResult{};
-  std::string secondExpectedResultRepresentation{};
+  std::string secondExpectedResultRepresentation;
   std::unique_ptr<qc::QuantumComputation> qpe;
   std::unique_ptr<qc::QuantumComputation> iqpe;
   std::unique_ptr<dd::Package<>> dd;

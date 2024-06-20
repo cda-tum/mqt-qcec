@@ -3,12 +3,17 @@
 // See README.md or go to https://github.com/cda-tum/qcec for more information.
 //
 
+#include "Configuration.hpp"
+#include "Definitions.hpp"
 #include "EquivalenceCheckingManager.hpp"
+#include "EquivalenceCriterion.hpp"
+#include "QuantumComputation.hpp"
 #include "algorithms/BernsteinVazirani.hpp"
+#include "checker/dd/applicationscheme/ApplicationScheme.hpp"
 
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
 #include <iostream>
-#include <string>
+#include <stdexcept>
 
 class GeneralTest : public ::testing::Test {
 protected:
@@ -125,10 +130,10 @@ TEST_F(GeneralTest, NoGateCancellation) {
   qc2.x(0);
 
   // two-qubit gates that cannot be cancelled
-  qc1.cx(1_pc, 0);
-  qc2.cx(0_pc, 1);
-  qc1.cx(1_pc, 0);
-  qc2.cx(0_pc, 1);
+  qc1.cx(1, 0);
+  qc2.cx(0, 1);
+  qc1.cx(1, 0);
+  qc2.cx(0, 1);
 
   // gates with parameters that cannot be cancelled
   qc1.p(2.0, 0);
@@ -138,8 +143,8 @@ TEST_F(GeneralTest, NoGateCancellation) {
 
   // gates with different number of controls that cannot be cancelled
   qc1.x(0);
-  qc2.cx(1_pc, 0);
-  qc1.cx(1_pc, 0);
+  qc2.cx(1, 0);
+  qc1.cx(1, 0);
   qc2.x(0);
 
   auto config = ec::Configuration{};

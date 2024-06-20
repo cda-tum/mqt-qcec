@@ -5,6 +5,10 @@
 
 #include "checker/dd/applicationscheme/GateCostApplicationScheme.hpp"
 
+#include "operations/OpType.hpp"
+
+#include <cstddef>
+
 namespace ec {
 [[nodiscard]] std::size_t
 legacyCostFunction(const GateCostLookupTableKeyType& key) noexcept {

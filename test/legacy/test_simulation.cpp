@@ -3,9 +3,13 @@
 // See README.md or go to https://github.com/cda-tum/qcec for more information.
 //
 
+#include "Configuration.hpp"
 #include "EquivalenceCheckingManager.hpp"
+#include "QuantumComputation.hpp"
+#include "checker/dd/simulation/StateType.hpp"
 
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
+#include <iostream>
 
 class SimulationTest : public ::testing::Test {
 protected:

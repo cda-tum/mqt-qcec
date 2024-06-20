@@ -3,13 +3,25 @@
 // See README.md or go to https://github.com/cda-tum/qcec for more information.
 //
 
+#include "Configuration.hpp"
 #include "EquivalenceCheckingManager.hpp"
+#include "EquivalenceCriterion.hpp"
+#include "QuantumComputation.hpp"
+#include "checker/dd/applicationscheme/ApplicationScheme.hpp"
 
-#include "gtest/gtest.h"
+#include <algorithm>
+#include <array>
+#include <cstddef>
+#include <cstdint>
 #include <functional>
+#include <gtest/gtest.h>
 #include <iostream>
+#include <iterator>
 #include <random>
+#include <set>
+#include <sstream>
 #include <string>
+#include <tuple>
 
 class JournalTestNonEQ
     : public testing::TestWithParam<std::tuple<std::string, std::uint16_t>> {
@@ -30,14 +42,14 @@ protected:
   std::size_t maxSims = 0U;
   double avgSims = 0.;
 
-  std::string transpiledFile{};
+  std::string transpiledFile;
 
   std::mt19937_64 mt;
   std::uniform_int_distribution<std::uint64_t> distribution;
   std::function<std::uint64_t()> rng;
 
   std::uint16_t gatesToRemove = 0U;
-  std::set<std::set<std::uint64_t>> alreadyRemoved{};
+  std::set<std::set<std::uint64_t>> alreadyRemoved;
 
   std::uint16_t successes = 0U;
 
@@ -176,7 +188,7 @@ TEST_P(JournalTestNonEQ, PowerOfSimulation) {
     ecm.run();
     auto results = ecm.getResults();
     std::cout << "[" << i << "] ";
-    std::cout << toString(results.equivalence) << std::endl;
+    std::cout << toString(results.equivalence) << '\n';
     addToStatistics(i, results.checkTime + results.preprocessingTime,
                     results.performedSimulations);
     if (results.equivalence == ec::EquivalenceCriterion::NotEquivalent) {
@@ -188,7 +200,7 @@ TEST_P(JournalTestNonEQ, PowerOfSimulation) {
             << tries << ";" << minSims << ";" << maxSims << ";" << avgSims
             << ";" << minTime << ";" << maxTime << ";" << avgTime << ";"
             << static_cast<double>(successes) / static_cast<double>(tries)
-            << ";" << std::endl;
+            << ";" << '\n';
 }
 
 TEST_P(JournalTestNonEQ, PowerOfSimulationParallel) {
@@ -230,7 +242,7 @@ TEST_P(JournalTestNonEQ, PowerOfSimulationParallel) {
     ecm.run();
     auto results = ecm.getResults();
     std::cout << "[" << i << "] ";
-    std::cout << toString(results.equivalence) << std::endl;
+    std::cout << toString(results.equivalence) << '\n';
     addToStatistics(i, results.checkTime + results.preprocessingTime,
                     results.performedSimulations);
     if (results.equivalence == ec::EquivalenceCriterion::NotEquivalent) {
@@ -242,7 +254,7 @@ TEST_P(JournalTestNonEQ, PowerOfSimulationParallel) {
             << tries << ";" << minSims << ";" << maxSims << ";" << avgSims
             << ";" << minTime << ";" << maxTime << ";" << avgTime << ";"
             << static_cast<double>(successes) / static_cast<double>(tries)
-            << ";" << std::endl;
+            << ";" << '\n';
 }
 
 class JournalTestEQ : public testing::TestWithParam<std::string> {
@@ -254,7 +266,7 @@ protected:
   std::string testOriginalDir = "./circuits/original/";
   std::string testTranspiledDir = "./circuits/transpiled/";
 
-  std::string transpiledFile{};
+  std::string transpiledFile;
 
   void SetUp() override {
     config.execution.parallel = false;

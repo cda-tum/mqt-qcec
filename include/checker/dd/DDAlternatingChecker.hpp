@@ -5,11 +5,16 @@
 
 #pragma once
 
+#include "Configuration.hpp"
 #include "DDEquivalenceChecker.hpp"
 #include "DDPackageConfigs.hpp"
+#include "EquivalenceCriterion.hpp"
+#include "QuantumComputation.hpp"
 #include "applicationscheme/LookaheadApplicationScheme.hpp"
+#include "dd/Package_fwd.hpp"
 
 #include <nlohmann/json_fwd.hpp>
+#include <utility>
 
 namespace ec {
 class DDAlternatingChecker final

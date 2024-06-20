@@ -6,6 +6,9 @@
 
 #include "Configuration.hpp"
 
+#include "checker/dd/applicationscheme/ApplicationScheme.hpp"
+#include "checker/dd/simulation/StateType.hpp"
+
 #include <nlohmann/json.hpp>
 
 namespace ec {
@@ -47,8 +50,8 @@ bool Configuration::onlySimulationCheckerConfigured() const noexcept {
          !execution.runAlternatingChecker && !execution.runZXChecker;
 }
 
-nlohmann::json Configuration::json() const {
-  nlohmann::json config{};
+nlohmann::basic_json<> Configuration::json() const {
+  nlohmann::basic_json<> config{};
   auto& exe = config["execution"];
   exe["tolerance"] = execution.numericalTolerance;
   exe["parallel"] = execution.parallel;

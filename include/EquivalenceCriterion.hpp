@@ -5,11 +5,12 @@
 
 #pragma once
 
-#include <exception>
+#include <cstdint>
 #include <iostream>
+#include <string>
 
 namespace ec {
-enum class EquivalenceCriterion {
+enum class EquivalenceCriterion : std::uint8_t {
   NotEquivalent = 0,
   Equivalent = 1,
   NoInformation = 2,

@@ -5,17 +5,21 @@
 
 #include "checker/zx/ZXChecker.hpp"
 
+#include "Configuration.hpp"
 #include "Definitions.hpp"
+#include "EquivalenceCriterion.hpp"
 #include "QuantumComputation.hpp"
+#include "checker/EquivalenceChecker.hpp"
 #include "zx/FunctionalityConstruction.hpp"
-#include "zx/Simplify.hpp"
+#include "zx/Rules.hpp"
+#include "zx/ZXDefinitions.hpp"
 #include "zx/ZXDiagram.hpp"
 
 #include <cassert>
 #include <chrono>
 #include <cstddef>
-#include <optional>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 
 namespace ec {

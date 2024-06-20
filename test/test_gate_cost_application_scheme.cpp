@@ -3,12 +3,20 @@
 // See README.md or go to https://github.com/cda-tum/qcec for more information.
 //
 
+#include "Configuration.hpp"
 #include "EquivalenceCheckingManager.hpp"
+#include "checker/dd/TaskManager.hpp"
+#include "checker/dd/applicationscheme/ApplicationScheme.hpp"
 #include "checker/dd/applicationscheme/GateCostApplicationScheme.hpp"
+#include "dd/Package.hpp"
+#include "dd/Package_fwd.hpp"
+#include "operations/Control.hpp"
 
-#include "gtest/gtest.h"
-#include <functional>
-#include <sstream>
+#include <cstddef>
+#include <fstream>
+#include <gtest/gtest.h>
+#include <iostream>
+#include <memory>
 #include <string>
 
 class GateCostApplicationSchemeTest : public testing::Test {

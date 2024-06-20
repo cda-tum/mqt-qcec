@@ -5,15 +5,17 @@
 
 #pragma once
 
-#include "QuantumComputation.hpp"
 #include "checker/dd/TaskManager.hpp"
 
+#include <cstddef>
+#include <cstdint>
 #include <iostream>
-#include <stdexcept>
+#include <string>
+#include <utility>
 
 namespace ec {
 // A list of application schemes that implement the below interface
-enum class ApplicationSchemeType {
+enum class ApplicationSchemeType : std::uint8_t {
   Sequential = 0,
   OneToOne = 1,
   Lookahead = 2,

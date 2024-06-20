@@ -5,10 +5,12 @@
 
 #pragma once
 
+#include <cstdint>
 #include <iostream>
+#include <string>
 
 namespace ec {
-enum class StateType {
+enum class StateType : std::uint8_t {
   ComputationalBasis = 0,
   Random1QBasis = 1,
   Stabilizer = 2

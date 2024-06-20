@@ -270,7 +270,7 @@ void DDEquivalenceChecker<DDType, Config>::initializeApplicationScheme(
 
 template <class DDType, class Config>
 void DDEquivalenceChecker<DDType, Config>::json(
-    nlohmann::json& j) const noexcept {
+    nlohmann::basic_json<>& j) const noexcept {
   EquivalenceChecker::json(j);
   j["max_nodes"] = maxActiveNodes;
 }

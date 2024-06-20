@@ -10,6 +10,7 @@
 #include "EquivalenceCriterion.hpp"
 #include "Permutation.hpp"
 #include "QuantumComputation.hpp"
+#include "ThreadSafeQueue.hpp"
 #include "checker/dd/DDAlternatingChecker.hpp"
 #include "checker/dd/DDConstructionChecker.hpp"
 #include "checker/dd/DDSimulationChecker.hpp"
@@ -21,11 +22,13 @@
 #include <cassert>
 #include <chrono>
 #include <cstddef>
+#include <future>
 #include <iostream>
 #include <memory>
 #include <mutex>
+#include <nlohmann/json.hpp>
 #include <optional>
-#include <string>
+#include <stdexcept>
 #include <thread>
 #include <utility>
 #include <vector>
@@ -336,7 +339,7 @@ void EquivalenceCheckingManager::run() {
   }
 
   for (const auto& checker : checkers) {
-    nlohmann::json j{};
+    nlohmann::basic_json j{};
     checker->json(j);
     results.checkerResults.emplace_back(j);
   }
@@ -881,7 +884,7 @@ void EquivalenceCheckingManager::checkSymbolic() {
       std::clog << "Checking symbolic circuits requires transformation "
                    "to ZX-diagram but one of the circuits contains "
                    "operations not supported by this checker! Exiting!"
-                << std::endl;
+                << '\n';
       checkers.clear();
       results.equivalence = EquivalenceCriterion::NoInformation;
       return;

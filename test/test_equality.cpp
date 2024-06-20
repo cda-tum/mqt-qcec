@@ -4,11 +4,16 @@
 //
 
 #include "EquivalenceCheckingManager.hpp"
-#include "checker/dd/applicationscheme/GateCostApplicationScheme.hpp"
+#include "EquivalenceCriterion.hpp"
+#include "checker/dd/applicationscheme/ApplicationScheme.hpp"
+#include "dd/DDDefinitions.hpp"
+#include "operations/Control.hpp"
 
-#include "gtest/gtest.h"
-#include <functional>
-#include <sstream>
+#include <cstddef>
+#include <gtest/gtest.h>
+#include <iostream>
+#include <optional>
+#include <stdexcept>
 
 class EqualityTest : public testing::Test {
   void SetUp() override {

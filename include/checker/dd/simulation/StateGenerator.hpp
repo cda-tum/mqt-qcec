@@ -7,12 +7,22 @@
 
 #include "StateType.hpp"
 #include "algorithms/RandomCliffordCircuit.hpp"
-#include "checker/dd/TaskManager.hpp"
+#include "dd/DDDefinitions.hpp"
+#include "dd/DDpackageConfig.hpp"
 #include "dd/Package.hpp"
-#include "dd/Simulation.hpp"
+#include "dd/Package_fwd.hpp"
+#include "dd/Simulation.hpp" // IWYU pragma: keep
 
-#include <functional>
+#include <array>
+#include <cassert>
+#include <cmath>
+#include <cstddef>
+#include <cstdint>
+#include <limits>
 #include <random>
+#include <tuple>
+#include <unordered_set>
+#include <vector>
 
 namespace ec {
 class StateGenerator {
@@ -168,7 +178,7 @@ private:
   std::size_t seed = 0U;
   std::mt19937_64 mt;
 
-  std::unordered_set<std::size_t> generatedComputationalBasisStates{};
+  std::unordered_set<std::size_t> generatedComputationalBasisStates;
   constexpr static std::size_t ONE_QUBIT_BASE_ELEMENTS = 6U;
   // this generator produces random bases from the set { |0>, |1>, |+>, |->,
   // |L>, |R> }

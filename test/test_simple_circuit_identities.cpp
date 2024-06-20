@@ -7,6 +7,8 @@
 #include "Definitions.hpp"
 #include "EquivalenceCheckingManager.hpp"
 #include "QuantumComputation.hpp"
+#include "checker/dd/applicationscheme/ApplicationScheme.hpp"
+#include "checker/dd/applicationscheme/GateCostApplicationScheme.hpp"
 
 #include "gtest/gtest.h"
 #include <iostream>
@@ -23,7 +25,7 @@ protected:
   qc::QuantumComputation qcAlternative;
   ec::Configuration config{};
 
-  std::unique_ptr<ec::EquivalenceCheckingManager> ecm{};
+  std::unique_ptr<ec::EquivalenceCheckingManager> ecm;
 
   void SetUp() override {
     const auto [circ1, circ2] = GetParam().second;

@@ -6,13 +6,16 @@
 #pragma once
 
 #include "Configuration.hpp"
-#include "Definitions.hpp"
 #include "EquivalenceCriterion.hpp"
+#include "Permutation.hpp"
 #include "QuantumComputation.hpp"
 #include "checker/EquivalenceChecker.hpp"
-#include "nlohmann/json.hpp"
-#include "zx/Simplify.hpp"
+#include "zx/Rules.hpp"
+#include "zx/ZXDefinitions.hpp"
 #include "zx/ZXDiagram.hpp"
+
+#include <cstddef>
+#include <nlohmann/json.hpp>
 
 namespace ec {
 class ZXEquivalenceChecker : public EquivalenceChecker {
@@ -23,7 +26,7 @@ public:
 
   EquivalenceCriterion run() override;
 
-  void json(nlohmann::json& j) const noexcept override {
+  void json(nlohmann::basic_json<>& j) const noexcept override {
     EquivalenceChecker::json(j);
     j["checker"] = "zx";
   }

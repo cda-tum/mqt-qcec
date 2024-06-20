@@ -3,12 +3,25 @@
 // See README.md or go to https://github.com/cda-tum/qcec for more information.
 //
 
+#include "Definitions.hpp"
 #include "EquivalenceCheckingManager.hpp"
+#include "EquivalenceCriterion.hpp"
 #include "QuantumComputation.hpp"
+#include "dd/DDDefinitions.hpp"
+#include "operations/Control.hpp"
 #include "operations/OpType.hpp"
 #include "operations/StandardOperation.hpp"
 
 #include "gtest/gtest.h"
+#include <algorithm>
+#include <cstddef>
+#include <cstdint>
+#include <iostream>
+#include <random>
+#include <stdexcept>
+#include <string>
+#include <utility>
+#include <vector>
 
 namespace dd {
 
@@ -891,7 +904,7 @@ void partialEquivalencCheckingBenchmarks(const qc::Qubit minN,
     double totalTime{0};
     std::size_t totalGates{0};
     for (size_t k = 0; k < reps; k++) {
-      qc::Qubit d{0};
+      qc::Qubit d{};
       if (addAncilla) {
         std::uniform_int_distribution<qc::Qubit> nrDataQubits(1, n);
         d = nrDataQubits(gen);

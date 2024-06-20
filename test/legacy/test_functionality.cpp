@@ -3,11 +3,18 @@
 // See README.md or go to https://github.com/cda-tum/qcec for more information.
 //
 
+#include "Configuration.hpp"
 #include "EquivalenceCheckingManager.hpp"
+#include "QuantumComputation.hpp"
+#include "checker/dd/applicationscheme/ApplicationScheme.hpp"
+#include "checker/dd/applicationscheme/GateCostApplicationScheme.hpp"
+#include "checker/dd/simulation/StateType.hpp"
 
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
 #include <iostream>
+#include <sstream>
 #include <string>
+#include <thread>
 
 class FunctionalityTest : public testing::TestWithParam<std::string> {
 protected:

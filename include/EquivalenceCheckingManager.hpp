@@ -9,8 +9,12 @@
 #include "EquivalenceCriterion.hpp"
 #include "QuantumComputation.hpp"
 #include "ThreadSafeQueue.hpp"
+#include "checker/EquivalenceChecker.hpp"
 #include "checker/dd/DDSimulationChecker.hpp"
+#include "checker/dd/applicationscheme/ApplicationScheme.hpp"
+#include "checker/dd/applicationscheme/GateCostApplicationScheme.hpp"
 #include "checker/dd/simulation/StateGenerator.hpp"
+#include "checker/dd/simulation/StateType.hpp"
 #include "dd/ComplexNumbers.hpp"
 #include "dd/DDDefinitions.hpp"
 

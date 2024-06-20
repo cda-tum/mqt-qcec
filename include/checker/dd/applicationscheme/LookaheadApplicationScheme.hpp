@@ -6,6 +6,13 @@
 #pragma once
 
 #include "ApplicationScheme.hpp"
+#include "checker/dd/TaskManager.hpp"
+#include "dd/Package.hpp"
+#include "dd/Package_fwd.hpp"
+
+#include <cassert>
+#include <cstddef>
+#include <utility>
 
 namespace ec {
 template <class Config>

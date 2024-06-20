@@ -6,6 +6,10 @@
 #pragma once
 
 #include "ApplicationScheme.hpp"
+#include "checker/dd/TaskManager.hpp"
+
+#include <cstddef>
+#include <utility>
 
 namespace ec {
 template <class DDType, class Config>

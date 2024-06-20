@@ -3,10 +3,15 @@
 // See README.md or go to https://github.com/cda-tum/qcec for more information.
 //
 
+#include "Configuration.hpp"
 #include "EquivalenceCheckingManager.hpp"
+#include "EquivalenceCriterion.hpp"
 #include "QuantumComputation.hpp"
+#include "dd/DDDefinitions.hpp"
+#include "operations/Control.hpp"
+#include "operations/Expression.hpp"
 
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
 
 using namespace qc;
 using namespace sym;
