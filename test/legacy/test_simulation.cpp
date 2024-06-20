@@ -11,18 +11,18 @@ class SimulationTest : public ::testing::Test {
 protected:
   qc::QuantumComputation qcOriginal;
   qc::QuantumComputation qcAlternative;
-  ec::Configuration      config{};
+  ec::Configuration config{};
 
   void SetUp() override {
-    config.execution.runAlternatingChecker  = false;
+    config.execution.runAlternatingChecker = false;
     config.execution.runConstructionChecker = false;
-    config.execution.runSimulationChecker   = true;
-    config.execution.parallel               = false;
+    config.execution.runSimulationChecker = true;
+    config.execution.parallel = false;
 
-    config.simulation.maxSims        = 8U;
-    config.simulation.storeCEXinput  = true;
+    config.simulation.maxSims = 8U;
+    config.simulation.storeCEXinput = true;
     config.simulation.storeCEXoutput = true;
-    config.simulation.seed           = 12345U;
+    config.simulation.seed = 12345U;
   }
 };
 

@@ -14,7 +14,7 @@ protected:
   qc::QuantumComputation qcOriginal;
   qc::QuantumComputation qcTranspiled;
 
-  std::string testOriginalDir   = "./circuits/original/";
+  std::string testOriginalDir = "./circuits/original/";
   std::string testTranspiledDir = "./circuits/transpiled/";
 
   ec::Configuration configuration{};
@@ -23,9 +23,9 @@ protected:
     qcOriginal.import(testOriginalDir + GetParam() + ".real");
     qcTranspiled.import(testTranspiledDir + GetParam() + "_transpiled.qasm");
 
-    configuration.execution.runAlternatingChecker  = true;
+    configuration.execution.runAlternatingChecker = true;
     configuration.execution.runConstructionChecker = false;
-    configuration.execution.runSimulationChecker   = false;
+    configuration.execution.runSimulationChecker = false;
 
     configuration.application.alternatingScheme =
         ec::ApplicationSchemeType::GateCost;
@@ -63,7 +63,7 @@ TEST_P(CompilationFlowTest, EquivalenceCompilationFlowNoElidePermutations) {
 
 TEST_P(CompilationFlowTest, EquivalenceCompilationFlowParallel) {
   configuration.execution.runSimulationChecker = true;
-  configuration.execution.parallel             = true;
+  configuration.execution.parallel = true;
 
   ec::EquivalenceCheckingManager ecm(qcOriginal, qcTranspiled, configuration);
   ecm.run();

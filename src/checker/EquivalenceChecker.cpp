@@ -10,5 +10,5 @@
 // every translation unit.
 void ec::EquivalenceChecker::json(nlohmann::json& j) const noexcept {
   j["equivalence"] = toString(equivalence);
-  j["runtime"]     = getRuntime();
+  j["runtime"] = getRuntime();
 }

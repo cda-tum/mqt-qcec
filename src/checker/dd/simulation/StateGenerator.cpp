@@ -11,7 +11,7 @@ void StateGenerator::seedGenerator(const std::size_t s) {
   seed = s;
   if (seed == 0U) {
     std::array<std::mt19937_64::result_type, std::mt19937_64::state_size>
-                       randomData{};
+        randomData{};
     std::random_device rd;
     std::generate(std::begin(randomData), std::end(randomData), std::ref(rd));
     std::seed_seq seeds(std::begin(randomData), std::end(randomData));

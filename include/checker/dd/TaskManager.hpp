@@ -32,7 +32,7 @@ public:
       : TaskManager(circ, dd, Direction::Left) {}
 
   void reset() noexcept {
-    iterator    = qc->begin();
+    iterator = qc->begin();
     permutation = qc->initialLayout;
   }
 
@@ -145,11 +145,11 @@ public:
 
 private:
   const qc::QuantumComputation* qc{};
-  DDPackage*                    package;
-  ec::Direction                 direction = Direction::Left;
-  qc::Permutation               permutation{};
-  decltype(qc->begin())         iterator;
-  decltype(qc->end())           end;
-  DDType                        internalState{};
+  DDPackage* package;
+  ec::Direction direction = Direction::Left;
+  qc::Permutation permutation{};
+  decltype(qc->begin()) iterator;
+  decltype(qc->end()) end;
+  DDType internalState{};
 };
 } // namespace ec

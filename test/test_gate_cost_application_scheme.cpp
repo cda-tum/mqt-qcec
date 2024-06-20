@@ -18,16 +18,16 @@ class GateCostApplicationSchemeTest : public testing::Test {
   }
 
 protected:
-  std::size_t                    nqubits = 3U;
+  std::size_t nqubits = 3U;
   std::unique_ptr<dd::Package<>> dd;
-  qc::QuantumComputation         qc;
+  qc::QuantumComputation qc;
 };
 
 TEST_F(GateCostApplicationSchemeTest, SchemeFromProfile) {
   using namespace qc::literals;
 
   const std::string filename = "simple.profile";
-  std::ofstream     ofs(filename);
+  std::ofstream ofs(filename);
 
   // create a very simple profile that just specifies that a Toffoli corresponds
   // to 15 gates
@@ -47,7 +47,7 @@ TEST_F(GateCostApplicationSchemeTest, SchemeFromProfile) {
   EXPECT_EQ(right, 15U);
 
   ec::Configuration config{};
-  config.application.profile           = filename;
+  config.application.profile = filename;
   config.application.alternatingScheme = ec::ApplicationSchemeType::GateCost;
   ec::EquivalenceCheckingManager ecm(qc, qc, config);
   ecm.run();

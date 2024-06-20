@@ -25,25 +25,25 @@ public:
   struct Execution {
     dd::fp numericalTolerance = dd::RealNumber::eps;
 
-    bool        parallel = true;
+    bool parallel = true;
     std::size_t nthreads = std::max(2U, std::thread::hardware_concurrency());
-    double      timeout  = 0.; // in seconds
+    double timeout = 0.; // in seconds
 
     bool runConstructionChecker = false;
-    bool runSimulationChecker   = true;
-    bool runAlternatingChecker  = true;
-    bool runZXChecker           = true;
+    bool runSimulationChecker = true;
+    bool runAlternatingChecker = true;
+    bool runZXChecker = true;
   };
 
   // configuration options for pre-check optimizations
   struct Optimizations {
-    bool fuseSingleQubitGates             = true;
-    bool reconstructSWAPs                 = true;
+    bool fuseSingleQubitGates = true;
+    bool reconstructSWAPs = true;
     bool removeDiagonalGatesBeforeMeasure = false;
-    bool transformDynamicCircuit          = false;
-    bool reorderOperations                = true;
-    bool backpropagateOutputPermutation   = false;
-    bool elidePermutations                = true;
+    bool transformDynamicCircuit = false;
+    bool reorderOperations = true;
+    bool backpropagateOutputPermutation = false;
+    bool elidePermutations = true;
   };
 
   // configuration options for application schemes
@@ -56,30 +56,30 @@ public:
         ApplicationSchemeType::Proportional;
 
     // options for the gate cost application scheme
-    std::string  profile;
+    std::string profile;
     CostFunction costFunction = &legacyCostFunction;
   };
 
   struct Functionality {
-    double traceThreshold          = 1e-8;
-    bool   checkPartialEquivalence = false;
+    double traceThreshold = 1e-8;
+    bool checkPartialEquivalence = false;
   };
 
   // configuration options for the simulation scheme
   struct Simulation {
-    double      fidelityThreshold = 1e-8;
-    std::size_t maxSims           = computeMaxSims();
-    StateType   stateType         = StateType::ComputationalBasis;
-    std::size_t seed              = 0U;
-    bool        storeCEXinput     = false;
-    bool        storeCEXoutput    = false;
+    double fidelityThreshold = 1e-8;
+    std::size_t maxSims = computeMaxSims();
+    StateType stateType = StateType::ComputationalBasis;
+    std::size_t seed = 0U;
+    bool storeCEXinput = false;
+    bool storeCEXoutput = false;
 
     // this function makes sure that the maximum number of simulations is
     // configured properly.
     static std::size_t computeMaxSims() {
-      constexpr std::size_t defaultMaxSims                 = 16U;
+      constexpr std::size_t defaultMaxSims = 16U;
       constexpr std::size_t defaultConfiguredOtherCheckers = 2U;
-      const auto            systemThreads = std::thread::hardware_concurrency();
+      const auto systemThreads = std::thread::hardware_concurrency();
       // catch the case where hardware_concurrency() returns 0 or the other
       // pre-configured checkers already use up all the available threads
       if (systemThreads < defaultConfiguredOtherCheckers) {
@@ -91,15 +91,15 @@ public:
   };
 
   struct Parameterized {
-    double      parameterizedTol          = 1e-12;
+    double parameterizedTol = 1e-12;
     std::size_t nAdditionalInstantiations = 0;
   };
 
-  Execution     execution{};
+  Execution execution{};
   Optimizations optimizations{};
-  Application   application{};
+  Application application{};
   Functionality functionality{};
-  Simulation    simulation{};
+  Simulation simulation{};
   Parameterized parameterized{};
 
   [[nodiscard]] bool anythingToExecute() const noexcept;

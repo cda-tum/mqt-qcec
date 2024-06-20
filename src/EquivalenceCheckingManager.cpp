@@ -43,9 +43,9 @@ void decrementLogicalQubitsInLayoutAboveIndex(
 }
 
 void EquivalenceCheckingManager::stripIdleQubits() {
-  auto& largerCircuit  = qc1.getNqubits() > qc2.getNqubits() ? qc1 : qc2;
+  auto& largerCircuit = qc1.getNqubits() > qc2.getNqubits() ? qc1 : qc2;
   auto& smallerCircuit = qc1.getNqubits() > qc2.getNqubits() ? qc2 : qc1;
-  auto  qubitDifference =
+  auto qubitDifference =
       largerCircuit.getNqubits() - smallerCircuit.getNqubits();
   auto largerCircuitLayoutCopy = largerCircuit.initialLayout;
 
@@ -191,7 +191,7 @@ void EquivalenceCheckingManager::setupAncillariesAndGarbage() {
   std::vector<std::pair<qc::Qubit, std::optional<qc::Qubit>>> removed{};
   removed.reserve(qubitDifference);
 
-  const auto        nqubits = largerCircuit.getNqubits();
+  const auto nqubits = largerCircuit.getNqubits();
   std::vector<bool> garbage(nqubits);
 
   for (std::size_t i = 0; i < qubitDifference; ++i) {
@@ -294,16 +294,16 @@ void EquivalenceCheckingManager::runOptimizationPasses() {
 void EquivalenceCheckingManager::run() {
   done = false;
 
-  results.name1              = qc1.getName();
-  results.name2              = qc2.getName();
-  results.numQubits1         = qc1.getNqubits();
-  results.numQubits2         = qc2.getNqubits();
+  results.name1 = qc1.getName();
+  results.name2 = qc2.getName();
+  results.numQubits1 = qc1.getNqubits();
+  results.numQubits2 = qc2.getNqubits();
   results.numMeasuredQubits1 = qc1.getNmeasuredQubits();
   results.numMeasuredQubits2 = qc2.getNmeasuredQubits();
-  results.numAncillae1       = qc1.getNancillae();
-  results.numAncillae2       = qc2.getNancillae();
-  results.numGates1          = qc1.getNops();
-  results.numGates2          = qc2.getNops();
+  results.numAncillae1 = qc1.getNancillae();
+  results.numAncillae2 = qc2.getNancillae();
+  results.numGates1 = qc1.getNops();
+  results.numGates2 = qc2.getNops();
 
   results.configuration = configuration;
 
@@ -319,7 +319,7 @@ void EquivalenceCheckingManager::run() {
 
   if (qc1.empty() && qc2.empty()) {
     results.equivalence = EquivalenceCriterion::Equivalent;
-    done                = true;
+    done = true;
     return;
   }
 
@@ -387,7 +387,7 @@ EquivalenceCheckingManager::EquivalenceCheckingManager(
       !DDAlternatingChecker::canHandle(this->qc1, this->qc2)) {
     std::clog << "[QCEC] Warning: alternating checker cannot handle the "
                  "circuits. Falling back to construction checker.\n";
-    this->configuration.execution.runAlternatingChecker  = false;
+    this->configuration.execution.runAlternatingChecker = false;
     this->configuration.execution.runConstructionChecker = true;
   }
 
@@ -398,7 +398,7 @@ EquivalenceCheckingManager::EquivalenceCheckingManager(
   // number of unique computational basis states
   if (configuration.execution.runSimulationChecker &&
       configuration.simulation.stateType == StateType::ComputationalBasis) {
-    const auto        nq           = this->qc1.getNqubitsWithoutAncillae();
+    const auto nq = this->qc1.getNqubitsWithoutAncillae();
     const std::size_t uniqueStates = 1ULL << nq;
     if (nq <= 63U && configuration.simulation.maxSims > uniqueStates) {
       this->configuration.simulation.maxSims = uniqueStates;
@@ -420,7 +420,7 @@ void EquivalenceCheckingManager::checkSequential() {
     timeoutThread = std::thread([this, timeout = std::chrono::duration<double>(
                                            configuration.execution.timeout)] {
       std::unique_lock doneLock(doneMutex);
-      const auto       finished =
+      const auto finished =
           doneCond.wait_for(doneLock, timeout, [this] { return done; });
       // if the thread has already finished within the timeout, nothing
       // has to be done
@@ -575,7 +575,7 @@ void EquivalenceCheckingManager::checkSequential() {
     }
   }
 
-  const auto end    = std::chrono::steady_clock::now();
+  const auto end = std::chrono::steady_clock::now();
   results.checkTime = std::chrono::duration<double>(end - start).count();
 
   // appropriately join the timeout thread, if it was launched
@@ -640,7 +640,7 @@ void EquivalenceCheckingManager::checkParallel() {
 
   // create a thread safe queue which is used to check for available results
   ThreadSafeQueue<std::size_t> queue{};
-  std::size_t                  id = 0U;
+  std::size_t id = 0U;
 
   // reserve space for the futures received from the async calls
   std::vector<std::future<void>> futures{};
@@ -699,7 +699,7 @@ void EquivalenceCheckingManager::checkParallel() {
 
     // in case non-equivalence has been shown, the execution can be stopped
     const auto* const checker = checkers.at(*completedID).get();
-    const auto        result  = checker->getEquivalence();
+    const auto result = checker->getEquivalence();
 
     if (result == EquivalenceCriterion::NoInformation) {
       if (dynamic_cast<const ZXEquivalenceChecker*>(checker) != nullptr) {
@@ -834,7 +834,7 @@ void EquivalenceCheckingManager::checkParallel() {
     }
   }
 
-  const auto end    = std::chrono::steady_clock::now();
+  const auto end = std::chrono::steady_clock::now();
   results.checkTime = std::chrono::duration<double>(end - start).count();
 
   // Futures are not explicitly waited for here, since the destructor of the
@@ -855,7 +855,7 @@ void EquivalenceCheckingManager::checkSymbolic() {
     timeoutThread = std::thread([this, timeout = std::chrono::duration<double>(
                                            configuration.execution.timeout)] {
       std::unique_lock doneLock(doneMutex);
-      auto             finished =
+      auto finished =
           doneCond.wait_for(doneLock, timeout, [this] { return done; });
       // if the thread has already finished within the timeout,
       // nothing has to be done
@@ -872,9 +872,9 @@ void EquivalenceCheckingManager::checkSymbolic() {
           std::make_unique<ZXEquivalenceChecker>(qc1, qc2, configuration));
       const auto& zxChecker = checkers.back();
       if (!done) {
-        const auto result   = zxChecker->run();
+        const auto result = zxChecker->run();
         results.equivalence = result;
-        done                = true;
+        done = true;
         doneCond.notify_one();
       }
     } else {
@@ -887,7 +887,7 @@ void EquivalenceCheckingManager::checkSymbolic() {
       return;
     }
   }
-  const auto end    = std::chrono::steady_clock::now();
+  const auto end = std::chrono::steady_clock::now();
   results.checkTime = std::chrono::duration<double>(end - start).count();
   // appropriately join the timeout thread, if it was launched
   if (timeoutThread.joinable()) {
@@ -938,25 +938,25 @@ void EquivalenceCheckingManager::elidePermutations() {
 nlohmann::json EquivalenceCheckingManager::Results::json() const {
   nlohmann::json res{};
 
-  auto& circuit1         = res["circuit1"];
-  circuit1["name"]       = name1;
+  auto& circuit1 = res["circuit1"];
+  circuit1["name"] = name1;
   circuit1["num_qubits"] = numQubits1;
-  circuit1["num_gates"]  = numGates1;
+  circuit1["num_gates"] = numGates1;
 
-  auto& circuit2         = res["circuit2"];
-  circuit2["name"]       = name2;
+  auto& circuit2 = res["circuit2"];
+  circuit2["name"] = name2;
   circuit2["num_qubits"] = numQubits2;
-  circuit2["num_gates"]  = numGates2;
+  circuit2["num_gates"] = numGates2;
 
   res["configuration"] = configuration.json();
 
   res["preprocessing_time"] = preprocessingTime;
-  res["check_time"]         = checkTime;
-  res["equivalence"]        = ec::toString(equivalence);
+  res["check_time"] = checkTime;
+  res["equivalence"] = ec::toString(equivalence);
 
   if (startedSimulations > 0) {
-    auto& sim        = res["simulations"];
-    sim["started"]   = startedSimulations;
+    auto& sim = res["simulations"];
+    sim["started"] = startedSimulations;
     sim["performed"] = performedSimulations;
 
     if (!cexInput.empty() || !cexOutput1.empty() || !cexOutput2.empty()) {
@@ -972,7 +972,7 @@ nlohmann::json EquivalenceCheckingManager::Results::json() const {
       }
     }
   }
-  auto& par                       = res["parameterized"];
+  auto& par = res["parameterized"];
   par["performed_instantiations"] = performedInstantiations;
 
   res["checkers"] = checkerResults;

@@ -19,7 +19,7 @@ class ZXEquivalenceChecker : public EquivalenceChecker {
 public:
   ZXEquivalenceChecker(const qc::QuantumComputation& circ1,
                        const qc::QuantumComputation& circ2,
-                       Configuration                 config) noexcept;
+                       Configuration config) noexcept;
 
   EquivalenceCriterion run() override;
 
@@ -30,8 +30,8 @@ public:
 
 private:
   zx::ZXDiagram miter;
-  zx::fp        tolerance;
-  bool          ancilla = false;
+  zx::fp tolerance;
+  bool ancilla = false;
 
   // the following methods are adaptations of the core ZX simplification
   // routines that additionally check a criterion for early termination of the

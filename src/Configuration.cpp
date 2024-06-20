@@ -49,18 +49,18 @@ bool Configuration::onlySimulationCheckerConfigured() const noexcept {
 
 nlohmann::json Configuration::json() const {
   nlohmann::json config{};
-  auto&          exe = config["execution"];
-  exe["tolerance"]   = execution.numericalTolerance;
-  exe["parallel"]    = execution.parallel;
+  auto& exe = config["execution"];
+  exe["tolerance"] = execution.numericalTolerance;
+  exe["parallel"] = execution.parallel;
   if (execution.parallel) {
     exe["nthreads"] = execution.nthreads;
   } else {
     exe["nthreads"] = 1U;
   }
   exe["run_construction_checker"] = execution.runConstructionChecker;
-  exe["run_simulation_checker"]   = execution.runSimulationChecker;
-  exe["run_alternating_checker"]  = execution.runAlternatingChecker;
-  exe["run_zx_checker"]           = execution.runZXChecker;
+  exe["run_simulation_checker"] = execution.runSimulationChecker;
+  exe["run_alternating_checker"] = execution.runAlternatingChecker;
+  exe["run_zx_checker"] = execution.runZXChecker;
   if (execution.timeout > 0.) {
     exe["timeout"] = execution.timeout;
   }
@@ -71,7 +71,7 @@ nlohmann::json Configuration::json() const {
   opt["remove_diagonal_gates_before_measure"] =
       optimizations.removeDiagonalGatesBeforeMeasure;
   opt["transform_dynamic_circuit"] = optimizations.transformDynamicCircuit;
-  opt["reorder_operations"]        = optimizations.reorderOperations;
+  opt["reorder_operations"] = optimizations.reorderOperations;
   opt["backpropagate_output_permutation"] =
       optimizations.backpropagateOutputPermutation;
   opt["elide_permutations"] = optimizations.elidePermutations;
@@ -96,23 +96,23 @@ nlohmann::json Configuration::json() const {
     }
   }
 
-  auto& par                        = config["parameterized"];
-  par["tolerance"]                 = parameterized.parameterizedTol;
+  auto& par = config["parameterized"];
+  par["tolerance"] = parameterized.parameterizedTol;
   par["additional_instantiations"] = parameterized.nAdditionalInstantiations;
 
   if (execution.runConstructionChecker || execution.runAlternatingChecker) {
-    auto& fun                        = config["functionality"];
-    fun["trace_threshold"]           = functionality.traceThreshold;
+    auto& fun = config["functionality"];
+    fun["trace_threshold"] = functionality.traceThreshold;
     fun["check_partial_equivalence"] = functionality.checkPartialEquivalence;
   }
 
   if (execution.runSimulationChecker) {
-    auto& sim                          = config["simulation"];
-    sim["fidelity_threshold"]          = simulation.fidelityThreshold;
-    sim["max_sims"]                    = simulation.maxSims;
-    sim["state_type"]                  = ec::toString(simulation.stateType);
-    sim["seed"]                        = simulation.seed;
-    sim["store_counterexample_input"]  = simulation.storeCEXinput;
+    auto& sim = config["simulation"];
+    sim["fidelity_threshold"] = simulation.fidelityThreshold;
+    sim["max_sims"] = simulation.maxSims;
+    sim["state_type"] = ec::toString(simulation.stateType);
+    sim["seed"] = simulation.seed;
+    sim["store_counterexample_input"] = simulation.storeCEXinput;
     sim["store_counterexample_output"] = simulation.storeCEXoutput;
   }
 

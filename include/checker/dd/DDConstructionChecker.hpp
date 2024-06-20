@@ -23,7 +23,7 @@ class DDConstructionChecker final
 public:
   DDConstructionChecker(const qc::QuantumComputation& circ1,
                         const qc::QuantumComputation& circ2,
-                        ec::Configuration             config)
+                        ec::Configuration config)
       : DDEquivalenceChecker(circ1, circ2, std::move(config)) {
     if (this->configuration.application.constructionScheme ==
         ApplicationSchemeType::Lookahead) {

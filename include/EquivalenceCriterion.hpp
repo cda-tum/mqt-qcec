@@ -10,13 +10,13 @@
 
 namespace ec {
 enum class EquivalenceCriterion {
-  NotEquivalent             = 0,
-  Equivalent                = 1,
-  NoInformation             = 2,
-  ProbablyEquivalent        = 3,
+  NotEquivalent = 0,
+  Equivalent = 1,
+  NoInformation = 2,
+  ProbablyEquivalent = 3,
   EquivalentUpToGlobalPhase = 4,
-  EquivalentUpToPhase       = 5,
-  ProbablyNotEquivalent     = 6
+  EquivalentUpToPhase = 5,
+  ProbablyNotEquivalent = 6
 };
 
 inline std::string toString(const EquivalenceCriterion& criterion) noexcept {
@@ -65,7 +65,7 @@ inline EquivalenceCriterion fromString(const std::string& criterion) noexcept {
   return EquivalenceCriterion::NoInformation;
 }
 
-inline std::istream& operator>>(std::istream&         in,
+inline std::istream& operator>>(std::istream& in,
                                 EquivalenceCriterion& criterion) {
   std::string token;
   in >> token;
@@ -79,7 +79,7 @@ inline std::istream& operator>>(std::istream&         in,
   return in;
 }
 
-inline std::ostream& operator<<(std::ostream&               out,
+inline std::ostream& operator<<(std::ostream& out,
                                 const EquivalenceCriterion& criterion) {
   out << toString(criterion);
   return out;

@@ -17,15 +17,15 @@ protected:
 };
 
 TEST_F(GeneralTest, DynamicCircuit) {
-  auto s   = qc::BitString(15U);
-  auto bv  = qc::BernsteinVazirani(s);
+  auto s = qc::BitString(15U);
+  auto bv = qc::BernsteinVazirani(s);
   auto dbv = qc::BernsteinVazirani(s, true);
 
   auto config = ec::Configuration{};
   EXPECT_THROW(ec::EquivalenceCheckingManager(bv, dbv, config),
                std::runtime_error);
 
-  config.optimizations.transformDynamicCircuit        = true;
+  config.optimizations.transformDynamicCircuit = true;
   config.optimizations.backpropagateOutputPermutation = true;
 
   auto ecm = ec::EquivalenceCheckingManager(bv, dbv, config);
@@ -77,7 +77,7 @@ TEST_F(GeneralTest, RemoveDiagonalGatesBeforeMeasure) {
 
   // if configured to remove diagonal gates before measurements, the circuits
   // are equivalent
-  auto config                                           = ec::Configuration{};
+  auto config = ec::Configuration{};
   config.optimizations.removeDiagonalGatesBeforeMeasure = true;
   auto ecm2 = ec::EquivalenceCheckingManager(qc1, qc2, config);
   ecm2.run();
@@ -91,11 +91,11 @@ TEST_F(GeneralTest, NothingToDo) {
   qc2.addQubitRegister(1U);
   qc2.x(0);
 
-  auto config                             = ec::Configuration{};
-  config.execution.runAlternatingChecker  = false;
-  config.execution.runSimulationChecker   = false;
+  auto config = ec::Configuration{};
+  config.execution.runAlternatingChecker = false;
+  config.execution.runSimulationChecker = false;
   config.execution.runConstructionChecker = false;
-  config.execution.runZXChecker           = false;
+  config.execution.runZXChecker = false;
 
   auto ecm = ec::EquivalenceCheckingManager(qc1, qc2, config);
   ecm.run();
@@ -142,10 +142,10 @@ TEST_F(GeneralTest, NoGateCancellation) {
   qc1.cx(1_pc, 0);
   qc2.x(0);
 
-  auto config                               = ec::Configuration{};
-  config.optimizations.reorderOperations    = false;
+  auto config = ec::Configuration{};
+  config.optimizations.reorderOperations = false;
   config.optimizations.fuseSingleQubitGates = false;
-  config.optimizations.reconstructSWAPs     = false;
+  config.optimizations.reconstructSWAPs = false;
   config.application.alternatingScheme = ec::ApplicationSchemeType::OneToOne;
 
   ec::EquivalenceCheckingManager ecm(qc1, qc2, config);

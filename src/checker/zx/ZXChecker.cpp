@@ -66,7 +66,7 @@ EquivalenceCriterion ZXEquivalenceChecker::run() {
         continue;
       }
 
-      const auto& in   = miter.getInput(i);
+      const auto& in = miter.getInput(i);
       const auto& edge = miter.incidentEdge(in, 0U);
 
       if (edge.type == zx::EdgeType::Hadamard) {
@@ -74,8 +74,8 @@ EquivalenceCriterion ZXEquivalenceChecker::run() {
         break;
       }
       const auto& out = edge.to;
-      const auto& q1  = miter.getVData(in);
-      const auto& q2  = miter.getVData(out);
+      const auto& q1 = miter.getVData(in);
+      const auto& q2 = miter.getVData(out);
       assert(q1.has_value());
       assert(q2.has_value());
       if (p1.at(static_cast<qc::Qubit>(q1->qubit)) !=
@@ -136,11 +136,11 @@ qc::Permutation complete(const qc::Permutation& p, const std::size_t n) {
 
   qc::Permutation pComp = p;
 
-  std::vector<bool>                     mappedTo(n, false);
+  std::vector<bool> mappedTo(n, false);
   std::unordered_map<std::size_t, bool> mappedFrom;
   for (const auto [k, v] : p) {
     mappedFrom[k] = true;
-    mappedTo[v]   = true;
+    mappedTo[v] = true;
   }
 
   // Map qubits greedily
@@ -153,8 +153,8 @@ qc::Permutation complete(const qc::Permutation& p, const std::size_t n) {
     for (std::size_t j = 0; j < n; ++j) {
       if (mappedFrom.find(j) == mappedFrom.end()) {
         pComp[static_cast<qc::Qubit>(j)] = static_cast<qc::Qubit>(i);
-        mappedTo[i]                      = true;
-        mappedFrom[j]                    = true;
+        mappedTo[i] = true;
+        mappedFrom[j] = true;
         break;
       }
     }
