@@ -53,12 +53,9 @@ if(BUILD_MQT_QCEC_TESTS)
   set(GTEST_VERSION
       1.14.0
       CACHE STRING "Google Test version")
-  set(GTEST_URL
-      https://github.com/google/googletest/archive/refs/tags/v${GTEST_VERSION}.tar.gz
-  )
+  set(GTEST_URL https://github.com/google/googletest/archive/refs/tags/v${GTEST_VERSION}.tar.gz)
   if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.24)
-    FetchContent_Declare(googletest URL ${GTEST_URL} FIND_PACKAGE_ARGS
-                                        ${GTEST_VERSION} NAMES GTest)
+    FetchContent_Declare(googletest URL ${GTEST_URL} FIND_PACKAGE_ARGS ${GTEST_VERSION} NAMES GTest)
     list(APPEND FETCH_PACKAGES googletest)
   else()
     find_package(googletest ${GTEST_VERSION} QUIET NAMES GTest)
@@ -80,8 +77,7 @@ if(BUILD_MQT_QCEC_BINDINGS)
   else()
     find_package(pybind11_json QUIET)
     if(NOT pybind11_json_FOUND)
-      FetchContent_Declare(
-        pybind11_json GIT_REPOSITORY https://github.com/pybind/pybind11_json)
+      FetchContent_Declare(pybind11_json GIT_REPOSITORY https://github.com/pybind/pybind11_json)
       list(APPEND FETCH_PACKAGES pybind11_json)
     endif()
   endif()
