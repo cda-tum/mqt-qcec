@@ -51,7 +51,7 @@ DDEquivalenceChecker<DDType, Config>::equals(const DDType& e, const DDType& f) {
     // product trace(U V^-1) and comparing it to some threshold. in a similar
     // fashion, we can simply compare U V^-1 with the identity, which results in
     // a much simpler check that is not prone to overflow.
-    bool       isClose{};
+    bool isClose{};
     const bool eIsClose =
         dd->isCloseToIdentity(e, configuration.functionality.traceThreshold);
     const bool fIsClose =
@@ -270,7 +270,7 @@ void DDEquivalenceChecker<DDType, Config>::initializeApplicationScheme(
 
 template <class DDType, class Config>
 void DDEquivalenceChecker<DDType, Config>::json(
-    nlohmann::json& j) const noexcept {
+    nlohmann::basic_json<>& j) const noexcept {
   EquivalenceChecker::json(j);
   j["max_nodes"] = maxActiveNodes;
 }

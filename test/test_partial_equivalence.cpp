@@ -3,12 +3,25 @@
 // See README.md or go to https://github.com/cda-tum/qcec for more information.
 //
 
+#include "Definitions.hpp"
 #include "EquivalenceCheckingManager.hpp"
+#include "EquivalenceCriterion.hpp"
 #include "QuantumComputation.hpp"
+#include "dd/DDDefinitions.hpp"
+#include "operations/Control.hpp"
 #include "operations/OpType.hpp"
 #include "operations/StandardOperation.hpp"
 
 #include "gtest/gtest.h"
+#include <algorithm>
+#include <cstddef>
+#include <cstdint>
+#include <iostream>
+#include <random>
+#include <stdexcept>
+#include <string>
+#include <utility>
+#include <vector>
 
 namespace dd {
 
@@ -26,19 +39,19 @@ const std::vector<std::vector<OpType>> PRE_GENERATED_CIRCUITS_SIZE_2_2{
 
 void addPreGeneratedCircuits(QuantumComputation& circuit1,
                              QuantumComputation& circuit2,
-                             const qc::Qubit     groupBeginIndex,
-                             const qc::Qubit     groupSize) {
-  const auto& circuits1       = groupSize == 1 ? PRE_GENERATED_CIRCUITS_SIZE_1_1
-                                               : PRE_GENERATED_CIRCUITS_SIZE_2_1;
-  const auto& circuits2       = groupSize == 1 ? PRE_GENERATED_CIRCUITS_SIZE_1_2
-                                               : PRE_GENERATED_CIRCUITS_SIZE_2_2;
-  const auto  nrCircuits      = circuits1.size();
-  auto        randomGenerator = circuit1.getGenerator();
+                             const qc::Qubit groupBeginIndex,
+                             const qc::Qubit groupSize) {
+  const auto& circuits1 = groupSize == 1 ? PRE_GENERATED_CIRCUITS_SIZE_1_1
+                                         : PRE_GENERATED_CIRCUITS_SIZE_2_1;
+  const auto& circuits2 = groupSize == 1 ? PRE_GENERATED_CIRCUITS_SIZE_1_2
+                                         : PRE_GENERATED_CIRCUITS_SIZE_2_2;
+  const auto nrCircuits = circuits1.size();
+  auto randomGenerator = circuit1.getGenerator();
   std::uniform_int_distribution<size_t> randomDistribution(0, nrCircuits - 1);
 
   const auto randomIndex = randomDistribution(randomGenerator);
-  const auto x1          = circuits1[randomIndex];
-  const auto x2          = circuits2[randomIndex];
+  const auto x1 = circuits1[randomIndex];
+  const auto x2 = circuits2[randomIndex];
   for (auto gateType : x1) {
     if (gateType == X) { // add CNOT
       circuit1.emplace_back<StandardOperation>(groupBeginIndex,
@@ -78,9 +91,9 @@ void addDecomposedCcxGate(QuantumComputation& circuit, const Controls& controls,
   circuit.cx(control2, control1);
 }
 
-void addStandardOperationToCircuit(QuantumComputation&      circuit,
+void addStandardOperationToCircuit(QuantumComputation& circuit,
                                    const StandardOperation& op,
-                                   const bool               decomposeCcx) {
+                                   const bool decomposeCcx) {
   if (op.getType() == X && decomposeCcx && op.getControls().size() == 2) {
     // decompose toffoli gate
     addDecomposedCcxGate(circuit, op.getControls(), op.getTargets()[0]);
@@ -196,7 +209,7 @@ makeRandomStandardOperation(const qc::Qubit nrQubits, const qc::Qubit min,
   std::uniform_int_distribution<> randomDistrOpType(H, RZX);
   auto randomOpType = static_cast<OpType>(randomDistrOpType(randomGenerator));
   const qc::Qubit randomTarget1 = randomNumbers[0];
-  qc::Qubit       randomTarget2{min};
+  qc::Qubit randomTarget2{min};
   if (randomNumbers.size() > 1) {
     randomTarget2 = randomNumbers[1];
   };
@@ -273,7 +286,7 @@ generatePartiallyEquivalentCircuits(const size_t n, const qc::Qubit d,
   // 3) Partially equivalent subcircuits
   // Divide data qubits into groups of size 1 or 2. For each group, we apply
   // pre-generated subcircuits, which are pairwise partially equivalent.
-  qc::Qubit                                groupBeginIndex = 0;
+  qc::Qubit groupBeginIndex = 0;
   std::uniform_int_distribution<qc::Qubit> randomDistrGroupSize(1, 2);
   while (groupBeginIndex < d) {
     qc::Qubit groupSize = 1;
@@ -342,20 +355,20 @@ class PartialEquivalenceTest : public testing::Test {
     qc1 = qc::QuantumComputation(nqubits, nqubits);
     qc2 = qc::QuantumComputation(nqubits, nqubits);
 
-    config.execution.runSimulationChecker   = false;
-    config.execution.runAlternatingChecker  = false;
+    config.execution.runSimulationChecker = false;
+    config.execution.runAlternatingChecker = false;
     config.execution.runConstructionChecker = false;
-    config.execution.runZXChecker           = false;
-    config.execution.nthreads               = 1;
+    config.execution.runZXChecker = false;
+    config.execution.nthreads = 1;
 
     config.functionality.checkPartialEquivalence = true;
   }
 
 protected:
-  std::size_t            nqubits = 3U;
+  std::size_t nqubits = 3U;
   qc::QuantumComputation qc1;
   qc::QuantumComputation qc2;
-  ec::Configuration      config{};
+  ec::Configuration config{};
 };
 
 TEST_F(PartialEquivalenceTest, AlternatingCheckerGarbage) {
@@ -717,7 +730,7 @@ TEST_F(PartialEquivalenceTest, MQTBenchGrover3Qubits) {
   c2.print(std::cout);
   // alternating checker
   config.execution.runConstructionChecker = false;
-  config.execution.runAlternatingChecker  = true;
+  config.execution.runAlternatingChecker = true;
   ec::EquivalenceCheckingManager ecm2(c1, c2, config);
   ecm2.run();
   EXPECT_EQ(ecm2.equivalence(),
@@ -741,7 +754,7 @@ TEST_F(PartialEquivalenceTest, MQTBenchGrover7Qubits) {
 
   // alternating checker
   config.execution.runConstructionChecker = false;
-  config.execution.runAlternatingChecker  = true;
+  config.execution.runAlternatingChecker = true;
   ec::EquivalenceCheckingManager ecm2(c1, c2, config);
   ecm2.run();
   EXPECT_EQ(ecm2.equivalence(), ec::EquivalenceCriterion::Equivalent);
@@ -880,18 +893,18 @@ TEST_F(PartialEquivalenceTest, ConstructionCheckerSliQECPeriodFinding8Qubits) {
   EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::Equivalent);
 }
 
-void partialEquivalencCheckingBenchmarks(const qc::Qubit          minN,
-                                         const qc::Qubit          maxN,
-                                         const size_t             reps,
-                                         const bool               addAncilla,
+void partialEquivalencCheckingBenchmarks(const qc::Qubit minN,
+                                         const qc::Qubit maxN,
+                                         const size_t reps,
+                                         const bool addAncilla,
                                          const ec::Configuration& config) {
   std::mt19937 gen(55);
 
   for (qc::Qubit n = minN; n < maxN; n++) {
-    double      totalTime{0};
+    double totalTime{0};
     std::size_t totalGates{0};
     for (size_t k = 0; k < reps; k++) {
-      qc::Qubit d{0};
+      qc::Qubit d{};
       if (addAncilla) {
         std::uniform_int_distribution<qc::Qubit> nrDataQubits(1, n);
         d = nrDataQubits(gen);
@@ -899,7 +912,7 @@ void partialEquivalencCheckingBenchmarks(const qc::Qubit          minN,
         d = n;
       }
       std::uniform_int_distribution<qc::Qubit> nrDataQubits(1, d);
-      const qc::Qubit                          m = nrDataQubits(gen);
+      const qc::Qubit m = nrDataQubits(gen);
 
       const auto [c1, c2] = dd::generatePartiallyEquivalentCircuits(n, d, m);
 
@@ -923,18 +936,18 @@ void partialEquivalencCheckingBenchmarks(const qc::Qubit          minN,
 
 TEST_F(PartialEquivalenceTest, Benchmark) {
   config.execution.runConstructionChecker = true;
-  const size_t minN                       = 2;
-  const size_t maxN                       = 8;
-  const size_t reps                       = 10;
+  const size_t minN = 2;
+  const size_t maxN = 8;
+  const size_t reps = 10;
   std::cout << "Partial equivalence check\n";
   partialEquivalencCheckingBenchmarks(minN, maxN, reps, true, config);
 }
 
 TEST_F(PartialEquivalenceTest, ZeroAncillaBenchmark) {
   config.execution.runAlternatingChecker = true;
-  const size_t minN                      = 3;
-  const size_t maxN                      = 14;
-  const size_t reps                      = 10;
+  const size_t minN = 3;
+  const size_t maxN = 14;
+  const size_t reps = 10;
   std::cout << "Zero-ancilla partial equivalence check\n";
   partialEquivalencCheckingBenchmarks(minN, maxN, reps, false, config);
 }

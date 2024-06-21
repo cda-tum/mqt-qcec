@@ -5,11 +5,16 @@
 
 #pragma once
 
+#include "Configuration.hpp"
 #include "DDEquivalenceChecker.hpp"
 #include "DDPackageConfigs.hpp"
+#include "EquivalenceCriterion.hpp"
+#include "QuantumComputation.hpp"
 #include "applicationscheme/LookaheadApplicationScheme.hpp"
+#include "dd/Package_fwd.hpp"
 
 #include <nlohmann/json_fwd.hpp>
+#include <utility>
 
 namespace ec {
 class DDAlternatingChecker final
@@ -17,7 +22,7 @@ class DDAlternatingChecker final
 public:
   DDAlternatingChecker(const qc::QuantumComputation& circ1,
                        const qc::QuantumComputation& circ2,
-                       ec::Configuration             config)
+                       ec::Configuration config)
       : DDEquivalenceChecker(circ1, circ2, std::move(config)) {
     // gates from the second circuit shall be applied "from the right"
     taskManager2.flipDirection();
@@ -47,10 +52,10 @@ public:
 private:
   qc::MatrixDD functionality{};
 
-  void                 initialize() override;
-  void                 execute() override;
-  void                 finish() override;
-  void                 postprocess() override;
+  void initialize() override;
+  void execute() override;
+  void finish() override;
+  void postprocess() override;
   EquivalenceCriterion checkEquivalence() override;
 
   // at some point this routine should probably make its way into the QFR

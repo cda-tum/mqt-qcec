@@ -6,6 +6,13 @@
 #pragma once
 
 #include "ApplicationScheme.hpp"
+#include "checker/dd/TaskManager.hpp"
+#include "dd/Package.hpp"
+#include "dd/Package_fwd.hpp"
+
+#include <cassert>
+#include <cstddef>
+#include <utility>
 
 namespace ec {
 template <class Config>
@@ -43,10 +50,10 @@ public:
     }
 
     // compute both possible applications and measure the resulting size
-    auto       saved = *internalState;
-    const auto dd1   = package->multiply(op1, saved);
+    auto saved = *internalState;
+    const auto dd1 = package->multiply(op1, saved);
     const auto size1 = dd1.size();
-    const auto dd2   = package->multiply(saved, op2);
+    const auto dd2 = package->multiply(saved, op2);
 
     // greedily chose the smaller resulting decision diagram
     if (const auto size2 = dd2.size(); size1 <= size2) {
@@ -75,14 +82,14 @@ public:
 
 private:
   qc::MatrixDD op1{};
-  bool         cached1 = false;
+  bool cached1 = false;
 
   qc::MatrixDD op2{};
-  bool         cached2 = false;
+  bool cached2 = false;
 
   // the lookahead application scheme maintains links to an internal state to
   // manipulate and a package to use
-  qc::MatrixDD*        internalState{};
+  qc::MatrixDD* internalState{};
   dd::Package<Config>* package{};
 };
 } // namespace ec

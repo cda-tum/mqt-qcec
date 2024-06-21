@@ -1,24 +1,34 @@
+#include "Configuration.hpp"
+#include "Definitions.hpp"
 #include "EquivalenceCheckingManager.hpp"
+#include "EquivalenceCriterion.hpp"
+#include "QuantumComputation.hpp"
 #include "algorithms/BernsteinVazirani.hpp"
 #include "algorithms/QFT.hpp"
 #include "algorithms/QPE.hpp"
+#include "dd/DDDefinitions.hpp"
+#include "dd/Package.hpp"
 
 #include <bitset>
+#include <cstddef>
+#include <cstdlib>
+#include <fstream>
 #include <gtest/gtest.h>
-#include <iomanip>
+#include <iostream>
+#include <memory>
+#include <sstream>
 #include <string>
-#include <utility>
 
 class DynamicCircuitTestExactQPE : public testing::TestWithParam<std::size_t> {
 protected:
-  std::size_t                             precision{};
-  qc::fp                                  theta{};
-  std::size_t                             expectedResult{};
-  std::string                             expectedResultRepresentation{};
+  std::size_t precision{};
+  qc::fp theta{};
+  std::size_t expectedResult{};
+  std::string expectedResultRepresentation;
   std::unique_ptr<qc::QuantumComputation> qpe;
   std::unique_ptr<qc::QuantumComputation> iqpe;
-  std::unique_ptr<dd::Package<>>          dd;
-  std::ofstream                           ofs;
+  std::unique_ptr<dd::Package<>> dd;
+  std::ofstream ofs;
 
   ec::Configuration config{};
 
@@ -31,7 +41,7 @@ protected:
     qpe = std::make_unique<qc::QPE>(precision);
 
     const auto lambda = dynamic_cast<qc::QPE*>(qpe.get())->lambda;
-    iqpe              = std::make_unique<qc::QPE>(lambda, precision, true);
+    iqpe = std::make_unique<qc::QPE>(lambda, precision, true);
 
     std::cout << "Estimating lambda = " << lambda << "π up to " << precision
               << "-bit precision.\n";
@@ -40,8 +50,8 @@ protected:
 
     std::cout << "Expected theta=" << theta << "\n";
     std::bitset<64> binaryExpansion{};
-    dd::fp          expansion = theta * 2;
-    std::size_t     index     = 0;
+    dd::fp expansion = theta * 2;
+    std::size_t index = 0;
     while (std::abs(expansion) > 1e-8) {
       if (expansion >= 1.) {
         binaryExpansion.set(index);
@@ -72,7 +82,7 @@ protected:
     std::cout << "The expected output state is |"
               << expectedResultRepresentation << ">.\n";
 
-    config.optimizations.transformDynamicCircuit        = true;
+    config.optimizations.transformDynamicCircuit = true;
     config.optimizations.backpropagateOutputPermutation = true;
   }
 };
@@ -81,7 +91,7 @@ INSTANTIATE_TEST_SUITE_P(
     Eval, DynamicCircuitTestExactQPE, testing::Range<std::size_t>(1U, 64U, 5U),
     [](const testing::TestParamInfo<DynamicCircuitTestExactQPE::ParamType>&
            inf) {
-      const auto        nqubits = inf.param;
+      const auto nqubits = inf.param;
       std::stringstream ss{};
       ss << nqubits;
       if (nqubits == 1) {
@@ -101,16 +111,16 @@ TEST_P(DynamicCircuitTestExactQPE, UnitaryEquivalence) {
 class DynamicCircuitTestInexactQPE
     : public testing::TestWithParam<std::size_t> {
 protected:
-  std::size_t                             precision{};
-  dd::fp                                  theta{};
-  std::size_t                             expectedResult{};
-  std::string                             expectedResultRepresentation{};
-  std::size_t                             secondExpectedResult{};
-  std::string                             secondExpectedResultRepresentation{};
+  std::size_t precision{};
+  dd::fp theta{};
+  std::size_t expectedResult{};
+  std::string expectedResultRepresentation;
+  std::size_t secondExpectedResult{};
+  std::string secondExpectedResultRepresentation;
   std::unique_ptr<qc::QuantumComputation> qpe;
   std::unique_ptr<qc::QuantumComputation> iqpe;
-  std::unique_ptr<dd::Package<>>          dd;
-  std::ofstream                           ofs;
+  std::unique_ptr<dd::Package<>> dd;
+  std::ofstream ofs;
 
   ec::Configuration config{};
 
@@ -123,7 +133,7 @@ protected:
     qpe = std::make_unique<qc::QPE>(precision, false);
 
     const auto lambda = dynamic_cast<qc::QPE*>(qpe.get())->lambda;
-    iqpe              = std::make_unique<qc::QPE>(lambda, precision, true);
+    iqpe = std::make_unique<qc::QPE>(lambda, precision, true);
 
     std::cout << "Estimating lambda = " << lambda << "π up to " << precision
               << "-bit precision.\n";
@@ -132,8 +142,8 @@ protected:
 
     std::cout << "Expected theta=" << theta << "\n";
     std::bitset<64> binaryExpansion{};
-    dd::fp          expansion = theta * 2;
-    std::size_t     index     = 0;
+    dd::fp expansion = theta * 2;
+    std::size_t index = 0;
     while (std::abs(expansion) > 1e-8) {
       if (expansion >= 1.) {
         binaryExpansion.set(index);
@@ -176,7 +186,7 @@ protected:
               << expectedResultRepresentation << "> and |"
               << secondExpectedResultRepresentation << ">.\n";
 
-    config.optimizations.transformDynamicCircuit        = true;
+    config.optimizations.transformDynamicCircuit = true;
     config.optimizations.backpropagateOutputPermutation = true;
   }
 };
@@ -185,7 +195,7 @@ INSTANTIATE_TEST_SUITE_P(Eval, DynamicCircuitTestInexactQPE,
                          testing::Range<std::size_t>(1U, 15U, 3U),
                          [](const testing::TestParamInfo<
                              DynamicCircuitTestInexactQPE::ParamType>& inf) {
-                           const auto        nqubits = inf.param;
+                           const auto nqubits = inf.param;
                            std::stringstream ss{};
                            ss << nqubits;
                            if (nqubits == 1) {
@@ -204,11 +214,11 @@ TEST_P(DynamicCircuitTestInexactQPE, UnitaryEquivalence) {
 
 class DynamicCircuitTestBV : public testing::TestWithParam<std::size_t> {
 protected:
-  std::size_t                             bitwidth{};
+  std::size_t bitwidth{};
   std::unique_ptr<qc::QuantumComputation> bv;
   std::unique_ptr<qc::QuantumComputation> dbv;
-  std::unique_ptr<dd::Package<>>          dd;
-  std::ofstream                           ofs;
+  std::unique_ptr<dd::Package<>> dd;
+  std::ofstream ofs;
 
   ec::Configuration config{};
 
@@ -221,14 +231,14 @@ protected:
     bv = std::make_unique<qc::BernsteinVazirani>(bitwidth);
 
     const auto s = dynamic_cast<qc::BernsteinVazirani*>(bv.get())->s;
-    dbv          = std::make_unique<qc::BernsteinVazirani>(s, bitwidth, true);
+    dbv = std::make_unique<qc::BernsteinVazirani>(s, bitwidth, true);
 
     const auto expected =
         dynamic_cast<qc::BernsteinVazirani*>(bv.get())->expected;
     std::cout << "Hidden bitstring: " << expected << " (" << bitwidth
               << " qubits)\n";
 
-    config.optimizations.transformDynamicCircuit        = true;
+    config.optimizations.transformDynamicCircuit = true;
     config.optimizations.backpropagateOutputPermutation = true;
   }
 };
@@ -236,7 +246,7 @@ protected:
 INSTANTIATE_TEST_SUITE_P(
     Eval, DynamicCircuitTestBV, testing::Range<std::size_t>(1U, 64U, 5U),
     [](const testing::TestParamInfo<DynamicCircuitTestBV::ParamType>& inf) {
-      const auto        nqubits = inf.param;
+      const auto nqubits = inf.param;
       std::stringstream ss{};
       ss << nqubits;
       if (nqubits == 1) {
@@ -255,11 +265,11 @@ TEST_P(DynamicCircuitTestBV, UnitaryEquivalence) {
 
 class DynamicCircuitTestQFT : public testing::TestWithParam<std::size_t> {
 protected:
-  std::size_t                             precision{};
+  std::size_t precision{};
   std::unique_ptr<qc::QuantumComputation> qft;
   std::unique_ptr<qc::QuantumComputation> dqft;
-  std::unique_ptr<dd::Package<>>          dd;
-  std::ofstream                           ofs;
+  std::unique_ptr<dd::Package<>> dd;
+  std::ofstream ofs;
 
   ec::Configuration config{};
 
@@ -273,7 +283,7 @@ protected:
 
     dqft = std::make_unique<qc::QFT>(precision, true, true);
 
-    config.optimizations.transformDynamicCircuit        = true;
+    config.optimizations.transformDynamicCircuit = true;
     config.optimizations.backpropagateOutputPermutation = true;
   }
 };
@@ -281,7 +291,7 @@ protected:
 INSTANTIATE_TEST_SUITE_P(
     Eval, DynamicCircuitTestQFT, testing::Range<std::size_t>(1U, 65U, 5U),
     [](const testing::TestParamInfo<DynamicCircuitTestQFT::ParamType>& inf) {
-      const auto        nqubits = inf.param;
+      const auto nqubits = inf.param;
       std::stringstream ss{};
       ss << nqubits;
       if (nqubits == 1) {

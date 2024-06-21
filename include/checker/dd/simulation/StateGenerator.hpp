@@ -7,12 +7,22 @@
 
 #include "StateType.hpp"
 #include "algorithms/RandomCliffordCircuit.hpp"
-#include "checker/dd/TaskManager.hpp"
+#include "dd/DDDefinitions.hpp"
+#include "dd/DDpackageConfig.hpp"
 #include "dd/Package.hpp"
-#include "dd/Simulation.hpp"
+#include "dd/Package_fwd.hpp"
+#include "dd/Simulation.hpp" // IWYU pragma: keep
 
-#include <functional>
+#include <array>
+#include <cassert>
+#include <cmath>
+#include <cstddef>
+#include <cstdint>
+#include <limits>
 #include <random>
+#include <tuple>
+#include <unordered_set>
+#include <vector>
 
 namespace ec {
 class StateGenerator {
@@ -26,7 +36,7 @@ public:
   qc::VectorDD
   generateRandomState(dd::Package<Config>& dd, const std::size_t totalQubits,
                       const std::size_t ancillaryQubits = 0U,
-                      const StateType   type = StateType::ComputationalBasis) {
+                      const StateType type = StateType::ComputationalBasis) {
     switch (type) {
     case ec::StateType::Random1QBasis:
       return generateRandom1QBasisState(dd, totalQubits, ancillaryQubits);
@@ -92,8 +102,8 @@ public:
   template <class Config = dd::DDPackageConfig>
   qc::VectorDD
   generateRandom1QBasisState(dd::Package<Config>& dd,
-                             const std::size_t    totalQubits,
-                             const std::size_t    ancillaryQubits = 0U) {
+                             const std::size_t totalQubits,
+                             const std::size_t ancillaryQubits = 0U) {
     // determine how many qubits truly are random
     const std::size_t randomQubits = totalQubits - ancillaryQubits;
 
@@ -132,8 +142,8 @@ public:
   template <class Config = dd::DDPackageConfig>
   qc::VectorDD
   generateRandomStabilizerState(dd::Package<Config>& dd,
-                                const std::size_t    totalQubits,
-                                const std::size_t    ancillaryQubits = 0U) {
+                                const std::size_t totalQubits,
+                                const std::size_t ancillaryQubits = 0U) {
     // determine how many qubits truly are random
     const std::size_t randomQubits = totalQubits - ancillaryQubits;
 
@@ -165,11 +175,11 @@ public:
   void clear() { generatedComputationalBasisStates.clear(); }
 
 private:
-  std::size_t     seed = 0U;
+  std::size_t seed = 0U;
   std::mt19937_64 mt;
 
-  std::unordered_set<std::size_t> generatedComputationalBasisStates{};
-  constexpr static std::size_t    ONE_QUBIT_BASE_ELEMENTS = 6U;
+  std::unordered_set<std::size_t> generatedComputationalBasisStates;
+  constexpr static std::size_t ONE_QUBIT_BASE_ELEMENTS = 6U;
   // this generator produces random bases from the set { |0>, |1>, |+>, |->,
   // |L>, |R> }
   std::uniform_int_distribution<std::size_t> random1QBasisDistribution =

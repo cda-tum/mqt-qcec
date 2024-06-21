@@ -3,10 +3,15 @@
 // See README.md or go to https://github.com/cda-tum/qcec for more information.
 //
 
+#include "Configuration.hpp"
 #include "EquivalenceCheckingManager.hpp"
+#include "QuantumComputation.hpp"
+#include "checker/dd/applicationscheme/ApplicationScheme.hpp"
+#include "checker/dd/applicationscheme/GateCostApplicationScheme.hpp"
 
-#include "gtest/gtest.h"
-#include <functional>
+#include <algorithm>
+#include <gtest/gtest.h>
+#include <iostream>
 #include <string>
 
 class CompilationFlowTest : public testing::TestWithParam<std::string> {
@@ -14,7 +19,7 @@ protected:
   qc::QuantumComputation qcOriginal;
   qc::QuantumComputation qcTranspiled;
 
-  std::string testOriginalDir   = "./circuits/original/";
+  std::string testOriginalDir = "./circuits/original/";
   std::string testTranspiledDir = "./circuits/transpiled/";
 
   ec::Configuration configuration{};
@@ -23,9 +28,9 @@ protected:
     qcOriginal.import(testOriginalDir + GetParam() + ".real");
     qcTranspiled.import(testTranspiledDir + GetParam() + "_transpiled.qasm");
 
-    configuration.execution.runAlternatingChecker  = true;
+    configuration.execution.runAlternatingChecker = true;
     configuration.execution.runConstructionChecker = false;
-    configuration.execution.runSimulationChecker   = false;
+    configuration.execution.runSimulationChecker = false;
 
     configuration.application.alternatingScheme =
         ec::ApplicationSchemeType::GateCost;
@@ -63,7 +68,7 @@ TEST_P(CompilationFlowTest, EquivalenceCompilationFlowNoElidePermutations) {
 
 TEST_P(CompilationFlowTest, EquivalenceCompilationFlowParallel) {
   configuration.execution.runSimulationChecker = true;
-  configuration.execution.parallel             = true;
+  configuration.execution.parallel = true;
 
   ec::EquivalenceCheckingManager ecm(qcOriginal, qcTranspiled, configuration);
   ecm.run();

@@ -5,19 +5,21 @@
 
 #pragma once
 
-#include "QuantumComputation.hpp"
 #include "checker/dd/TaskManager.hpp"
 
+#include <cstddef>
+#include <cstdint>
 #include <iostream>
-#include <stdexcept>
+#include <string>
+#include <utility>
 
 namespace ec {
 // A list of application schemes that implement the below interface
-enum class ApplicationSchemeType {
-  Sequential   = 0,
-  OneToOne     = 1,
-  Lookahead    = 2,
-  GateCost     = 3,
+enum class ApplicationSchemeType : std::uint8_t {
+  Sequential = 0,
+  OneToOne = 1,
+  Lookahead = 2,
+  GateCost = 3,
   Proportional = 4
 };
 
@@ -62,7 +64,7 @@ applicationSchemeFromString(const std::string& applicationScheme) noexcept {
   return ApplicationSchemeType::Proportional;
 }
 
-inline std::istream& operator>>(std::istream&          in,
+inline std::istream& operator>>(std::istream& in,
                                 ApplicationSchemeType& applicationScheme) {
   std::string token;
   in >> token;

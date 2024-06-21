@@ -4,28 +4,33 @@
 //
 
 #include "EquivalenceCheckingManager.hpp"
-#include "checker/dd/applicationscheme/GateCostApplicationScheme.hpp"
+#include "EquivalenceCriterion.hpp"
+#include "checker/dd/applicationscheme/ApplicationScheme.hpp"
+#include "dd/DDDefinitions.hpp"
+#include "operations/Control.hpp"
 
-#include "gtest/gtest.h"
-#include <functional>
-#include <sstream>
+#include <cstddef>
+#include <gtest/gtest.h>
+#include <iostream>
+#include <optional>
+#include <stdexcept>
 
 class EqualityTest : public testing::Test {
   void SetUp() override {
     qc1 = qc::QuantumComputation(nqubits);
     qc2 = qc::QuantumComputation(nqubits);
 
-    config.execution.runSimulationChecker   = false;
-    config.execution.runAlternatingChecker  = false;
+    config.execution.runSimulationChecker = false;
+    config.execution.runAlternatingChecker = false;
     config.execution.runConstructionChecker = false;
-    config.execution.runZXChecker           = false;
+    config.execution.runZXChecker = false;
   }
 
 protected:
-  std::size_t            nqubits = 1U;
+  std::size_t nqubits = 1U;
   qc::QuantumComputation qc1;
   qc::QuantumComputation qc2;
-  ec::Configuration      config{};
+  ec::Configuration config{};
 };
 
 TEST_F(EqualityTest, GlobalPhase) {
@@ -59,14 +64,14 @@ TEST_F(EqualityTest, GlobalPhaseSimulation) {
   qc2.z(0);
   qc2.x(0);
 
-  config.execution.runAlternatingChecker  = false;
+  config.execution.runAlternatingChecker = false;
   config.execution.runConstructionChecker = false;
-  config.execution.runZXChecker           = false;
-  config.execution.runSimulationChecker   = true;
-  config.execution.parallel               = false;
+  config.execution.runZXChecker = false;
+  config.execution.runSimulationChecker = true;
+  config.execution.parallel = false;
   ec::EquivalenceCheckingManager ecm(qc1, qc2, config);
   ecm.run();
-  const auto json       = ecm.getResults().json();
+  const auto json = ecm.getResults().json();
   const auto simChecker = json["checkers"].front();
   EXPECT_EQ(simChecker["equivalence"], "equivalent_up_to_phase");
 }
@@ -77,7 +82,7 @@ TEST_F(EqualityTest, CloseButNotEqualAlternating) {
   qc2.x(0);
   qc2.p(dd::PI / 1024., 0);
 
-  config.functionality.traceThreshold    = 1e-2;
+  config.functionality.traceThreshold = 1e-2;
   config.execution.runAlternatingChecker = true;
   ec::EquivalenceCheckingManager ecm(qc1, qc2, config);
   ecm.run();
@@ -91,7 +96,7 @@ TEST_F(EqualityTest, CloseButNotEqualConstruction) {
   qc2.x(0);
   qc2.p(dd::PI / 1024., 0);
 
-  config.functionality.traceThreshold     = 1e-2;
+  config.functionality.traceThreshold = 1e-2;
   config.execution.runConstructionChecker = true;
   ec::EquivalenceCheckingManager ecm(qc1, qc2, config);
   ecm.run();
@@ -110,7 +115,7 @@ TEST_F(EqualityTest, CloseButNotEqualAlternatingGlobalPhase) {
   qc2.z(0);
   qc2.x(0);
 
-  config.functionality.traceThreshold    = 1e-2;
+  config.functionality.traceThreshold = 1e-2;
   config.execution.runAlternatingChecker = true;
   ec::EquivalenceCheckingManager ecm(qc1, qc2, config);
   ecm.run();
@@ -125,7 +130,7 @@ TEST_F(EqualityTest, CloseButNotEqualSimulation) {
   qc2.h(0);
   qc2.p(dd::PI / 1024., 0);
 
-  config.simulation.fidelityThreshold   = 1e-2;
+  config.simulation.fidelityThreshold = 1e-2;
   config.execution.runSimulationChecker = true;
   ec::EquivalenceCheckingManager ecm(qc1, qc2, config);
   ecm.run();
@@ -141,7 +146,7 @@ TEST_F(EqualityTest, SimulationMoreThan64Qubits) {
   for (auto i = 0U; i < 64U; ++i) {
     qc1.cx(0_pc, i + 1);
   }
-  qc2                                   = qc1;
+  qc2 = qc1;
   config.execution.runSimulationChecker = true;
   ec::EquivalenceCheckingManager ecm(qc1, qc2, config);
   ecm.run();
@@ -193,11 +198,11 @@ TEST_F(EqualityTest, AutomaticSwitchToConstructionChecker) {
 TEST_F(EqualityTest, ExceptionInParallelThread) {
   qc1.x(0);
 
-  config                                  = ec::Configuration{};
-  config.execution.runAlternatingChecker  = false;
+  config = ec::Configuration{};
+  config.execution.runAlternatingChecker = false;
   config.execution.runConstructionChecker = false;
-  config.execution.runSimulationChecker   = true;
-  config.execution.runZXChecker           = false;
+  config.execution.runSimulationChecker = true;
+  config.execution.runZXChecker = false;
   config.application.simulationScheme = ec::ApplicationSchemeType::Lookahead;
 
   ec::EquivalenceCheckingManager ecm(qc1, qc1, config);
@@ -288,7 +293,7 @@ TEST_F(EqualityTest, onlySingleTask) {
   qc1.h(0);
   qc2.h(0);
   config.execution.runSimulationChecker = true;
-  config.simulation.maxSims             = 1U;
+  config.simulation.maxSims = 1U;
   ec::EquivalenceCheckingManager ecm(qc1, qc2, config);
   ecm.run();
   EXPECT_TRUE(ecm.getConfiguration().onlySingleTask());
@@ -389,7 +394,7 @@ TEST_F(EqualityTest, EqualDueToNoSeparateIdleQubitStripping) {
   qc2.initializeIOMapping();
 
   config.execution.runConstructionChecker = true;
-  config.optimizations.elidePermutations  = false;
+  config.optimizations.elidePermutations = false;
   ec::EquivalenceCheckingManager ecm(qc1, qc2, config);
   ecm.run();
   EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::Equivalent);
@@ -403,7 +408,7 @@ TEST_F(EqualityTest,
        StripIdleQubitPresentInBothCircuitsWithDifferentInitialLayout) {
   // Test that idle qubits are removed correctly even if the initial layout is
   // different
-  qc1                  = qc::QuantumComputation(3, 2);
+  qc1 = qc::QuantumComputation(3, 2);
   qc1.initialLayout[0] = 0;
   qc1.initialLayout[1] = 2;
   qc1.initialLayout[2] = 1;
@@ -465,7 +470,7 @@ TEST_F(EqualityTest, StripIdleQubitLogicalOnlyInOnePhysicalInBothCircuits) {
   qc1.measure(1, 1);
   qc1.initializeIOMapping();
 
-  qc2                  = qc::QuantumComputation(3, 2);
+  qc2 = qc::QuantumComputation(3, 2);
   qc2.initialLayout[0] = 0;
   qc2.initialLayout[1] = 2;
   qc2.initialLayout[2] = 1;
@@ -494,13 +499,13 @@ TEST_F(EqualityTest, StripIdleQubitOutputPermutationDifferent) {
   qc1.swap(0, 1);
   qc1.initializeIOMapping();
 
-  qc2                      = qc::QuantumComputation(2);
+  qc2 = qc::QuantumComputation(2);
   qc2.outputPermutation[0] = 1;
   qc2.outputPermutation[1] = 0;
   qc2.initializeIOMapping();
 
   config.execution.runConstructionChecker = true;
-  config.optimizations.elidePermutations  = true;
+  config.optimizations.elidePermutations = true;
   ec::EquivalenceCheckingManager ecm(qc1, qc2, config);
   ecm.run();
   EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::Equivalent);
@@ -518,9 +523,9 @@ TEST_F(EqualityTest, StripIdleQubitOutputPermutationEquivalent) {
   qc1 = qc::QuantumComputation(2);
   qc1.initializeIOMapping();
 
-  qc2                      = qc::QuantumComputation(2);
-  qc2.initialLayout[0]     = 1;
-  qc2.initialLayout[1]     = 0;
+  qc2 = qc::QuantumComputation(2);
+  qc2.initialLayout[0] = 1;
+  qc2.initialLayout[1] = 0;
   qc2.outputPermutation[0] = 1;
   qc2.outputPermutation[1] = 0;
   qc2.initializeIOMapping();
@@ -542,7 +547,7 @@ TEST_F(EqualityTest, StripQubitIdleInOneCircuitOnlyOutputPermutationDifferent) {
   qc1 = qc::QuantumComputation(1);
   qc1.initializeIOMapping();
 
-  qc2                      = qc::QuantumComputation(2);
+  qc2 = qc::QuantumComputation(2);
   qc2.outputPermutation[0] = 1;
   qc2.outputPermutation[1] = 0;
   qc2.initializeIOMapping();

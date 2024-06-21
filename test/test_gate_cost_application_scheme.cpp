@@ -3,12 +3,20 @@
 // See README.md or go to https://github.com/cda-tum/qcec for more information.
 //
 
+#include "Configuration.hpp"
 #include "EquivalenceCheckingManager.hpp"
+#include "checker/dd/TaskManager.hpp"
+#include "checker/dd/applicationscheme/ApplicationScheme.hpp"
 #include "checker/dd/applicationscheme/GateCostApplicationScheme.hpp"
+#include "dd/Package.hpp"
+#include "dd/Package_fwd.hpp"
+#include "operations/Control.hpp"
 
-#include "gtest/gtest.h"
-#include <functional>
-#include <sstream>
+#include <cstddef>
+#include <fstream>
+#include <gtest/gtest.h>
+#include <iostream>
+#include <memory>
 #include <string>
 
 class GateCostApplicationSchemeTest : public testing::Test {
@@ -18,16 +26,16 @@ class GateCostApplicationSchemeTest : public testing::Test {
   }
 
 protected:
-  std::size_t                    nqubits = 3U;
+  std::size_t nqubits = 3U;
   std::unique_ptr<dd::Package<>> dd;
-  qc::QuantumComputation         qc;
+  qc::QuantumComputation qc;
 };
 
 TEST_F(GateCostApplicationSchemeTest, SchemeFromProfile) {
   using namespace qc::literals;
 
   const std::string filename = "simple.profile";
-  std::ofstream     ofs(filename);
+  std::ofstream ofs(filename);
 
   // create a very simple profile that just specifies that a Toffoli corresponds
   // to 15 gates
@@ -47,7 +55,7 @@ TEST_F(GateCostApplicationSchemeTest, SchemeFromProfile) {
   EXPECT_EQ(right, 15U);
 
   ec::Configuration config{};
-  config.application.profile           = filename;
+  config.application.profile = filename;
   config.application.alternatingScheme = ec::ApplicationSchemeType::GateCost;
   ec::EquivalenceCheckingManager ecm(qc, qc, config);
   ecm.run();

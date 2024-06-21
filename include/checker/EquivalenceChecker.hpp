@@ -20,7 +20,7 @@ class EquivalenceChecker {
 public:
   EquivalenceChecker(const qc::QuantumComputation& circ1,
                      const qc::QuantumComputation& circ2,
-                     Configuration                 config) noexcept
+                     Configuration config) noexcept
       : qc1(&circ1), qc2(&circ2),
         nqubits(std::max(qc1->getNqubits(), qc2->getNqubits())),
         configuration(std::move(config)) {};
@@ -50,7 +50,7 @@ protected:
   Configuration configuration;
 
   EquivalenceCriterion equivalence = EquivalenceCriterion::NoInformation;
-  double               runtime{};
+  double runtime{};
 
 private:
   std::atomic<bool> done{false};

@@ -6,32 +6,35 @@
 #pragma once
 
 #include "Configuration.hpp"
-#include "Definitions.hpp"
 #include "EquivalenceCriterion.hpp"
+#include "Permutation.hpp"
 #include "QuantumComputation.hpp"
 #include "checker/EquivalenceChecker.hpp"
-#include "nlohmann/json.hpp"
-#include "zx/Simplify.hpp"
+#include "zx/Rules.hpp"
+#include "zx/ZXDefinitions.hpp"
 #include "zx/ZXDiagram.hpp"
+
+#include <cstddef>
+#include <nlohmann/json.hpp>
 
 namespace ec {
 class ZXEquivalenceChecker : public EquivalenceChecker {
 public:
   ZXEquivalenceChecker(const qc::QuantumComputation& circ1,
                        const qc::QuantumComputation& circ2,
-                       Configuration                 config) noexcept;
+                       Configuration config) noexcept;
 
   EquivalenceCriterion run() override;
 
-  void json(nlohmann::json& j) const noexcept override {
+  void json(nlohmann::basic_json<>& j) const noexcept override {
     EquivalenceChecker::json(j);
     j["checker"] = "zx";
   }
 
 private:
   zx::ZXDiagram miter;
-  zx::fp        tolerance;
-  bool          ancilla = false;
+  zx::fp tolerance;
+  bool ancilla = false;
 
   // the following methods are adaptations of the core ZX simplification
   // routines that additionally check a criterion for early termination of the

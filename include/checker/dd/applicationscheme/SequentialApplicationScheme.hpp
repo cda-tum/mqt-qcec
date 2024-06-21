@@ -6,6 +6,10 @@
 #pragma once
 
 #include "ApplicationScheme.hpp"
+#include "checker/dd/TaskManager.hpp"
+
+#include <cstddef>
+#include <utility>
 
 namespace ec {
 template <class DDType, class Config>
@@ -23,7 +27,7 @@ public:
   }
 
 private:
-  const std::size_t gates1;
-  const std::size_t gates2;
+  std::size_t gates1;
+  std::size_t gates2;
 };
 } // namespace ec

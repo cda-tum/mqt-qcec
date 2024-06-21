@@ -3,46 +3,58 @@
 // See README.md or go to https://github.com/cda-tum/qcec for more information.
 //
 
+#include "Configuration.hpp"
 #include "EquivalenceCheckingManager.hpp"
+#include "EquivalenceCriterion.hpp"
+#include "QuantumComputation.hpp"
+#include "checker/dd/applicationscheme/ApplicationScheme.hpp"
 
-#include "gtest/gtest.h"
+#include <algorithm>
+#include <array>
+#include <cstddef>
+#include <cstdint>
 #include <functional>
+#include <gtest/gtest.h>
 #include <iostream>
+#include <iterator>
 #include <random>
+#include <set>
+#include <sstream>
 #include <string>
+#include <tuple>
 
 class JournalTestNonEQ
     : public testing::TestWithParam<std::tuple<std::string, std::uint16_t>> {
 protected:
   qc::QuantumComputation qcOriginal;
   qc::QuantumComputation qcTranspiled;
-  ec::Configuration      config;
+  ec::Configuration config;
 
-  std::string testOriginalDir   = "./circuits/original/";
+  std::string testOriginalDir = "./circuits/original/";
   std::string testTranspiledDir = "./circuits/transpiled/";
 
   std::uint16_t tries = 10U;
 
-  double      minTime = 0.;
-  double      maxTime = 0.;
-  double      avgTime = 0.;
+  double minTime = 0.;
+  double maxTime = 0.;
+  double avgTime = 0.;
   std::size_t minSims = 0U;
   std::size_t maxSims = 0U;
-  double      avgSims = 0.;
+  double avgSims = 0.;
 
-  std::string transpiledFile{};
+  std::string transpiledFile;
 
-  std::mt19937_64                              mt;
+  std::mt19937_64 mt;
   std::uniform_int_distribution<std::uint64_t> distribution;
-  std::function<std::uint64_t()>               rng;
+  std::function<std::uint64_t()> rng;
 
-  std::uint16_t                     gatesToRemove = 0U;
-  std::set<std::set<std::uint64_t>> alreadyRemoved{};
+  std::uint16_t gatesToRemove = 0U;
+  std::set<std::set<std::uint64_t>> alreadyRemoved;
 
   std::uint16_t successes = 0U;
 
   static bool setExists(const std::set<std::set<std::uint64_t>>& all,
-                        const std::set<std::uint64_t>&           test) {
+                        const std::set<std::uint64_t>& test) {
     // first entry
     if (all.empty()) {
       return false;
@@ -70,13 +82,13 @@ protected:
     transpiledFile = ss.str();
 
     std::array<std::mt19937_64::result_type, std::mt19937_64::state_size>
-                       randomData{};
+        randomData{};
     std::random_device rd;
     std::generate(begin(randomData), end(randomData), [&]() { return rd(); });
     std::seed_seq seeds(begin(randomData), end(randomData));
     mt.seed(seeds);
     distribution = decltype(distribution)(0U, qcTranspiled.getNops() - 1U);
-    rng          = [this]() { return distribution(mt); };
+    rng = [this]() { return distribution(mt); };
 
     gatesToRemove = std::get<1>(GetParam());
 
@@ -129,7 +141,7 @@ INSTANTIATE_TEST_SUITE_P(
         testing::Range(static_cast<unsigned short>(1U),
                        static_cast<unsigned short>(4U), 2)),
     [](const testing::TestParamInfo<JournalTestNonEQ::ParamType>& inf) {
-      std::string          name          = std::get<0>(inf.param);
+      std::string name = std::get<0>(inf.param);
       const unsigned short gatesToRemove = std::get<1>(inf.param);
       std::replace(name.begin(), name.end(), '-', '_');
       std::stringstream ss{};
@@ -138,13 +150,13 @@ INSTANTIATE_TEST_SUITE_P(
     });
 
 TEST_P(JournalTestNonEQ, PowerOfSimulation) {
-  config.execution.runAlternatingChecker  = false;
+  config.execution.runAlternatingChecker = false;
   config.execution.runConstructionChecker = false;
-  config.execution.runSimulationChecker   = true;
-  config.execution.runZXChecker           = false;
-  config.execution.parallel               = false;
-  config.execution.timeout                = 60.;
-  config.simulation.maxSims               = 16U;
+  config.execution.runSimulationChecker = true;
+  config.execution.runZXChecker = false;
+  config.execution.parallel = false;
+  config.execution.timeout = 60.;
+  config.simulation.maxSims = 16U;
   config.application.simulationScheme = ec::ApplicationSchemeType::Sequential;
   config.functionality.checkPartialEquivalence = true;
 
@@ -176,7 +188,7 @@ TEST_P(JournalTestNonEQ, PowerOfSimulation) {
     ecm.run();
     auto results = ecm.getResults();
     std::cout << "[" << i << "] ";
-    std::cout << toString(results.equivalence) << std::endl;
+    std::cout << toString(results.equivalence) << '\n';
     addToStatistics(i, results.checkTime + results.preprocessingTime,
                     results.performedSimulations);
     if (results.equivalence == ec::EquivalenceCriterion::NotEquivalent) {
@@ -188,17 +200,17 @@ TEST_P(JournalTestNonEQ, PowerOfSimulation) {
             << tries << ";" << minSims << ";" << maxSims << ";" << avgSims
             << ";" << minTime << ";" << maxTime << ";" << avgTime << ";"
             << static_cast<double>(successes) / static_cast<double>(tries)
-            << ";" << std::endl;
+            << ";" << '\n';
 }
 
 TEST_P(JournalTestNonEQ, PowerOfSimulationParallel) {
-  config.execution.runAlternatingChecker  = false;
+  config.execution.runAlternatingChecker = false;
   config.execution.runConstructionChecker = false;
-  config.execution.runZXChecker           = false;
-  config.execution.runSimulationChecker   = true;
-  config.execution.parallel               = true;
-  config.execution.timeout                = 60.;
-  config.simulation.maxSims               = 16U;
+  config.execution.runZXChecker = false;
+  config.execution.runSimulationChecker = true;
+  config.execution.parallel = true;
+  config.execution.timeout = 60.;
+  config.simulation.maxSims = 16U;
   config.application.simulationScheme = ec::ApplicationSchemeType::Sequential;
   config.functionality.checkPartialEquivalence = true;
 
@@ -230,7 +242,7 @@ TEST_P(JournalTestNonEQ, PowerOfSimulationParallel) {
     ecm.run();
     auto results = ecm.getResults();
     std::cout << "[" << i << "] ";
-    std::cout << toString(results.equivalence) << std::endl;
+    std::cout << toString(results.equivalence) << '\n';
     addToStatistics(i, results.checkTime + results.preprocessingTime,
                     results.performedSimulations);
     if (results.equivalence == ec::EquivalenceCriterion::NotEquivalent) {
@@ -242,29 +254,29 @@ TEST_P(JournalTestNonEQ, PowerOfSimulationParallel) {
             << tries << ";" << minSims << ";" << maxSims << ";" << avgSims
             << ";" << minTime << ";" << maxTime << ";" << avgTime << ";"
             << static_cast<double>(successes) / static_cast<double>(tries)
-            << ";" << std::endl;
+            << ";" << '\n';
 }
 
 class JournalTestEQ : public testing::TestWithParam<std::string> {
 protected:
   qc::QuantumComputation qcOriginal;
   qc::QuantumComputation qcTranspiled;
-  ec::Configuration      config{};
+  ec::Configuration config{};
 
-  std::string testOriginalDir   = "./circuits/original/";
+  std::string testOriginalDir = "./circuits/original/";
   std::string testTranspiledDir = "./circuits/transpiled/";
 
-  std::string transpiledFile{};
+  std::string transpiledFile;
 
   void SetUp() override {
-    config.execution.parallel               = false;
+    config.execution.parallel = false;
     config.execution.runConstructionChecker = false;
-    config.execution.runAlternatingChecker  = false;
-    config.execution.runZXChecker           = false;
-    config.execution.runSimulationChecker   = false;
-    config.simulation.maxSims               = 16;
+    config.execution.runAlternatingChecker = false;
+    config.execution.runZXChecker = false;
+    config.execution.runSimulationChecker = false;
+    config.simulation.maxSims = 16;
     config.application.simulationScheme = ec::ApplicationSchemeType::OneToOne;
-    config.execution.timeout            = 60.;
+    config.execution.timeout = 60.;
 
     std::stringstream ss{};
     ss << testTranspiledDir << GetParam() << "_transpiled.qasm";
@@ -305,7 +317,7 @@ INSTANTIATE_TEST_SUITE_P(
 
 TEST_P(JournalTestEQ, EQReference) {
   config.execution.runConstructionChecker = true;
-  config.application.constructionScheme   = ec::ApplicationSchemeType::OneToOne;
+  config.application.constructionScheme = ec::ApplicationSchemeType::OneToOne;
 
   ec::EquivalenceCheckingManager ecm(qcOriginal, qcTranspiled, config);
   ecm.run();
@@ -315,7 +327,7 @@ TEST_P(JournalTestEQ, EQReference) {
 
 TEST_P(JournalTestEQ, EQNaive) {
   config.execution.runAlternatingChecker = true;
-  config.application.alternatingScheme   = ec::ApplicationSchemeType::OneToOne;
+  config.application.alternatingScheme = ec::ApplicationSchemeType::OneToOne;
 
   ec::EquivalenceCheckingManager ecm(qcOriginal, qcTranspiled, config);
   ecm.run();
@@ -336,7 +348,7 @@ TEST_P(JournalTestEQ, EQProportional) {
 
 TEST_P(JournalTestEQ, EQLookahead) {
   config.execution.runAlternatingChecker = true;
-  config.application.alternatingScheme   = ec::ApplicationSchemeType::Lookahead;
+  config.application.alternatingScheme = ec::ApplicationSchemeType::Lookahead;
 
   ec::EquivalenceCheckingManager ecm(qcOriginal, qcTranspiled, config);
   ecm.run();
@@ -354,7 +366,7 @@ TEST_P(JournalTestEQ, EQPowerOfSimulation) {
 }
 
 TEST_P(JournalTestEQ, EQReferenceParallel) {
-  config.execution.parallel               = true;
+  config.execution.parallel = true;
   config.execution.runConstructionChecker = true;
   config.execution.runSimulationChecker = true; // additionally run simulations
   config.application.constructionScheme = ec::ApplicationSchemeType::OneToOne;
@@ -366,9 +378,9 @@ TEST_P(JournalTestEQ, EQReferenceParallel) {
 }
 
 TEST_P(JournalTestEQ, EQNaiveParallel) {
-  config.execution.parallel              = true;
+  config.execution.parallel = true;
   config.execution.runAlternatingChecker = true;
-  config.application.alternatingScheme   = ec::ApplicationSchemeType::OneToOne;
+  config.application.alternatingScheme = ec::ApplicationSchemeType::OneToOne;
 
   ec::EquivalenceCheckingManager ecm(qcOriginal, qcTranspiled, config);
   ecm.run();
@@ -377,7 +389,7 @@ TEST_P(JournalTestEQ, EQNaiveParallel) {
 }
 
 TEST_P(JournalTestEQ, EQProportionalParallel) {
-  config.execution.parallel              = true;
+  config.execution.parallel = true;
   config.execution.runAlternatingChecker = true;
   config.application.alternatingScheme =
       ec::ApplicationSchemeType::Proportional;
@@ -389,9 +401,9 @@ TEST_P(JournalTestEQ, EQProportionalParallel) {
 }
 
 TEST_P(JournalTestEQ, EQLookaheadParallel) {
-  config.execution.parallel              = true;
+  config.execution.parallel = true;
   config.execution.runAlternatingChecker = true;
-  config.application.alternatingScheme   = ec::ApplicationSchemeType::Lookahead;
+  config.application.alternatingScheme = ec::ApplicationSchemeType::Lookahead;
 
   ec::EquivalenceCheckingManager ecm(qcOriginal, qcTranspiled, config);
   ecm.run();
@@ -400,7 +412,7 @@ TEST_P(JournalTestEQ, EQLookaheadParallel) {
 }
 
 TEST_P(JournalTestEQ, EQPowerOfSimulationParallel) {
-  config.execution.parallel             = true;
+  config.execution.parallel = true;
   config.execution.runSimulationChecker = true;
 
   ec::EquivalenceCheckingManager ecm(qcOriginal, qcTranspiled, config);

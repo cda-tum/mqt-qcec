@@ -9,8 +9,12 @@
 #include "EquivalenceCriterion.hpp"
 #include "QuantumComputation.hpp"
 #include "ThreadSafeQueue.hpp"
+#include "checker/EquivalenceChecker.hpp"
 #include "checker/dd/DDSimulationChecker.hpp"
+#include "checker/dd/applicationscheme/ApplicationScheme.hpp"
+#include "checker/dd/applicationscheme/GateCostApplicationScheme.hpp"
 #include "checker/dd/simulation/StateGenerator.hpp"
+#include "checker/dd/simulation/StateType.hpp"
 #include "dd/ComplexNumbers.hpp"
 #include "dd/DDDefinitions.hpp"
 
@@ -54,11 +58,11 @@ public:
 
     EquivalenceCriterion equivalence = EquivalenceCriterion::NoInformation;
 
-    std::size_t startedSimulations   = 0U;
+    std::size_t startedSimulations = 0U;
     std::size_t performedSimulations = 0U;
-    dd::CVec    cexInput;
-    dd::CVec    cexOutput1;
-    dd::CVec    cexOutput2;
+    dd::CVec cexInput;
+    dd::CVec cexOutput1;
+    dd::CVec cexOutput2;
     std::size_t performedInstantiations = 0U;
 
     nlohmann::json checkerResults = nlohmann::json::array();
@@ -85,7 +89,7 @@ public:
     }
     [[nodiscard]] std::string toString() const { return json().dump(2); }
     friend std::ostream&
-    operator<<(std::ostream&                              os,
+    operator<<(std::ostream& os,
                const EquivalenceCheckingManager::Results& res) {
       return os << res.toString();
     }
@@ -107,7 +111,7 @@ public:
     return results.equivalence;
   }
   [[nodiscard]] Configuration getConfiguration() const { return configuration; }
-  [[nodiscard]] Results       getResults() const { return results; }
+  [[nodiscard]] Results getResults() const { return results; }
 
   // convenience functions for changing the configuration after the manager has
   // been constructed: Execution: These settings may be changed to influence
@@ -138,9 +142,9 @@ public:
 
   void disableAllCheckers() {
     configuration.execution.runConstructionChecker = false;
-    configuration.execution.runZXChecker           = false;
-    configuration.execution.runSimulationChecker   = false;
-    configuration.execution.runAlternatingChecker  = false;
+    configuration.execution.runZXChecker = false;
+    configuration.execution.runSimulationChecker = false;
+    configuration.execution.runAlternatingChecker = false;
   }
 
   // Optimization: Optimizations are applied during initialization. Already
@@ -251,11 +255,11 @@ protected:
   Configuration configuration{};
 
   StateGenerator stateGenerator;
-  std::mutex     stateGeneratorMutex;
+  std::mutex stateGeneratorMutex;
 
-  bool                                             done{false};
-  std::condition_variable                          doneCond;
-  std::mutex                                       doneMutex;
+  bool done{false};
+  std::condition_variable doneCond;
+  std::mutex doneMutex;
   std::vector<std::unique_ptr<EquivalenceChecker>> checkers;
 
   Results results{};
@@ -315,7 +319,7 @@ protected:
   /// once it is done.
   /// \return A future that can be used to wait for the checker to finish.
   template <class Checker>
-  std::future<void> asyncRunChecker(const std::size_t             id,
+  std::future<void> asyncRunChecker(const std::size_t id,
                                     ThreadSafeQueue<std::size_t>& queue) {
     static_assert(std::is_base_of_v<EquivalenceChecker, Checker>,
                   "Checker must be derived from EquivalenceChecker");

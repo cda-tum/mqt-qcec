@@ -23,19 +23,19 @@ class ZXTest : public testing::TestWithParam<std::string> {
 protected:
   qc::QuantumComputation qcOriginal;
   qc::QuantumComputation qcAlternative;
-  ec::Configuration      config{};
+  ec::Configuration config{};
 
   std::unique_ptr<ec::EquivalenceCheckingManager> ecm;
 
-  std::string testOriginal       = "./circuits/test/test.real";
+  std::string testOriginal = "./circuits/test/test.real";
   std::string testAlternativeDir = "./circuits/test/";
 
   void SetUp() override {
-    config.execution.parallel               = true;
+    config.execution.parallel = true;
     config.execution.runConstructionChecker = false;
-    config.execution.runAlternatingChecker  = false;
-    config.execution.runSimulationChecker   = false;
-    config.execution.runZXChecker           = true;
+    config.execution.runAlternatingChecker = false;
+    config.execution.runSimulationChecker = false;
+    config.execution.runZXChecker = true;
   }
 
   void TearDown() override { std::cout << ecm->getResults() << "\n"; }
@@ -86,8 +86,8 @@ TEST_F(ZXTest, Timeout) {
 
   // construct large circuit
   constexpr auto numLayers = 10000;
-  qcOriginal               = qc::QuantumComputation(2);
-  qcAlternative            = qc::QuantumComputation(2);
+  qcOriginal = qc::QuantumComputation(2);
+  qcAlternative = qc::QuantumComputation(2);
   for (auto i = 0; i < numLayers; ++i) {
     qcOriginal.cx(1, 0);
     qcOriginal.h(0);
@@ -166,9 +166,9 @@ TEST_F(ZXTest, Permutation) {
   qc2.x(0);
   qc2.x(1);
   qc::Permutation p;
-  p[0]                  = 1;
-  p[1]                  = 0;
-  qc1.initialLayout     = p;
+  p[0] = 1;
+  p[1] = 0;
+  qc1.initialLayout = p;
   qc1.outputPermutation = p;
 
   ecm = std::make_unique<ec::EquivalenceCheckingManager>(qc1, qc2, config);
@@ -196,8 +196,8 @@ TEST_F(ZXTest, Ancilla) {
 TEST_F(ZXTest, ZXWrongAncilla) {
   using namespace qc::literals;
 
-  auto            qc1 = qc::QuantumComputation(1);
-  auto            qc2 = qc::QuantumComputation(2);
+  auto qc1 = qc::QuantumComputation(1);
+  auto qc2 = qc::QuantumComputation(2);
   qc::Permutation p1{};
   p1[0] = 0;
   qc1.x(0);
@@ -256,19 +256,19 @@ class ZXTestCompFlow : public testing::TestWithParam<std::string> {
 protected:
   qc::QuantumComputation qcOriginal;
   qc::QuantumComputation qcTranspiled;
-  ec::Configuration      config{};
+  ec::Configuration config{};
 
   std::unique_ptr<ec::EquivalenceCheckingManager> ecm;
 
-  std::string testOriginalDir   = "./circuits/original/";
+  std::string testOriginalDir = "./circuits/original/";
   std::string testTranspiledDir = "./circuits/transpiled/";
 
   void SetUp() override {
-    config.execution.parallel               = false;
+    config.execution.parallel = false;
     config.execution.runConstructionChecker = false;
-    config.execution.runAlternatingChecker  = false;
-    config.execution.runSimulationChecker   = false;
-    config.execution.runZXChecker           = true;
+    config.execution.runAlternatingChecker = false;
+    config.execution.runSimulationChecker = false;
+    config.execution.runZXChecker = true;
 
     qcOriginal.import(testOriginalDir + GetParam() + ".real");
     qcTranspiled.import(testTranspiledDir + GetParam() + "_transpiled.qasm");
@@ -295,7 +295,7 @@ TEST_P(ZXTestCompFlow, EquivalenceCompilationFlow) {
 
 TEST(ZXTestsMisc, IdentityNotHadamard) {
   const auto qc1 = qc::QuantumComputation(1);
-  auto       qc2 = qc::QuantumComputation(1);
+  auto qc2 = qc::QuantumComputation(1);
   qc2.h(0);
 
   auto ecm = ec::EquivalenceCheckingManager(qc1, qc2);
@@ -402,10 +402,10 @@ TEST_F(ZXTest, IdleQubit) {
   qc2.measure(4, 2);
   qc2.initializeIOMapping();
 
-  config.execution.runZXChecker           = true;
-  config.execution.parallel               = false;
-  config.execution.runSimulationChecker   = false;
-  config.execution.runAlternatingChecker  = false;
+  config.execution.runZXChecker = true;
+  config.execution.parallel = false;
+  config.execution.runSimulationChecker = false;
+  config.execution.runAlternatingChecker = false;
   config.execution.runConstructionChecker = false;
   ecm = std::make_unique<ec::EquivalenceCheckingManager>(qc1, qc2, config);
 
@@ -438,10 +438,10 @@ TEST_F(ZXTest, TwoQubitRotations) {
   qc2.cx(0, 1);
   qc2.rx(-qc::PI_2, 0);
   qc2.rx(-qc::PI_2, 1);
-  config.execution.runZXChecker           = true;
-  config.execution.parallel               = false;
-  config.execution.runSimulationChecker   = false;
-  config.execution.runAlternatingChecker  = false;
+  config.execution.runZXChecker = true;
+  config.execution.parallel = false;
+  config.execution.runSimulationChecker = false;
+  config.execution.runAlternatingChecker = false;
   config.execution.runConstructionChecker = false;
   ecm = std::make_unique<ec::EquivalenceCheckingManager>(qc1, qc2, config);
 

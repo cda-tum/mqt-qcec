@@ -7,6 +7,8 @@
 #include "Definitions.hpp"
 #include "EquivalenceCheckingManager.hpp"
 #include "QuantumComputation.hpp"
+#include "checker/dd/applicationscheme/ApplicationScheme.hpp"
+#include "checker/dd/applicationscheme/GateCostApplicationScheme.hpp"
 
 #include "gtest/gtest.h"
 #include <iostream>
@@ -21,9 +23,9 @@ class SimpleCircuitIdentitiesTest
 protected:
   qc::QuantumComputation qcOriginal;
   qc::QuantumComputation qcAlternative;
-  ec::Configuration      config{};
+  ec::Configuration config{};
 
-  std::unique_ptr<ec::EquivalenceCheckingManager> ecm{};
+  std::unique_ptr<ec::EquivalenceCheckingManager> ecm;
 
   void SetUp() override {
     const auto [circ1, circ2] = GetParam().second;
@@ -32,11 +34,11 @@ protected:
     std::stringstream ss2{circ2};
     qcAlternative.import(ss2, qc::Format::OpenQASM2);
 
-    config.optimizations.reconstructSWAPs     = false;
+    config.optimizations.reconstructSWAPs = false;
     config.optimizations.fuseSingleQubitGates = false;
-    config.optimizations.reorderOperations    = false;
-    config.optimizations.elidePermutations    = false;
-    config.execution.runZXChecker             = true;
+    config.optimizations.reorderOperations = false;
+    config.optimizations.elidePermutations = false;
+    config.execution.runZXChecker = true;
     EXPECT_NO_THROW(ecm = std::make_unique<ec::EquivalenceCheckingManager>(
                         qcOriginal, qcAlternative, config););
   }

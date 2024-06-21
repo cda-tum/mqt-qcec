@@ -38,10 +38,10 @@ public:
     auto p = std::make_unique<Node>();
     {
       const std::lock_guard tailLock(tailMutex);
-      tail->data          = data;
+      tail->data = data;
       Node* const newTail = p.get();
-      tail->next          = std::move(p);
-      tail                = newTail;
+      tail->next = std::move(p);
+      tail = newTail;
     }
     dataCond.notify_one();
   }
@@ -52,13 +52,13 @@ public:
 
 private:
   struct Node {
-    std::shared_ptr<T>    data;
+    std::shared_ptr<T> data;
     std::unique_ptr<Node> next;
   };
-  std::mutex              headMutex;
-  std::unique_ptr<Node>   head = std::make_unique<Node>();
-  std::mutex              tailMutex;
-  Node*                   tail;
+  std::mutex headMutex;
+  std::unique_ptr<Node> head = std::make_unique<Node>();
+  std::mutex tailMutex;
+  Node* tail;
   std::condition_variable dataCond;
 
   auto getTail() {
@@ -68,7 +68,7 @@ private:
 
   auto popHead() {
     auto oldHead = std::move(head);
-    head         = std::move(oldHead->next);
+    head = std::move(oldHead->next);
     return oldHead;
   }
 

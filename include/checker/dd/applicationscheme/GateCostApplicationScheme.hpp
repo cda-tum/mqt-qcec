@@ -44,8 +44,8 @@ class GateCostApplicationScheme final
 public:
   GateCostApplicationScheme(TaskManager<DDType, Config>& tm1,
                             TaskManager<DDType, Config>& tm2,
-                            const CostFunction&          costFunction,
-                            const bool                   singleQubitGateFusion)
+                            const CostFunction& costFunction,
+                            const bool singleQubitGateFusion)
       : ApplicationScheme<DDType, Config>(tm1, tm2),
         singleQubitGateFusionEnabled(singleQubitGateFusion) {
     populateLookupTable(costFunction, tm1.getCircuit());
@@ -54,8 +54,8 @@ public:
 
   GateCostApplicationScheme(TaskManager<DDType, Config>& tm1,
                             TaskManager<DDType, Config>& tm2,
-                            const std::string&           filename,
-                            const bool                   singleQubitGateFusion)
+                            const std::string& filename,
+                            const bool singleQubitGateFusion)
       : ApplicationScheme<DDType, Config>(tm1, tm2),
         singleQubitGateFusionEnabled(singleQubitGateFusion) {
     populateLookupTable(filename);
@@ -85,15 +85,15 @@ public:
 
 private:
   GateCostLookupTable gateCostLookupTable;
-  bool                singleQubitGateFusionEnabled;
+  bool singleQubitGateFusionEnabled;
 
   template <class CostFun>
-  void populateLookupTable(CostFun                       costFunction,
+  void populateLookupTable(CostFun costFunction,
                            const qc::QuantumComputation* qc) {
     for (const auto& op : *qc) {
-      const auto type      = op->getType();
+      const auto type = op->getType();
       const auto nControls = op->getNcontrols();
-      const auto key       = GateCostLookupTableKeyType{type, nControls};
+      const auto key = GateCostLookupTableKeyType{type, nControls};
       if (const auto it = gateCostLookupTable.find(key);
           it == gateCostLookupTable.end()) {
         const auto cost = costFunction(key);
@@ -114,9 +114,9 @@ private:
     populateLookupTable(ifs);
   }
   void populateLookupTable(std::istream& is) {
-    qc::OpType  opType    = qc::OpType::None;
+    qc::OpType opType = qc::OpType::None;
     std::size_t nControls = 0U;
-    std::size_t cost      = 1U;
+    std::size_t cost = 1U;
 
     std::string line;
     while (std::getline(is, line)) {

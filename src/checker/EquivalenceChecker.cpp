@@ -5,10 +5,14 @@
 
 #include "checker/EquivalenceChecker.hpp"
 
+#include "EquivalenceCriterion.hpp"
+
+#include <nlohmann/json.hpp>
+
 // this function is mainly placed here in order to have an out-of-line
 // virtual method definition which avoids emitting the classe's vtable in
 // every translation unit.
-void ec::EquivalenceChecker::json(nlohmann::json& j) const noexcept {
+void ec::EquivalenceChecker::json(nlohmann::basic_json<>& j) const noexcept {
   j["equivalence"] = toString(equivalence);
-  j["runtime"]     = getRuntime();
+  j["runtime"] = getRuntime();
 }

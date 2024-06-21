@@ -3,10 +3,15 @@
 // See README.md or go to https://github.com/cda-tum/qcec for more information.
 //
 
+#include "Configuration.hpp"
 #include "EquivalenceCheckingManager.hpp"
+#include "EquivalenceCriterion.hpp"
 #include "QuantumComputation.hpp"
+#include "dd/DDDefinitions.hpp"
+#include "operations/Control.hpp"
+#include "operations/Expression.hpp"
 
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
 
 using namespace qc;
 using namespace sym;
@@ -14,7 +19,7 @@ class SymbolicTest : public ::testing::Test {
 public:
   Variable x = Variable("x");
 
-  Symbolic xMonom    = Symbolic{Term<dd::fp>{x}};
+  Symbolic xMonom = Symbolic{Term<dd::fp>{x}};
   Symbolic xMonomNeg = Symbolic{-Term<dd::fp>{x}};
 
   QuantumComputation symQc1 = QuantumComputation(1);
@@ -50,8 +55,8 @@ TEST_F(SymbolicTest, SymbolicNonEqu) {
 TEST_F(SymbolicTest, Timeout) {
   // construct large circuit
   constexpr auto numLayers = 100000;
-  symQc1                   = qc::QuantumComputation(2);
-  symQc2                   = qc::QuantumComputation(2);
+  symQc1 = qc::QuantumComputation(2);
+  symQc2 = qc::QuantumComputation(2);
   for (auto i = 0; i < numLayers; ++i) {
     symQc1.cx(1_pc, 0);
     symQc1.rx(xMonom, 0);

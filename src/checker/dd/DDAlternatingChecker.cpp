@@ -162,7 +162,7 @@ bool DDAlternatingChecker::canHandle(const qc::QuantumComputation& qc1,
   return true;
 }
 
-void DDAlternatingChecker::json(nlohmann::json& j) const noexcept {
+void DDAlternatingChecker::json(nlohmann::basic_json<>& j) const noexcept {
   DDEquivalenceChecker::json(j);
   j["checker"] = "decision_diagram_alternating";
 }
