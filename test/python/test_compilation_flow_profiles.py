@@ -74,8 +74,11 @@ def test_generated_profiles_are_still_valid(optimization_level: int, ancilla_mod
             1
             for line in diff
             if (
-                (line.startswith("-") and not line.startswith("---"))
-                or (line.startswith("+") and not line.startswith("+++"))
+                line.find("Qiskit version") == -1
+                and (
+                    (line.startswith("-") and not line.startswith("---"))
+                    or (line.startswith("+") and not line.startswith("+++"))
+                )
             )
         )
         sys.stdout.writelines(diff)
