@@ -23,9 +23,7 @@ if(BUILD_MQT_QCEC_BINDINGS)
       CACHE STRING "Prefer Brew/Conda to Apple framework Python")
   set(Python_ARTIFACTS_INTERACTIVE
       ON
-      CACHE
-        BOOL
-        "Prevent multiple searches for Python and instead cache the results.")
+      CACHE BOOL "Prevent multiple searches for Python and instead cache the results.")
 
   # top-level call to find Python
   find_package(
@@ -46,9 +44,7 @@ if(BUILD_MQT_QCEC_TESTS)
   add_subdirectory(test)
 endif()
 
-configure_file(
-  ${CMAKE_CURRENT_SOURCE_DIR}/cmake/cmake_uninstall.cmake.in
-  ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake IMMEDIATE @ONLY)
-add_custom_target(
-  uninstall COMMAND ${CMAKE_COMMAND} -P
-                    ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/cmake_uninstall.cmake.in
+               ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake IMMEDIATE @ONLY)
+add_custom_target(uninstall COMMAND ${CMAKE_COMMAND} -P
+                                    ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)

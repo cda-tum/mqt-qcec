@@ -1,14 +1,13 @@
 FormatStyle: file
 
 Checks: |
-  clang-diagnostic-*,
-  clang-analyzer-*,
-  -clang-analyzer-core.NullDereference,
   boost-*,
   bugprone-*,
   -bugprone-easily-swappable-parameters,
   -bugprone-unchecked-optional-access,
   clang-analyzer-*,
+  -clang-analyzer-core.NullDereference,
+  clang-diagnostic-*,
   cppcoreguidelines-*,
   -cppcoreguidelines-non-private-member-variables-in-classes,
   -cppcoreguidelines-special-member-functions,

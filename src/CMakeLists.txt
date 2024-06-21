@@ -22,8 +22,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC ${PROJECT_SOURCE_DIR}/include
 
 # link to the MQT::Core libraries
 target_link_libraries(${PROJECT_NAME} PUBLIC MQT::CoreDD MQT::CoreZX)
-target_link_libraries(${PROJECT_NAME} PRIVATE MQT::ProjectWarnings
-                                              MQT::ProjectOptions)
+target_link_libraries(${PROJECT_NAME} PRIVATE MQT::ProjectWarnings MQT::ProjectOptions)
 
 # add MQT alias
 add_library(MQT::QCEC ALIAS ${PROJECT_NAME})
