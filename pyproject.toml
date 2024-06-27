@@ -220,10 +220,23 @@ ignore = [
 ]
 isort.required-imports = ["from __future__ import annotations"]
 
+[tool.ruff.lint.flake8-tidy-imports.banned-api]
+"typing.Callable".msg = "Use collections.abc.Callable instead."
+"typing.Iterator".msg = "Use collections.abc.Iterator instead."
+"typing.Mapping".msg = "Use collections.abc.Mapping instead."
+"typing.Sequence".msg = "Use collections.abc.Sequence instead."
+"typing.Set".msg = "Use collections.abc.Set instead."
+"importlib.resources".msg = "Use mqt.qcec._compat.importlib.resources instead."
+"importlib_resources".msg = "Use mqt.qcec._compat.importlib.resources instead."
+
 [tool.ruff.lint.per-file-ignores]
-"test/python/**" = ["T20", "ANN"]
+"test/python/**" = [
+  "T20",  # allow print statements in tests
+  "PLC2701"  # allow private name imports in tests
+]
 "docs/**" = ["T20"]
 "noxfile.py" = ["T20", "TID251"]
+"src/mqt/qcec/_compat/**.py" = ["TID251"]
 "*.pyi" = ["D"]  # pydocstyle
 "*.ipynb" = [
     "D",    # pydocstyle
