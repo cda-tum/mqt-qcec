@@ -158,6 +158,11 @@ warn_unreachable = true
 module = ["qiskit.*"]
 ignore_missing_imports = true
 
+
+[tool.check-wheel-contents]
+ignore = ["W002"]  # Triggers on __init__.py's
+
+
 [tool.ruff]
 line-length = 120
 extend-include = ["*.ipynb"]
