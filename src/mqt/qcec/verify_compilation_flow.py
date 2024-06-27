@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import sys
 import warnings
 from typing import TYPE_CHECKING
 
@@ -11,15 +10,11 @@ if TYPE_CHECKING:
 
     from .configuration import ConfigurationOptions
 
-if TYPE_CHECKING or sys.version_info < (3, 10, 0):
-    import importlib_resources as resources
-else:
-    from importlib import resources
-
 from qiskit import QuantumCircuit
 from qiskit.transpiler.passes import ContainsInstruction
 
 from . import ApplicationScheme, Configuration, EquivalenceCheckingManager
+from ._compat.importlib import resources
 from .compilation_flow_profiles import AncillaMode, generate_profile_name
 from .configuration import augment_config_from_kwargs
 from .verify import verify
