@@ -8,7 +8,7 @@ from qiskit import QuantumCircuit, transpile
 from mqt import qcec
 
 
-@pytest.fixture()
+@pytest.fixture
 def original_circuit() -> QuantumCircuit:
     """Fixture for a simple circuit."""
     qc = QuantumCircuit(3)
