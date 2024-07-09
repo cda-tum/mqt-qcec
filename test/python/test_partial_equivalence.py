@@ -8,7 +8,7 @@ from qiskit import QuantumCircuit
 from mqt import qcec
 
 
-@pytest.fixture()
+@pytest.fixture
 def original_circuit() -> QuantumCircuit:
     """Fixture for a simple circuit."""
     qc = QuantumCircuit(3, 1)
@@ -20,7 +20,7 @@ def original_circuit() -> QuantumCircuit:
     return qc
 
 
-@pytest.fixture()
+@pytest.fixture
 def alternative_circuit() -> QuantumCircuit:
     """Fixture for a partially equivalent version of the simple circuit."""
     qc = QuantumCircuit(3, 1)

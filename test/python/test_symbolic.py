@@ -13,7 +13,7 @@ alpha = Parameter("alpha")
 beta = Parameter("beta")
 
 
-@pytest.fixture()
+@pytest.fixture
 def rz_commute_lhs() -> QuantumCircuit:
     """Fixture for a circuit."""
     qc = QuantumCircuit(2)
@@ -24,7 +24,7 @@ def rz_commute_lhs() -> QuantumCircuit:
     return qc
 
 
-@pytest.fixture()
+@pytest.fixture
 def rz_commute_rhs_correct() -> QuantumCircuit:
     """Fixture for an equivalent circuit."""
     qc = QuantumCircuit(2)
@@ -35,7 +35,7 @@ def rz_commute_rhs_correct() -> QuantumCircuit:
     return qc
 
 
-@pytest.fixture()
+@pytest.fixture
 def rz_commute_rhs_incorrect() -> QuantumCircuit:
     """Fixture for a non-equivalent circuit."""
     qc = QuantumCircuit(2)
@@ -46,7 +46,7 @@ def rz_commute_rhs_incorrect() -> QuantumCircuit:
     return qc
 
 
-@pytest.fixture()
+@pytest.fixture
 def rotation_gate_fuse_lhs() -> QuantumCircuit:
     """Fixture for a symbolic circuit with simplification opportunities."""
     qc = QuantumCircuit(1)
@@ -55,7 +55,7 @@ def rotation_gate_fuse_lhs() -> QuantumCircuit:
     return qc
 
 
-@pytest.fixture()
+@pytest.fixture
 def rotation_gate_fuse_rhs_correct() -> QuantumCircuit:
     """Fixture for an equivalent, optimized circuit."""
     qc = QuantumCircuit(1)
@@ -63,7 +63,7 @@ def rotation_gate_fuse_rhs_correct() -> QuantumCircuit:
     return qc
 
 
-@pytest.fixture()
+@pytest.fixture
 def rotation_gate_fuse_rhs_incorrect() -> QuantumCircuit:
     """Fixture for a non-equivalent, optimized circuit."""
     qc = QuantumCircuit(1)
@@ -71,7 +71,7 @@ def rotation_gate_fuse_rhs_incorrect() -> QuantumCircuit:
     return qc
 
 
-@pytest.fixture()
+@pytest.fixture
 def rotation_gate_fuse_rhs_approximate() -> QuantumCircuit:
     """Fixture for an approximately-equivalent, optimized circuit."""
     qc = QuantumCircuit(1)
@@ -79,7 +79,7 @@ def rotation_gate_fuse_rhs_approximate() -> QuantumCircuit:
     return qc
 
 
-@pytest.fixture()
+@pytest.fixture
 def cnot_rx() -> QuantumCircuit:
     """Fixture for a circuit with a CNOT and a rotation gate."""
     qc = QuantumCircuit(2)
@@ -88,7 +88,7 @@ def cnot_rx() -> QuantumCircuit:
     return qc
 
 
-@pytest.fixture()
+@pytest.fixture
 def cnot_rx_flipped() -> QuantumCircuit:
     """Fixture for a circuit with a CNOT and a rotation gate, but commuted."""
     qc = QuantumCircuit(2)
@@ -97,7 +97,7 @@ def cnot_rx_flipped() -> QuantumCircuit:
     return qc
 
 
-@pytest.fixture()
+@pytest.fixture
 def cnot_rx_flipped_approx() -> QuantumCircuit:
     """Fixture for an approximately-equivalent circuit with a CNOT and a rotation gate."""
     qc = QuantumCircuit(2)
@@ -106,7 +106,7 @@ def cnot_rx_flipped_approx() -> QuantumCircuit:
     return qc
 
 
-@pytest.fixture()
+@pytest.fixture
 def original_circuit() -> QuantumCircuit:
     """Fixture for a circuit with a couple of gates."""
     qc = QuantumCircuit(3)

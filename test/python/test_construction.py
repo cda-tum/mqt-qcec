@@ -10,7 +10,7 @@ from qiskit import QuantumCircuit, qasm2
 from mqt import qcec
 
 
-@pytest.fixture()
+@pytest.fixture
 def example_circuit() -> QuantumCircuit:
     """Fixture for a simple circuit."""
     qc = QuantumCircuit(1)
