@@ -104,4 +104,5 @@ After the run has completed, several results can be obtained:
 
 * A JSON-style dictionary containing all available information.
 
-    .. automethod:: EquivalenceCheckingManager.Results.json
+    .. automethod:: mqt.qcec.EquivalenceCheckingManager.Results.json
+       :noindex:
