@@ -1324,16 +1324,55 @@ wheels = [
 ]
 
 [[package]]
+name = "mqt-core"
+version = "3.0.0b1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/23/29/c04de804b105d31ecf3d18fd6e0b2541f8765be98d5d19ac308e43c93e5c/mqt_core-3.0.0b1.tar.gz", hash = "sha256:447ae469cb7921766a149c66bc19870e01e3fdd7ecb38b97510d17c3b2cfea6a", size = 406986 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/64/fb/4b3d9a2fdeae5b8580483513c4f2a8f961cb4ff88b40f7072f3de894eb05/mqt_core-3.0.0b1-cp310-cp310-macosx_10_15_x86_64.whl", hash = "sha256:cb3b9673e5425cd39226af795adc7a8f7d96f0fba68e57558e9842b60cbfc3f1", size = 3152816 },
+    { url = "https://files.pythonhosted.org/packages/50/31/eabb0b8aa50e9bbb95adb339dce71281d4d53323be7492cf0339f38f5e21/mqt_core-3.0.0b1-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:848117099c390729b84ec9feb43c3cc57782d6da9a7bc30f3e6a469237a07167", size = 2917490 },
+    { url = "https://files.pythonhosted.org/packages/57/21/383872cb48a639b67d4421599a2650ea0080a837943c90759289277582f6/mqt_core-3.0.0b1-cp310-cp310-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:3340a47504f6a26b21b8ceaffb50a5a1dfb13f7d77e9ee40548f8e8a2aac1ffc", size = 3736431 },
+    { url = "https://files.pythonhosted.org/packages/99/c1/35639c8bf91005788b5ba2f5b44b2b3e57a74cdc78beeb03cbb4f8740c23/mqt_core-3.0.0b1-cp310-cp310-win_amd64.whl", hash = "sha256:f272f722c4fcc2b40f5635139222e11466181f03b50faf6104e18b092bd3d59e", size = 4202024 },
+    { url = "https://files.pythonhosted.org/packages/d7/3d/25732d82ab4a4361dfe7e743ed7b87b54f0f428debee7e2513274d2c86f6/mqt_core-3.0.0b1-cp311-cp311-macosx_10_15_x86_64.whl", hash = "sha256:dcfa34ef7d76f2734355ffdd39382469b6a7f86e26247b789c6a3473ea35cde7", size = 3153640 },
+    { url = "https://files.pythonhosted.org/packages/2a/79/efdc2d6b16c2b23516b89c0ace5fd6a1b7279a892bb681251dddd77f3060/mqt_core-3.0.0b1-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:78f09fb242322d6fc24e1b5699a3b800eb237ad3e7e31e674efc527791a04a5d", size = 2918347 },
+    { url = "https://files.pythonhosted.org/packages/eb/bb/ded1c762c054b9e6ab30d85457f17640679a00e69a101eb350867237ce2b/mqt_core-3.0.0b1-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:54a24bb71ca78da63e01fa894e53d904ef1eb7591e742ece9ab02055021e5197", size = 3737178 },
+    { url = "https://files.pythonhosted.org/packages/86/cd/867a7ccef42f69995905c281acfc10bafea9312c65925fceb72b313bf52c/mqt_core-3.0.0b1-cp311-cp311-win_amd64.whl", hash = "sha256:7b7523fc4eb4a9eb47780bcd5a04a4449082d339ec2371c415bd22f40f6e90c5", size = 4202578 },
+    { url = "https://files.pythonhosted.org/packages/33/d2/4aee0ead4e86c5fd3781194e9a932ebc6cb39885925871b56c4e5db220fa/mqt_core-3.0.0b1-cp312-cp312-macosx_10_15_x86_64.whl", hash = "sha256:98a96f1423321fd4032dca5ee3440abe0d7bffb1c50f9266610c2d538f3fd680", size = 3182057 },
+    { url = "https://files.pythonhosted.org/packages/0d/55/b50818bab7ef76d167f6494d62f60927d369aa850d31a4094b1d225f1868/mqt_core-3.0.0b1-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:4686914db8c80700d6e00bdf77c22505ee9e1aa949ceb67a89879d1631f1acea", size = 2943892 },
+    { url = "https://files.pythonhosted.org/packages/80/4c/44f458910d5fc8483dfe955550c883a92a683f65795c8771b543bc88e281/mqt_core-3.0.0b1-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:a71112e0a745c78fccb6fcc395e92f6dc587e38283944b0d3a7ba4b8b412dd2d", size = 3737017 },
+    { url = "https://files.pythonhosted.org/packages/de/91/c013c563050e16032b1c0561f24a50e61158017a703250695afedcee6ed4/mqt_core-3.0.0b1-cp312-cp312-win_amd64.whl", hash = "sha256:b9967d3b9015430ac602189ee27f0c2ff8ad06c6484c21f568d723d4c0f3fbb8", size = 4203442 },
+    { url = "https://files.pythonhosted.org/packages/d3/7f/54f363a6dd98c8ec780326383fc49b7bbdc6db85ed3baafa8172afbcc6d1/mqt_core-3.0.0b1-cp313-cp313-macosx_10_15_x86_64.whl", hash = "sha256:caaf285f0dd7f9a08fe44db1e5d24bee95f8a4eac3e8f4c1979b717e8fc050fa", size = 3182000 },
+    { url = "https://files.pythonhosted.org/packages/a9/92/12c973e0ee08ff69ea0b22679bfbc4048abb29bdfab4786663a13e38e1a9/mqt_core-3.0.0b1-cp313-cp313-macosx_11_0_arm64.whl", hash = "sha256:099a8a7a3fc80fd1ca26e115d5de86a34864471c0828d17f698cc46adc63f987", size = 2943636 },
+    { url = "https://files.pythonhosted.org/packages/12/65/d2214b3fffffa1ab5c1d58ae5f09f1e6a6c0a85b1c15b69e19e48254cd9a/mqt_core-3.0.0b1-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:c66f6f70f022393bc4d93f62bcc41bee5354061900239216c86b3444b41a3a11", size = 3737048 },
+    { url = "https://files.pythonhosted.org/packages/d8/4b/d271fd2dd9717d46179090f65f158cc9a0c5a7cf82d27e1cc3089e278956/mqt_core-3.0.0b1-cp313-cp313-win_amd64.whl", hash = "sha256:4286d1cee527cdc87bd5a4c38cacde2b1509388d3a123ca788b5591a4d79b9d6", size = 4203560 },
+    { url = "https://files.pythonhosted.org/packages/0a/6d/e3794207f25bd3dfa88f6f9721af8bc2cdfb831e5d9cb776f965ba31bd9e/mqt_core-3.0.0b1-cp313-cp313t-macosx_10_15_x86_64.whl", hash = "sha256:bf05625094fe3d6bb58bdd5822a154237a9cab4834f721c5d7b7963fe1928274", size = 3186075 },
+    { url = "https://files.pythonhosted.org/packages/55/94/6db92c8103746bbf568385fff14b21dd0fefc7dd1a620275a6cb78b02374/mqt_core-3.0.0b1-cp313-cp313t-macosx_11_0_arm64.whl", hash = "sha256:0660a1c66b5b2cfe86ed00689ed27f58e9a6500a598957a93102f929f716d0c2", size = 2949990 },
+    { url = "https://files.pythonhosted.org/packages/8d/fe/cbf8a5c0e053434c13203630177d485d8878112e596197d07aa7bda7e47c/mqt_core-3.0.0b1-cp313-cp313t-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:cff0e599378134b1c636d254f4c08e0a8bea8a3e9a90302bc8e9a2aa5781225c", size = 3739115 },
+    { url = "https://files.pythonhosted.org/packages/c6/7f/a9e864e2b1c79f7f7b2699c6b564e96c65ca4e84a0b17360d9e969f4f0b2/mqt_core-3.0.0b1-cp313-cp313t-win_amd64.whl", hash = "sha256:41384dd77884edf2b15fae7a01057df8da3b4c13fc371e2ab405297da7b9ebcf", size = 4225640 },
+    { url = "https://files.pythonhosted.org/packages/21/e6/bd44ee28d92a378400216ba7f03783e35917b1d5c93cf33b95cf511e6e2a/mqt_core-3.0.0b1-cp39-cp39-macosx_10_15_x86_64.whl", hash = "sha256:6368b96b2b351776e40e93dbf791861f9f39657dcd5b9cc651d0a79e80c3d4c5", size = 3152957 },
+    { url = "https://files.pythonhosted.org/packages/20/32/d6c8d7196c862f4b2b9fb92f5ef3e7dfc6b63186565d88e5e770557ccbc0/mqt_core-3.0.0b1-cp39-cp39-macosx_11_0_arm64.whl", hash = "sha256:21c18296c30ad3051edabfb351c951864bccaa5ffff2272332a7347060b757c7", size = 2917593 },
+    { url = "https://files.pythonhosted.org/packages/79/94/4b1272a153a929d066e08d2d8109ae3b6229433dea264afed2bd4e7377c7/mqt_core-3.0.0b1-cp39-cp39-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:e56591ca6a917e928bcc5cfc00c68884736b2b1ef1953035ee13b0b8fa64dd94", size = 3736454 },
+    { url = "https://files.pythonhosted.org/packages/4b/d0/bfa25bc6f37a16b0a076bb08bd091cfb3ac7dfeb9c8c7297bc4fd4292ec2/mqt_core-3.0.0b1-cp39-cp39-win_amd64.whl", hash = "sha256:8e12208ea72bd3dbd04860fdcf53e987b1b90f5502b7db72c6d8d46967bcec3b", size = 4202599 },
+]
+
+[package.optional-dependencies]
+qiskit = [
+    { name = "qiskit", extra = ["qasm3-import"] },
+]
+
+[[package]]
 name = "mqt-qcec"
 source = { editable = "." }
 dependencies = [
     { name = "importlib-resources", marker = "python_full_version < '3.10'" },
+    { name = "mqt-core" },
     { name = "qiskit", extra = ["qasm3-import"] },
     { name = "typing-extensions", marker = "python_full_version < '3.11'" },
 ]
 
 [package.dev-dependencies]
 build = [
+    { name = "mqt-core" },
     { name = "pybind11" },
     { name = "scikit-build-core" },
     { name = "setuptools-scm" },
@@ -1341,6 +1380,7 @@ build = [
 dev = [
     { name = "furo" },
     { name = "ipykernel" },
+    { name = "mqt-core", extra = ["qiskit"] },
     { name = "nbsphinx" },
     { name = "pybind11" },
     { name = "pytest" },
@@ -1360,6 +1400,7 @@ dev = [
 docs = [
     { name = "furo" },
     { name = "ipykernel" },
+    { name = "mqt-core", extra = ["qiskit"] },
     { name = "nbsphinx" },
     { name = "qiskit", extra = ["visualization"] },
     { name = "setuptools-scm" },
@@ -1373,6 +1414,7 @@ docs = [
     { name = "sphinxext-opengraph" },
 ]
 test = [
+    { name = "mqt-core", extra = ["qiskit"] },
     { name = "pytest" },
     { name = "pytest-cov" },
 ]
@@ -1380,12 +1422,14 @@ test = [
 [package.metadata]
 requires-dist = [
     { name = "importlib-resources", marker = "python_full_version < '3.10'", specifier = ">=5.0" },
+    { name = "mqt-core", specifier = ">=3.0.0b1" },
     { name = "qiskit", extras = ["qasm3-import"], specifier = ">=1.0.0" },
     { name = "typing-extensions", marker = "python_full_version < '3.11'", specifier = ">=4.2" },
 ]
 
 [package.metadata.requires-dev]
 build = [
+    { name = "mqt-core", specifier = ">=3.0.0b1" },
     { name = "pybind11", specifier = ">=2.13.6" },
     { name = "scikit-build-core", specifier = ">=0.10.7" },
     { name = "setuptools-scm", specifier = ">=8.1" },
@@ -1393,6 +1437,8 @@ build = [
 dev = [
     { name = "furo", specifier = ">=2024.8.6" },
     { name = "ipykernel", specifier = ">=6.29.5" },
+    { name = "mqt-core", specifier = ">=3.0.0b1" },
+    { name = "mqt-core", extras = ["qiskit"], specifier = ">=3.0.0b1" },
     { name = "nbsphinx", specifier = ">=0.9.6" },
     { name = "pybind11", specifier = ">=2.13.6" },
     { name = "pytest", specifier = ">=8.3.4" },
@@ -1411,6 +1457,7 @@ dev = [
 docs = [
     { name = "furo", specifier = ">=2024.8.6" },
     { name = "ipykernel", specifier = ">=6.29.5" },
+    { name = "mqt-core", extras = ["qiskit"], specifier = ">=3.0.0b1" },
     { name = "nbsphinx", specifier = ">=0.9.6" },
     { name = "qiskit", extras = ["visualization"], specifier = ">=1.0.0" },
     { name = "setuptools-scm", specifier = ">=8.1" },
@@ -1423,6 +1470,7 @@ docs = [
     { name = "sphinxext-opengraph", specifier = ">=0.9.1" },
 ]
 test = [
+    { name = "mqt-core", extras = ["qiskit"], specifier = ">=3.0.0b1" },
     { name = "pytest", specifier = ">=8.3.4" },
     { name = "pytest-cov", specifier = ">=6" },
 ]
