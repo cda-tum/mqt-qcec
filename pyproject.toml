@@ -43,14 +43,18 @@ dependencies = [
     "mqt.core @ git+https://github.com/cda-tum/mqt-core@shared-libs",
     "importlib_resources>=5.0; python_version < '3.10'",
     "typing_extensions>=4.2; python_version < '3.11'", # used for typing.Unpack
-    "qiskit[qasm3-import]>=1.0.0",
+    "numpy>=1.26; python_version >= '3.12'",
+    "numpy>=1.24; python_version >= '3.11'",
+    "numpy>=1.22",
 ]
 dynamic = ["version"]
 
 [project.optional-dependencies]
-test = ["pytest>=7.2"]
+qiskit = ["mqt.core[qiskit]"]
+test = ["mqt.qcec[qiskit]", "pytest>=7.2"]
 coverage = ["mqt.qcec[test]", "pytest-cov>=4"]
 docs = [
+    "mqt.qcec[qiskit]",
     "furo>=2023.9.10",
     "qiskit[visualization]",
     "setuptools-scm>=8.1",
