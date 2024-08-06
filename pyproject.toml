@@ -3,6 +3,7 @@ requires = [
   "scikit-build-core>=0.10.7",
   "setuptools-scm>=8.1",
   "pybind11>=2.13.6",
+  "mqt.core>=3.0.0b1",
 ]
 build-backend = "scikit_build_core.build"
 
@@ -39,6 +40,7 @@ classifiers = [
 ]
 requires-python = ">=3.9"
 dependencies = [
+    "mqt.core>=3.0.0b1",
     "importlib_resources>=5.0; python_version < '3.10'",
     "typing_extensions>=4.2; python_version < '3.11'", # used for typing.Unpack
     "qiskit[qasm3-import]>=1.0.0",
@@ -295,6 +297,7 @@ environment = { MACOSX_DEPLOYMENT_TARGET = "11.0" }
 required-version = ">=0.5.20"
 reinstall-package = ["mqt.qcec"]
 
+
 [tool.uv.sources]
 mqt-qcec = { workspace = true }
 
@@ -303,6 +306,7 @@ build = [
   "pybind11>=2.13.6",
   "scikit-build-core>=0.10.7",
   "setuptools-scm>=8.1",
+  "mqt-core>=3.0.0b1",
 ]
 docs = [
   "furo>=2024.8.6",
@@ -317,10 +321,12 @@ docs = [
   "ipykernel>=6.29.5",
   "nbsphinx>=0.9.6",
   "sphinx-autodoc-typehints>=2.3.0",
+  "mqt-core[qiskit]>=3.0.0b1",
 ]
 test = [
   "pytest>=8.3.4",
   "pytest-cov>=6",
+  "mqt-core[qiskit]>=3.0.0b1",
 ]
 dev = [
   {include-group = "build"},
