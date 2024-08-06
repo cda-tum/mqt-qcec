@@ -3,6 +3,7 @@ requires = [
   "scikit-build-core>=0.10.1",
   "setuptools-scm>=8.1",
   "pybind11>=2.13.5",
+  "mqt.core @ git+https://github.com/cda-tum/mqt-core@shared-libs",
 ]
 build-backend = "scikit_build_core.build"
 
@@ -39,6 +40,7 @@ classifiers = [
 ]
 requires-python = ">=3.9"
 dependencies = [
+    "mqt.core @ git+https://github.com/cda-tum/mqt-core@shared-libs",
     "importlib_resources>=5.0; python_version < '3.10'",
     "typing_extensions>=4.2; python_version < '3.11'", # used for typing.Unpack
     "qiskit[qasm3-import]>=1.0.0",
