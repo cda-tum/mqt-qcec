@@ -7,11 +7,12 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
-from qiskit import QuantumCircuit, transpile
-from qiskit import __version__ as qiskit_version
+
+from ._compat.optional import HAS_QISKIT
 
 if TYPE_CHECKING:
     from numpy.typing import NDArray
+    from qiskit.circuit import QuantumCircuit
 
 
 @unique
@@ -156,6 +157,9 @@ multi_controlled_gates_v_chain = [mcx_v_chain]
 
 def create_general_gate(qubits: int, params: int, controls: int, identifier: str) -> QuantumCircuit:
     """Create a ``QuantumCircuit`` containing a single gate ``identifier`` with the given number of ``qubits``, ``params``, and ``controls``."""
+    HAS_QISKIT.require_now("generate compilation flow profiles")
+    from qiskit.circuit import QuantumCircuit
+
     required_qubits = qubits + controls
     qc = QuantumCircuit(required_qubits)
     gate_identifier = "c" * controls + identifier
@@ -176,6 +180,9 @@ def create_multi_controlled_gate(
     identifier: str,
 ) -> QuantumCircuit:
     """Create a ``QuantumCircuit`` containing a single multi-controlled gate ``identifier`` with the given number of ``qubits``, ``params``, and ``controls`` using ``ancilla_qubits`` ancilla qubits and the given ancilla ``mode``."""
+    HAS_QISKIT.require_now("generate compilation flow profiles")
+    from qiskit.circuit import QuantumCircuit
+
     required_qubits = qubits + controls
 
     # special handling for v-chain mode which is indicated by the ancilla_qubits being None
@@ -214,6 +221,9 @@ def compute_cost(
     optimization_level: int = 1,
 ) -> int:
     """Compute the cost of a circuit by transpiling the circuit to a given ``basis_gates`` gate set and a certain ``optimization_level``."""
+    HAS_QISKIT.require_now("generate compilation flow profiles")
+    from qiskit import transpile
+
     transpiled_circuit = transpile(
         qc, basis_gates=basis_gates, optimization_level=optimization_level, seed_transpiler=12345
     )
@@ -299,6 +309,9 @@ def generate_profile_name(optimization_level: int = 1, mode: AncillaMode = Ancil
 
 def write_profile_data_to_file(profile_data: dict[tuple[str, int], int], filename: Path) -> None:
     """Write the profile data to a file."""
+    HAS_QISKIT.require_now("generate compilation flow profiles")
+    from qiskit import __version__ as qiskit_version
+
     with Path(filename).open("w+", encoding="utf-8") as f:
         f.write(f"# {filename}, Qiskit version: {qiskit_version}\n")
         for (gate, controls), cost in profile_data.items():
