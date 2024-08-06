@@ -7,7 +7,7 @@ See README.md or go to https://github.com/cda-tum/qcec for more information.
 from __future__ import annotations
 
 from ._version import version as __version__
-from .compilation_flow_profiles import AncillaMode, generate_profile
+from .compilation_flow_profiles import AncillaMode
 from .pyqcec import (
     ApplicationScheme,
     Configuration,
@@ -26,7 +26,6 @@ __all__ = [
     "EquivalenceCriterion",
     "StateType",
     "__version__",
-    "generate_profile",
     "verify",
     "verify_compilation",
 ]

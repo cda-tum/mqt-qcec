@@ -43,9 +43,15 @@ dependencies = [
     "mqt.core>=3.0.0b4",
     "importlib_resources>=5.0; python_version < '3.10'",
     "typing_extensions>=4.2; python_version < '3.11'", # used for typing.Unpack
-    "qiskit[qasm3-import]>=1.0.0",
+    "numpy>=2.1; python_version >= '3.13'",
+    "numpy>=1.26; python_version >= '3.12'",
+    "numpy>=1.24; python_version >= '3.11'",
+    "numpy>=1.22",
 ]
 dynamic = ["version"]
+
+[project.optional-dependencies]
+qiskit = ["qiskit[qasm3-import]>=1.0.0"]
 
 [project.urls]
 Homepage = "https://github.com/cda-tum/mqt-qcec"
@@ -310,7 +316,7 @@ build = [
 ]
 docs = [
   "furo>=2024.8.6",
-  "qiskit[visualization]>=1.0.0",
+  "qiskit[qasm3-import,visualization]>=1.0.0",
   "setuptools-scm>=8.1",
   "sphinx-autoapi>=3.4.0",
   "sphinx-copybutton>=0.5.2",
@@ -321,12 +327,11 @@ docs = [
   "ipykernel>=6.29.5",
   "nbsphinx>=0.9.6",
   "sphinx-autodoc-typehints>=2.3.0",
-  "mqt-core[qiskit]>=3.0.0b1",
 ]
 test = [
   "pytest>=8.3.4",
   "pytest-cov>=6",
-  "mqt-core[qiskit]>=3.0.0b1",
+  "qiskit[qasm3-import]>=1.0.0",
 ]
 dev = [
   {include-group = "build"},
