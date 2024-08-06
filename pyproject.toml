@@ -1,5 +1,10 @@
 [build-system]
-requires = ["scikit-build-core>=0.8.1", "setuptools-scm>=7", "pybind11>=2.13"]
+requires = [
+  "scikit-build-core>=0.8.1",
+  "setuptools-scm>=7",
+  "pybind11>=2.13",
+  "mqt.core @ git+https://github.com/cda-tum/mqt-core@shared-libs",
+]
 build-backend = "scikit_build_core.build"
 
 [project]
@@ -36,6 +41,7 @@ classifiers = [
 ]
 requires-python = ">=3.8"
 dependencies = [
+    "mqt.core @ git+https://github.com/cda-tum/mqt-core@shared-libs",
     "importlib_resources>=5.0; python_version < '3.10'",
     "typing_extensions>=4.2",
     "qiskit[qasm3-import]>=1.0.0",
