@@ -2,7 +2,7 @@ from typing import Any, ClassVar, overload
 
 from qiskit import QuantumCircuit
 
-from .types import ApplicationSchemeName, EquivalenceCriterionName, StateTypeName
+from .literals import ApplicationSchemeName, EquivalenceCriterionName, StateTypeName
 
 class ApplicationScheme:
     __members__: ClassVar[dict[ApplicationScheme, int]] = ...  # read-only

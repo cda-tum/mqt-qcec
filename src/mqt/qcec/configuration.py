@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, TypedDict
 
 if TYPE_CHECKING:
     from . import ApplicationScheme, Configuration, StateType
-    from .types import ApplicationSchemeName, StateTypeName
+    from .literals import ApplicationSchemeName, StateTypeName
 
 
 class ConfigurationOptions(TypedDict, total=False):
