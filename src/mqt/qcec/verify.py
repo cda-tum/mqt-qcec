@@ -5,19 +5,21 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from qiskit import QuantumCircuit
+    from mqt.core import CircuitInputType
 
     from ._compat.typing import Unpack
     from .configuration import ConfigurationOptions
 
+from mqt.core import load
+
 from . import Configuration, EquivalenceCheckingManager
 from .configuration import augment_config_from_kwargs
-from .parameterized import __is_parameterized, check_parameterized
+from .parameterized import check_parameterized
 
 
 def verify(
-    circ1: QuantumCircuit | str,
-    circ2: QuantumCircuit | str,
+    circ1: CircuitInputType,
+    circ2: CircuitInputType,
     configuration: Configuration | None = None,
     **kwargs: Unpack[ConfigurationOptions],
 ) -> EquivalenceCheckingManager.Results:
@@ -49,11 +51,15 @@ def verify(
     # prepare the configuration
     augment_config_from_kwargs(configuration, kwargs)
 
-    if __is_parameterized(circ1) or __is_parameterized(circ2):
-        return check_parameterized(circ1, circ2, configuration)
+    # load the circuits
+    qc1 = load(circ1)
+    qc2 = load(circ2)
+
+    if not qc1.is_variable_free() or not qc2.is_variable_free():
+        return check_parameterized(qc1, qc2, configuration)
 
     # create the equivalence checker from configuration
-    ecm = EquivalenceCheckingManager(circ1, circ2, configuration)
+    ecm = EquivalenceCheckingManager(qc1, qc2, configuration)
 
     # execute the check
     ecm.run()
