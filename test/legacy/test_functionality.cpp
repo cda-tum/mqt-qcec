@@ -9,6 +9,7 @@
 #include "checker/dd/applicationscheme/GateCostApplicationScheme.hpp"
 #include "checker/dd/simulation/StateType.hpp"
 #include "ir/QuantumComputation.hpp"
+#include "qasm3/Importer.hpp"
 
 #include <gtest/gtest.h>
 #include <iostream>
@@ -22,11 +23,17 @@ protected:
   qc::QuantumComputation qcAlternative;
   ec::Configuration config{};
 
-  std::string testOriginal = "./circuits/test/test.real";
+  std::string testOriginal = "./circuits/test/test.qasm";
   std::string testAlternativeDir = "./circuits/test/";
 
   void SetUp() override {
-    qcOriginal.import(testOriginal);
+    qcOriginal = qasm3::Importer::importf(testOriginal);
+    if (::testing::UnitTest::GetInstance()
+            ->current_test_info()
+            ->value_param() != nullptr) {
+      qcAlternative = qasm3::Importer::importf(testAlternativeDir + "test_" +
+                                               GetParam() + ".qasm");
+    }
 
     config.execution.parallel = false;
     config.execution.runConstructionChecker = false;
@@ -56,8 +63,6 @@ INSTANTIATE_TEST_SUITE_P(
     });
 
 TEST_P(FunctionalityTest, Reference) {
-  qcAlternative.import(testAlternativeDir + "test_" + GetParam() + ".qasm");
-
   config.execution.runConstructionChecker = true;
 
   ec::EquivalenceCheckingManager ecm(qcOriginal, qcAlternative, config);
@@ -67,8 +72,6 @@ TEST_P(FunctionalityTest, Reference) {
 }
 
 TEST_P(FunctionalityTest, Proportional) {
-  qcAlternative.import(testAlternativeDir + "test_" + GetParam() + ".qasm");
-
   config.execution.runAlternatingChecker = true;
   config.application.alternatingScheme =
       ec::ApplicationSchemeType::Proportional;
@@ -80,8 +83,6 @@ TEST_P(FunctionalityTest, Proportional) {
 }
 
 TEST_P(FunctionalityTest, Lookahead) {
-  qcAlternative.import(testAlternativeDir + "test_" + GetParam() + ".qasm");
-
   config.execution.runAlternatingChecker = true;
   config.application.alternatingScheme = ec::ApplicationSchemeType::Lookahead;
 
@@ -92,8 +93,6 @@ TEST_P(FunctionalityTest, Lookahead) {
 }
 
 TEST_P(FunctionalityTest, Naive) {
-  qcAlternative.import(testAlternativeDir + "test_" + GetParam() + ".qasm");
-
   config.execution.runAlternatingChecker = true;
   config.application.alternatingScheme = ec::ApplicationSchemeType::OneToOne;
 
@@ -104,8 +103,6 @@ TEST_P(FunctionalityTest, Naive) {
 }
 
 TEST_P(FunctionalityTest, CompilationFlow) {
-  qcAlternative.import(testAlternativeDir + "test_" + GetParam() + ".qasm");
-
   config.execution.runAlternatingChecker = true;
   config.application.alternatingScheme = ec::ApplicationSchemeType::GateCost;
   config.application.costFunction = ec::legacyCostFunction;
@@ -117,8 +114,6 @@ TEST_P(FunctionalityTest, CompilationFlow) {
 }
 
 TEST_P(FunctionalityTest, Simulation) {
-  qcAlternative.import(testAlternativeDir + "test_" + GetParam() + ".qasm");
-
   config.execution.runSimulationChecker = true;
 
   ec::EquivalenceCheckingManager ecm(qcOriginal, qcAlternative, config);
@@ -128,8 +123,6 @@ TEST_P(FunctionalityTest, Simulation) {
 }
 
 TEST_P(FunctionalityTest, SimulationRandom1QBasis) {
-  qcAlternative.import(testAlternativeDir + "test_" + GetParam() + ".qasm");
-
   config.execution.runSimulationChecker = true;
   config.simulation.stateType = ec::StateType::Random1QBasis;
 
@@ -140,8 +133,6 @@ TEST_P(FunctionalityTest, SimulationRandom1QBasis) {
 }
 
 TEST_P(FunctionalityTest, SimulationStabilizer) {
-  qcAlternative.import(testAlternativeDir + "test_" + GetParam() + ".qasm");
-
   config.execution.runSimulationChecker = true;
   config.simulation.stateType = ec::StateType::Stabilizer;
 
@@ -152,8 +143,6 @@ TEST_P(FunctionalityTest, SimulationStabilizer) {
 }
 
 TEST_P(FunctionalityTest, SimulationParallel) {
-  qcAlternative.import(testAlternativeDir + "test_" + GetParam() + ".qasm");
-
   config.execution.runSimulationChecker = true;
   config.execution.parallel = true;
   config.execution.nthreads = std::thread::hardware_concurrency() + 1U;
@@ -166,9 +155,10 @@ TEST_P(FunctionalityTest, SimulationParallel) {
 }
 
 TEST_F(FunctionalityTest, test2) {
-  testOriginal = "./circuits/test/test2.real";
-  qcOriginal.import(testOriginal);
-  qcAlternative.import(testAlternativeDir + "test2_optimized.qasm");
+  testOriginal = "./circuits/test/test2.qasm";
+  qcOriginal = qasm3::Importer::importf(testOriginal);
+  qcAlternative =
+      qasm3::Importer::importf(testAlternativeDir + "test2_optimized.qasm");
 
   config.execution.runConstructionChecker = true;
 

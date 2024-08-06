@@ -3,7 +3,7 @@ requires = [
   "scikit-build-core>=0.10.7",
   "setuptools-scm>=8.1",
   "pybind11>=2.13.6",
-  "mqt.core>=3.0.0b1",
+  "mqt.core>=3.0.0b4",
 ]
 build-backend = "scikit_build_core.build"
 
@@ -40,7 +40,7 @@ classifiers = [
 ]
 requires-python = ">=3.9"
 dependencies = [
-    "mqt.core>=3.0.0b1",
+    "mqt.core>=3.0.0b4",
     "importlib_resources>=5.0; python_version < '3.10'",
     "typing_extensions>=4.2; python_version < '3.11'", # used for typing.Unpack
     "qiskit[qasm3-import]>=1.0.0",
@@ -306,7 +306,7 @@ build = [
   "pybind11>=2.13.6",
   "scikit-build-core>=0.10.7",
   "setuptools-scm>=8.1",
-  "mqt-core>=3.0.0b1",
+  "mqt-core>=3.0.0b4",
 ]
 docs = [
   "furo>=2024.8.6",

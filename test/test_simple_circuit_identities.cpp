@@ -4,11 +4,11 @@
 //
 
 #include "Configuration.hpp"
-#include "Definitions.hpp"
 #include "EquivalenceCheckingManager.hpp"
 #include "checker/dd/applicationscheme/ApplicationScheme.hpp"
 #include "checker/dd/applicationscheme/GateCostApplicationScheme.hpp"
 #include "ir/QuantumComputation.hpp"
+#include "qasm3/Importer.hpp"
 
 #include <gtest/gtest.h>
 #include <iostream>
@@ -29,10 +29,8 @@ protected:
 
   void SetUp() override {
     const auto [circ1, circ2] = GetParam().second;
-    std::stringstream ss1{circ1};
-    qcOriginal.import(ss1, qc::Format::OpenQASM2);
-    std::stringstream ss2{circ2};
-    qcAlternative.import(ss2, qc::Format::OpenQASM2);
+    qcOriginal = qasm3::Importer::imports(circ1);
+    qcAlternative = qasm3::Importer::imports(circ2);
 
     config.optimizations.reconstructSWAPs = false;
     config.optimizations.fuseSingleQubitGates = false;
