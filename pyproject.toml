@@ -169,7 +169,6 @@ ignore = ["W002"]  # Triggers on __init__.py's
 
 [tool.ruff]
 line-length = 120
-extend-include = ["*.ipynb"]
 src = ["src"]
 namespace-packages = ["mqt"]
 preview = true

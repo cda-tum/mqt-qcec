@@ -1,4 +1,4 @@
-"""Types for the QCEC module."""
+"""Typing Literals for the QCEC module."""
 
 from __future__ import annotations
 

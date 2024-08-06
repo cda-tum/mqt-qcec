@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING
 import pytest
 
 if TYPE_CHECKING:
-    from mqt.qcec.types import ApplicationSchemeName, StateTypeName
+    from mqt.qcec.literals import ApplicationSchemeName, StateTypeName
 
 from mqt import qcec
 
