@@ -6,6 +6,12 @@ import warnings
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
+    import os
+
+    from qiskit.circuit import QuantumCircuit
+
+    from mqt.core.ir import QuantumComputation
+
     from ._compat.typing import Unpack
     from .configuration import ConfigurationOptions
 
@@ -40,8 +46,8 @@ def __check_if_circuit_contains_measurements(circuit: QuantumCircuit) -> None:
 
 
 def verify_compilation(
-    original_circuit: QuantumCircuit | str,
-    compiled_circuit: QuantumCircuit | str,
+    original_circuit: QuantumComputation | str | os.PathLike[str] | QuantumCircuit,
+    compiled_circuit: QuantumComputation | str | os.PathLike[str] | QuantumCircuit,
     optimization_level: int = 1,
     ancilla_mode: AncillaMode = AncillaMode.NO_ANCILLA,
     configuration: Configuration | None = None,
