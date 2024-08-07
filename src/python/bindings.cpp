@@ -61,7 +61,7 @@ createManagerFromConfiguration(const py::object& circ1, const py::object& circ2,
 }
 } // namespace
 
-PYBIND11_MODULE(pyqcec, m) {
+PYBIND11_MODULE(pyqcec, m, py::mod_gil_not_used()) {
   m.doc() = "Python interface for the MQT QCEC quantum circuit equivalence "
             "checking tool";
 
