@@ -10,7 +10,7 @@
 #include <nlohmann/json.hpp>
 
 // this function is mainly placed here in order to have an out-of-line
-// virtual method definition which avoids emitting the classe's vtable in
+// virtual method definition which avoids emitting the classes' vtable in
 // every translation unit.
 void ec::EquivalenceChecker::json(nlohmann::basic_json<>& j) const noexcept {
   j["equivalence"] = toString(equivalence);
