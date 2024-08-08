@@ -604,3 +604,31 @@ TEST_F(EqualityTest, StripIdleQubitInOutputPermutationWithAncilla) {
   EXPECT_EQ(ecm.getResults().numAncillae1, 0);
   EXPECT_EQ(ecm.getResults().numAncillae2, 0);
 }
+
+TEST_F(EqualityTest, ApproximateEquivalenceConstructionEqual) {
+  qc1 = qc::QuantumComputation(3);
+  qc2 = qc::QuantumComputation(3);
+  // Toffoli gate
+  qc1.mcx({0, 1}, 2);
+  qc2.i(0);
+  config.execution.runConstructionChecker = true;
+  config.functionality.checkApproximateEquivalence = true;
+  config.functionality.approximateCheckingThreshold = 0.7;
+  ec::EquivalenceCheckingManager ecm(qc1, qc2, config);
+  ecm.run();
+  EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::Equivalent);
+}
+
+TEST_F(EqualityTest, ApproximateEquivalenceConstructionNotEqual) {
+  qc1 = qc::QuantumComputation(3);
+  qc2 = qc::QuantumComputation(3);
+  // Toffoli gate
+  qc1.mcx({0, 1}, 2);
+  qc2.i(0);
+  config.execution.runConstructionChecker = true;
+  config.functionality.checkApproximateEquivalence = true;
+  config.functionality.approximateCheckingThreshold = 0.8;
+  ec::EquivalenceCheckingManager ecm(qc1, qc2, config);
+  ecm.run();
+  EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::NotEquivalent);
+}

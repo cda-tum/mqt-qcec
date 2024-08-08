@@ -5,6 +5,7 @@
 
 #include "checker/dd/DDEquivalenceChecker.hpp"
 
+#include "Configuration.hpp"
 #include "EquivalenceCriterion.hpp"
 #include "checker/EquivalenceChecker.hpp"
 #include "checker/dd/DDPackageConfigs.hpp"
@@ -15,6 +16,7 @@
 #include "checker/dd/applicationscheme/OneToOneApplicationScheme.hpp"
 #include "checker/dd/applicationscheme/ProportionalApplicationScheme.hpp"
 #include "checker/dd/applicationscheme/SequentialApplicationScheme.hpp"
+#include "dd/ComplexValue.hpp"
 #include "dd/DDpackageConfig.hpp"
 #include "dd/Package_fwd.hpp"
 
@@ -48,34 +50,41 @@ DDEquivalenceChecker<DDType, Config>::equals(const DDType& e, const DDType& f) {
   // decision diagrams being extremely close (for some definition of `close`).
   if constexpr (std::is_same_v<DDType, qc::MatrixDD>) {
     // for matrices this can be resolved by calculating their Frobenius inner
-    // product trace(U V^-1) and comparing it to some threshold. in a similar
-    // fashion, we can simply compare U V^-1 with the identity, which results in
-    // a much simpler check that is not prone to overflow.
-    bool isClose{};
-    const bool eIsClose =
-        dd->isCloseToIdentity(e, configuration.functionality.traceThreshold);
-    const bool fIsClose =
-        dd->isCloseToIdentity(f, configuration.functionality.traceThreshold);
-    if (eIsClose || fIsClose) {
-      // if any of the DDs is close to the identity (structure), the result can
-      // be decided by whether both DDs are close enough to the identity.
-      isClose = eIsClose && fIsClose;
-    } else {
-      // otherwise, one DD needs to be inverted before multiplying both of them
-      // together and checking whether the resulting DD is close enough to the
-      // identity.
+    // product trace(U V^-1) and comparing it to some threshold.
+    if (configuration.functionality.checkApproximateEquivalence) {
       auto g = dd->multiply(e, dd->conjugateTranspose(f));
-      isClose =
-          dd->isCloseToIdentity(g, configuration.functionality.traceThreshold);
-    }
-
-    if (isClose) {
-      // whenever the top edge weights differ, both decision diagrams are only
-      // equivalent up to a global phase
-      if (!e.w.approximatelyEquals(f.w)) {
-        return EquivalenceCriterion::EquivalentUpToGlobalPhase;
+      auto trace = dd->trace(g, nqubits).mag();
+      if (trace >= configuration.functionality.approximateCheckingThreshold) {
+        return EquivalenceCriterion::Equivalent;
       }
-      return EquivalenceCriterion::Equivalent;
+    } else {
+      // in a similar fashion, we can simply compare U V^-1 with the identity,
+      // which results in a much simpler check that is not prone to overflow.
+      bool isClose{};
+      const bool eIsClose =
+          dd->isCloseToIdentity(e, configuration.functionality.traceThreshold);
+      const bool fIsClose =
+          dd->isCloseToIdentity(f, configuration.functionality.traceThreshold);
+      if (eIsClose || fIsClose) {
+        // if any of the DDs is close to the identity (structure), the result
+        // can be decided by whether both DDs are close enough to the identity.
+        isClose = eIsClose && fIsClose;
+      } else {
+        // otherwise, one DD needs to be inverted before multiplying both of
+        // them together and checking whether the resulting DD is close enough
+        // to the identity.
+        auto g = dd->multiply(e, dd->conjugateTranspose(f));
+        isClose = dd->isCloseToIdentity(
+            g, configuration.functionality.traceThreshold);
+      }
+      if (isClose) {
+        // whenever the top edge weights differ, both decision diagrams are only
+        // equivalent up to a global phase
+        if (!e.w.approximatelyEquals(f.w)) {
+          return EquivalenceCriterion::EquivalentUpToGlobalPhase;
+        }
+        return EquivalenceCriterion::Equivalent;
+      }
     }
   } else {
     // for vectors this is resolved by computing the inner product (or fidelity)

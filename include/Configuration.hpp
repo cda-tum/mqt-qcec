@@ -62,7 +62,9 @@ public:
 
   struct Functionality {
     double traceThreshold = 1e-8;
+    double approximateCheckingThreshold = 0.8;
     bool checkPartialEquivalence = false;
+    bool checkApproximateEquivalence = false;
   };
 
   // configuration options for the simulation scheme
