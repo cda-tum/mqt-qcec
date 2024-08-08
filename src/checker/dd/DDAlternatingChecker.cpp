@@ -102,21 +102,28 @@ EquivalenceCriterion DDAlternatingChecker::checkEquivalence() {
     garbage[static_cast<std::size_t>(q)] =
         qc1->logicalQubitIsGarbage(q) && qc2->logicalQubitIsGarbage(q);
   }
-  const bool isClose =
-      configuration.functionality.checkPartialEquivalence
-          ? dd->isCloseToIdentity(functionality,
-                                  configuration.functionality.traceThreshold,
-                                  garbage, false)
-          : dd->isCloseToIdentity(functionality,
-                                  configuration.functionality.traceThreshold);
-
-  if (isClose) {
-    // whenever the top edge weight is not one, both decision diagrams are only
-    // equivalent up to a global phase
-    if (!functionality.w.approximatelyEquals(dd::Complex::one())) {
-      return EquivalenceCriterion::EquivalentUpToGlobalPhase;
+  if (configuration.functionality.checkApproximateEquivalence) {
+    auto trace = dd->trace(functionality, nqubits).mag();
+    if (trace >= configuration.functionality.approximateCheckingThreshold) {
+      return EquivalenceCriterion::Equivalent;
     }
-    return EquivalenceCriterion::Equivalent;
+  } else {
+    const bool isClose =
+        configuration.functionality.checkPartialEquivalence
+            ? dd->isCloseToIdentity(functionality,
+                                    configuration.functionality.traceThreshold,
+                                    garbage, false)
+            : dd->isCloseToIdentity(functionality,
+                                    configuration.functionality.traceThreshold);
+
+    if (isClose) {
+      // whenever the top edge weight is not one, both decision diagrams are
+      // only equivalent up to a global phase
+      if (!functionality.w.approximatelyEquals(dd::Complex::one())) {
+        return EquivalenceCriterion::EquivalentUpToGlobalPhase;
+      }
+      return EquivalenceCriterion::Equivalent;
+    }
   }
   return EquivalenceCriterion::NotEquivalent;
 }
