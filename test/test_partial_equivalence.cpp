@@ -103,8 +103,8 @@ void addStandardOperationToCircuit(QuantumComputation& circuit,
 }
 
 std::vector<qc::Qubit>
-fiveDiffferentRandomNumbers(const qc::Qubit min, const qc::Qubit max,
-                            std::mt19937_64& randomGenerator) {
+fiveDifferentRandomNumbers(const qc::Qubit min, const qc::Qubit max,
+                           std::mt19937_64& randomGenerator) {
   std::vector<qc::Qubit> numbers;
 
   for (qc::Qubit i = min; i < max; i++) {
@@ -202,7 +202,7 @@ StandardOperation
 makeRandomStandardOperation(const qc::Qubit nrQubits, const qc::Qubit min,
                             std::mt19937_64& randomGenerator) {
   const auto randomNumbers =
-      fiveDiffferentRandomNumbers(min, min + nrQubits, randomGenerator);
+      fiveDifferentRandomNumbers(min, min + nrQubits, randomGenerator);
 
   // choose one of the non-compound operations, but not "None", and also
   // not GPhase or I or Barrier

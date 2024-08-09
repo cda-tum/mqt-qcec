@@ -138,7 +138,7 @@ def test_non_equivalent_phase_rz_commute(
     assert result.equivalence == qcec.EquivalenceCriterion.not_equivalent
 
 
-def test_equivalent_roation_gate_fuse(
+def test_equivalent_rotation_gate_fuse(
     rotation_gate_fuse_lhs: QuantumCircuit, rotation_gate_fuse_rhs_correct: QuantumCircuit
 ) -> None:
     """Test a rotation gate fusion rule."""
@@ -146,7 +146,7 @@ def test_equivalent_roation_gate_fuse(
     assert result.equivalence == qcec.EquivalenceCriterion.equivalent
 
 
-def test_non_equivalent_roation_gate_fuse(
+def test_non_equivalent_rotation_gate_fuse(
     rotation_gate_fuse_lhs: QuantumCircuit, rotation_gate_fuse_rhs_incorrect: QuantumCircuit
 ) -> None:
     """Test an invalid rotation gate fusion rule."""
