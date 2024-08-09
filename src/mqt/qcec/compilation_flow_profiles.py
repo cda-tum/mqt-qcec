@@ -265,7 +265,7 @@ def create_gate_profile_data(
                 cost = compute_cost(qc, basis_gates, optimization_level)
 
                 # add the cost to the profile data
-                profile_data[(gate, control)] = cost
+                profile_data[gate, control] = cost
     return profile_data
 
 
@@ -360,7 +360,7 @@ def find_continuation(
         if next_term >= prediction_cutoff:
             break
         sequence.append(next_term)
-        profile_data[(gate, max_control + i + 1)] = next_term
+        profile_data[gate, max_control + i + 1] = next_term
 
 
 gate_collection_for_mode = {
