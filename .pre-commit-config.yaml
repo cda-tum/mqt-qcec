@@ -105,6 +105,7 @@ repos:
           - importlib_resources
           - numpy
           - pytest
+          - mqt.core @ git+https://github.com/cda-tum/mqt-core@shared-libs
 
   # Check for spelling
   - repo: https://github.com/codespell-project/codespell

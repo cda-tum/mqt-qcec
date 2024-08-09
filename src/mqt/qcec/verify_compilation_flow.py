@@ -8,6 +8,8 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from typing_extensions import Unpack
 
+    from mqt.core.load import CircuitInputType
+
     from .configuration import ConfigurationOptions
 
 from qiskit import QuantumCircuit
@@ -41,8 +43,8 @@ def __check_if_circuit_contains_measurements(circuit: QuantumCircuit) -> None:
 
 
 def verify_compilation(
-    original_circuit: QuantumCircuit | str,
-    compiled_circuit: QuantumCircuit | str,
+    original_circuit: CircuitInputType,
+    compiled_circuit: CircuitInputType,
     optimization_level: int = 1,
     ancilla_mode: AncillaMode = AncillaMode.NO_ANCILLA,
     configuration: Configuration | None = None,
