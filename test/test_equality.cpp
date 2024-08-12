@@ -5,6 +5,7 @@
 
 #include "EquivalenceCheckingManager.hpp"
 #include "EquivalenceCriterion.hpp"
+#include "QuantumComputation.hpp"
 #include "checker/dd/applicationscheme/ApplicationScheme.hpp"
 #include "dd/DDDefinitions.hpp"
 #include "operations/Control.hpp"
@@ -659,4 +660,51 @@ TEST_F(EqualityTest, ApproximateEquivalenceAlternatingNotEqual) {
   ec::EquivalenceCheckingManager ecm(qc1, qc2, config);
   ecm.run();
   EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::NotEquivalent);
+}
+
+TEST_F(EqualityTest, ApproximateEquivalenceBqskitToffoliDefaultError) {
+  const qc::QuantumComputation c1{
+      "./mqt-qcec/test/circuits/approximateEquivalenceTest/toffoli.qasm"};
+  qc::QuantumComputation c2{
+      "./mqt-qcec/test/circuits/approximateEquivalenceTest/"
+      "toffoli_out_default_error.qasm"};
+  config.execution.runAlternatingChecker = true;
+  config.functionality.checkApproximateEquivalence = true;
+  // using default error threshold
+  ec::EquivalenceCheckingManager ecm(c1, c2, config);
+  ecm.run();
+  EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::Equivalent);
+}
+
+TEST_F(EqualityTest, ApproximateEquivalenceBqskitToffoliSmallError) {
+  const qc::QuantumComputation c1{
+      "./mqt-qcec/test/circuits/approximateEquivalenceTest/toffoli.qasm"};
+  qc::QuantumComputation c2{
+      "./mqt-qcec/test/circuits/approximateEquivalenceTest/"
+      "toffoli_out_small_error.qasm"};
+  config.execution.runAlternatingChecker = true;
+  config.functionality.checkApproximateEquivalence = true;
+  config.functionality.approximateCheckingThreshold = 5e-2;
+  ec::EquivalenceCheckingManager ecm(c1, c2, config);
+  ecm.run();
+  EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::Equivalent);
+}
+
+TEST_F(EqualityTest, ApproximateEquivalenceBqskitToffoliHighError) {
+  const qc::QuantumComputation c1{
+      "./mqt-qcec/test/circuits/approximateEquivalenceTest/toffoli.qasm"};
+  qc::QuantumComputation c2{
+      "./mqt-qcec/test/circuits/approximateEquivalenceTest/"
+      "toffoli_out_high_error.qasm"};
+  config.execution.runAlternatingChecker = true;
+  config.functionality.checkApproximateEquivalence = true;
+  // using default error threshold
+  ec::EquivalenceCheckingManager ecm(c1, c2, config);
+  ecm.run();
+  EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::NotEquivalent);
+  // using synthesis_epsilon
+  config.functionality.approximateCheckingThreshold = 0.5;
+  ec::EquivalenceCheckingManager ecm2(c1, c2, config);
+  ecm2.run();
+  EXPECT_EQ(ecm2.equivalence(), ec::EquivalenceCriterion::Equivalent);
 }
