@@ -104,7 +104,8 @@ EquivalenceCriterion DDAlternatingChecker::checkEquivalence() {
   }
   if (configuration.functionality.checkApproximateEquivalence) {
     auto trace = dd->trace(functionality, nqubits).mag();
-    if (trace >= configuration.functionality.approximateCheckingThreshold) {
+    if (std::abs(trace - 1.) <
+        configuration.functionality.approximateCheckingThreshold) {
       return EquivalenceCriterion::Equivalent;
     }
   } else {

@@ -613,7 +613,7 @@ TEST_F(EqualityTest, ApproximateEquivalenceConstructionEqual) {
   qc2.i(0);
   config.execution.runConstructionChecker = true;
   config.functionality.checkApproximateEquivalence = true;
-  config.functionality.approximateCheckingThreshold = 0.7;
+  config.functionality.approximateCheckingThreshold = 0.3;
   ec::EquivalenceCheckingManager ecm(qc1, qc2, config);
   ecm.run();
   EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::Equivalent);
@@ -627,7 +627,7 @@ TEST_F(EqualityTest, ApproximateEquivalenceConstructionNotEqual) {
   qc2.i(0);
   config.execution.runConstructionChecker = true;
   config.functionality.checkApproximateEquivalence = true;
-  config.functionality.approximateCheckingThreshold = 0.8;
+  config.functionality.approximateCheckingThreshold = 0.2;
   ec::EquivalenceCheckingManager ecm(qc1, qc2, config);
   ecm.run();
   EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::NotEquivalent);
@@ -641,7 +641,7 @@ TEST_F(EqualityTest, ApproximateEquivalenceAlternatingEqual) {
   qc2.i(0);
   config.execution.runAlternatingChecker = true;
   config.functionality.checkApproximateEquivalence = true;
-  config.functionality.approximateCheckingThreshold = 0.7;
+  config.functionality.approximateCheckingThreshold = 0.3;
   ec::EquivalenceCheckingManager ecm(qc1, qc2, config);
   ecm.run();
   EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::Equivalent);
@@ -655,7 +655,7 @@ TEST_F(EqualityTest, ApproximateEquivalenceAlternatingNotEqual) {
   qc2.i(0);
   config.execution.runAlternatingChecker = true;
   config.functionality.checkApproximateEquivalence = true;
-  config.functionality.approximateCheckingThreshold = 0.8;
+  config.functionality.approximateCheckingThreshold = 0.2;
   ec::EquivalenceCheckingManager ecm(qc1, qc2, config);
   ecm.run();
   EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::NotEquivalent);

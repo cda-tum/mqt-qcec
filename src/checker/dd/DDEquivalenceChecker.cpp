@@ -54,7 +54,8 @@ DDEquivalenceChecker<DDType, Config>::equals(const DDType& e, const DDType& f) {
     if (configuration.functionality.checkApproximateEquivalence) {
       auto g = dd->multiply(e, dd->conjugateTranspose(f));
       auto trace = dd->trace(g, nqubits).mag();
-      if (trace >= configuration.functionality.approximateCheckingThreshold) {
+      if (std::abs(trace - 1.) <
+          configuration.functionality.approximateCheckingThreshold) {
         return EquivalenceCriterion::Equivalent;
       }
     } else {
