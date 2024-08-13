@@ -102,6 +102,8 @@ EquivalenceCriterion DDAlternatingChecker::checkEquivalence() {
     garbage[static_cast<std::size_t>(q)] =
         qc1->logicalQubitIsGarbage(q) && qc2->logicalQubitIsGarbage(q);
   }
+  // For approximate equivalence checking, calculate the Frobenius inner
+  // product trace(U V^-1) and compare it to some threshold.
   if (configuration.functionality.checkApproximateEquivalence) {
     auto trace = dd->trace(functionality, nqubits).mag();
     if (std::abs(trace - 1.) <
@@ -109,6 +111,7 @@ EquivalenceCriterion DDAlternatingChecker::checkEquivalence() {
       return EquivalenceCriterion::Equivalent;
     }
   } else {
+    // Otherwise, we can simply compare U V^-1 with the identity
     const bool isClose =
         configuration.functionality.checkPartialEquivalence
             ? dd->isCloseToIdentity(functionality,

@@ -607,6 +607,8 @@ TEST_F(EqualityTest, StripIdleQubitInOutputPermutationWithAncilla) {
 }
 
 TEST_F(EqualityTest, ApproximateEquivalenceConstructionEqual) {
+  // Check that the difference between the circuits is below the
+  // approximateCheckingThreshold using the ConstructionChecker
   qc1 = qc::QuantumComputation(3);
   qc2 = qc::QuantumComputation(3);
   // Toffoli gate
@@ -621,6 +623,8 @@ TEST_F(EqualityTest, ApproximateEquivalenceConstructionEqual) {
 }
 
 TEST_F(EqualityTest, ApproximateEquivalenceConstructionNotEqual) {
+  // Check that the difference between the circuits is above the
+  // approximateCheckingThreshold using the ConstructionChecker
   qc1 = qc::QuantumComputation(3);
   qc2 = qc::QuantumComputation(3);
   // Toffoli gate
@@ -635,6 +639,8 @@ TEST_F(EqualityTest, ApproximateEquivalenceConstructionNotEqual) {
 }
 
 TEST_F(EqualityTest, ApproximateEquivalenceAlternatingEqual) {
+  // Check that the difference between the circuits is below the
+  // approximateCheckingThreshold using the AlternatingChecker
   qc1 = qc::QuantumComputation(3);
   qc2 = qc::QuantumComputation(3);
   // Toffoli gate
@@ -649,6 +655,8 @@ TEST_F(EqualityTest, ApproximateEquivalenceAlternatingEqual) {
 }
 
 TEST_F(EqualityTest, ApproximateEquivalenceAlternatingNotEqual) {
+  // Check that the difference between the circuits is above the
+  // approximateCheckingThreshold using the AlternatingChecker
   qc1 = qc::QuantumComputation(3);
   qc2 = qc::QuantumComputation(3);
   // Toffoli gate
@@ -663,6 +671,8 @@ TEST_F(EqualityTest, ApproximateEquivalenceAlternatingNotEqual) {
 }
 
 TEST_F(EqualityTest, ApproximateEquivalenceBqskitToffoliDefaultError) {
+  // Check that the Toffoli gate is equivalent to itself after synthesizing it
+  // with the BQSKit compiler, which introduces by default a distance up to 1e-8
   const qc::QuantumComputation c1{
       "./circuits/approximateEquivalenceTest/toffoli.qasm"};
   qc::QuantumComputation c2{"./circuits/approximateEquivalenceTest/"
@@ -676,6 +686,8 @@ TEST_F(EqualityTest, ApproximateEquivalenceBqskitToffoliDefaultError) {
 }
 
 TEST_F(EqualityTest, ApproximateEquivalenceBqskitToffoliSmallError) {
+  // Check that the Toffoli gate is equivalent to itself after synthesizing it
+  // with the BQSKit compiler, when setting the error_threshold to 5e-2
   const qc::QuantumComputation c1{
       "./circuits/approximateEquivalenceTest/toffoli.qasm"};
   qc::QuantumComputation c2{"./circuits/approximateEquivalenceTest/"
@@ -689,6 +701,9 @@ TEST_F(EqualityTest, ApproximateEquivalenceBqskitToffoliSmallError) {
 }
 
 TEST_F(EqualityTest, ApproximateEquivalenceBqskitToffoliHighError) {
+  // Check that the Toffoli gate is equivalent to itself after synthesizing it
+  // with the BQSKit compiler, when setting the error_threshold to 0.5 Here, the
+  // computed distance indeed exceeds the default threshold of 1e-8.
   const qc::QuantumComputation c1{
       "./circuits/approximateEquivalenceTest/toffoli.qasm"};
   qc::QuantumComputation c2{"./circuits/approximateEquivalenceTest/"
@@ -699,7 +714,7 @@ TEST_F(EqualityTest, ApproximateEquivalenceBqskitToffoliHighError) {
   ec::EquivalenceCheckingManager ecm(c1, c2, config);
   ecm.run();
   EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::NotEquivalent);
-  // using synthesis_epsilon
+  // using non-default error threshold
   config.functionality.approximateCheckingThreshold = 0.5;
   ec::EquivalenceCheckingManager ecm2(c1, c2, config);
   ecm2.run();
@@ -707,6 +722,8 @@ TEST_F(EqualityTest, ApproximateEquivalenceBqskitToffoliHighError) {
 }
 
 TEST_F(EqualityTest, ApproximateEquivalenceBqskitBellDefaultError) {
+  // Check that the Bell circuit is equivalent to itself after synthesizing it
+  // with the BQSKit compiler, which introduces by default a distance up to 1e-8
   const qc::QuantumComputation c1{"./approximateEquivalenceTest/bell.qasm"};
   qc::QuantumComputation c2{"./circuits/approximateEquivalenceTest/"
                             "bell_out_default_error.qasm"};
@@ -719,6 +736,9 @@ TEST_F(EqualityTest, ApproximateEquivalenceBqskitBellDefaultError) {
 }
 
 TEST_F(EqualityTest, ApproximateEquivalenceBqskitBellHighError) {
+  // Check that the Bell circuit is equivalent to itself after synthesizing it
+  // with the BQSKit compiler, when setting the error_threshold to 0.5 Here, the
+  // computed distance indeed exceeds the default threshold of 1e-8.
   const qc::QuantumComputation c1{
       "./circuits/approximateEquivalenceTest/bell.qasm"};
   qc::QuantumComputation c2{"./circuits/approximateEquivalenceTest/"
@@ -729,7 +749,7 @@ TEST_F(EqualityTest, ApproximateEquivalenceBqskitBellHighError) {
   ec::EquivalenceCheckingManager ecm(c1, c2, config);
   ecm.run();
   EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::NotEquivalent);
-  // using synthesis_epsilon
+  // using non-default error threshold
   config.functionality.approximateCheckingThreshold = 0.5;
   ec::EquivalenceCheckingManager ecm2(c1, c2, config);
   ecm2.run();
