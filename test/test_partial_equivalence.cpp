@@ -25,20 +25,20 @@
 
 namespace dd {
 
-const std::vector<std::vector<OpType>> PRE_GENERATED_CIRCUITS_SIZE_1_1{
+const std::vector<std::vector<qc::OpType>> PRE_GENERATED_CIRCUITS_SIZE_1_1{
     {}, {}, {}, {}};
 
-const std::vector<std::vector<OpType>> PRE_GENERATED_CIRCUITS_SIZE_1_2{
-    {Z}, {Tdg}, {S}, {Sdg}};
+const std::vector<std::vector<qc::OpType>> PRE_GENERATED_CIRCUITS_SIZE_1_2{
+    {qc::Z}, {qc::Tdg}, {qc::S}, {qc::Sdg}};
 
-const std::vector<std::vector<OpType>> PRE_GENERATED_CIRCUITS_SIZE_2_1{
-    {}, {}, {}, {}, {X}, {X}};
+const std::vector<std::vector<qc::OpType>> PRE_GENERATED_CIRCUITS_SIZE_2_1{
+    {}, {}, {}, {}, {qc::X}, {qc::X}};
 
-const std::vector<std::vector<OpType>> PRE_GENERATED_CIRCUITS_SIZE_2_2{
-    {Z}, {Tdg}, {S}, {Sdg}, {X, Z}, {Z, X}};
+const std::vector<std::vector<qc::OpType>> PRE_GENERATED_CIRCUITS_SIZE_2_2{
+    {qc::Z}, {qc::Tdg}, {qc::S}, {qc::Sdg}, {qc::X, qc::Z}, {qc::Z, qc::X}};
 
-void addPreGeneratedCircuits(QuantumComputation& circuit1,
-                             QuantumComputation& circuit2,
+void addPreGeneratedCircuits(qc::QuantumComputation& circuit1,
+                             qc::QuantumComputation& circuit2,
                              const qc::Qubit groupBeginIndex,
                              const qc::Qubit groupSize) {
   const auto& circuits1 = groupSize == 1 ? PRE_GENERATED_CIRCUITS_SIZE_1_1
@@ -53,24 +53,25 @@ void addPreGeneratedCircuits(QuantumComputation& circuit1,
   const auto x1 = circuits1[randomIndex];
   const auto x2 = circuits2[randomIndex];
   for (auto gateType : x1) {
-    if (gateType == X) { // add CNOT
-      circuit1.emplace_back<StandardOperation>(groupBeginIndex,
-                                               groupBeginIndex + 1, gateType);
+    if (gateType == qc::X) { // add CNOT
+      circuit1.emplace_back<qc::StandardOperation>(
+          groupBeginIndex, groupBeginIndex + 1, gateType);
     } else {
-      circuit1.emplace_back<StandardOperation>(groupBeginIndex, gateType);
+      circuit1.emplace_back<qc::StandardOperation>(groupBeginIndex, gateType);
     }
   }
   for (auto gateType : x2) {
-    if (gateType == X) { // add CNOT
-      circuit2.emplace_back<StandardOperation>(groupBeginIndex,
-                                               groupBeginIndex + 1, gateType);
+    if (gateType == qc::X) { // add CNOT
+      circuit2.emplace_back<qc::StandardOperation>(
+          groupBeginIndex, groupBeginIndex + 1, gateType);
     } else {
-      circuit2.emplace_back<StandardOperation>(groupBeginIndex, gateType);
+      circuit2.emplace_back<qc::StandardOperation>(groupBeginIndex, gateType);
     }
   }
 }
 
-void addDecomposedCcxGate(QuantumComputation& circuit, const Controls& controls,
+void addDecomposedCcxGate(qc::QuantumComputation& circuit,
+                          const qc::Controls& controls,
                           const qc::Qubit target) {
   const qc::Qubit control1 = controls.begin()->qubit;
   const qc::Qubit control2 = (++controls.begin())->qubit;
@@ -91,14 +92,14 @@ void addDecomposedCcxGate(QuantumComputation& circuit, const Controls& controls,
   circuit.cx(control2, control1);
 }
 
-void addStandardOperationToCircuit(QuantumComputation& circuit,
-                                   const StandardOperation& op,
+void addStandardOperationToCircuit(qc::QuantumComputation& circuit,
+                                   const qc::StandardOperation& op,
                                    const bool decomposeCcx) {
-  if (op.getType() == X && decomposeCcx && op.getControls().size() == 2) {
+  if (op.getType() == qc::X && decomposeCcx && op.getControls().size() == 2) {
     // decompose toffoli gate
     addDecomposedCcxGate(circuit, op.getControls(), op.getTargets()[0]);
   } else {
-    circuit.emplace_back<StandardOperation>(op);
+    circuit.emplace_back<qc::StandardOperation>(op);
   }
 }
 
@@ -120,11 +121,11 @@ fiveDifferentRandomNumbers(const qc::Qubit min, const qc::Qubit max,
   return outputVector;
 }
 
-StandardOperation convertToStandardOperation(
-    const size_t nrQubits, const OpType randomOpType,
+qc::StandardOperation convertToStandardOperation(
+    const size_t nrQubits, const qc::OpType randomOpType,
     const qc::Qubit randomTarget1, const qc::Qubit randomTarget2,
     const fp randomParameter1, const fp randomParameter2,
-    const fp randomParameter3, const Controls& randomControls) {
+    const fp randomParameter3, const qc::Controls& randomControls) {
   switch (randomOpType) {
     // two targets and zero parameters
   case qc::SWAP:
@@ -135,7 +136,7 @@ StandardOperation convertToStandardOperation(
   case qc::DCX:
   case qc::ECR:
     if (nrQubits > 1) {
-      return {randomControls, Targets{randomTarget1, randomTarget2},
+      return {randomControls, qc::Targets{randomTarget1, randomTarget2},
               randomOpType};
     }
     break;
@@ -146,7 +147,7 @@ StandardOperation convertToStandardOperation(
   case qc::RZZ:
   case qc::RZX:
     if (nrQubits > 1) {
-      return {randomControls, Targets{randomTarget1, randomTarget2},
+      return {randomControls, qc::Targets{randomTarget1, randomTarget2},
               randomOpType, std::vector<fp>{randomParameter1}};
     }
     break;
@@ -155,7 +156,7 @@ StandardOperation convertToStandardOperation(
   case qc::XXminusYY:
   case qc::XXplusYY:
     if (nrQubits > 1) {
-      return {randomControls, Targets{randomTarget1, randomTarget2},
+      return {randomControls, qc::Targets{randomTarget1, randomTarget2},
               randomOpType,
               std::vector<fp>{randomParameter1, randomParameter2}};
     }
@@ -198,7 +199,7 @@ StandardOperation convertToStandardOperation(
   return {randomTarget1, qc::I};
 }
 
-StandardOperation
+qc::StandardOperation
 makeRandomStandardOperation(const qc::Qubit nrQubits, const qc::Qubit min,
                             std::mt19937_64& randomGenerator) {
   const auto randomNumbers =
@@ -206,8 +207,9 @@ makeRandomStandardOperation(const qc::Qubit nrQubits, const qc::Qubit min,
 
   // choose one of the non-compound operations, but not "None", and also
   // not GPhase or I or Barrier
-  std::uniform_int_distribution<> randomDistrOpType(H, RZX);
-  auto randomOpType = static_cast<OpType>(randomDistrOpType(randomGenerator));
+  std::uniform_int_distribution<> randomDistrOpType(qc::H, qc::RZX);
+  auto randomOpType =
+      static_cast<qc::OpType>(randomDistrOpType(randomGenerator));
   const qc::Qubit randomTarget1 = randomNumbers[0];
   qc::Qubit randomTarget2{min};
   if (randomNumbers.size() > 1) {
@@ -224,7 +226,7 @@ makeRandomStandardOperation(const qc::Qubit nrQubits, const qc::Qubit min,
     // otherwise Toffoli gates are almost never generated
     randomOpType = qc::X;
   }
-  Controls randomControls{};
+  qc::Controls randomControls{};
   for (size_t i = 0; i < nrControls; i++) {
     randomControls.emplace(randomNumbers[i + 2]);
   }
@@ -904,12 +906,10 @@ void partialEquivalencCheckingBenchmarks(const qc::Qubit minN,
     double totalTime{0};
     std::size_t totalGates{0};
     for (size_t k = 0; k < reps; k++) {
-      qc::Qubit d{};
+      qc::Qubit d = n;
       if (addAncilla) {
         std::uniform_int_distribution<qc::Qubit> nrDataQubits(1, n);
         d = nrDataQubits(gen);
-      } else {
-        d = n;
       }
       std::uniform_int_distribution<qc::Qubit> nrDataQubits(1, d);
       const qc::Qubit m = nrDataQubits(gen);
