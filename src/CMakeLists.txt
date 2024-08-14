@@ -24,7 +24,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC ${PROJECT_SOURCE_DIR}/include
 target_link_libraries(
   ${PROJECT_NAME}
   PUBLIC MQT::CoreDD MQT::CoreZX
-  PRIVATE MQT::CoreCircuitOptimizer MQT::ProjectWarnings MQT::ProjectOptions)
+  PRIVATE MQT::CoreCircuitOptimizer MQT::CoreAlgorithms MQT::ProjectWarnings MQT::ProjectOptions)
 
 # add MQT alias
 add_library(MQT::QCEC ALIAS ${PROJECT_NAME})
