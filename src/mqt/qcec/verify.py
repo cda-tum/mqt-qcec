@@ -6,8 +6,8 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from qiskit import QuantumCircuit
-    from typing_extensions import Unpack
 
+    from ._compat.typing import Unpack
     from .configuration import ConfigurationOptions
 
 from . import Configuration, EquivalenceCheckingManager
