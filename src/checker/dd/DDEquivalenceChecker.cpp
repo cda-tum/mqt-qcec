@@ -16,11 +16,11 @@
 #include "checker/dd/applicationscheme/OneToOneApplicationScheme.hpp"
 #include "checker/dd/applicationscheme/ProportionalApplicationScheme.hpp"
 #include "checker/dd/applicationscheme/SequentialApplicationScheme.hpp"
-#include "dd/ComplexValue.hpp"
 #include "dd/DDpackageConfig.hpp"
 #include "dd/Package_fwd.hpp"
 
 #include <chrono>
+#include <cmath>
 #include <nlohmann/json.hpp>
 #include <stdexcept>
 

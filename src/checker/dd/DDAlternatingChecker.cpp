@@ -11,6 +11,7 @@
 #include "checker/dd/applicationscheme/ApplicationScheme.hpp"
 
 #include <cassert>
+#include <cmath>
 #include <cstddef>
 #include <nlohmann/json.hpp>
 #include <stdexcept>
