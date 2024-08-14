@@ -1,15 +1,8 @@
-package_add_test(
-  mqt-qcec-test
-  MQT::QCEC
-  legacy/test_functionality.cpp
-  legacy/test_journal.cpp
-  legacy/test_compilationflow.cpp
-  legacy/test_general.cpp
-  legacy/test_simulation.cpp
-  test_dynamic_circuits.cpp
-  test_simple_circuit_identities.cpp
-  test_gate_cost_application_scheme.cpp
-  test_equality.cpp
-  test_zx.cpp
-  test_symbolic.cpp
-  test_partial_equivalence.cpp)
+# collect all test files
+file(GLOB_RECURSE TEST_FILES "*.cpp")
+
+# add test executable
+package_add_test(mqt-qcec-test MQT::QCEC ${TEST_FILES})
+
+# link to MQT::CoreAlgorithms library for dynamic circuit tests
+target_link_libraries(mqt-qcec-test PRIVATE MQT::CoreAlgorithms)

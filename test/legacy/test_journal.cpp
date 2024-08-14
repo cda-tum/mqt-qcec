@@ -6,8 +6,8 @@
 #include "Configuration.hpp"
 #include "EquivalenceCheckingManager.hpp"
 #include "EquivalenceCriterion.hpp"
-#include "QuantumComputation.hpp"
 #include "checker/dd/applicationscheme/ApplicationScheme.hpp"
+#include "ir/QuantumComputation.hpp"
 
 #include <algorithm>
 #include <array>

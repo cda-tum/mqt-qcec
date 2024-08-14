@@ -10,7 +10,7 @@
 #include "checker/dd/applicationscheme/GateCostApplicationScheme.hpp"
 #include "dd/Package.hpp"
 #include "dd/Package_fwd.hpp"
-#include "operations/Control.hpp"
+#include "ir/operations/Control.hpp"
 
 #include <cstddef>
 #include <fstream>

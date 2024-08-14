@@ -5,17 +5,17 @@
 
 #include "EquivalenceCheckingManager.hpp"
 
-#include "CircuitOptimizer.hpp"
 #include "Definitions.hpp"
 #include "EquivalenceCriterion.hpp"
-#include "Permutation.hpp"
-#include "QuantumComputation.hpp"
 #include "ThreadSafeQueue.hpp"
 #include "checker/dd/DDAlternatingChecker.hpp"
 #include "checker/dd/DDConstructionChecker.hpp"
 #include "checker/dd/DDSimulationChecker.hpp"
 #include "checker/dd/simulation/StateType.hpp"
 #include "checker/zx/ZXChecker.hpp"
+#include "circuit_optimizer/CircuitOptimizer.hpp"
+#include "ir/Permutation.hpp"
+#include "ir/QuantumComputation.hpp"
 #include "zx/FunctionalityConstruction.hpp"
 
 #include <algorithm>
@@ -284,8 +284,8 @@ void EquivalenceCheckingManager::runOptimizationPasses() {
   }
 
   if (configuration.optimizations.reorderOperations) {
-    qc::CircuitOptimizer::reorderOperations(qc1);
-    qc::CircuitOptimizer::reorderOperations(qc2);
+    qc1.reorderOperations();
+    qc2.reorderOperations();
   }
 
   // remove final measurements from both circuits so that the underlying
@@ -916,8 +916,8 @@ void EquivalenceCheckingManager::reconstructSWAPs() {
 
 void EquivalenceCheckingManager::reorderOperations() {
   if (!configuration.optimizations.reorderOperations) {
-    qc::CircuitOptimizer::reorderOperations(qc1);
-    qc::CircuitOptimizer::reorderOperations(qc2);
+    qc1.reorderOperations();
+    qc2.reorderOperations();
     configuration.optimizations.reorderOperations = true;
   }
 }

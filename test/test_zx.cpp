@@ -7,9 +7,9 @@
 #include "Definitions.hpp"
 #include "EquivalenceCheckingManager.hpp"
 #include "EquivalenceCriterion.hpp"
-#include "Permutation.hpp"
-#include "QuantumComputation.hpp"
-#include "operations/Control.hpp"
+#include "ir/Permutation.hpp"
+#include "ir/QuantumComputation.hpp"
+#include "ir/operations/Control.hpp"
 #include "zx/ZXDefinitions.hpp"
 
 #include <algorithm>

@@ -8,10 +8,10 @@
 #include "Configuration.hpp"
 #include "DDEquivalenceChecker.hpp"
 #include "DDPackageConfigs.hpp"
-#include "QuantumComputation.hpp"
 #include "checker/dd/TaskManager.hpp"
 #include "checker/dd/applicationscheme/ApplicationScheme.hpp"
 #include "dd/Package_fwd.hpp"
+#include "ir/QuantumComputation.hpp"
 
 #include <nlohmann/json_fwd.hpp>
 #include <stdexcept>
