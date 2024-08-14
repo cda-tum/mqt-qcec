@@ -675,8 +675,8 @@ TEST_F(EqualityTest, ApproximateEquivalenceBqskitToffoliDefaultError) {
   // with the BQSKit compiler, which introduces by default a distance up to 1e-8
   const qc::QuantumComputation c1{
       "./circuits/approximateEquivalenceTest/toffoli.qasm"};
-  qc::QuantumComputation c2{"./circuits/approximateEquivalenceTest/"
-                            "toffoli_out_default_error.qasm"};
+  const qc::QuantumComputation c2{"./circuits/approximateEquivalenceTest/"
+                                  "toffoli_out_default_error.qasm"};
   config.execution.runAlternatingChecker = true;
   config.functionality.checkApproximateEquivalence = true;
   // using default error threshold
@@ -690,8 +690,8 @@ TEST_F(EqualityTest, ApproximateEquivalenceBqskitToffoliSmallError) {
   // with the BQSKit compiler, when setting the error_threshold to 5e-2
   const qc::QuantumComputation c1{
       "./circuits/approximateEquivalenceTest/toffoli.qasm"};
-  qc::QuantumComputation c2{"./circuits/approximateEquivalenceTest/"
-                            "toffoli_out_small_error.qasm"};
+  const qc::QuantumComputation c2{"./circuits/approximateEquivalenceTest/"
+                                  "toffoli_out_small_error.qasm"};
   config.execution.runAlternatingChecker = true;
   config.functionality.checkApproximateEquivalence = true;
   config.functionality.approximateCheckingThreshold = 5e-2;
@@ -706,8 +706,8 @@ TEST_F(EqualityTest, ApproximateEquivalenceBqskitToffoliHighError) {
   // computed distance indeed exceeds the default threshold of 1e-8.
   const qc::QuantumComputation c1{
       "./circuits/approximateEquivalenceTest/toffoli.qasm"};
-  qc::QuantumComputation c2{"./circuits/approximateEquivalenceTest/"
-                            "toffoli_out_high_error.qasm"};
+  const qc::QuantumComputation c2{"./circuits/approximateEquivalenceTest/"
+                                  "toffoli_out_high_error.qasm"};
   config.execution.runAlternatingChecker = true;
   config.functionality.checkApproximateEquivalence = true;
   // using default error threshold
@@ -724,9 +724,10 @@ TEST_F(EqualityTest, ApproximateEquivalenceBqskitToffoliHighError) {
 TEST_F(EqualityTest, ApproximateEquivalenceBqskitBellDefaultError) {
   // Check that the Bell circuit is equivalent to itself after synthesizing it
   // with the BQSKit compiler, which introduces by default a distance up to 1e-8
-  const qc::QuantumComputation c1{"./approximateEquivalenceTest/bell.qasm"};
-  qc::QuantumComputation c2{"./circuits/approximateEquivalenceTest/"
-                            "bell_out_default_error.qasm"};
+  const qc::QuantumComputation c1{
+      "./circuits/approximateEquivalenceTest/bell.qasm"};
+  const qc::QuantumComputation c2{"./circuits/approximateEquivalenceTest/"
+                                  "bell_out_default_error.qasm"};
   config.execution.runAlternatingChecker = true;
   config.functionality.checkApproximateEquivalence = true;
   // using default error threshold
@@ -741,8 +742,8 @@ TEST_F(EqualityTest, ApproximateEquivalenceBqskitBellHighError) {
   // computed distance indeed exceeds the default threshold of 1e-8.
   const qc::QuantumComputation c1{
       "./circuits/approximateEquivalenceTest/bell.qasm"};
-  qc::QuantumComputation c2{"./circuits/approximateEquivalenceTest/"
-                            "bell_out_high_error.qasm"};
+  const qc::QuantumComputation c2{"./circuits/approximateEquivalenceTest/"
+                                  "bell_out_high_error.qasm"};
   config.execution.runAlternatingChecker = true;
   config.functionality.checkApproximateEquivalence = true;
   // using default error threshold
