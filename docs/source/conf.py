@@ -72,14 +72,14 @@ modindex_common_prefix = ["mqt.qcec."]
 
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3", None),
-    "typing_extensions": ("https://typing-extensions.readthedocs.io/en/latest/", None),
-    "qiskit": ("https://qiskit.org/documentation/", None),
-    "mqt": ("https://mqt.readthedocs.io/en/latest/", None),
-    "core": ("https://mqt.readthedocs.io/projects/core/en/latest/", None),
-    "ddsim": ("https://mqt.readthedocs.io/projects/ddsim/en/latest/", None),
-    "qmap": ("https://mqt.readthedocs.io/projects/qmap/en/latest/", None),
-    "qecc": ("https://mqt.readthedocs.io/projects/qecc/en/latest/", None),
-    "syrec": ("https://mqt.readthedocs.io/projects/syrec/en/latest/", None),
+    "typing_extensions": ("https://typing-extensions.readthedocs.io/en/latest", None),
+    "qiskit": ("https://qiskit.org/documentation", None),
+    "mqt": ("https://mqt.readthedocs.io/en/latest", None),
+    "core": ("https://mqt.readthedocs.io/projects/core/en/latest", None),
+    "ddsim": ("https://mqt.readthedocs.io/projects/ddsim/en/latest", None),
+    "qmap": ("https://mqt.readthedocs.io/projects/qmap/en/latest", None),
+    "qecc": ("https://mqt.readthedocs.io/projects/qecc/en/latest", None),
+    "syrec": ("https://mqt.readthedocs.io/projects/syrec/en/latest", None),
 }
 
 nbsphinx_execute = "auto"
