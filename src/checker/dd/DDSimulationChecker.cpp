@@ -7,11 +7,11 @@
 
 #include "Configuration.hpp"
 #include "EquivalenceCriterion.hpp"
-#include "QuantumComputation.hpp"
 #include "checker/dd/DDEquivalenceChecker.hpp"
 #include "checker/dd/DDPackageConfigs.hpp"
 #include "checker/dd/TaskManager.hpp"
 #include "checker/dd/simulation/StateGenerator.hpp"
+#include "ir/QuantumComputation.hpp"
 
 #include <nlohmann/json.hpp>
 #include <utility>

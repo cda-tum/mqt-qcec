@@ -6,8 +6,8 @@ pybind11_add_module(
   OPT_SIZE
   # Source code goes here
   bindings.cpp)
-target_link_libraries(pyqcec PRIVATE MQT::QCEC MQT::CorePython pybind11_json MQT::ProjectOptions
-                                     MQT::ProjectWarnings)
+target_link_libraries(pyqcec PRIVATE MQT::QCEC MQT::CoreAlgorithms MQT::CorePython pybind11_json
+                                     MQT::ProjectOptions MQT::ProjectWarnings)
 
 # Install directive for scikit-build-core
 install(

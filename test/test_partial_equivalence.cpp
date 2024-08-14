@@ -6,16 +6,16 @@
 #include "Definitions.hpp"
 #include "EquivalenceCheckingManager.hpp"
 #include "EquivalenceCriterion.hpp"
-#include "QuantumComputation.hpp"
 #include "dd/DDDefinitions.hpp"
-#include "operations/Control.hpp"
-#include "operations/OpType.hpp"
-#include "operations/StandardOperation.hpp"
+#include "ir/QuantumComputation.hpp"
+#include "ir/operations/Control.hpp"
+#include "ir/operations/OpType.hpp"
+#include "ir/operations/StandardOperation.hpp"
 
-#include "gtest/gtest.h"
 #include <algorithm>
 #include <cstddef>
 #include <cstdint>
+#include <gtest/gtest.h>
 #include <iostream>
 #include <random>
 #include <stdexcept>
