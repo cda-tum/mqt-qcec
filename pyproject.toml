@@ -169,7 +169,6 @@ ignore = ["W002"]  # Triggers on __init__.py's
 
 [tool.ruff]
 line-length = 120
-src = ["src"]
 namespace-packages = ["mqt"]
 preview = true
 unsafe-fixes = true
@@ -267,13 +266,6 @@ default.extend-ignore-re = [
 wille = "wille"
 anc = "anc"
 aer = "aer"
-
-
-[tool.repo-review]
-ignore = [
-  "PC160", # "Uses codespell" -> switched to https://github.com/crate-ci/typos
-  "PC180", # "Uses prettier" -> switched to different prettier-mirror that is not recognized by the check
-]
 
 
 [tool.cibuildwheel]
