@@ -226,6 +226,9 @@ void EquivalenceCheckingManager::setupAncillariesAndGarbage() {
 }
 
 void EquivalenceCheckingManager::runOptimizationPasses() {
+  std::cout << qc1 << "\n";
+  std::cout << qc2 << "\n";
+
   if (qc1.empty() && qc2.empty()) {
     return;
   }
@@ -250,6 +253,9 @@ void EquivalenceCheckingManager::runOptimizationPasses() {
           "in Python).");
     }
   }
+
+  std::cout << qc1 << "\n";
+  std::cout << qc2 << "\n";
 
   // first, make sure any potential SWAPs are reconstructed
   if (configuration.optimizations.reconstructSWAPs) {
@@ -287,6 +293,13 @@ void EquivalenceCheckingManager::runOptimizationPasses() {
     qc1.reorderOperations();
     qc2.reorderOperations();
   }
+
+  std::cout << qc1 << "\n";
+  std::cout << qc2 << "\n";
+
+  std::cout << qc1.toQASM() << "\n";
+
+  std::cout << "\n" << qc2.toQASM() << "\n";
 
   // remove final measurements from both circuits so that the underlying
   // functionality should be unitary
@@ -497,7 +510,9 @@ void EquivalenceCheckingManager::checkSequential() {
         std::make_unique<DDAlternatingChecker>(qc1, qc2, configuration));
     const auto& alternatingChecker = checkers.back();
     if (!done) {
+      std::cout << "Running alternating checker...\n";
       const auto result = alternatingChecker->run();
+      std::cout << "Alternating checker result: " << result << "\n";
 
       // if the alternating check produces a result, this is final
       if (result != EquivalenceCriterion::NoInformation) {

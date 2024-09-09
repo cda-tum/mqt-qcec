@@ -38,6 +38,10 @@ ZXEquivalenceChecker::ZXEquivalenceChecker(const qc::QuantumComputation& circ1,
   const auto& p1 = invertPermutations(*qc1);
   const auto& p2 = invertPermutations(*qc2);
 
+  qc::QuantumComputation::printPermutation(p1);
+  std::cout << "\n";
+  qc::QuantumComputation::printPermutation(p2);
+
   // fix ancillaries to |0>
   const auto nQubitsWithoutAncillae =
       static_cast<zx::Qubit>(qc1->getNqubitsWithoutAncillae());
