@@ -1,7 +1,7 @@
 [build-system]
 requires = [
   "scikit-build-core>=0.10.1",
-  "setuptools-scm>=7",
+  "setuptools-scm>=8.1",
   "pybind11>=2.13.5",
 ]
 build-backend = "scikit_build_core.build"
@@ -46,22 +46,22 @@ dependencies = [
 dynamic = ["version"]
 
 [project.optional-dependencies]
-test = ["pytest>=7.0"]
+test = ["pytest>=7.2"]
 coverage = ["mqt.qcec[test]", "pytest-cov>=4"]
 docs = [
-    "furo>=2023.08.17",
-    "sphinx>=7",
-    "setuptools-scm>=7",
+    "furo>=2023.9.10",
+    "qiskit[visualization]",
+    "setuptools-scm>=8.1",
+    "sphinx_design>=0.6",
+    "sphinx-autoapi>=3",
+    "sphinx-copybutton>=0.5",
     "sphinxcontrib-bibtex>=2.4.2",
-    "sphinx-copybutton",
-    "sphinx-hoverxref",
-    "pybtex>=0.24",
+    "sphinxcontrib-svg2pdfconverter>=1.2",
+    "sphinxext-opengraph>=0.9",
     "ipython",
     "ipykernel",
     "nbsphinx",
-    "sphinxext-opengraph",
     "sphinx-autodoc-typehints",
-    "qiskit[visualization]",
 ]
 dev = ["mqt.qcec[coverage, docs]"]
 
@@ -134,7 +134,7 @@ write_to = "src/mqt/qcec/_version.py"
 
 
 [tool.pytest.ini_options]
-minversion = "7.0"
+minversion = "7.2"
 testpaths = ["test/python"]
 addopts = ["-ra", "--strict-markers", "--strict-config", "--showlocals"]
 log_cli_level = "INFO"
