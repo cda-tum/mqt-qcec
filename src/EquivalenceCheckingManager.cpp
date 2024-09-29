@@ -70,9 +70,7 @@ void EquivalenceCheckingManager::stripIdleQubits() {
     // Remove idle logical qubit present exclusively in largerCircuit
     if (qubitDifference > 0 &&
         ((smallerCircuit.getNqubits() == 0) ||
-         logicalQubitIndex >
-             qc::QuantumComputation::getHighestLogicalQubitIndex(
-                 smallerCircuit.initialLayout))) {
+         logicalQubitIndex > smallerCircuit.initialLayout.maxValue())) {
       const bool physicalUsedInOutputPermutation =
           largerCircuit.outputPermutation.find(physicalQubitIndex) !=
           largerCircuit.outputPermutation.end();
@@ -198,9 +196,7 @@ void EquivalenceCheckingManager::setupAncillariesAndGarbage() {
   std::vector<bool> garbage(nqubits);
 
   for (std::size_t i = 0; i < qubitDifference; ++i) {
-    const auto logicalQubitIndex =
-        qc::QuantumComputation::getHighestLogicalQubitIndex(
-            largerCircuit.initialLayout);
+    const auto logicalQubitIndex = largerCircuit.initialLayout.maxValue();
     garbage[logicalQubitIndex] =
         largerCircuit.logicalQubitIsGarbage(logicalQubitIndex);
     removed.push_back(largerCircuit.removeQubit(logicalQubitIndex));
@@ -230,8 +226,8 @@ void EquivalenceCheckingManager::runOptimizationPasses() {
     return;
   }
 
-  const auto isDynamicCircuit1 = qc::CircuitOptimizer::isDynamicCircuit(qc1);
-  const auto isDynamicCircuit2 = qc::CircuitOptimizer::isDynamicCircuit(qc2);
+  const auto isDynamicCircuit1 = qc1.isDynamic();
+  const auto isDynamicCircuit2 = qc2.isDynamic();
   if (isDynamicCircuit1 || isDynamicCircuit2) {
     if (configuration.optimizations.transformDynamicCircuit) {
       if (isDynamicCircuit1) {
