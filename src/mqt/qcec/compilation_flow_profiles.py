@@ -4,11 +4,14 @@ from __future__ import annotations
 
 from enum import Enum, unique
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 from qiskit import QuantumCircuit, transpile
 from qiskit import __version__ as qiskit_version
+
+if TYPE_CHECKING:
+    from numpy.typing import NDArray
 
 
 @unique
@@ -307,22 +310,20 @@ def check_recurrence(seq: list[int], order: int = 2) -> list[int] | None:
     if len(seq) < (2 * order + 1):
         return None
 
-    mat, f = [], []
-    for i in range(order):
-        mat.append(seq[i : i + order])
-        f.append(seq[i + order])
+    mat = np.array([seq[i : i + order] for i in range(order)], dtype=int)
+    f = np.array([seq[i + order] for i in range(order)], dtype=int)
 
     if np.linalg.det(mat) == 0:
         return None
 
-    coeffs = np.linalg.inv(mat).dot(f)
+    coefficients: NDArray[np.float64] = np.linalg.inv(mat).dot(f)
 
     for i in range(2 * order, len(seq)):
-        predict = np.sum(coeffs * np.array(seq[i - order : i]))
+        predict: float = np.sum(coefficients * np.array(seq[i - order : i], dtype=float))
         if abs(predict - seq[i]) > 10 ** (-2):
             return None
 
-    return list(coeffs)
+    return list(coefficients)
 
 
 def find_continuation(

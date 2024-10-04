@@ -9,9 +9,9 @@
 #include "DDEquivalenceChecker.hpp"
 #include "DDPackageConfigs.hpp"
 #include "EquivalenceCriterion.hpp"
-#include "QuantumComputation.hpp"
 #include "applicationscheme/LookaheadApplicationScheme.hpp"
 #include "dd/Package_fwd.hpp"
+#include "ir/QuantumComputation.hpp"
 
 #include <nlohmann/json_fwd.hpp>
 #include <utility>

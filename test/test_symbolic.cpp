@@ -6,10 +6,10 @@
 #include "Configuration.hpp"
 #include "EquivalenceCheckingManager.hpp"
 #include "EquivalenceCriterion.hpp"
-#include "QuantumComputation.hpp"
 #include "dd/DDDefinitions.hpp"
-#include "operations/Control.hpp"
-#include "operations/Expression.hpp"
+#include "ir/QuantumComputation.hpp"
+#include "ir/operations/Control.hpp"
+#include "ir/operations/Expression.hpp"
 
 #include <gtest/gtest.h>
 

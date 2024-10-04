@@ -7,11 +7,11 @@
 
 #include "Configuration.hpp"
 #include "EquivalenceCriterion.hpp"
-#include "QuantumComputation.hpp"
 #include "TaskManager.hpp"
 #include "applicationscheme/ApplicationScheme.hpp"
 #include "checker/EquivalenceChecker.hpp"
 #include "dd/Package.hpp"
+#include "ir/QuantumComputation.hpp"
 
 #include <cstddef>
 #include <memory>

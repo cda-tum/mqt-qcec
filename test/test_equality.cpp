@@ -8,7 +8,7 @@
 #include "QuantumComputation.hpp"
 #include "checker/dd/applicationscheme/ApplicationScheme.hpp"
 #include "dd/DDDefinitions.hpp"
-#include "operations/Control.hpp"
+#include "ir/operations/Control.hpp"
 
 #include <cstddef>
 #include <gtest/gtest.h>

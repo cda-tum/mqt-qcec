@@ -2,12 +2,12 @@
 #include "Definitions.hpp"
 #include "EquivalenceCheckingManager.hpp"
 #include "EquivalenceCriterion.hpp"
-#include "QuantumComputation.hpp"
 #include "algorithms/BernsteinVazirani.hpp"
 #include "algorithms/QFT.hpp"
 #include "algorithms/QPE.hpp"
 #include "dd/DDDefinitions.hpp"
 #include "dd/Package.hpp"
+#include "ir/QuantumComputation.hpp"
 
 #include <bitset>
 #include <cstddef>
@@ -17,6 +17,7 @@
 #include <iostream>
 #include <memory>
 #include <sstream>
+#include <stdexcept>
 #include <string>
 
 class DynamicCircuitTestExactQPE : public testing::TestWithParam<std::size_t> {
@@ -306,4 +307,33 @@ TEST_P(DynamicCircuitTestQFT, UnitaryEquivalence) {
   ec::EquivalenceCheckingManager ecm(*qft, *dqft, config);
   ecm.run();
   EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::Equivalent);
+}
+
+TEST(GeneralDynamicCircuitTest, DynamicCircuit) {
+  auto s = qc::BitString(15U);
+  auto bv = qc::BernsteinVazirani(s);
+  auto dbv = qc::BernsteinVazirani(s, true);
+
+  auto config = ec::Configuration{};
+  EXPECT_THROW(ec::EquivalenceCheckingManager(bv, dbv, config),
+               std::runtime_error);
+
+  config.optimizations.transformDynamicCircuit = true;
+  config.optimizations.backpropagateOutputPermutation = true;
+
+  auto ecm = ec::EquivalenceCheckingManager(bv, dbv, config);
+
+  ecm.run();
+
+  EXPECT_TRUE(ecm.getResults().consideredEquivalent());
+
+  std::cout << ecm.getResults() << "\n";
+
+  auto ecm2 = ec::EquivalenceCheckingManager(dbv, dbv, config);
+
+  ecm2.run();
+
+  EXPECT_TRUE(ecm2.getResults().consideredEquivalent());
+
+  std::cout << ecm2.getResults() << "\n";
 }

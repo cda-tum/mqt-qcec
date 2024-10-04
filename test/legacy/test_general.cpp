@@ -4,51 +4,19 @@
 //
 
 #include "Configuration.hpp"
-#include "Definitions.hpp"
 #include "EquivalenceCheckingManager.hpp"
 #include "EquivalenceCriterion.hpp"
-#include "QuantumComputation.hpp"
-#include "algorithms/BernsteinVazirani.hpp"
 #include "checker/dd/applicationscheme/ApplicationScheme.hpp"
+#include "ir/QuantumComputation.hpp"
 
 #include <gtest/gtest.h>
 #include <iostream>
-#include <stdexcept>
 
 class GeneralTest : public ::testing::Test {
 protected:
   qc::QuantumComputation qc1;
   qc::QuantumComputation qc2;
 };
-
-TEST_F(GeneralTest, DynamicCircuit) {
-  auto s = qc::BitString(15U);
-  auto bv = qc::BernsteinVazirani(s);
-  auto dbv = qc::BernsteinVazirani(s, true);
-
-  auto config = ec::Configuration{};
-  EXPECT_THROW(ec::EquivalenceCheckingManager(bv, dbv, config),
-               std::runtime_error);
-
-  config.optimizations.transformDynamicCircuit = true;
-  config.optimizations.backpropagateOutputPermutation = true;
-
-  auto ecm = ec::EquivalenceCheckingManager(bv, dbv, config);
-
-  ecm.run();
-
-  EXPECT_TRUE(ecm.getResults().consideredEquivalent());
-
-  std::cout << ecm.getResults() << "\n";
-
-  auto ecm2 = ec::EquivalenceCheckingManager(dbv, dbv, config);
-
-  ecm2.run();
-
-  EXPECT_TRUE(ecm2.getResults().consideredEquivalent());
-
-  std::cout << ecm2.getResults() << "\n";
-}
 
 TEST_F(GeneralTest, RemoveDiagonalGatesBeforeMeasure) {
   qc1.addQubitRegister(1U);

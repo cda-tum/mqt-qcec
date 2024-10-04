@@ -6,11 +6,11 @@
 #include "Configuration.hpp"
 #include "Definitions.hpp"
 #include "EquivalenceCheckingManager.hpp"
-#include "QuantumComputation.hpp"
 #include "checker/dd/applicationscheme/ApplicationScheme.hpp"
 #include "checker/dd/applicationscheme/GateCostApplicationScheme.hpp"
+#include "ir/QuantumComputation.hpp"
 
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
 #include <iostream>
 #include <memory>
 #include <sstream>

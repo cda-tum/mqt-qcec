@@ -6,8 +6,7 @@ import warnings
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from typing_extensions import Unpack
-
+    from ._compat.typing import Unpack
     from .configuration import ConfigurationOptions
 
 from qiskit import QuantumCircuit

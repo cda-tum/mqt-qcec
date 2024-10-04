@@ -7,7 +7,7 @@
 
 #include "Configuration.hpp"
 #include "EquivalenceCriterion.hpp"
-#include "QuantumComputation.hpp"
+#include "ir/QuantumComputation.hpp"
 
 #include <algorithm>
 #include <atomic>

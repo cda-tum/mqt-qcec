@@ -5,9 +5,9 @@
 
 #include "Configuration.hpp"
 #include "EquivalenceCheckingManager.hpp"
-#include "QuantumComputation.hpp"
 #include "checker/dd/applicationscheme/ApplicationScheme.hpp"
 #include "checker/dd/applicationscheme/GateCostApplicationScheme.hpp"
+#include "ir/QuantumComputation.hpp"
 
 #include <algorithm>
 #include <gtest/gtest.h>
