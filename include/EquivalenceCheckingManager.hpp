@@ -7,7 +7,6 @@
 
 #include "Configuration.hpp"
 #include "EquivalenceCriterion.hpp"
-#include "QuantumComputation.hpp"
 #include "ThreadSafeQueue.hpp"
 #include "checker/EquivalenceChecker.hpp"
 #include "checker/dd/DDSimulationChecker.hpp"
@@ -17,6 +16,7 @@
 #include "checker/dd/simulation/StateType.hpp"
 #include "dd/ComplexNumbers.hpp"
 #include "dd/DDDefinitions.hpp"
+#include "ir/QuantumComputation.hpp"
 
 #include <condition_variable>
 #include <cstddef>

@@ -16,13 +16,13 @@ if(BUILD_MQT_QCEC_BINDINGS)
   endif()
 
   # add pybind11 library
-  find_package(pybind11 2.13 CONFIG REQUIRED)
+  find_package(pybind11 2.13.5 CONFIG REQUIRED)
 endif()
 
 # cmake-format: off
-set(MQT_CORE_VERSION 2.6.0
+set(MQT_CORE_VERSION 2.6.1
     CACHE STRING "MQT Core version")
-set(MQT_CORE_REV "2a7a92951fb67d0c4e795afbd17449063aa42d20"
+set(MQT_CORE_REV "3529a4435339af3b400e976b1a5e7393d8e5bf4f"
     CACHE STRING "MQT Core identifier (tag, branch or commit hash)")
 set(MQT_CORE_REPO_OWNER "cda-tum"
 	CACHE STRING "MQT Core repository owner (change when using a fork)")

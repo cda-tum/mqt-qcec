@@ -1,5 +1,9 @@
 [build-system]
-requires = ["scikit-build-core>=0.10.1", "setuptools-scm>=7", "pybind11>=2.13"]
+requires = [
+  "scikit-build-core>=0.10.1",
+  "setuptools-scm>=8.1",
+  "pybind11>=2.13.5",
+]
 build-backend = "scikit_build_core.build"
 
 [project]
@@ -25,7 +29,6 @@ classifiers = [
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
@@ -34,31 +37,31 @@ classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Typing :: Typed",
 ]
-requires-python = ">=3.8"
+requires-python = ">=3.9"
 dependencies = [
     "importlib_resources>=5.0; python_version < '3.10'",
-    "typing_extensions>=4.2",
+    "typing_extensions>=4.2; python_version < '3.11'", # used for typing.Unpack
     "qiskit[qasm3-import]>=1.0.0",
 ]
 dynamic = ["version"]
 
 [project.optional-dependencies]
-test = ["pytest>=7.0"]
+test = ["pytest>=7.2"]
 coverage = ["mqt.qcec[test]", "pytest-cov>=4"]
 docs = [
-    "furo>=2023.08.17",
-    "sphinx>=7",
-    "setuptools-scm>=7",
+    "furo>=2023.9.10",
+    "qiskit[visualization]",
+    "setuptools-scm>=8.1",
+    "sphinx_design>=0.6",
+    "sphinx-autoapi>=3",
+    "sphinx-copybutton>=0.5",
     "sphinxcontrib-bibtex>=2.4.2",
-    "sphinx-copybutton",
-    "sphinx-hoverxref",
-    "pybtex>=0.24",
+    "sphinxcontrib-svg2pdfconverter>=1.2",
+    "sphinxext-opengraph>=0.9",
     "ipython",
     "ipykernel",
     "nbsphinx",
-    "sphinxext-opengraph",
     "sphinx-autodoc-typehints",
-    "qiskit[visualization]",
 ]
 dev = ["mqt.qcec[coverage, docs]"]
 
@@ -108,6 +111,13 @@ BUILD_MQT_QCEC_TESTS = "OFF"
 BUILD_MQT_QCEC_BINDINGS = "ON"
 ENABLE_IPO = "ON"
 
+[[tool.scikit-build.overrides]]
+if.python-version = ">=3.13"
+if.abi-flags = "t"
+if.platform-system = "win32"
+inherit.cmake.define = "append"
+cmake.define.DISABLE_GIL = "1"
+
 
 [tool.check-sdist]
 sdist-only = ["src/mqt/qcec/_version.py"]
@@ -124,7 +134,7 @@ write_to = "src/mqt/qcec/_version.py"
 
 
 [tool.pytest.ini_options]
-minversion = "7.0"
+minversion = "7.2"
 testpaths = ["test/python"]
 addopts = ["-ra", "--strict-markers", "--strict-config", "--showlocals"]
 log_cli_level = "INFO"
@@ -133,7 +143,6 @@ filterwarnings = [
     "error",
     'ignore:.*encountered in det.*:RuntimeWarning:numpy.linalg:',
     'ignore:.*datetime\.datetime\.utcfromtimestamp.*:DeprecationWarning:',
-    'ignore:.*Qiskit with Python 3.8.*:DeprecationWarning:',
 ]
 
 [tool.coverage]
@@ -150,7 +159,7 @@ report.exclude_also = [
 [tool.mypy]
 files = ["src/mqt", "test/python", "noxfile.py"]
 mypy_path = ["$MYPY_CONFIG_FILE_DIR/src"]
-python_version = "3.8"
+python_version = "3.9"
 warn_unused_configs = true
 enable_error_code = ["ignore-without-code", "redundant-expr", "truthy-bool"]
 strict = true
@@ -169,7 +178,6 @@ ignore = ["W002"]  # Triggers on __init__.py's
 
 [tool.ruff]
 line-length = 120
-src = ["src"]
 namespace-packages = ["mqt"]
 preview = true
 unsafe-fixes = true
@@ -226,6 +234,7 @@ ignore = [
     "PT004",   # Incorrect, just usefixtures instead.
     "S101",    # Use of assert detected
 ]
+typing-modules = ["mqt.qcec._compat.typing"]
 isort.required-imports = ["from __future__ import annotations"]
 
 [tool.ruff.lint.flake8-tidy-imports.banned-api]
@@ -269,10 +278,7 @@ aer = "aer"
 
 
 [tool.repo-review]
-ignore = [
-  "PC160", # "Uses codespell" -> switched to https://github.com/crate-ci/typos
-  "PC180", # "Uses prettier" -> switched to different prettier-mirror that is not recognized by the check
-]
+ignore = ["GH200"]
 
 
 [tool.cibuildwheel]
@@ -280,9 +286,13 @@ build = "cp3*"
 skip = "*-musllinux_*"
 archs = "auto64"
 test-command = "python -c \"from mqt import qcec\""
-test-skip = ["cp38-macosx_arm64", "cp313*"] # skip testing on Python 3.13 until our dependencies are ready
+test-skip = ["cp313*"] # skip testing on Python 3.13 until our dependencies are ready
 build-frontend = "build[uv]"
 free-threaded-support = true
+manylinux-x86_64-image = "manylinux_2_28"
+manylinux-aarch64-image = "manylinux_2_28"
+manylinux-ppc64le-image = "manylinux_2_28"
+manylinux-s390x-image = "manylinux_2_28"
 
 [tool.cibuildwheel.linux]
 environment = { DEPLOY="ON" }
@@ -294,3 +304,11 @@ environment = { MACOSX_DEPLOYMENT_TARGET = "10.15" }
 before-build = "pip install delvewheel>=1.7.3"
 repair-wheel-command = "delvewheel repair -v -w {dest_dir} {wheel} --namespace-pkg mqt"
 environment = { CMAKE_ARGS = "-T ClangCL", SKBUILD_CMAKE_ARGS="--fresh" }
+
+[[tool.cibuildwheel.overrides]]
+select = "*-macosx_arm64"
+environment = { MACOSX_DEPLOYMENT_TARGET = "11.0" }
+
+
+[tool.uv]
+reinstall-package = ["mqt.qcec"]

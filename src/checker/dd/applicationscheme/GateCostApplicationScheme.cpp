@@ -5,7 +5,7 @@
 
 #include "checker/dd/applicationscheme/GateCostApplicationScheme.hpp"
 
-#include "operations/OpType.hpp"
+#include "ir/operations/OpType.hpp"
 
 #include <cstddef>
 

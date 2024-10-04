@@ -5,8 +5,8 @@
 
 #include "Configuration.hpp"
 #include "EquivalenceCheckingManager.hpp"
-#include "QuantumComputation.hpp"
 #include "checker/dd/simulation/StateType.hpp"
+#include "ir/QuantumComputation.hpp"
 
 #include <gtest/gtest.h>
 #include <iostream>
