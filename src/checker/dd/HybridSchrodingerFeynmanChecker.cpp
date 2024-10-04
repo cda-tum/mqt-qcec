@@ -12,8 +12,11 @@
 #include <cmath>
 #include <cstddef>
 #include <cstdio>
+#include <map>
+#include <memory>
 #include <mutex>
 #include <stdexcept>
+#include <string>
 #include <taskflow/core/async.hpp>
 #include <taskflow/core/executor.hpp>
 

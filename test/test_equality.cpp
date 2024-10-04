@@ -13,6 +13,7 @@
 #include <cstddef>
 #include <gtest/gtest.h>
 #include <iostream>
+#include <optional>
 #include <stdexcept>
 
 class EqualityTest : public testing::Test {

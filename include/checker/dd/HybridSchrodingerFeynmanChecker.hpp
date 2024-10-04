@@ -5,6 +5,7 @@
 #include "dd/Package.hpp"
 #include "dd/Package_fwd.hpp"
 #include "ir/QuantumComputation.hpp"
+#include "memory"
 
 #include <cstddef>
 #include <map>
