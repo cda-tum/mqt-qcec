@@ -12,4 +12,5 @@ package_add_test(
   test_equality.cpp
   test_zx.cpp
   test_symbolic.cpp
-  test_partial_equivalence.cpp)
+  test_partial_equivalence.cpp
+  test_hsf.cpp)

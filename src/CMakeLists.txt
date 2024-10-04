@@ -12,6 +12,7 @@ add_library(
   checker/dd/DDConstructionChecker.cpp
   checker/dd/DDSimulationChecker.cpp
   checker/dd/DDAlternatingChecker.cpp
+  checker/dd/HybridSchrodingerFeynmanChecker.cpp
   checker/dd/applicationscheme/GateCostApplicationScheme.cpp
   checker/dd/simulation/StateGenerator.cpp
   checker/zx/ZXChecker.cpp)
@@ -21,8 +22,11 @@ target_include_directories(${PROJECT_NAME} PUBLIC ${PROJECT_SOURCE_DIR}/include
                                                   ${PROJECT_BINARY_DIR}/include)
 
 # link to the MQT::Core libraries
-target_link_libraries(${PROJECT_NAME} PUBLIC MQT::CoreDD MQT::CoreZX)
+target_link_libraries(${PROJECT_NAME} PUBLIC MQT::CoreDD MQT::CoreZX Taskflow)
 target_link_libraries(${PROJECT_NAME} PRIVATE MQT::ProjectWarnings MQT::ProjectOptions)
+
+set_target_properties(Taskflow PROPERTIES INTERFACE_SYSTEM_INCLUDE_DIRECTORIES
+                                          $<TARGET_PROPERTY:Taskflow,INTERFACE_INCLUDE_DIRECTORIES>)
 
 # add MQT alias
 add_library(MQT::QCEC ALIAS ${PROJECT_NAME})
