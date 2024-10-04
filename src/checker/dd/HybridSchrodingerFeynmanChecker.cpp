@@ -1,6 +1,7 @@
 #include "checker/dd/HybridSchrodingerFeynmanChecker.hpp"
 
 #include "Definitions.hpp"
+#include "circuit_optimizer/CircuitOptimizer.hpp"
 #include "dd/ComplexValue.hpp"
 #include "dd/DDpackageConfig.hpp"
 #include "dd/Operations.hpp"
@@ -11,11 +12,8 @@
 #include <cmath>
 #include <cstddef>
 #include <cstdio>
-#include <map>
-#include <memory>
 #include <mutex>
 #include <stdexcept>
-#include <string>
 #include <taskflow/core/async.hpp>
 #include <taskflow/core/executor.hpp>
 
@@ -171,6 +169,9 @@ bool ec::HybridSchrodingerFeynmanChecker<Config>::Slice::apply(
 template <class Config>
 std::map<std::string, std::size_t>
 ec::HybridSchrodingerFeynmanChecker<Config>::check() {
+  qc::CircuitOptimizer::removeFinalMeasurements(*qc1);
+  qc::CircuitOptimizer::removeFinalMeasurements(*qc2);
+  this->qc2->invert();
   auto nqubits = this->qc1->getNqubits();
   auto splitQubit = static_cast<qc::Qubit>(nqubits / 2);
   approximateVerification(splitQubit);

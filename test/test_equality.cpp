@@ -5,15 +5,14 @@
 
 #include "EquivalenceCheckingManager.hpp"
 #include "EquivalenceCriterion.hpp"
-#include "QuantumComputation.hpp"
 #include "checker/dd/applicationscheme/ApplicationScheme.hpp"
 #include "dd/DDDefinitions.hpp"
+#include "ir/QuantumComputation.hpp"
 #include "ir/operations/Control.hpp"
 
 #include <cstddef>
 #include <gtest/gtest.h>
 #include <iostream>
-#include <optional>
 #include <stdexcept>
 
 class EqualityTest : public testing::Test {

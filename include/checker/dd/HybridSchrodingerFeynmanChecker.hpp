@@ -1,15 +1,13 @@
 #pragma once
 
-#include "CircuitOptimizer.hpp"
 #include "Definitions.hpp"
-#include "QuantumComputation.hpp"
 #include "dd/ComplexValue.hpp"
 #include "dd/Package.hpp"
 #include "dd/Package_fwd.hpp"
+#include "ir/QuantumComputation.hpp"
 
 #include <cstddef>
 #include <map>
-#include <memory>
 #include <string>
 
 namespace ec {
@@ -24,9 +22,6 @@ public:
       throw std::invalid_argument(
           "The two circuits have a different number of qubits.");
     }
-    qc::CircuitOptimizer::removeFinalMeasurements(*qc1);
-    qc::CircuitOptimizer::removeFinalMeasurements(*qc2);
-    qc2->invert();
   }
   std::map<std::string, std::size_t> check();
 
