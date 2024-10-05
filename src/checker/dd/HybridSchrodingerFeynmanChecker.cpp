@@ -12,7 +12,6 @@
 #include "ir/operations/StandardOperation.hpp"
 
 #include <algorithm>
-#include <cassert>
 #include <cmath>
 #include <cstddef>
 #include <cstdio>

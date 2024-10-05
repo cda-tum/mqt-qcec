@@ -7,6 +7,7 @@
 #include "ir/QuantumComputation.hpp"
 #include "memory"
 
+#include <cassert>
 #include <cstddef>
 #include <map>
 #include <stdexcept>
@@ -48,10 +49,10 @@ private:
 
   class Slice;
 
-  inline void applyLowerUpper(std::unique_ptr<DDPackage>& sliceDD1,
-                              std::unique_ptr<DDPackage>& sliceDD2,
-                              const std::unique_ptr<qc::Operation>& op,
-                              Slice& lower, Slice& upper) {
+  void applyLowerUpper(std::unique_ptr<DDPackage>& sliceDD1,
+                       std::unique_ptr<DDPackage>& sliceDD2,
+                       const std::unique_ptr<qc::Operation>& op, Slice& lower,
+                       Slice& upper) {
     if (op->isUnitary()) {
       [[maybe_unused]] auto l = lower.apply(sliceDD1, op);
       [[maybe_unused]] auto u = upper.apply(sliceDD2, op);
