@@ -4,8 +4,13 @@
 #include "circuit_optimizer/CircuitOptimizer.hpp"
 #include "dd/ComplexValue.hpp"
 #include "dd/DDpackageConfig.hpp"
+#include "dd/GateMatrixDefinitions.hpp"
 #include "dd/Operations.hpp"
 #include "dd/Package.hpp"
+#include "ir/QuantumComputation.hpp"
+#include "ir/operations/Control.hpp"
+#include "ir/operations/OpType.hpp"
+#include "ir/operations/StandardOperation.hpp"
 
 #include <algorithm>
 #include <cassert>
@@ -212,7 +217,7 @@ void ec::HybridSchrodingerFeynmanChecker<Config>::approximateVerification(
                                                   splitQubit);
         auto result =
             simulateSlicing(sliceDD1, sliceDD2, splitQubit, totalControl);
-        std::lock_guard<std::mutex> guard(traceMutex);
+        const std::lock_guard<std::mutex> guard(traceMutex);
         trace += result;
       }
     });

@@ -1,4 +1,6 @@
 #include "checker/dd/HybridSchrodingerFeynmanChecker.hpp"
+#include "dd/DDpackageConfig.hpp"
+#include "ir/QuantumComputation.hpp"
 
 #include <gtest/gtest.h>
 #include <string>

@@ -9,6 +9,7 @@
 
 #include <cstddef>
 #include <map>
+#include <stdexcept>
 #include <string>
 
 namespace ec {
