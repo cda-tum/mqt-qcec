@@ -1,7 +1,6 @@
 #include "checker/dd/HybridSchrodingerFeynmanChecker.hpp"
 
 #include "Definitions.hpp"
-#include "circuit_optimizer/CircuitOptimizer.hpp"
 #include "dd/ComplexValue.hpp"
 #include "dd/DDpackageConfig.hpp"
 #include "dd/GateMatrixDefinitions.hpp"
@@ -27,7 +26,7 @@
 
 template <class Config>
 std::size_t ec::HybridSchrodingerFeynmanChecker<Config>::getNDecisions(
-    qc::Qubit splitQubit, qc::QuantumComputation& qc) {
+    qc::Qubit splitQubit, const qc::QuantumComputation& qc) {
   std::size_t ndecisions = 0;
   // calculate number of decisions
   for (const auto& op : qc) {
@@ -69,22 +68,11 @@ dd::ComplexValue ec::HybridSchrodingerFeynmanChecker<Config>::simulateSlicing(
   Slice upper(sliceDD2, splitQubit,
               static_cast<qc::Qubit>(this->qc1->getNqubits() - 1), controls);
   for (const auto& op : *this->qc1) {
-    if (op->isUnitary()) {
-      [[maybe_unused]] auto l = lower.apply(sliceDD1, op);
-      [[maybe_unused]] auto u = upper.apply(sliceDD2, op);
-      assert(l == u);
-    }
-    sliceDD1->garbageCollect();
-    sliceDD2->garbageCollect();
+    applyLowerUpper(sliceDD1, sliceDD2, op, lower, upper);
   }
-  for (const auto& op : *this->qc2) {
-    if (op->isUnitary()) {
-      [[maybe_unused]] auto l = lower.apply(sliceDD1, op);
-      [[maybe_unused]] auto u = upper.apply(sliceDD2, op);
-      assert(l == u);
-    }
-    sliceDD1->garbageCollect();
-    sliceDD2->garbageCollect();
+  for (auto it = this->qc2->rbegin(); it != this->qc2->rend(); ++it) {
+    auto opInv = it->get()->getInverted();
+    applyLowerUpper(sliceDD1, sliceDD2, opInv, lower, upper);
   }
   auto traceLower = sliceDD1->trace(lower.matrix, lower.nqubits);
   auto traceUpper = sliceDD2->trace(upper.matrix, upper.nqubits);
@@ -177,9 +165,6 @@ bool ec::HybridSchrodingerFeynmanChecker<Config>::Slice::apply(
 template <class Config>
 std::map<std::string, std::size_t>
 ec::HybridSchrodingerFeynmanChecker<Config>::check() {
-  qc::CircuitOptimizer::removeFinalMeasurements(*qc1);
-  qc::CircuitOptimizer::removeFinalMeasurements(*qc2);
-  this->qc2->invert();
   auto nqubits = this->qc1->getNqubits();
   auto splitQubit = static_cast<qc::Qubit>(nqubits / 2);
   approximateVerification(splitQubit);
