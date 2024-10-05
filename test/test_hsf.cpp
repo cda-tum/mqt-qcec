@@ -19,7 +19,7 @@ TEST(HSFTest, ghz10) {
       "./circuits/approximateEquivalenceTest/"
       "ghz_nativegates_ibm_qiskit_opt3_10_no_measure.qasm"};
   const qc::QuantumComputation c2{
-      "./approximateEquivalenceTest/"
+      "./circuits/approximateEquivalenceTest/"
       "out_ghz_nativegates_ibm_qiskit_opt3_10_high_error.qasm"};
   ec::HybridSchrodingerFeynmanChecker<dd::DDPackageConfig> hsf(c1, c2, 6);
   auto resultDD = hsf.check();
