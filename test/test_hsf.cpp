@@ -10,8 +10,10 @@ TEST(HSFTest, dj10) {
                                   "dj_indep_qiskit_10_no_measure.qasm"};
   const qc::QuantumComputation c2{"./circuits/approximateEquivalenceTest/"
                                   "out_dj_indep_qiskit_10_high_error.qasm"};
-  ec::HybridSchrodingerFeynmanChecker<dd::DDPackageConfig> hsf(c1, c2, 6);
-  auto resultDD = hsf.check();
+  ec::HybridSchrodingerFeynmanChecker<dd::DDPackageConfig> hsf(c1, c2, 0.912,
+                                                               6);
+  auto result = hsf.run();
+  EXPECT_EQ(result, ec::EquivalenceCriterion::Equivalent);
 }
 
 TEST(HSFTest, ghz10) {
@@ -21,8 +23,10 @@ TEST(HSFTest, ghz10) {
   const qc::QuantumComputation c2{
       "./circuits/approximateEquivalenceTest/"
       "out_ghz_nativegates_ibm_qiskit_opt3_10_high_error.qasm"};
-  ec::HybridSchrodingerFeynmanChecker<dd::DDPackageConfig> hsf(c1, c2, 6);
-  auto resultDD = hsf.check();
+  ec::HybridSchrodingerFeynmanChecker<dd::DDPackageConfig> hsf(c1, c2, 0.956,
+                                                               6);
+  auto result = hsf.run();
+  EXPECT_EQ(result, ec::EquivalenceCriterion::Equivalent);
 }
 
 TEST(HSFTest, wstate10) {
@@ -30,8 +34,10 @@ TEST(HSFTest, wstate10) {
                                   "wstate_indep_qiskit_10_no_measure.qasm"};
   const qc::QuantumComputation c2{"./circuits/approximateEquivalenceTest/"
                                   "out_wstate_indep_qiskit_10_high_error.qasm"};
-  ec::HybridSchrodingerFeynmanChecker<dd::DDPackageConfig> hsf(c1, c2, 6);
-  auto resultDD = hsf.check();
+  ec::HybridSchrodingerFeynmanChecker<dd::DDPackageConfig> hsf(c1, c2, 0.991,
+                                                               6);
+  auto result = hsf.run();
+  EXPECT_EQ(result, ec::EquivalenceCriterion::Equivalent);
 }
 
 TEST(HSFTest, graphstate10) {
@@ -40,8 +46,10 @@ TEST(HSFTest, graphstate10) {
   const qc::QuantumComputation c2{
       "./circuits/approximateEquivalenceTest/"
       "out_graphstate_indep_qiskit_10_high_error.qasm"};
-  ec::HybridSchrodingerFeynmanChecker<dd::DDPackageConfig> hsf(c1, c2, 6);
-  auto resultDD = hsf.check();
+  ec::HybridSchrodingerFeynmanChecker<dd::DDPackageConfig> hsf(c1, c2, 0.912,
+                                                               6);
+  auto result = hsf.run();
+  EXPECT_EQ(result, ec::EquivalenceCriterion::Equivalent);
 }
 
 TEST(HSFTest, vqe10) {
@@ -49,19 +57,23 @@ TEST(HSFTest, vqe10) {
                                   "vqe_indep_qiskit_10_no_measure.qasm"};
   const qc::QuantumComputation c2{"./circuits/approximateEquivalenceTest/"
                                   "out_vqe_indep_qiskit_10_high_error.qasm"};
-  ec::HybridSchrodingerFeynmanChecker<dd::DDPackageConfig> hsf(c1, c2, 6);
-  auto resultDD = hsf.check();
+  ec::HybridSchrodingerFeynmanChecker<dd::DDPackageConfig> hsf(c1, c2, 0.998,
+                                                               6);
+  auto result = hsf.run();
+  EXPECT_EQ(result, ec::EquivalenceCriterion::Equivalent);
 }
 
 TEST(HSFTest, qftNativegates10) {
-  const qc::QuantumComputation c2{
-      "./circuits/approximateEquivalenceTest/check/"
-      "qft_nativegates_ibm_qiskit_opt3_10_no_measure.qasm"};
   const qc::QuantumComputation c1{
       "./circuits/approximateEquivalenceTest/check/"
+      "qft_nativegates_ibm_qiskit_opt3_10_no_measure.qasm"};
+  const qc::QuantumComputation c2{
+      "./circuits/approximateEquivalenceTest/check/"
       "out_qft_nativegates_ibm_qiskit_opt3_10_high_error.qasm"};
-  ec::HybridSchrodingerFeynmanChecker<dd::DDPackageConfig> hsf(c1, c2, 6);
-  auto resultDD = hsf.check();
+  ec::HybridSchrodingerFeynmanChecker<dd::DDPackageConfig> hsf(c1, c2, 0.9981,
+                                                               6);
+  auto result = hsf.run();
+  EXPECT_EQ(result, ec::EquivalenceCriterion::Equivalent);
 }
 
 TEST(HSFTest, qpeExact10) {
@@ -71,8 +83,10 @@ TEST(HSFTest, qpeExact10) {
   const qc::QuantumComputation c2{
       "./circuits/approximateEquivalenceTest/check/"
       "out_qpeexact_nativegates_ibm_qiskit_opt3_10_high_error.qasm"};
-  ec::HybridSchrodingerFeynmanChecker<dd::DDPackageConfig> hsf(c1, c2, 6);
-  auto resultDD = hsf.check();
+  ec::HybridSchrodingerFeynmanChecker<dd::DDPackageConfig> hsf(c1, c2, 0.9846,
+                                                               6);
+  auto result = hsf.run();
+  EXPECT_EQ(result, ec::EquivalenceCriterion::Equivalent);
 }
 
 TEST(HSFTest, qpeInexact10) {
@@ -82,6 +96,8 @@ TEST(HSFTest, qpeInexact10) {
   const qc::QuantumComputation c2{
       "./circuits/approximateEquivalenceTest/check/"
       "out_qpeinexact_nativegates_ibm_qiskit_opt3_10_high_error.qasm"};
-  ec::HybridSchrodingerFeynmanChecker<dd::DDPackageConfig> hsf(c1, c2, 6);
-  auto resultDD = hsf.check();
+  ec::HybridSchrodingerFeynmanChecker<dd::DDPackageConfig> hsf(c1, c2, 0.9893,
+                                                               6);
+  auto result = hsf.run();
+  EXPECT_EQ(result, ec::EquivalenceCriterion::Equivalent);
 }

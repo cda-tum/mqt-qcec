@@ -15,17 +15,17 @@
 #include <cmath>
 #include <cstddef>
 #include <cstdio>
-#include <map>
+#include <cstdlib>
 #include <memory>
 #include <mutex>
 #include <stdexcept>
-#include <string>
 #include <taskflow/core/async.hpp>
 #include <taskflow/core/executor.hpp>
 
+namespace ec {
 template <class Config>
-std::size_t ec::HybridSchrodingerFeynmanChecker<Config>::getNDecisions(
-    qc::Qubit splitQubit, const qc::QuantumComputation& qc) {
+std::size_t HybridSchrodingerFeynmanChecker<Config>::getNDecisions(
+    const qc::QuantumComputation& qc) const {
   std::size_t ndecisions = 0;
   // calculate number of decisions
   for (const auto& op : qc) {
@@ -38,8 +38,8 @@ std::size_t ec::HybridSchrodingerFeynmanChecker<Config>::getNDecisions(
       bool controlInLowerSlice = false;
       bool controlInUpperSlice = false;
       for (const auto& target : op->getTargets()) {
-        targetInLowerSlice = targetInLowerSlice || target < splitQubit;
-        targetInUpperSlice = targetInUpperSlice || target >= splitQubit;
+        targetInLowerSlice = targetInLowerSlice || target < this->splitQubit;
+        targetInUpperSlice = targetInUpperSlice || target >= this->splitQubit;
       }
       for (const auto& control : op->getControls()) {
         controlInLowerSlice = controlInLowerSlice || control.qubit < splitQubit;
@@ -59,10 +59,9 @@ std::size_t ec::HybridSchrodingerFeynmanChecker<Config>::getNDecisions(
 }
 
 template <class Config>
-dd::ComplexValue ec::HybridSchrodingerFeynmanChecker<Config>::simulateSlicing(
+dd::ComplexValue HybridSchrodingerFeynmanChecker<Config>::simulateSlicing(
     std::unique_ptr<dd::Package<Config>>& sliceDD1,
-    std::unique_ptr<dd::Package<Config>>& sliceDD2, unsigned int splitQubit,
-    size_t controls) {
+    std::unique_ptr<dd::Package<Config>>& sliceDD2, size_t controls) {
   Slice lower(sliceDD1, 0, splitQubit - 1, controls);
   Slice upper(sliceDD2, splitQubit,
               static_cast<qc::Qubit>(this->qc1->getNqubits() - 1), controls);
@@ -80,8 +79,8 @@ dd::ComplexValue ec::HybridSchrodingerFeynmanChecker<Config>::simulateSlicing(
 }
 
 template <class Config>
-bool ec::HybridSchrodingerFeynmanChecker<Config>::Slice::apply(
-    std::unique_ptr<dd::Package<Config>>& sliceDD,
+bool HybridSchrodingerFeynmanChecker<Config>::Slice::apply(
+    std::unique_ptr<DDPackage>& sliceDD,
     const std::unique_ptr<qc::Operation>& op) {
   bool isSplitOp = false;
   if (dynamic_cast<qc::StandardOperation*>(op.get()) !=
@@ -162,19 +161,18 @@ bool ec::HybridSchrodingerFeynmanChecker<Config>::Slice::apply(
 }
 
 template <class Config>
-std::map<std::string, std::size_t>
-ec::HybridSchrodingerFeynmanChecker<Config>::check() {
-  auto nqubits = this->qc1->getNqubits();
-  auto splitQubit = static_cast<qc::Qubit>(nqubits / 2);
-  approximateVerification(splitQubit);
-  return {};
+EquivalenceCriterion HybridSchrodingerFeynmanChecker<Config>::run() {
+  const auto start = std::chrono::steady_clock::now();
+  auto equivalence = checkEquivalence();
+  const auto end = std::chrono::steady_clock::now();
+  runtime += std::chrono::duration<double>(end - start).count();
+  return equivalence;
 }
 
 template <class Config>
-void ec::HybridSchrodingerFeynmanChecker<Config>::approximateVerification(
-    qc::Qubit splitQubit) {
-  const auto ndecisions =
-      getNDecisions(splitQubit, *qc1) + getNDecisions(splitQubit, *qc2);
+EquivalenceCriterion
+HybridSchrodingerFeynmanChecker<Config>::checkEquivalence() {
+  const auto ndecisions = getNDecisions(*qc1) + getNDecisions(*qc2);
   const auto maxControl = 1ULL << ndecisions;
   const auto actuallyUsedThreads = std::min<std::size_t>(maxControl, nthreads);
   const auto chunkSize = static_cast<std::size_t>(
@@ -186,27 +184,31 @@ void ec::HybridSchrodingerFeynmanChecker<Config>::approximateVerification(
   tf::Executor executor(actuallyUsedThreads);
   for (std::size_t control = 0; control < maxControl;
        control += nslicesOnOneCpu) {
-    executor.silent_async([this, &trace, nslicesOnOneCpu, control, splitQubit,
-                           maxControl, &traceMutex]() {
+    executor.silent_async([this, &trace, nslicesOnOneCpu, control, maxControl,
+                           &traceMutex]() {
       for (std::size_t localControl = 0; localControl < nslicesOnOneCpu;
            localControl++) {
         const std::size_t totalControl = control + localControl;
         if (totalControl >= maxControl) {
           break;
         }
-        std::unique_ptr<dd::Package<Config>> sliceDD1 =
-            std::make_unique<dd::Package<Config>>(splitQubit);
-        std::unique_ptr<dd::Package<Config>> sliceDD2 =
-            std::make_unique<dd::Package<Config>>(this->qc1->getNqubits() -
-                                                  splitQubit);
-        auto result =
-            simulateSlicing(sliceDD1, sliceDD2, splitQubit, totalControl);
+        std::unique_ptr<DDPackage> sliceDD1 =
+            std::make_unique<DDPackage>(splitQubit);
+        std::unique_ptr<DDPackage> sliceDD2 =
+            std::make_unique<DDPackage>(this->qc1->getNqubits() - splitQubit);
+        auto result = simulateSlicing(sliceDD1, sliceDD2, totalControl);
         const std::lock_guard<std::mutex> guard(traceMutex);
         trace += result;
       }
     });
   }
   executor.wait_for_all();
+
+  if (std::abs(trace.mag() - 1.) < traceThreshold) {
+    return EquivalenceCriterion::Equivalent;
+  }
+  return EquivalenceCriterion::NotEquivalent;
 }
 
 template class ec::HybridSchrodingerFeynmanChecker<dd::DDPackageConfig>;
+} // namespace ec
