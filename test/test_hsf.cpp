@@ -1,3 +1,4 @@
+#include "EquivalenceCriterion.hpp"
 #include "checker/dd/HybridSchrodingerFeynmanChecker.hpp"
 #include "dd/DDpackageConfig.hpp"
 #include "ir/QuantumComputation.hpp"

@@ -1,6 +1,7 @@
 #include "checker/dd/HybridSchrodingerFeynmanChecker.hpp"
 
 #include "Definitions.hpp"
+#include "EquivalenceCriterion.hpp"
 #include "dd/ComplexValue.hpp"
 #include "dd/DDpackageConfig.hpp"
 #include "dd/GateMatrixDefinitions.hpp"
@@ -12,6 +13,7 @@
 #include "ir/operations/StandardOperation.hpp"
 
 #include <algorithm>
+#include <chrono>
 #include <cmath>
 #include <cstddef>
 #include <cstdio>
