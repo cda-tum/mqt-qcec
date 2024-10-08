@@ -54,7 +54,7 @@ def _run_tests(
     posargs = list(session.posargs)
     env = {}
     if os.environ.get("CI", None) and sys.platform == "win32":
-        env["SKBUILD_CMAKE_ARGS"] = "-T ClangCL;--fresh"
+        env["SKBUILD_CMAKE_ARGS"] = "-T ClangCL"
 
     if shutil.which("cmake") is None and shutil.which("cmake3") is None:
         session.install("cmake")
@@ -67,6 +67,19 @@ def _run_tests(
         posargs.append("--cov-config=pyproject.toml")
 
     session.install(*BUILD_REQUIREMENTS, *install_args, env=env)
+
+    # install mqt.core from source to avoid ABI incompatibilities
+    session.install(
+        "--no-build-isolation",
+        "mqt.core @ git+https://github.com/cda-tum/mqt-core@shared-libs",
+        "--no-binary",
+        "mqt.core",
+        *install_args,
+        env={
+            "CMAKE_GENERATOR": "Ninja",
+        },
+    )
+
     install_arg = f"-ve.[{','.join(_extras)}]"
     session.install("--no-build-isolation", install_arg, *install_args, env=env)
     session.run("pytest", *run_args, *posargs, env=env)
@@ -103,6 +116,15 @@ def docs(session: nox.Session) -> None:
     serve = args.builder == "html" and session.interactive
     extra_installs = ["sphinx-autobuild"] if serve else []
     session.install(*BUILD_REQUIREMENTS, *extra_installs)
+
+    # install mqt.core from source to avoid ABI incompatibilities
+    session.install(
+        "--no-build-isolation",
+        "mqt.core @ git+https://github.com/cda-tum/mqt-core@shared-libs",
+        "--no-binary",
+        "mqt.core",
+    )
+
     session.install("--no-build-isolation", "-ve.[docs]")
 
     if args.builder == "linkcheck":
