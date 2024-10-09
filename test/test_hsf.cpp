@@ -7,6 +7,13 @@
 #include <stdexcept>
 #include <string>
 
+/**
+ * Approximate equivalence checking of an original circuit 'c1' and its
+ * approximate version 'c2'. The circuits 'c2' were generated using the BQSKit
+ * compiler with synthesis_epsilon=0.3 and error_threshold=0.5.
+ *
+ */
+
 TEST(HSFTest, dj10) {
   const qc::QuantumComputation c1{"./circuits/approximateEquivalenceTest/"
                                   "dj_indep_qiskit_10_no_measure.qasm"};

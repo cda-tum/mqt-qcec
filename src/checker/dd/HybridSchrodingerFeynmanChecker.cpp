@@ -88,13 +88,15 @@ std::size_t HybridSchrodingerFeynmanChecker<Config>::getNDecisions(
 template <class Config>
 dd::ComplexValue HybridSchrodingerFeynmanChecker<Config>::simulateSlicing(
     std::unique_ptr<dd::Package<Config>>& sliceDD1,
-    std::unique_ptr<dd::Package<Config>>& sliceDD2, size_t controls) {
-  Slice lower(sliceDD1, 0, splitQubit - 1, controls);
+    std::unique_ptr<dd::Package<Config>>& sliceDD2, size_t i) {
+  Slice lower(sliceDD1, 0, splitQubit - 1, i);
   Slice upper(sliceDD2, splitQubit,
-              static_cast<qc::Qubit>(this->qc1->getNqubits() - 1), controls);
+              static_cast<qc::Qubit>(this->qc1->getNqubits() - 1), i);
   for (const auto& op : *this->qc1) {
     applyLowerUpper(sliceDD1, sliceDD2, op, lower, upper);
   }
+  // Invert the second circuit by iterating through the operations in reverse
+  // order and inverting each one
   for (auto it = this->qc2->rbegin(); it != this->qc2->rend(); ++it) {
     auto opInv = it->get()->getInverted();
     applyLowerUpper(sliceDD1, sliceDD2, opInv, lower, upper);
@@ -111,7 +113,6 @@ bool HybridSchrodingerFeynmanChecker<Config>::Slice::apply(
     const std::unique_ptr<qc::Operation>& op) {
   bool isSplitOp = false;
   assert(op->isStandardOperation());
-  // TODO change control and target if wrong direction
   qc::Targets opTargets{};
   qc::Controls opControls{};
 
@@ -156,8 +157,7 @@ bool HybridSchrodingerFeynmanChecker<Config>::Slice::apply(
     const bool control = getNextControl();
     for (const auto& c : opControls) {
       auto tmp = matrix;
-      auto project = control != (c.type == qc::Control::Type::Neg) ? 0 : 1;
-      auto projMatrix = project == 1
+      auto projMatrix = control == (c.type == qc::Control::Type::Neg)
                             ? sliceDD->makeGateDD(dd::MEAS_ZERO_MAT, c.qubit)
                             : sliceDD->makeGateDD(dd::MEAS_ONE_MAT, c.qubit);
       matrix = sliceDD->multiply(projMatrix, matrix);
