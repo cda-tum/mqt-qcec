@@ -91,6 +91,7 @@ private:
       dd->incRef(matrix);
     }
 
+    // returns true if this operation was a split operation
     bool apply(std::unique_ptr<DDPackage>& sliceDD,
                const std::unique_ptr<qc::Operation>& op);
   };
