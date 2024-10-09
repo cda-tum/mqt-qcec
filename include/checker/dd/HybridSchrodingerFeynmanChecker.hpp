@@ -68,7 +68,7 @@ private:
 
   class Slice {
   protected:
-    qc::Qubit nextControlIdx = 0;
+    std::uint64_t nextControlIdx = 0;
 
     std::size_t getNextControl() {
       std::size_t idx = 1UL << nextControlIdx;

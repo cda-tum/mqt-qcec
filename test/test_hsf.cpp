@@ -4,6 +4,7 @@
 #include "ir/QuantumComputation.hpp"
 
 #include <gtest/gtest.h>
+#include <stdexcept>
 #include <string>
 
 TEST(HSFTest, dj10) {
@@ -73,8 +74,7 @@ TEST(HSFTest, qftNativegates10) {
       "out_qft_nativegates_ibm_qiskit_opt3_10_high_error.qasm"};
   ec::HybridSchrodingerFeynmanChecker<dd::DDPackageConfig> hsf(c1, c2, 0.9981,
                                                                6);
-  auto result = hsf.run();
-  EXPECT_EQ(result, ec::EquivalenceCriterion::Equivalent);
+  EXPECT_THROW(hsf.run(), std::overflow_error);
 }
 
 TEST(HSFTest, qpeExact10) {
@@ -86,8 +86,7 @@ TEST(HSFTest, qpeExact10) {
       "out_qpeexact_nativegates_ibm_qiskit_opt3_10_high_error.qasm"};
   ec::HybridSchrodingerFeynmanChecker<dd::DDPackageConfig> hsf(c1, c2, 0.9846,
                                                                6);
-  auto result = hsf.run();
-  EXPECT_EQ(result, ec::EquivalenceCriterion::Equivalent);
+  EXPECT_THROW(hsf.run(), std::overflow_error);
 }
 
 TEST(HSFTest, qpeInexact10) {
@@ -99,6 +98,5 @@ TEST(HSFTest, qpeInexact10) {
       "out_qpeinexact_nativegates_ibm_qiskit_opt3_10_high_error.qasm"};
   ec::HybridSchrodingerFeynmanChecker<dd::DDPackageConfig> hsf(c1, c2, 0.9893,
                                                                6);
-  auto result = hsf.run();
-  EXPECT_EQ(result, ec::EquivalenceCriterion::Equivalent);
+  EXPECT_THROW(hsf.run(), std::overflow_error);
 }

@@ -13,6 +13,7 @@
 #include "ir/operations/StandardOperation.hpp"
 
 #include <algorithm>
+#include <cassert>
 #include <chrono>
 #include <cmath>
 #include <cstddef>
@@ -190,6 +191,10 @@ template <class Config>
 EquivalenceCriterion
 HybridSchrodingerFeynmanChecker<Config>::checkEquivalence() {
   const auto ndecisions = getNDecisions(*qc1) + getNDecisions(*qc2);
+  if (ndecisions > 63) {
+    throw std::overflow_error(
+        "Number of split operations exceeds the maximum allowed number of 63.");
+  }
   const auto maxControl = 1ULL << ndecisions;
   const auto actuallyUsedThreads = std::min<std::size_t>(maxControl, nthreads);
   const auto chunkSize = static_cast<std::size_t>(
