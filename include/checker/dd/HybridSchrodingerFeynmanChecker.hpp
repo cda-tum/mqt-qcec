@@ -7,6 +7,7 @@
 #include "dd/Package.hpp"
 #include "dd/Package_fwd.hpp"
 #include "ir/QuantumComputation.hpp"
+#include "ir/operations/OpType.hpp"
 #include "memory"
 
 #include <cassert>
@@ -50,15 +51,18 @@ public:
           "checked for equivalence.");
     }
 
-    // Invert the second circuit by iterating through the operations in reverse
-    // order and inverting each one
-    for (auto it = circ2.rbegin(); it != circ2.rend(); ++it) {
-      qc2Inverted->emplace_back(it->get()->getInverted());
-    }
-
     // Flatten the operations of the circuits
     qc::CircuitOptimizer::flattenOperations(*qc1);
     qc::CircuitOptimizer::flattenOperations(*qc2Inverted);
+
+    // Invert the second circuit by iterating through the operations in reverse
+    // order and inverting each one - except for Measure and Barrier operations
+    for (auto it = circ2.rbegin(); it != circ2.rend(); ++it) {
+      if (it->get()->getType() != qc::Measure &&
+          it->get()->getType() != qc::Barrier) {
+        qc2Inverted->emplace_back(it->get()->getInverted());
+      }
+    }
 
     splitQubit = static_cast<qc::Qubit>((&circ1)->getNqubits() / 2);
   }
