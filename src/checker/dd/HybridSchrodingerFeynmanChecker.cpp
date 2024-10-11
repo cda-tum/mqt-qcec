@@ -28,7 +28,7 @@
 namespace ec {
 template <class Config>
 std::size_t HybridSchrodingerFeynmanChecker<Config>::getNDecisions(
-    const qc::QuantumComputation& qc) const {
+    qc::QuantumComputation& qc) const {
   std::size_t ndecisions = 0;
   // calculate number of decisions
   for (const auto& op : qc) {
@@ -92,14 +92,11 @@ dd::ComplexValue HybridSchrodingerFeynmanChecker<Config>::simulateSlicing(
   Slice lower(sliceDD1, 0, splitQubit - 1, i);
   Slice upper(sliceDD2, splitQubit,
               static_cast<qc::Qubit>(this->qc1->getNqubits() - 1), i);
-  for (const auto& op : *this->qc1) {
+  for (const auto& op : *qc1) {
     applyLowerUpper(sliceDD1, sliceDD2, op, lower, upper);
   }
-  // Invert the second circuit by iterating through the operations in reverse
-  // order and inverting each one
-  for (auto it = this->qc2->rbegin(); it != this->qc2->rend(); ++it) {
-    auto opInv = it->get()->getInverted();
-    applyLowerUpper(sliceDD1, sliceDD2, opInv, lower, upper);
+  for (const auto& op : *qc2Inverted) {
+    applyLowerUpper(sliceDD1, sliceDD2, op, lower, upper);
   }
   auto traceLower = sliceDD1->trace(lower.matrix, lower.nqubits);
   auto traceUpper = sliceDD2->trace(upper.matrix, upper.nqubits);
@@ -190,7 +187,7 @@ EquivalenceCriterion HybridSchrodingerFeynmanChecker<Config>::run() {
 template <class Config>
 EquivalenceCriterion
 HybridSchrodingerFeynmanChecker<Config>::checkEquivalence() {
-  const auto ndecisions = getNDecisions(*qc1) + getNDecisions(*qc2);
+  const auto ndecisions = getNDecisions(*qc1) + getNDecisions(*qc2Inverted);
   if (ndecisions > 63) {
     throw std::overflow_error(
         "Number of split operations exceeds the maximum allowed number of 63.");

@@ -2,6 +2,7 @@
 
 #include "Definitions.hpp"
 #include "EquivalenceCriterion.hpp"
+#include "circuit_optimizer/CircuitOptimizer.hpp"
 #include "dd/ComplexValue.hpp"
 #include "dd/Package.hpp"
 #include "dd/Package_fwd.hpp"
@@ -40,21 +41,33 @@ public:
                                   const qc::QuantumComputation& circ2,
                                   const double threshold,
                                   const std::size_t nThreads)
-      : qc1(&circ1), qc2(&circ2), traceThreshold(threshold),
-        nthreads(nThreads) {
-    if (this->qc1->getNqubits() != this->qc2->getNqubits()) {
+      : qc1(std::make_unique<qc::QuantumComputation>(circ1)),
+        qc2Inverted(std::make_unique<qc::QuantumComputation>()),
+        traceThreshold(threshold), nthreads(nThreads) {
+    if (circ1.getNqubits() != circ2.getNqubits()) {
       throw std::invalid_argument(
           "The two circuits have a different number of qubits and cannot be "
           "checked for equivalence.");
     }
-    splitQubit = static_cast<qc::Qubit>(this->qc1->getNqubits() / 2);
+
+    // Invert the second circuit by iterating through the operations in reverse
+    // order and inverting each one
+    for (auto it = circ2.rbegin(); it != circ2.rend(); ++it) {
+      qc2Inverted->emplace_back(it->get()->getInverted());
+    }
+
+    // Flatten the operations of the circuits
+    qc::CircuitOptimizer::flattenOperations(*qc1);
+    qc::CircuitOptimizer::flattenOperations(*qc2Inverted);
+
+    splitQubit = static_cast<qc::Qubit>((&circ1)->getNqubits() / 2);
   }
 
   EquivalenceCriterion run();
 
 private:
-  qc::QuantumComputation const* qc1;
-  qc::QuantumComputation const* qc2;
+  std::unique_ptr<qc::QuantumComputation> qc1;
+  std::unique_ptr<qc::QuantumComputation> qc2Inverted;
   double traceThreshold = 1e-8;
   std::size_t nthreads = 2;
   qc::Qubit splitQubit;
@@ -78,8 +91,7 @@ private:
    * @param qc
    * @return std::size_t
    */
-  [[nodiscard]] std::size_t
-  getNDecisions(const qc::QuantumComputation& qc) const;
+  [[nodiscard]] std::size_t getNDecisions(qc::QuantumComputation& qc) const;
 
   /**
    * @brief Computes the trace for the i-th summand after applying the Schmidt
