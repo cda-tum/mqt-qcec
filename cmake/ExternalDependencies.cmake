@@ -20,9 +20,9 @@ if(BUILD_MQT_QCEC_BINDINGS)
 endif()
 
 # cmake-format: off
-set(MQT_CORE_VERSION 2.6.1
+set(MQT_CORE_VERSION 2.7.0
     CACHE STRING "MQT Core version")
-set(MQT_CORE_REV "3529a4435339af3b400e976b1a5e7393d8e5bf4f"
+set(MQT_CORE_REV "2ccf532b66998af376c256ae94a39eed802b990c"
     CACHE STRING "MQT Core identifier (tag, branch or commit hash)")
 set(MQT_CORE_REPO_OWNER "cda-tum"
 	CACHE STRING "MQT Core repository owner (change when using a fork)")

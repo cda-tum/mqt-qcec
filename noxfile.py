@@ -54,7 +54,7 @@ def _run_tests(
     posargs = list(session.posargs)
     env = {}
     if os.environ.get("CI", None) and sys.platform == "win32":
-        env["SKBUILD_CMAKE_ARGS"] = "-T ClangCL;--fresh"
+        env["SKBUILD_CMAKE_ARGS"] = "-T ClangCL"
 
     if shutil.which("cmake") is None and shutil.which("cmake3") is None:
         session.install("cmake")
@@ -104,17 +104,18 @@ def docs(session: nox.Session) -> None:
     extra_installs = ["sphinx-autobuild"] if serve else []
     session.install(*BUILD_REQUIREMENTS, *extra_installs)
     session.install("--no-build-isolation", "-ve.[docs]")
+    session.chdir("docs")
 
     if args.builder == "linkcheck":
-        session.run("sphinx-build", "-b", "linkcheck", "docs", "docs/_build/linkcheck", *posargs)
+        session.run("sphinx-build", "-b", "linkcheck", "source", "_build/linkcheck", *posargs)
         return
 
     shared_args = (
         "-n",  # nitpicky mode
         "-T",  # full tracebacks
         f"-b={args.builder}",
-        "docs",
-        f"docs/_build/{args.builder}",
+        "source",
+        f"_build/{args.builder}",
         *posargs,
     )
 
