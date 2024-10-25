@@ -106,7 +106,11 @@ nlohmann::basic_json<> Configuration::json() const {
   if (execution.runConstructionChecker || execution.runAlternatingChecker) {
     auto& fun = config["functionality"];
     fun["trace_threshold"] = functionality.traceThreshold;
+    fun["approximate_checking_threshold"] =
+        functionality.approximateCheckingThreshold;
     fun["check_partial_equivalence"] = functionality.checkPartialEquivalence;
+    fun["check_approximate_equivalence"] =
+        functionality.checkApproximateEquivalence;
   }
 
   if (execution.runSimulationChecker) {
