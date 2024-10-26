@@ -90,6 +90,12 @@ INSTANTIATE_TEST_SUITE_P(
                 "q[0], q[1];\n",
                 "OPENQASM 2.0;\ninclude \"qelib1.inc\";\nqreg q[2];\ns q[0]; s "
                 "q[1]; h q[0]; cx q[0],q[1]; cx q[1],q[0]; h q[1];\n"}},
+        std::pair{
+            "dcx_decomposition",
+            std::pair{"OPENQASM 2.0;\ninclude \"qelib1.inc\";\nqreg q[2];\ndcx "
+                      "q[0], q[1];\n",
+                      "OPENQASM 2.0;\ninclude \"qelib1.inc\";\nqreg q[2];\ncx "
+                      "q[0],q[1];\ncx q[1],q[0];\n"}},
         std::pair{"Global_Phase",
                   std::pair{"OPENQASM 2.0;\ninclude \"qelib1.inc\";\nqreg "
                             "q[1];\nz q[0]; x q[0]; z q[0];\n",
