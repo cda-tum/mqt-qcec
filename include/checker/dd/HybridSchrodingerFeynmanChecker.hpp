@@ -6,6 +6,7 @@
 #include "EquivalenceCriterion.hpp"
 #include "circuit_optimizer/CircuitOptimizer.hpp"
 #include "dd/ComplexValue.hpp"
+#include "dd/DDpackageConfig.hpp"
 #include "dd/Package.hpp"
 #include "dd/Package_fwd.hpp"
 #include "ir/QuantumComputation.hpp"
@@ -15,7 +16,9 @@
 #include <cassert>
 #include <cstddef>
 #include <cstdint>
+#include <nlohmann/json.hpp>
 #include <stdexcept>
+#include <utility>
 
 namespace ec {
 /**
@@ -164,7 +167,7 @@ private:
      * @return std::size_t
      */
     std::size_t getNextControl() {
-      std::size_t idx = 1UL << nextControlIdx;
+      const std::size_t idx = 1UL << nextControlIdx;
       nextControlIdx++;
       return controlIdx & idx;
     }

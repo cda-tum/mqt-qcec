@@ -20,9 +20,9 @@
 #include <cstdlib>
 #include <memory>
 #include <mutex>
+#include <nlohmann/json.hpp>
 #include <stdexcept>
-#include <taskflow/core/async.hpp>
-#include <taskflow/core/executor.hpp>
+#include <taskflow/taskflow.hpp>
 #include <thread>
 
 namespace ec {
@@ -132,7 +132,7 @@ bool HybridSchrodingerFeynmanChecker::Slice::apply(
     } else { // other controls are set to the corresponding value
       if (targetInSplit) {
         isSplitOp = true;
-        const bool nextControl = getNextControl();
+        const bool nextControl = getNextControl() != 0U;
         // break if control is not activated
         if ((control.type == qc::Control::Type::Pos && !nextControl) ||
             (control.type == qc::Control::Type::Neg && nextControl)) {
@@ -148,7 +148,7 @@ bool HybridSchrodingerFeynmanChecker::Slice::apply(
     assert(opControls.size() == 1);
 
     isSplitOp = true;
-    const bool control = getNextControl();
+    const bool control = getNextControl() != 0U;
     for (const auto& c : opControls) {
       auto tmp = matrix;
       auto projMatrix = control == (c.type == qc::Control::Type::Neg)
@@ -187,7 +187,8 @@ EquivalenceCriterion HybridSchrodingerFeynmanChecker::checkEquivalence() {
         "Number of split operations exceeds the maximum allowed number of 63.");
   }
   const auto maxControl = 1ULL << ndecisions;
-  std::size_t nthreads = std::max(2U, std::thread::hardware_concurrency());
+  const std::size_t nthreads =
+      std::max(2U, std::thread::hardware_concurrency());
   const auto actuallyUsedThreads = std::min<std::size_t>(maxControl, nthreads);
   const auto chunkSize = static_cast<std::size_t>(
       std::ceil(static_cast<double>(maxControl) /
