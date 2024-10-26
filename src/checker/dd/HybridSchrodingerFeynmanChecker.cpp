@@ -3,7 +3,6 @@
 #include "Definitions.hpp"
 #include "EquivalenceCriterion.hpp"
 #include "dd/ComplexValue.hpp"
-#include "dd/DDpackageConfig.hpp"
 #include "dd/GateMatrixDefinitions.hpp"
 #include "dd/Operations.hpp"
 #include "dd/Package.hpp"
@@ -24,10 +23,10 @@
 #include <stdexcept>
 #include <taskflow/core/async.hpp>
 #include <taskflow/core/executor.hpp>
+#include <thread>
 
 namespace ec {
-template <class Config>
-std::size_t HybridSchrodingerFeynmanChecker<Config>::getNDecisions(
+std::size_t HybridSchrodingerFeynmanChecker::getNDecisions(
     qc::QuantumComputation& qc) const {
   std::size_t ndecisions = 0;
   // calculate number of decisions
@@ -85,10 +84,9 @@ std::size_t HybridSchrodingerFeynmanChecker<Config>::getNDecisions(
   return ndecisions;
 }
 
-template <class Config>
-dd::ComplexValue HybridSchrodingerFeynmanChecker<Config>::simulateSlicing(
-    std::unique_ptr<dd::Package<Config>>& sliceDD1,
-    std::unique_ptr<dd::Package<Config>>& sliceDD2, size_t i) {
+dd::ComplexValue HybridSchrodingerFeynmanChecker::simulateSlicing(
+    std::unique_ptr<DDPackage>& sliceDD1, std::unique_ptr<DDPackage>& sliceDD2,
+    size_t i) {
   Slice lower(sliceDD1, 0, splitQubit - 1, i);
   Slice upper(sliceDD2, splitQubit,
               static_cast<qc::Qubit>(this->qc1->getNqubits() - 1), i);
@@ -104,8 +102,7 @@ dd::ComplexValue HybridSchrodingerFeynmanChecker<Config>::simulateSlicing(
   return result;
 }
 
-template <class Config>
-bool HybridSchrodingerFeynmanChecker<Config>::Slice::apply(
+bool HybridSchrodingerFeynmanChecker::Slice::apply(
     std::unique_ptr<DDPackage>& sliceDD,
     const std::unique_ptr<qc::Operation>& op) {
   bool isSplitOp = false;
@@ -175,24 +172,22 @@ bool HybridSchrodingerFeynmanChecker<Config>::Slice::apply(
   return isSplitOp;
 }
 
-template <class Config>
-EquivalenceCriterion HybridSchrodingerFeynmanChecker<Config>::run() {
+EquivalenceCriterion HybridSchrodingerFeynmanChecker::run() {
   const auto start = std::chrono::steady_clock::now();
-  auto equivalence = checkEquivalence();
+  auto eq = checkEquivalence();
   const auto end = std::chrono::steady_clock::now();
   runtime += std::chrono::duration<double>(end - start).count();
-  return equivalence;
+  return eq;
 }
 
-template <class Config>
-EquivalenceCriterion
-HybridSchrodingerFeynmanChecker<Config>::checkEquivalence() {
+EquivalenceCriterion HybridSchrodingerFeynmanChecker::checkEquivalence() {
   const auto ndecisions = getNDecisions(*qc1) + getNDecisions(*qc2Inverted);
   if (ndecisions > 63) {
     throw std::overflow_error(
         "Number of split operations exceeds the maximum allowed number of 63.");
   }
   const auto maxControl = 1ULL << ndecisions;
+  std::size_t nthreads = std::max(2U, std::thread::hardware_concurrency());
   const auto actuallyUsedThreads = std::min<std::size_t>(maxControl, nthreads);
   const auto chunkSize = static_cast<std::size_t>(
       std::ceil(static_cast<double>(maxControl) /
@@ -222,11 +217,16 @@ HybridSchrodingerFeynmanChecker<Config>::checkEquivalence() {
     });
   }
   executor.wait_for_all();
-  if (std::abs(trace.mag() - 1.) < traceThreshold) {
+  if (std::abs(trace.mag() - 1.) <
+      configuration.functionality.approximateCheckingThreshold) {
     return EquivalenceCriterion::Equivalent;
   }
   return EquivalenceCriterion::NotEquivalent;
 }
 
-template class ec::HybridSchrodingerFeynmanChecker<dd::DDPackageConfig>;
+void HybridSchrodingerFeynmanChecker::json(
+    nlohmann::basic_json<>& j) const noexcept {
+  DDEquivalenceChecker::json(j);
+  j["checker"] = "decision_diagram_hybridSchrodingerFeynman";
+}
 } // namespace ec

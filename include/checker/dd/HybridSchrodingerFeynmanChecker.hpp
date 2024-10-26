@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Configuration.hpp"
+#include "DDEquivalenceChecker.hpp"
 #include "Definitions.hpp"
 #include "EquivalenceCriterion.hpp"
 #include "circuit_optimizer/CircuitOptimizer.hpp"
@@ -36,15 +38,15 @@ namespace ec {
  * @note Only suitable for shallow circuits with a maximum number of 63
  * controlled gates crossing the middle line (decisions).
  */
-template <class Config> class HybridSchrodingerFeynmanChecker final {
+class HybridSchrodingerFeynmanChecker final
+    : public DDEquivalenceChecker<qc::MatrixDD, dd::DDPackageConfig> {
 public:
   HybridSchrodingerFeynmanChecker(const qc::QuantumComputation& circ1,
                                   const qc::QuantumComputation& circ2,
-                                  const double threshold,
-                                  const std::size_t nThreads)
-      : qc1(std::make_unique<qc::QuantumComputation>(circ1)),
-        qc2Inverted(std::make_unique<qc::QuantumComputation>()),
-        traceThreshold(threshold), nthreads(nThreads) {
+                                  ec::Configuration config)
+      : DDEquivalenceChecker(circ1, circ2, std::move(config)),
+        qc1(std::make_unique<qc::QuantumComputation>(circ1)),
+        qc2Inverted(std::make_unique<qc::QuantumComputation>()) {
     if (circ1.getNqubits() != circ2.getNqubits()) {
       throw std::invalid_argument(
           "The two circuits have a different number of qubits and cannot be "
@@ -65,27 +67,12 @@ public:
     }
 
     splitQubit = static_cast<qc::Qubit>((&circ1)->getNqubits() / 2);
+    initializeApplicationScheme(
+        this->configuration.application.alternatingScheme);
   }
+  EquivalenceCriterion run() override;
 
-  EquivalenceCriterion run();
-
-private:
-  std::unique_ptr<qc::QuantumComputation> qc1;
-  std::unique_ptr<qc::QuantumComputation> qc2Inverted;
-  double traceThreshold = 1e-8;
-  std::size_t nthreads = 2;
-  qc::Qubit splitQubit;
-  double runtime{};
-
-  using DDPackage = typename dd::Package<Config>;
-
-  /**
-   * @brief Computing the Frobenius inner product trace(U * V^-1) and comparing
-   * it to the desired threshold.
-   * @return EquivalenceCriterion Returns `Equivalent` if the result is below
-   * the `traceThreshold`, `NotEquivalent´ otherwise.
-   */
-  EquivalenceCriterion checkEquivalence();
+  void json(nlohmann::json& j) const noexcept override;
 
   /**
    * @brief Get # of decisions for given split_qubit, so that lower slice: q0 <
@@ -96,6 +83,21 @@ private:
    * @return std::size_t
    */
   [[nodiscard]] std::size_t getNDecisions(qc::QuantumComputation& qc) const;
+
+private:
+  std::unique_ptr<qc::QuantumComputation> qc1;
+  std::unique_ptr<qc::QuantumComputation> qc2Inverted;
+  qc::Qubit splitQubit;
+
+  using DDPackage = typename dd::Package<dd::DDPackageConfig>;
+
+  /**
+   * @brief Computing the Frobenius inner product trace(U * V^-1) and comparing
+   * it to the desired threshold.
+   * @return EquivalenceCriterion Returns `Equivalent` if the result is below
+   * the `traceThreshold`, `NotEquivalent´ otherwise.
+   */
+  EquivalenceCriterion checkEquivalence() override;
 
   /**
    * @brief Computes the trace for the i-th summand after applying the Schmidt

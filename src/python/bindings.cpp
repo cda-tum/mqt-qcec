@@ -562,6 +562,13 @@ PYBIND11_MODULE(pyqcec, m, py::mod_gil_not_used()) {
           "<EquivalenceChecking:ZX-Calculus Equivalence Checker>` should be "
           "executed. Defaults to :code:`True` but arbitrary multi-controlled "
           "operations are only partially supported.")
+      .def_readwrite(
+          "run_hsf_checker", &Configuration::Execution::runHSFChecker,
+          "Set whether the :ref:`hsf checker "
+          "<EquivalenceChecking:Hybrid Schrodinger-Feynman Equivalence "
+          "Checker>` should be "
+          "executed. Defaults to :code:`False`. Arbitrary multi-controlled "
+          "operations are only partially supported.")
       .def_readwrite("numerical_tolerance",
                      &Configuration::Execution::numericalTolerance,
                      "Set the numerical tolerance of the underlying decision "

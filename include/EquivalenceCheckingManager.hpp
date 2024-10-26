@@ -139,12 +139,14 @@ public:
     configuration.execution.runAlternatingChecker = run;
   }
   void setZXChecker(bool run) { configuration.execution.runZXChecker = run; }
+  void setHSFChecker(bool run) { configuration.execution.runHSFChecker = run; }
 
   void disableAllCheckers() {
     configuration.execution.runConstructionChecker = false;
     configuration.execution.runZXChecker = false;
     configuration.execution.runSimulationChecker = false;
     configuration.execution.runAlternatingChecker = false;
+    configuration.execution.runHSFChecker = false;
   }
 
   // Optimization: Optimizations are applied during initialization. Already

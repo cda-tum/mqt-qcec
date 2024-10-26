@@ -11,6 +11,7 @@
 #include "checker/dd/DDAlternatingChecker.hpp"
 #include "checker/dd/DDConstructionChecker.hpp"
 #include "checker/dd/DDSimulationChecker.hpp"
+#include "checker/dd/HybridSchrodingerFeynmanChecker.hpp"
 #include "checker/dd/simulation/StateType.hpp"
 #include "checker/zx/ZXChecker.hpp"
 #include "circuit_optimizer/CircuitOptimizer.hpp"
@@ -380,6 +381,15 @@ EquivalenceCheckingManager::EquivalenceCheckingManager(
                  "inputs! Proceed with caution!\n";
   }
 
+  if (!configuration.functionality.checkApproximateEquivalence &&
+      configuration.execution.runHSFChecker) {
+    std::clog
+        << "[QCEC] Warning: The HSF checker performs approximate, not exact, "
+           "equivalence checking. The HSF checker has been disabled. Set "
+           "'checkApproximateEquivalence' to True to enable it.\n";
+    this->configuration.execution.runHSFChecker = false;
+  }
+
   // check whether the alternating checker is configured and can handle the
   // circuits
   if (configuration.execution.runAlternatingChecker &&
@@ -524,6 +534,24 @@ void EquivalenceCheckingManager::checkSequential() {
     }
   }
 
+  if (configuration.execution.runHSFChecker && !done) {
+    checkers.emplace_back(std::make_unique<HybridSchrodingerFeynmanChecker>(
+        qc1, qc2, configuration));
+    const auto& hsfChecker = checkers.back();
+    if (!done) {
+      const auto result = hsfChecker->run();
+
+      // if the hsf check produces a result, this is final
+      if (result != EquivalenceCriterion::NoInformation) {
+        results.equivalence = result;
+
+        // everything is done
+        done = true;
+        doneCond.notify_one();
+      }
+    }
+  }
+
   if (configuration.execution.runZXChecker && !done) {
     if (zx::FunctionalityConstruction::transformableToZX(&qc1) &&
         zx::FunctionalityConstruction::transformableToZX(&qc2)) {
@@ -609,6 +637,9 @@ void EquivalenceCheckingManager::checkParallel() {
   if (configuration.execution.runConstructionChecker) {
     ++tasksToExecute;
   }
+  if (configuration.execution.runHSFChecker) {
+    ++tasksToExecute;
+  }
   if (configuration.execution.runSimulationChecker) {
     if (configuration.simulation.maxSims > 0U) {
       tasksToExecute += configuration.simulation.maxSims;
@@ -654,6 +685,13 @@ void EquivalenceCheckingManager::checkParallel() {
   if (configuration.execution.runConstructionChecker && !done) {
     // start a new thread that constructs and runs the construction check
     futures.emplace_back(asyncRunChecker<DDConstructionChecker>(id, queue));
+    ++id;
+  }
+
+  if (configuration.execution.runHSFChecker && !done) {
+    // start a new thread that constructs and runs the HSF check
+    futures.emplace_back(
+        asyncRunChecker<HybridSchrodingerFeynmanChecker>(id, queue));
     ++id;
   }
 
