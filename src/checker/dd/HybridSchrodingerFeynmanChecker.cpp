@@ -2,6 +2,7 @@
 
 #include "Definitions.hpp"
 #include "EquivalenceCriterion.hpp"
+#include "checker/dd/DDEquivalenceChecker.hpp"
 #include "dd/ComplexValue.hpp"
 #include "dd/GateMatrixDefinitions.hpp"
 #include "dd/Operations.hpp"
@@ -22,7 +23,8 @@
 #include <mutex>
 #include <nlohmann/json.hpp>
 #include <stdexcept>
-#include <taskflow/taskflow.hpp>
+#include <taskflow/core/async.hpp> // IWYU pragma: keep
+#include <taskflow/core/executor.hpp>
 #include <thread>
 
 namespace ec {

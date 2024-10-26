@@ -12,11 +12,11 @@
 #include "ir/QuantumComputation.hpp"
 #include "ir/operations/OpType.hpp"
 #include "memory"
+#include "nlohmann/json_fwd.hpp"
 
 #include <cassert>
 #include <cstddef>
 #include <cstdint>
-#include <nlohmann/json.hpp>
 #include <stdexcept>
 #include <utility>
 

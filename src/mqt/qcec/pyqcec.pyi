@@ -43,6 +43,7 @@ class Configuration:
         run_construction_checker: bool
         run_simulation_checker: bool
         run_zx_checker: bool
+        run_hsf_checker: bool
         timeout: float
         def __init__(self) -> None: ...
 

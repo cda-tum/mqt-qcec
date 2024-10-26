@@ -2,7 +2,6 @@
 #include "Configuration.hpp"
 #include "EquivalenceCheckingManager.hpp"
 #include "EquivalenceCriterion.hpp"
-#include "checker/dd/DDEquivalenceChecker.hpp"
 #include "ir/QuantumComputation.hpp"
 
 #include <gtest/gtest.h>
