@@ -176,10 +176,10 @@ bool HybridSchrodingerFeynmanChecker::Slice::apply(
 
 EquivalenceCriterion HybridSchrodingerFeynmanChecker::run() {
   const auto start = std::chrono::steady_clock::now();
-  auto eq = checkEquivalence();
+  equivalence = checkEquivalence();
   const auto end = std::chrono::steady_clock::now();
   runtime += std::chrono::duration<double>(end - start).count();
-  return eq;
+  return equivalence;
 }
 
 EquivalenceCriterion HybridSchrodingerFeynmanChecker::checkEquivalence() {

@@ -781,10 +781,12 @@ void EquivalenceCheckingManager::checkParallel() {
       break;
     }
 
-    // the alternating and the construction checker provide definitive answers
-    // once they finish
+    // the alternating, the construction and the HSF checker provide definitive
+    // answers once they finish
     if ((dynamic_cast<const DDAlternatingChecker*>(checker) != nullptr) ||
-        (dynamic_cast<const DDConstructionChecker*>(checker) != nullptr)) {
+        (dynamic_cast<const DDConstructionChecker*>(checker) != nullptr) ||
+        (dynamic_cast<const HybridSchrodingerFeynmanChecker*>(checker) !=
+         nullptr)) {
       setAndSignalDone();
       results.equivalence = result;
       break;

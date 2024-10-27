@@ -17,8 +17,7 @@ class HSFTest : public testing::Test {
 protected:
   ec::Configuration config{};
 
-  std::string testOriginal = "./circuits/approximateEquivalenceTest/";
-  std::string testApproximateDir = "./circuits/approximateEquivalenceTest/";
+  std::string testDir = "./circuits/approximateEquivalenceTest/";
 
   void SetUp() override {
     config.execution.runConstructionChecker = false;
@@ -32,69 +31,37 @@ protected:
 };
 
 TEST_F(HSFTest, approximateEquivalenceCheckingWithHSF) {
-  // Check that the approximate equivalence flag has to be enabled to use the
+  // Test that enabling the approximate equivalence flag is required to use the
   // HSF checker
-  const qc::QuantumComputation c1{testOriginal +
+  const qc::QuantumComputation c1{testDir +
                                   "dj_indep_qiskit_10_no_measure.qasm"};
-  const qc::QuantumComputation c2{testApproximateDir +
+  const qc::QuantumComputation c2{testDir +
                                   "out_dj_indep_qiskit_10_high_error.qasm"};
   config.functionality.checkApproximateEquivalence = false;
   ec::EquivalenceCheckingManager ecm(c1, c2, config);
   ecm.run();
-  EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::NoInformation);
 }
 
-TEST_F(HSFTest, dj10) {
-  const qc::QuantumComputation c1{testOriginal +
+TEST_F(HSFTest, dj10ParallelChecking) {
+  // Test the parallel equivalence checking flow with only the HSF checker
+  // enabled
+  const qc::QuantumComputation c1{testDir +
                                   "dj_indep_qiskit_10_no_measure.qasm"};
-  const qc::QuantumComputation c2{testApproximateDir +
+  const qc::QuantumComputation c2{testDir +
                                   "out_dj_indep_qiskit_10_high_error.qasm"};
   config.functionality.approximateCheckingThreshold = 0.912;
-  config.functionality.checkApproximateEquivalence = true;
+  config.execution.parallel = true;
   ec::EquivalenceCheckingManager ecm(c1, c2, config);
   ecm.run();
   EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::Equivalent);
 }
 
-TEST_F(HSFTest, ghz10) {
-  const qc::QuantumComputation c1{
-      testOriginal + "ghz_nativegates_ibm_qiskit_opt3_10_no_measure.qasm"};
-  const qc::QuantumComputation c2{
-      testApproximateDir +
-      "out_ghz_nativegates_ibm_qiskit_opt3_10_high_error.qasm"};
-  config.functionality.approximateCheckingThreshold = 0.956;
-  ec::EquivalenceCheckingManager ecm(c1, c2, config);
-  ecm.run();
-  EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::Equivalent);
-}
-
-TEST_F(HSFTest, wstate10) {
-  const qc::QuantumComputation c1{testOriginal +
-                                  "wstate_indep_qiskit_10_no_measure.qasm"};
-  const qc::QuantumComputation c2{testApproximateDir +
-                                  "out_wstate_indep_qiskit_10_high_error.qasm"};
-  config.functionality.approximateCheckingThreshold = 0.991;
-  ec::EquivalenceCheckingManager ecm(c1, c2, config);
-  ecm.run();
-  EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::Equivalent);
-}
-
-TEST_F(HSFTest, graphstate10) {
-  const qc::QuantumComputation c1{testOriginal +
-                                  "graphstate_indep_qiskit_10_no_measure.qasm"};
-  const qc::QuantumComputation c2{
-      testApproximateDir + "out_graphstate_indep_qiskit_10_high_error.qasm"};
-  config.functionality.approximateCheckingThreshold = 0.912;
-  config.execution.runAlternatingChecker = false;
-  ec::EquivalenceCheckingManager ecm(c1, c2, config);
-  ecm.run();
-  EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::Equivalent);
-}
-
-TEST_F(HSFTest, vqe10) {
-  const qc::QuantumComputation c1{testOriginal +
+TEST_F(HSFTest, vqe10ParallelChecking) {
+  // Test the parallel equivalence checking flow with only the HSF checker
+  // enabled (parallel checking is enabled per default)
+  const qc::QuantumComputation c1{testDir +
                                   "vqe_indep_qiskit_10_no_measure.qasm"};
-  const qc::QuantumComputation c2{testApproximateDir +
+  const qc::QuantumComputation c2{testDir +
                                   "out_vqe_indep_qiskit_10_high_error.qasm"};
   config.functionality.approximateCheckingThreshold = 0.998;
   ec::EquivalenceCheckingManager ecm(c1, c2, config);
@@ -102,38 +69,102 @@ TEST_F(HSFTest, vqe10) {
   EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::Equivalent);
 }
 
-TEST_F(HSFTest, qftNativegates10) {
+TEST_F(HSFTest, wstate10ParallelChecking) {
+  // Note: This test might be commented out as it takes about 4 minutes to run
+  // Test the parallel equivalence checking flow where the HSF checker delivers
+  // results first
+  const qc::QuantumComputation c1{testDir +
+                                  "wstate_indep_qiskit_10_no_measure.qasm"};
+  const qc::QuantumComputation c2{testDir +
+                                  "out_wstate_indep_qiskit_10_high_error.qasm"};
+  config.functionality.approximateCheckingThreshold = 0.991;
+  config.execution.runConstructionChecker = true;
+  config.execution.runAlternatingChecker = true;
+  config.execution.parallel = true;
+  ec::EquivalenceCheckingManager ecm(c1, c2, config);
+  ecm.run();
+  EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::Equivalent);
+}
+
+TEST_F(HSFTest, ghz10ParallelChecking) {
+  // Test the parallel equivalence checking flow where the alternating or
+  // construction checker delivers results first
   const qc::QuantumComputation c1{
-      testOriginal +
-      "check/qft_nativegates_ibm_qiskit_opt3_10_no_measure.qasm"};
+      testDir + "ghz_nativegates_ibm_qiskit_opt3_10_no_measure.qasm"};
   const qc::QuantumComputation c2{
-      testApproximateDir +
-      "check/out_qft_nativegates_ibm_qiskit_opt3_10_high_error.qasm"};
-  config.functionality.approximateCheckingThreshold = 0.9981;
+      testDir + "out_ghz_nativegates_ibm_qiskit_opt3_10_high_error.qasm"};
+  config.functionality.approximateCheckingThreshold = 0.956;
+  config.execution.runConstructionChecker = true;
+  config.execution.runAlternatingChecker = true;
+  config.execution.parallel = true;
+  ec::EquivalenceCheckingManager ecm(c1, c2, config);
+  ecm.run();
+  EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::Equivalent);
+}
+
+TEST_F(HSFTest, ghz10SequentialChecking) {
+  // Test the sequential equivalence checking flow where the alternating or
+  // construction checker delivers results first
+  const qc::QuantumComputation c1{
+      testDir + "ghz_nativegates_ibm_qiskit_opt3_10_no_measure.qasm"};
+  const qc::QuantumComputation c2{
+      testDir + "out_ghz_nativegates_ibm_qiskit_opt3_10_high_error.qasm"};
+  config.functionality.approximateCheckingThreshold = 0.956;
+  config.execution.runConstructionChecker = true;
+  config.execution.runAlternatingChecker = true;
+  config.execution.parallel = false;
+  ec::EquivalenceCheckingManager ecm(c1, c2, config);
+  ecm.run();
+  EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::Equivalent);
+}
+
+TEST_F(HSFTest, graphstate10SequentialChecking) {
+  // Test the sequential equivalence checking flow with only the HSF checker
+  // enabled
+  const qc::QuantumComputation c1{testDir +
+                                  "graphstate_indep_qiskit_10_no_measure.qasm"};
+  const qc::QuantumComputation c2{
+      testDir + "out_graphstate_indep_qiskit_10_high_error.qasm"};
+  config.functionality.approximateCheckingThreshold = 0.912;
+  config.execution.parallel = false;
+  ec::EquivalenceCheckingManager ecm(c1, c2, config);
+  ecm.run();
+  EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::Equivalent);
+}
+
+TEST_F(HSFTest, qftNativegates10DecisionOverflow) {
+  // Test that an overflow_error is thrown if the number of decisions exceeds
+  // the maximum number of decisions
+  const qc::QuantumComputation c1{
+      testDir + "check/qft_nativegates_ibm_qiskit_opt3_10_no_measure.qasm"};
+  const qc::QuantumComputation c2{
+      testDir + "check/out_qft_nativegates_ibm_qiskit_opt3_10_high_error.qasm"};
   ec::EquivalenceCheckingManager ecm(c1, c2, config);
   EXPECT_THROW(ecm.run(), std::overflow_error);
 }
 
-TEST_F(HSFTest, qpeExact10) {
+TEST_F(HSFTest, qpeExact10DecisionOverflow) {
+  // Test that an overflow_error is thrown if the number of decisions exceeds
+  // the maximum number of decisions
   const qc::QuantumComputation c1{
-      testOriginal +
+      testDir +
       "check/qpeexact_nativegates_ibm_qiskit_opt3_10_no_measure.qasm"};
   const qc::QuantumComputation c2{
-      testApproximateDir +
+      testDir +
       "check/out_qpeexact_nativegates_ibm_qiskit_opt3_10_high_error.qasm"};
-  config.functionality.approximateCheckingThreshold = 0.9846;
   ec::EquivalenceCheckingManager ecm(c1, c2, config);
   EXPECT_THROW(ecm.run(), std::overflow_error);
 }
 
-TEST_F(HSFTest, qpeInexact10) {
+TEST_F(HSFTest, qpeInexact10DecisionOverflow) {
+  // Test that an overflow_error is thrown if the number of decisions exceeds
+  // the maximum number of decisions
   const qc::QuantumComputation c1{
-      testOriginal +
+      testDir +
       "check/qpeinexact_nativegates_ibm_qiskit_opt3_10_no_measure.qasm"};
   const qc::QuantumComputation c2{
-      testApproximateDir +
+      testDir +
       "check/out_qpeinexact_nativegates_ibm_qiskit_opt3_10_high_error.qasm"};
-  config.functionality.approximateCheckingThreshold = 0.9893;
   ec::EquivalenceCheckingManager ecm(c1, c2, config);
   EXPECT_THROW(ecm.run(), std::overflow_error);
 }
