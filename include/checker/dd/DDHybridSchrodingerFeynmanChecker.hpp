@@ -23,7 +23,7 @@
 namespace ec {
 /**
  * @brief Approximate Equivalence Checking with the
- * HybridSchrodingerFeynmanChecker This checker divides a circuit horizontally
+ * DDHybridSchrodingerFeynmanChecker This checker divides a circuit horizontally
  * into two halves: a lower part and an upper part. This is achieved by
  * decomposing controlled gates, acting across both halves, according to the
  * Schmidt decomposition. By leveraging key trace equalities - specifically,
@@ -41,12 +41,12 @@ namespace ec {
  * @note Only suitable for shallow circuits with a maximum number of 63
  * controlled gates acting on both circuit parts (decisions).
  */
-class HybridSchrodingerFeynmanChecker final
+class DDHybridSchrodingerFeynmanChecker final
     : public DDEquivalenceChecker<qc::MatrixDD, dd::DDPackageConfig> {
 public:
-  HybridSchrodingerFeynmanChecker(const qc::QuantumComputation& circ1,
-                                  const qc::QuantumComputation& circ2,
-                                  ec::Configuration config)
+  DDHybridSchrodingerFeynmanChecker(const qc::QuantumComputation& circ1,
+                                    const qc::QuantumComputation& circ2,
+                                    ec::Configuration config)
       : DDEquivalenceChecker(circ1, circ2, std::move(config)),
         qc1(std::make_unique<qc::QuantumComputation>(circ1)),
         qc2Inverted(std::make_unique<qc::QuantumComputation>()) {

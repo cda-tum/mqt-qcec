@@ -10,8 +10,8 @@
 #include "ThreadSafeQueue.hpp"
 #include "checker/dd/DDAlternatingChecker.hpp"
 #include "checker/dd/DDConstructionChecker.hpp"
+#include "checker/dd/DDHybridSchrodingerFeynmanChecker.hpp"
 #include "checker/dd/DDSimulationChecker.hpp"
-#include "checker/dd/HybridSchrodingerFeynmanChecker.hpp"
 #include "checker/dd/simulation/StateType.hpp"
 #include "checker/zx/ZXChecker.hpp"
 #include "circuit_optimizer/CircuitOptimizer.hpp"
@@ -535,7 +535,7 @@ void EquivalenceCheckingManager::checkSequential() {
   }
 
   if (configuration.execution.runHSFChecker && !done) {
-    checkers.emplace_back(std::make_unique<HybridSchrodingerFeynmanChecker>(
+    checkers.emplace_back(std::make_unique<DDHybridSchrodingerFeynmanChecker>(
         qc1, qc2, configuration));
     const auto& hsfChecker = checkers.back();
     if (!done) {
@@ -691,7 +691,7 @@ void EquivalenceCheckingManager::checkParallel() {
   if (configuration.execution.runHSFChecker && !done) {
     // start a new thread that constructs and runs the HSF check
     futures.emplace_back(
-        asyncRunChecker<HybridSchrodingerFeynmanChecker>(id, queue));
+        asyncRunChecker<DDHybridSchrodingerFeynmanChecker>(id, queue));
     ++id;
   }
 
@@ -785,7 +785,7 @@ void EquivalenceCheckingManager::checkParallel() {
     // answers once they finish
     if ((dynamic_cast<const DDAlternatingChecker*>(checker) != nullptr) ||
         (dynamic_cast<const DDConstructionChecker*>(checker) != nullptr) ||
-        (dynamic_cast<const HybridSchrodingerFeynmanChecker*>(checker) !=
+        (dynamic_cast<const DDHybridSchrodingerFeynmanChecker*>(checker) !=
          nullptr)) {
       setAndSignalDone();
       results.equivalence = result;

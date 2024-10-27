@@ -1,4 +1,4 @@
-#include "checker/dd/HybridSchrodingerFeynmanChecker.hpp"
+#include "checker/dd/DDHybridSchrodingerFeynmanChecker.hpp"
 
 #include "Definitions.hpp"
 #include "EquivalenceCriterion.hpp"
@@ -28,7 +28,7 @@
 #include <thread>
 
 namespace ec {
-std::size_t HybridSchrodingerFeynmanChecker::getNDecisions(
+std::size_t DDHybridSchrodingerFeynmanChecker::getNDecisions(
     qc::QuantumComputation& qc) const {
   std::size_t ndecisions = 0;
   // calculate number of decisions
@@ -86,7 +86,7 @@ std::size_t HybridSchrodingerFeynmanChecker::getNDecisions(
   return ndecisions;
 }
 
-dd::ComplexValue HybridSchrodingerFeynmanChecker::simulateSlicing(
+dd::ComplexValue DDHybridSchrodingerFeynmanChecker::simulateSlicing(
     std::unique_ptr<DDPackage>& sliceDD1, std::unique_ptr<DDPackage>& sliceDD2,
     size_t i) {
   Slice lower(sliceDD1, 0, splitQubit - 1, i);
@@ -104,7 +104,7 @@ dd::ComplexValue HybridSchrodingerFeynmanChecker::simulateSlicing(
   return result;
 }
 
-bool HybridSchrodingerFeynmanChecker::Slice::apply(
+bool DDHybridSchrodingerFeynmanChecker::Slice::apply(
     std::unique_ptr<DDPackage>& sliceDD,
     const std::unique_ptr<qc::Operation>& op) {
   bool isSplitOp = false;
@@ -174,7 +174,7 @@ bool HybridSchrodingerFeynmanChecker::Slice::apply(
   return isSplitOp;
 }
 
-EquivalenceCriterion HybridSchrodingerFeynmanChecker::run() {
+EquivalenceCriterion DDHybridSchrodingerFeynmanChecker::run() {
   const auto start = std::chrono::steady_clock::now();
   equivalence = checkEquivalence();
   const auto end = std::chrono::steady_clock::now();
@@ -182,7 +182,7 @@ EquivalenceCriterion HybridSchrodingerFeynmanChecker::run() {
   return equivalence;
 }
 
-EquivalenceCriterion HybridSchrodingerFeynmanChecker::checkEquivalence() {
+EquivalenceCriterion DDHybridSchrodingerFeynmanChecker::checkEquivalence() {
   const auto ndecisions = getNDecisions(*qc1) + getNDecisions(*qc2Inverted);
   if (ndecisions > 63) {
     throw std::overflow_error(
@@ -227,7 +227,7 @@ EquivalenceCriterion HybridSchrodingerFeynmanChecker::checkEquivalence() {
   return EquivalenceCriterion::NotEquivalent;
 }
 
-void HybridSchrodingerFeynmanChecker::json(
+void DDHybridSchrodingerFeynmanChecker::json(
     nlohmann::basic_json<>& j) const noexcept {
   DDEquivalenceChecker::json(j);
   j["checker"] = "decision_diagram_hybridSchrodingerFeynman";
