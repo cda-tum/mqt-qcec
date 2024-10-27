@@ -24,9 +24,9 @@ namespace ec {
 /**
  * @brief Approximate Equivalence Checking with the
  * HybridSchrodingerFeynmanChecker This checker divides a circuit horizontally
- * into two halves: a lower part and an upper part. This is achieved by cutting
- * controlled gates that cross the middle line according to the Schmidt
- * decomposition. By leveraging key trace equalities - specifically,
+ * into two halves: a lower part and an upper part. This is achieved by
+ * decomposing controlled gates, acting across both halves, according to the
+ * Schmidt decomposition. By leveraging key trace equalities - specifically,
  *
  * tr[L ⊗ U] = tr[L] ⋅ tr[U]
  *
@@ -39,7 +39,7 @@ namespace ec {
  * computation, allowing to check the equivalence of larger, yet shallow
  * circuits.
  * @note Only suitable for shallow circuits with a maximum number of 63
- * controlled gates crossing the middle line (decisions).
+ * controlled gates acting on both circuit parts (decisions).
  */
 class HybridSchrodingerFeynmanChecker final
     : public DDEquivalenceChecker<qc::MatrixDD, dd::DDPackageConfig> {
@@ -81,7 +81,7 @@ public:
    * @brief Get # of decisions for given split_qubit, so that lower slice: q0 <
    * i < qubit; upper slice: qubit <= i < nqubits
    * @details The number of decisions is determined by the number of controlled
-   * gates that cross the middle line.
+   * gates that operate across both halves.
    * @param qc
    * @return std::size_t
    */
@@ -110,7 +110,7 @@ private:
    * into a sum of circuits, each consisting of only single-qubit gates. By
    * recursively applying this decomposition to all decisions, we generate a
    * total of 2^decisions circuits, which do not contain controlled operations
-   * crossing the middle line. This enables independent investigation of the
+   * acting on both halves. This enables independent investigation of the
    * lower and upper circuit parts.
    *
    * This function computes the trace for the i-th summand, where the index 'i'
