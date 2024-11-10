@@ -363,9 +363,19 @@ EquivalenceCheckingManager::EquivalenceCheckingManager(
   // set numeric tolerance used throughout the check
   setTolerance(configuration.execution.numericalTolerance);
 
-  if (qc1.isVariableFree() && qc2.isVariableFree()) {
+  if (qc1.isVariableFree() && qc2.isVariableFree() &&
+      !configuration.execution.runHSFChecker) {
     // run all configured optimization passes
     runOptimizationPasses();
+  }
+
+  // If the HSF checker is enabled, flatten the operations in the circuits and
+  // remove the final measurements
+  if (configuration.execution.runHSFChecker) {
+    qc::CircuitOptimizer::flattenOperations(qc1);
+    qc::CircuitOptimizer::flattenOperations(qc2);
+    qc::CircuitOptimizer::removeFinalMeasurements(qc1);
+    qc::CircuitOptimizer::removeFinalMeasurements(qc2);
   }
 
   // strip away qubits that are not acted upon
@@ -388,6 +398,16 @@ EquivalenceCheckingManager::EquivalenceCheckingManager(
            "equivalence checking. The HSF checker has been disabled. Set "
            "'checkApproximateEquivalence' to True to enable it.\n";
     this->configuration.execution.runHSFChecker = false;
+  }
+
+  // Check whether the hsf checker is configured and can handle the circuits
+  if (configuration.execution.runHSFChecker &&
+      !DDHybridSchrodingerFeynmanChecker::canHandle(this->qc1, this->qc2)) {
+    std::clog
+        << "[QCEC] Warning: Hsf checker cannot handle the "
+           "circuits. Falling back to alternating or construction checker.\n";
+    this->configuration.execution.runHSFChecker = false;
+    this->configuration.execution.runAlternatingChecker = true;
   }
 
   // check whether the alternating checker is configured and can handle the

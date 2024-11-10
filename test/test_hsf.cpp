@@ -5,7 +5,6 @@
 #include "ir/QuantumComputation.hpp"
 
 #include <gtest/gtest.h>
-#include <stdexcept>
 #include <string>
 /**
  * Approximate equivalence checking of an original circuit 'c1' and its
@@ -26,7 +25,6 @@ protected:
     config.execution.runZXChecker = false;
     config.execution.runHSFChecker = true;
     config.functionality.checkApproximateEquivalence = true;
-    config.optimizations = {false, false, false, false, false, false, false};
   }
 };
 
@@ -116,38 +114,29 @@ TEST_F(HSFTest, graphstate10SequentialChecking) {
 }
 
 TEST_F(HSFTest, qftNativegates10DecisionOverflow) {
-  // Test that an overflow_error is thrown if the number of decisions exceeds
-  // the maximum number of decisions
+  // Test the HSF checker for overflow errors, ensuring that if an
+  // `std::overflow_error` occurs, the checker falls back to an alternative
+  // checker
   const qc::QuantumComputation c1{
       testDir + "check/qft_nativegates_ibm_qiskit_opt3_10_no_measure.qasm"};
   const qc::QuantumComputation c2{
       testDir + "check/out_qft_nativegates_ibm_qiskit_opt3_10_high_error.qasm"};
+  config.functionality.approximateCheckingThreshold = 0.999;
   ec::EquivalenceCheckingManager ecm(c1, c2, config);
-  EXPECT_THROW(ecm.run(), std::overflow_error);
+  ecm.run();
+  EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::Equivalent);
 }
 
-TEST_F(HSFTest, qpeExact10DecisionOverflow) {
-  // Test that an overflow_error is thrown if the number of decisions exceeds
-  // the maximum number of decisions
-  const qc::QuantumComputation c1{
-      testDir +
-      "check/qpeexact_nativegates_ibm_qiskit_opt3_10_no_measure.qasm"};
-  const qc::QuantumComputation c2{
-      testDir +
-      "check/out_qpeexact_nativegates_ibm_qiskit_opt3_10_high_error.qasm"};
+TEST_F(HSFTest, qaoaIndep10GatesNotSupported) {
+  // Test the HSF checker for invalid argument errors, such as unsupported
+  // gates, ensuring that if an `std::invalid_argument` occurs, the checker
+  // falls back to an alternative checker
+  const qc::QuantumComputation c1{testDir +
+                                  "qaoa_indep_qiskit_10_no_measure.qasm"};
+  const qc::QuantumComputation c2{testDir +
+                                  "out_qaoa_indep_qiskit_10_high_error.qasm"};
+  config.functionality.approximateCheckingThreshold = 0.958;
   ec::EquivalenceCheckingManager ecm(c1, c2, config);
-  EXPECT_THROW(ecm.run(), std::overflow_error);
-}
-
-TEST_F(HSFTest, qpeInexact10DecisionOverflow) {
-  // Test that an overflow_error is thrown if the number of decisions exceeds
-  // the maximum number of decisions
-  const qc::QuantumComputation c1{
-      testDir +
-      "check/qpeinexact_nativegates_ibm_qiskit_opt3_10_no_measure.qasm"};
-  const qc::QuantumComputation c2{
-      testDir +
-      "check/out_qpeinexact_nativegates_ibm_qiskit_opt3_10_high_error.qasm"};
-  ec::EquivalenceCheckingManager ecm(c1, c2, config);
-  EXPECT_THROW(ecm.run(), std::overflow_error);
+  ecm.run();
+  EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::Equivalent);
 }

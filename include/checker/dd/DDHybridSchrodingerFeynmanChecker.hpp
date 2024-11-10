@@ -1,16 +1,14 @@
 #pragma once
 
 #include "Configuration.hpp"
-#include "DDEquivalenceChecker.hpp"
 #include "Definitions.hpp"
 #include "EquivalenceCriterion.hpp"
-#include "circuit_optimizer/CircuitOptimizer.hpp"
+#include "checker/EquivalenceChecker.hpp"
 #include "dd/ComplexValue.hpp"
 #include "dd/DDpackageConfig.hpp"
 #include "dd/Package.hpp"
 #include "dd/Package_fwd.hpp"
 #include "ir/QuantumComputation.hpp"
-#include "ir/operations/OpType.hpp"
 #include "memory"
 #include "nlohmann/json_fwd.hpp"
 
@@ -41,38 +39,20 @@ namespace ec {
  * @note Only suitable for shallow circuits with a maximum number of 63
  * controlled gates acting on both circuit parts (decisions).
  */
-class DDHybridSchrodingerFeynmanChecker final
-    : public DDEquivalenceChecker<qc::MatrixDD, dd::DDPackageConfig> {
+class DDHybridSchrodingerFeynmanChecker final : public EquivalenceChecker {
 public:
   DDHybridSchrodingerFeynmanChecker(const qc::QuantumComputation& circ1,
                                     const qc::QuantumComputation& circ2,
                                     ec::Configuration config)
-      : DDEquivalenceChecker(circ1, circ2, std::move(config)),
-        qc1(std::make_unique<qc::QuantumComputation>(circ1)),
-        qc2Inverted(std::make_unique<qc::QuantumComputation>()) {
-    if (circ1.getNqubits() != circ2.getNqubits()) {
+      : EquivalenceChecker(circ1, invertCircuit(circ2), std::move(config)) {
+    if (qc1->getNqubits() != qc2->getNqubits()) {
       throw std::invalid_argument(
           "The two circuits have a different number of qubits and cannot be "
           "checked for equivalence.");
     }
-
-    // Flatten the operations of the circuits
-    qc::CircuitOptimizer::flattenOperations(*qc1);
-    qc::CircuitOptimizer::flattenOperations(*qc2Inverted);
-
-    // Invert the second circuit by iterating through the operations in reverse
-    // order and inverting each one - except for Measure and Barrier operations
-    for (auto it = circ2.rbegin(); it != circ2.rend(); ++it) {
-      if (it->get()->getType() != qc::Measure &&
-          it->get()->getType() != qc::Barrier) {
-        qc2Inverted->emplace_back(it->get()->getInverted());
-      }
-    }
-
-    splitQubit = static_cast<qc::Qubit>((&circ1)->getNqubits() / 2);
-    initializeApplicationScheme(
-        this->configuration.application.alternatingScheme);
+    splitQubit = static_cast<qc::Qubit>(qc1->getNqubits() / 2);
   }
+
   EquivalenceCriterion run() override;
 
   void json(nlohmann::json& j) const noexcept override;
@@ -85,11 +65,39 @@ public:
    * @param qc
    * @return std::size_t
    */
-  [[nodiscard]] std::size_t getNDecisions(qc::QuantumComputation& qc) const;
+  [[nodiscard]] static std::size_t
+  getNDecisions(const qc::QuantumComputation& qc);
+
+  /**
+   * @brief Check whether the HSF checker can handle the given circuits.
+   *
+   * The function returns `false` if any of the following conditions are met:
+   * - The circuits contain multi-qubit gates that are not supported by the HSF
+   * checker.
+   * - The total number of decisions exceeds the maximum allowable limit of 63.
+   *
+   * @param qc1
+   * @param qc2
+   * @return `true` if both circuits can be handled by the HSF checker,
+   * otherwise `false`.
+   */
+  static bool canHandle(const qc::QuantumComputation& qc1,
+                        const qc::QuantumComputation& qc2);
+
+  /**
+   * @brief Creates a unique pointer to a copy of the given quantum circuit and
+   * returns an inverted version of it
+   * @param circ
+   * @return std::unique_ptr<qc::QuantumComputation>
+   */
+  static std::unique_ptr<qc::QuantumComputation>
+  invertCircuit(const qc::QuantumComputation& circ) {
+    auto qcInverted = std::make_unique<qc::QuantumComputation>(circ);
+    qcInverted->invert();
+    return qcInverted;
+  }
 
 private:
-  std::unique_ptr<qc::QuantumComputation> qc1;
-  std::unique_ptr<qc::QuantumComputation> qc2Inverted;
   qc::Qubit splitQubit;
 
   using DDPackage = typename dd::Package<dd::DDPackageConfig>;
@@ -100,7 +108,7 @@ private:
    * @return EquivalenceCriterion Returns `Equivalent` if the result is below
    * the `traceThreshold`, `NotEquivalent´ otherwise.
    */
-  EquivalenceCriterion checkEquivalence() override;
+  EquivalenceCriterion checkEquivalence();
 
   /**
    * @brief Computes the trace for the i-th summand after applying the Schmidt

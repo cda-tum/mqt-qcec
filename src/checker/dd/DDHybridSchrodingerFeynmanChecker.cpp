@@ -2,7 +2,6 @@
 
 #include "Definitions.hpp"
 #include "EquivalenceCriterion.hpp"
-#include "checker/dd/DDEquivalenceChecker.hpp"
 #include "dd/ComplexValue.hpp"
 #include "dd/GateMatrixDefinitions.hpp"
 #include "dd/Operations.hpp"
@@ -29,7 +28,7 @@
 
 namespace ec {
 std::size_t DDHybridSchrodingerFeynmanChecker::getNDecisions(
-    qc::QuantumComputation& qc) const {
+    const qc::QuantumComputation& qc) {
   std::size_t ndecisions = 0;
   // calculate number of decisions
   for (const auto& op : qc) {
@@ -44,12 +43,13 @@ std::size_t DDHybridSchrodingerFeynmanChecker::getNDecisions(
     size_t nControlsInLowerSlice = 0;
     bool controlInUpperSlice = false;
     size_t nControlsInUpperSlice = 0;
+    auto spQubit = static_cast<qc::Qubit>(qc.getNqubits() / 2);
     for (const auto& target : op->getTargets()) {
-      targetInLowerSlice = targetInLowerSlice || target < splitQubit;
-      targetInUpperSlice = targetInUpperSlice || target >= splitQubit;
+      targetInLowerSlice = targetInLowerSlice || target < spQubit;
+      targetInUpperSlice = targetInUpperSlice || target >= spQubit;
     }
     for (const auto& control : op->getControls()) {
-      if (control.qubit < splitQubit) {
+      if (control.qubit < spQubit) {
         controlInLowerSlice = true;
         nControlsInLowerSlice++;
       } else {
@@ -86,6 +86,24 @@ std::size_t DDHybridSchrodingerFeynmanChecker::getNDecisions(
   return ndecisions;
 }
 
+bool DDHybridSchrodingerFeynmanChecker::canHandle(
+    const qc::QuantumComputation& qc1, const qc::QuantumComputation& qc2) {
+  try {
+    const auto ndecisions =
+        getNDecisions(qc1) + getNDecisions(*invertCircuit(qc2));
+    if (ndecisions > 63) {
+      std::clog << "[QCEC] Warning: Number of split operations exceeds the "
+                   "maximum allowed number: "
+                << ndecisions << "\n";
+      return false;
+    }
+    return true;
+  } catch (const std::invalid_argument& e) {
+    std::clog << "[QCEC] Warning: " << e.what() << "\n";
+    return false;
+  }
+}
+
 dd::ComplexValue DDHybridSchrodingerFeynmanChecker::simulateSlicing(
     std::unique_ptr<DDPackage>& sliceDD1, std::unique_ptr<DDPackage>& sliceDD2,
     size_t i) {
@@ -95,7 +113,7 @@ dd::ComplexValue DDHybridSchrodingerFeynmanChecker::simulateSlicing(
   for (const auto& op : *qc1) {
     applyLowerUpper(sliceDD1, sliceDD2, op, lower, upper);
   }
-  for (const auto& op : *qc2Inverted) {
+  for (const auto& op : *qc2) {
     applyLowerUpper(sliceDD1, sliceDD2, op, lower, upper);
   }
   auto traceLower = sliceDD1->trace(lower.matrix, lower.nqubits);
@@ -183,7 +201,7 @@ EquivalenceCriterion DDHybridSchrodingerFeynmanChecker::run() {
 }
 
 EquivalenceCriterion DDHybridSchrodingerFeynmanChecker::checkEquivalence() {
-  const auto ndecisions = getNDecisions(*qc1) + getNDecisions(*qc2Inverted);
+  const auto ndecisions = getNDecisions(*qc1) + getNDecisions(*qc2);
   if (ndecisions > 63) {
     throw std::overflow_error(
         "Number of split operations exceeds the maximum allowed number of 63.");
@@ -229,7 +247,7 @@ EquivalenceCriterion DDHybridSchrodingerFeynmanChecker::checkEquivalence() {
 
 void DDHybridSchrodingerFeynmanChecker::json(
     nlohmann::basic_json<>& j) const noexcept {
-  DDEquivalenceChecker::json(j);
-  j["checker"] = "decision_diagram_hybridSchrodingerFeynman";
+  EquivalenceChecker::json(j);
+  j["checker"] = "hsf";
 }
 } // namespace ec
