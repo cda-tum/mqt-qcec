@@ -2,6 +2,7 @@
 
 #include "Definitions.hpp"
 #include "EquivalenceCriterion.hpp"
+#include "checker/EquivalenceChecker.hpp"
 #include "dd/ComplexValue.hpp"
 #include "dd/GateMatrixDefinitions.hpp"
 #include "dd/Operations.hpp"
@@ -18,6 +19,7 @@
 #include <cstddef>
 #include <cstdio>
 #include <cstdlib>
+#include <iostream>
 #include <memory>
 #include <mutex>
 #include <nlohmann/json.hpp>

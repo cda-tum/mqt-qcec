@@ -12,6 +12,7 @@
 #include <algorithm>
 #include <atomic>
 #include <cstddef>
+#include <memory>
 #include <nlohmann/json_fwd.hpp>
 #include <utility>
 
