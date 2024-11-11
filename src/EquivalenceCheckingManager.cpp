@@ -393,10 +393,9 @@ EquivalenceCheckingManager::EquivalenceCheckingManager(
 
   if (!configuration.functionality.checkApproximateEquivalence &&
       configuration.execution.runHSFChecker) {
-    std::clog
-        << "[QCEC] Warning: The HSF checker performs approximate, not exact, "
-           "equivalence checking. The HSF checker has been disabled. Set "
-           "'checkApproximateEquivalence' to True to enable it.\n";
+    std::clog << "[QCEC] Warning: The HSF checker performs approximate "
+                 "equivalence checking. The HSF checker has been disabled. Set "
+                 "'checkApproximateEquivalence' to True to enable it.\n";
     this->configuration.execution.runHSFChecker = false;
   }
 
