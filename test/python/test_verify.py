@@ -93,3 +93,30 @@ def test_cpp_exception_propagation_internal() -> None:
 
     with pytest.raises(ValueError, match="Lookahead application scheme can only be used for matrices."):
         qcec.verify(qc, qc, configuration=config)
+
+
+def test_zx_ancilla_support() -> None:
+    """This is a regression test for the handling of ancilla registers in the ZX checker."""
+    from qiskit.circuit import AncillaRegister
+
+    anc = AncillaRegister(1)
+
+    qc1 = QuantumCircuit(1, 0)
+
+    qc1.add_register(anc)
+    qc1.h(anc[0])
+
+    qc2 = QuantumCircuit(1, 0)
+    qc2.add_register(anc)
+
+    result = qcec.verify(
+        qc1,
+        qc2,
+        check_partial_equivalence=True,
+        parallel=False,
+        run_alternating_checker=False,
+        run_simulation_checker=False,
+        run_zx_checker=True,
+        run_construction_checker=False,
+    )
+    assert result.equivalence == qcec.EquivalenceCriterion.not_equivalent
