@@ -189,6 +189,10 @@ void EquivalenceCheckingManager::setupAncillariesAndGarbage() {
   const auto qubitDifference =
       largerCircuit.getNqubits() - smallerCircuit.getNqubits();
 
+  if (qubitDifference == 0) {
+    return;
+  }
+
   std::vector<std::pair<qc::Qubit, std::optional<qc::Qubit>>> removed{};
   removed.reserve(qubitDifference);
 
