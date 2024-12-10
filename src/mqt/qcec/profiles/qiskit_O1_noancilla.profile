@@ -1,4 +1,4 @@
-# qiskit_O1_noancilla.profile, Qiskit version: 1.2.0
+# qiskit_O1_noancilla.profile, Qiskit version: 1.3.0
 x 0 1
 y 0 2
 z 0 1
