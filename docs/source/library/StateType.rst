@@ -11,7 +11,7 @@ The type of states that is used in the :ref:`simulation checker <EquivalenceChec
 
 For details, see :cite:p:`burgholzer2021randomStimuliGenerationQuantum`.
 
-    .. autoclass:: mqt.qcec.types.StateTypeName
+    .. autoclass:: mqt.qcec.literals.StateTypeName
 
     .. autoclass:: mqt.qcec.StateType
         :undoc-members:
