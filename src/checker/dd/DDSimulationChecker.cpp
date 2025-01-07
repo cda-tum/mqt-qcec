@@ -38,6 +38,7 @@ EquivalenceCriterion DDSimulationChecker::checkEquivalence() {
   // adjust reference counts to facilitate reuse of the simulation checker
   taskManager1.decRef();
   taskManager2.decRef();
+  dd->decRef(initialState);
 
   return equivalence;
 }

@@ -13,8 +13,10 @@
 #include "ir/operations/OpType.hpp"
 #include "ir/operations/Operation.hpp"
 
+#include <cassert>
 #include <cstddef>
 #include <memory>
+#include <utility>
 
 namespace ec {
 enum class Direction : bool { Left = true, Right = false };
@@ -53,10 +55,10 @@ public:
   }
 
   [[nodiscard]] qc::MatrixDD getDD() {
-    return dd::getDD((*iterator).get(), *package, permutation);
+    return dd::getDD(iterator->get(), *package, permutation);
   }
   [[nodiscard]] qc::MatrixDD getInverseDD() {
-    return dd::getInverseDD((*iterator).get(), *package, permutation);
+    return dd::getInverseDD(iterator->get(), *package, permutation);
   }
 
   [[nodiscard]] const qc::QuantumComputation* getCircuit() const noexcept {
@@ -85,17 +87,22 @@ public:
     ++iterator;
   }
 
-  void applySwapOperations(DDType& state) {
-    while (!finished() && (*iterator)->getType() == qc::SWAP) {
-      applyGate(state);
+  void applySwapOperations() {
+    while (!finished() && (*iterator)->getType() == qc::SWAP &&
+           !(*iterator)->isControlled()) {
+      const auto& targets = (*iterator)->getTargets();
+      assert(targets.size() == 2);
+      const auto t1 = targets[0];
+      const auto t2 = targets[1];
+      std::swap(permutation.at(t1), permutation.at(t2));
+      ++iterator;
     }
   }
-  void applySwapOperations() { applySwapOperations(internalState); }
 
   void advance(DDType& state, const std::size_t steps) {
     for (std::size_t i = 0U; i < steps && !finished(); ++i) {
       applyGate(state);
-      applySwapOperations(state);
+      applySwapOperations();
     }
   }
   void advance(DDType& state) { advance(state, 1U); }

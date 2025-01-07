@@ -143,15 +143,15 @@ qc::VectorDD StateGenerator::generateRandomStabilizerState(
   // circuit
   auto stabilizer = simulate(&rcs, dd.makeZeroState(randomQubits), dd);
 
-  // decrease the ref count right after so that it stays correct later on
-  dd.decRef(stabilizer);
-
   // add |0> edges for all the ancillary qubits
   auto initial = stabilizer;
   for (std::size_t p = randomQubits; p < totalQubits; ++p) {
     initial = dd.makeDDNode(static_cast<dd::Qubit>(p),
                             std::array{initial, qc::VectorDD::zero()});
   }
+  // properly set the reference count for the state
+  dd.incRef(initial);
+  dd.decRef(stabilizer);
 
   // return the resulting decision diagram
   return initial;
