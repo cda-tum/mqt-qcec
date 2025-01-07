@@ -1,7 +1,7 @@
 version: 2
 
 formats:
-  - pdf
+  #  - pdf
   - htmlzip
 
 build:
@@ -30,10 +30,10 @@ build:
     - mkdir -p $READTHEDOCS_OUTPUT/htmlzip
     - zip -r $READTHEDOCS_OUTPUT/htmlzip/html.zip docs/_build/dirhtml/*
     # Run the latex builder and create a pdf file
-    - uv run --frozen --no-dev --group docs -m sphinx -T -b latex -d docs/_build/doctrees -D language=en docs/source docs/_build/latex
-    - cd docs/_build/latex && latexmk -pdf -f -dvi- -ps- -interaction=nonstopmode -jobname=$READTHEDOCS_PROJECT
-    - mkdir -p $READTHEDOCS_OUTPUT/pdf
-    - cp docs/_build/latex/$READTHEDOCS_PROJECT.pdf $READTHEDOCS_OUTPUT/pdf/$READTHEDOCS_PROJECT.pdf
+#    - uv run --frozen --no-dev --group docs -m sphinx -T -b latex -d docs/_build/doctrees -D language=en docs/source docs/_build/latex
+#    - cd docs/_build/latex && latexmk -pdf -f -dvi- -ps- -interaction=nonstopmode -jobname=$READTHEDOCS_PROJECT
+#    - mkdir -p $READTHEDOCS_OUTPUT/pdf
+#    - cp docs/_build/latex/$READTHEDOCS_PROJECT.pdf $READTHEDOCS_OUTPUT/pdf/$READTHEDOCS_PROJECT.pdf
 
 sphinx:
   configuration: docs/conf.py
