@@ -52,8 +52,8 @@ void DDAlternatingChecker::initialize() {
 void DDAlternatingChecker::execute() {
   while (!taskManager1.finished() && !taskManager2.finished() && !isDone()) {
     // skip over any SWAP operations
-    taskManager1.applySwapOperations(functionality);
-    taskManager2.applySwapOperations(functionality);
+    taskManager1.applySwapOperations();
+    taskManager2.applySwapOperations();
 
     if (!taskManager1.finished() && !taskManager2.finished() && !isDone()) {
       // whenever the current functionality resembles the identity, identical
