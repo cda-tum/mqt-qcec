@@ -26,7 +26,7 @@ template <class DDType, class Config = dd::DDPackageConfig> class TaskManager {
 
 public:
   TaskManager(const qc::QuantumComputation& circ, DDPackage& dd,
-              const ec::Direction& dir) noexcept
+              const Direction& dir) noexcept
       : qc(&circ), package(&dd), direction(dir),
         permutation(circ.initialLayout), iterator(circ.begin()),
         end(circ.end()) {}
@@ -55,10 +55,10 @@ public:
   }
 
   [[nodiscard]] qc::MatrixDD getDD() {
-    return dd::getDD(iterator->get(), *package, permutation);
+    return dd::getDD(**iterator, *package, permutation);
   }
   [[nodiscard]] qc::MatrixDD getInverseDD() {
-    return dd::getInverseDD(iterator->get(), *package, permutation);
+    return dd::getInverseDD(**iterator, *package, permutation);
   }
 
   [[nodiscard]] const qc::QuantumComputation* getCircuit() const noexcept {
@@ -124,7 +124,7 @@ public:
 
   void reduceAncillae(DDType& state) {
     if constexpr (std::is_same_v<DDType, qc::MatrixDD>) {
-      state = package->reduceAncillae(state, qc->ancillary,
+      state = package->reduceAncillae(state, qc->getAncillary(),
                                       static_cast<bool>(direction));
     }
   }
@@ -136,9 +136,9 @@ public:
    **/
   void reduceGarbage(DDType& state) {
     if constexpr (std::is_same_v<DDType, qc::VectorDD>) {
-      state = package->reduceGarbage(state, qc->garbage, true);
+      state = package->reduceGarbage(state, qc->getGarbage(), true);
     } else if constexpr (std::is_same_v<DDType, qc::MatrixDD>) {
-      state = package->reduceGarbage(state, qc->garbage,
+      state = package->reduceGarbage(state, qc->getGarbage(),
                                      static_cast<bool>(direction), true);
     }
   }
@@ -153,7 +153,7 @@ public:
 private:
   const qc::QuantumComputation* qc{};
   DDPackage* package;
-  ec::Direction direction = Direction::Left;
+  Direction direction = Direction::Left;
   qc::Permutation permutation{};
   decltype(qc->begin()) iterator;
   decltype(qc->end()) end;
