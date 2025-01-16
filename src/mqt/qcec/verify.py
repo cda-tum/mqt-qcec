@@ -4,6 +4,12 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from mqt.core import load
+
+from . import Configuration, EquivalenceCheckingManager
+from .configuration import augment_config_from_kwargs
+from .parameterized import check_parameterized
+
 if TYPE_CHECKING:
     import os
 
@@ -14,11 +20,11 @@ if TYPE_CHECKING:
     from ._compat.typing import Unpack
     from .configuration import ConfigurationOptions
 
-from mqt.core import load
+__all__ = ["verify"]
 
-from . import Configuration, EquivalenceCheckingManager
-from .configuration import augment_config_from_kwargs
-from .parameterized import check_parameterized
+
+def __dir__() -> list[str]:
+    return __all__
 
 
 def verify(

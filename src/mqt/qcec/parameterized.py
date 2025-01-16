@@ -19,6 +19,17 @@ if TYPE_CHECKING:
     from mqt.core.ir.operations import SymbolicOperation
     from mqt.core.ir.symbolic import Variable
 
+__all__ = [
+    "check_instantiated",
+    "check_instantiated_random",
+    "check_parameterized",
+    "check_parameterized_zx",
+]
+
+
+def __dir__() -> list[str]:
+    return __all__
+
 
 def __adjust_timeout(curr_timeout: float, res: EquivalenceCheckingManager.Results | float) -> float:
     if curr_timeout == 0:
@@ -42,7 +53,7 @@ def check_parameterized_zx(
     return ecm.get_results()
 
 
-def extract_params(
+def __extract_params(
     circ1: QuantumComputation, circ2: QuantumComputation
 ) -> tuple[list[Variable], NDArray[np.float64], NDArray[np.float64]]:
     """Extract parameters and equations of parameterized circuits."""
@@ -136,7 +147,7 @@ def check_parameterized(
     n_checks = configuration.parameterized.additional_instantiations
     tol = configuration.parameterized.parameterized_tolerance
 
-    parameters, mat, offsets = extract_params(circ1, circ2)
+    parameters, mat, offsets = __extract_params(circ1, circ2)
 
     def __instantiate_params(
         qc1: QuantumComputation, qc2: QuantumComputation, b: NDArray[np.float64]

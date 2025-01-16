@@ -5,6 +5,14 @@ from __future__ import annotations
 import warnings
 from typing import TYPE_CHECKING
 
+from mqt.core import load
+
+from . import ApplicationScheme, Configuration, EquivalenceCheckingManager
+from ._compat.importlib import resources
+from .compilation_flow_profiles import AncillaMode, generate_profile_name
+from .configuration import augment_config_from_kwargs
+from .verify import verify
+
 if TYPE_CHECKING:
     import os
 
@@ -15,13 +23,11 @@ if TYPE_CHECKING:
     from ._compat.typing import Unpack
     from .configuration import ConfigurationOptions
 
-from mqt.core import load
+__all__ = ["verify_compilation"]
 
-from . import ApplicationScheme, Configuration, EquivalenceCheckingManager
-from ._compat.importlib import resources
-from .compilation_flow_profiles import AncillaMode, generate_profile_name
-from .configuration import augment_config_from_kwargs
-from .verify import verify
+
+def __dir__() -> list[str]:
+    return __all__
 
 
 def __check_if_circuit_contains_measurements(circuit: QuantumComputation) -> None:

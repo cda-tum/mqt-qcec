@@ -11,6 +11,12 @@ import importlib
 import typing
 import warnings
 
+__all__ = ["HAS_QISKIT", "OptionalDependencyTester"]
+
+
+def __dir__() -> list[str]:
+    return __all__
+
 
 class OptionalDependencyTester:
     """A manager for optional dependencies to assert their availability.

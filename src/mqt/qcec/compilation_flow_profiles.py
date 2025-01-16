@@ -14,6 +14,16 @@ if TYPE_CHECKING:
     from numpy.typing import NDArray
     from qiskit.circuit import QuantumCircuit
 
+__all__ = [
+    "AncillaMode",
+    "generate_profile",
+    "generate_profile_name",
+]
+
+
+def __dir__() -> list[str]:
+    return __all__
+
 
 @unique
 class AncillaMode(Enum):
