@@ -22,7 +22,7 @@ endif()
 # cmake-format: off
 set(MQT_CORE_VERSION 2.7.1
     CACHE STRING "MQT Core version")
-set(MQT_CORE_REV "5c3cb8edf0f43663a8edc7ae77c753926b466802"
+set(MQT_CORE_REV "cefedf2ec154498b591ba0c0d25ccde5e2bb0fb5"
     CACHE STRING "MQT Core identifier (tag, branch or commit hash)")
 set(MQT_CORE_REPO_OWNER "cda-tum"
 	CACHE STRING "MQT Core repository owner (change when using a fork)")
