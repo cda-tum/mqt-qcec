@@ -207,7 +207,7 @@ void EquivalenceCheckingManager::setupAncillariesAndGarbage() {
   }
 
   // add appropriate ancillary register to smaller circuit
-  smallerCircuit.addAncillaryRegister(qubitDifference);
+  smallerCircuit.addAncillaryRegister(qubitDifference, "anc_qcec");
 
   // reverse iterate over the removed qubits and add them back into the larger
   // circuit as ancillary
