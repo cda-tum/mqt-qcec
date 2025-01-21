@@ -41,6 +41,6 @@ def test_warning_on_missing_measurements() -> None:
     qc.h(0)
     qc.cx(0, 1)
 
-    with pytest.warns(UserWarning):
+    with pytest.warns(UserWarning, match=r"One of the circuits does not contain any measurements."):
         result = qcec.verify_compilation(qc, qc)
-        assert result.equivalence == qcec.EquivalenceCriterion.equivalent
+    assert result.equivalence == qcec.EquivalenceCriterion.equivalent
