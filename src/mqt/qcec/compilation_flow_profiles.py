@@ -301,8 +301,7 @@ def write_profile_data_to_file(profile_data: dict[tuple[str, int], int], filenam
     """Write the profile data to a file."""
     with Path(filename).open("w+", encoding="utf-8") as f:
         f.write(f"# {filename}, Qiskit version: {qiskit_version}\n")
-        for (gate, controls), cost in profile_data.items():
-            f.write(f"{gate} {controls} {cost}\n")
+        f.writelines(f"{gate} {controls} {cost}\n" for (gate, controls), cost in profile_data.items())
 
 
 def check_recurrence(seq: list[int], order: int = 2) -> list[int] | None:
