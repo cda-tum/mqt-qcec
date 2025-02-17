@@ -130,7 +130,7 @@ filterwarnings = [
 
 [tool.coverage]
 run.source = ["mqt.qcec"]
-run.omit = ["src/mqt/qcec/types.py"]
+run.omit = ["src/mqt/qcec/literals.py"]
 report.exclude_also = [
     '\.\.\.',
     'if TYPE_CHECKING:',
