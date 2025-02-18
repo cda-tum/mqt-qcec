@@ -10,6 +10,7 @@
 #include "ir/Permutation.hpp"
 #include "ir/QuantumComputation.hpp"
 #include "ir/operations/Control.hpp"
+#include "qasm3/Importer.hpp"
 #include "zx/ZXDefinitions.hpp"
 
 #include <algorithm>
@@ -27,7 +28,7 @@ protected:
 
   std::unique_ptr<ec::EquivalenceCheckingManager> ecm;
 
-  std::string testOriginal = "./circuits/test/test.real";
+  std::string testOriginal = "./circuits/test/test.qasm";
   std::string testAlternativeDir = "./circuits/test/";
 
   void SetUp() override {
@@ -56,8 +57,9 @@ INSTANTIATE_TEST_SUITE_P(
     });
 
 TEST_P(ZXTest, TestCircuits) {
-  qcOriginal.import(testOriginal);
-  qcAlternative.import(testAlternativeDir + "test_" + GetParam() + ".qasm");
+  qcOriginal = qasm3::Importer::importf(testOriginal);
+  qcAlternative = qasm3::Importer::importf(testAlternativeDir + "test_" +
+                                           GetParam() + ".qasm");
   ecm = std::make_unique<ec::EquivalenceCheckingManager>(qcOriginal,
                                                          qcAlternative, config);
 
@@ -68,13 +70,12 @@ TEST_P(ZXTest, TestCircuits) {
 }
 
 TEST_F(ZXTest, NonEquivalent) {
-  auto ss = std::stringstream("OPENQASM 2.0;\ninclude \"qelib1.inc\";\nqreg "
-                              "q[2];\ncx q[0], q[1];\n");
-  qcOriginal.import(ss, qc::Format::OpenQASM2);
-  auto ss2 =
-      std::stringstream("OPENQASM 2.0;\ninclude \"qelib1.inc\";\nqreg q[2];\nh "
-                        "q[0]; cx q[1], q[0]; h q[0]; h q[1];\n");
-  qcAlternative.import(ss2, qc::Format::OpenQASM2);
+  qcOriginal =
+      qasm3::Importer::imports("OPENQASM 2.0;\ninclude \"qelib1.inc\";\nqreg "
+                               "q[2];\ncx q[0], q[1];\n");
+  qcAlternative = qasm3::Importer::imports(
+      "OPENQASM 2.0;\ninclude \"qelib1.inc\";\nqreg q[2];\nh "
+      "q[0]; cx q[1], q[0]; h q[0]; h q[1];\n");
   ecm = std::make_unique<ec::EquivalenceCheckingManager>(qcOriginal,
                                                          qcAlternative, config);
 
@@ -272,8 +273,10 @@ protected:
     config.execution.runHSFChecker = false;
     config.execution.runZXChecker = true;
 
-    qcOriginal.import(testOriginalDir + GetParam() + ".real");
-    qcTranspiled.import(testTranspiledDir + GetParam() + "_transpiled.qasm");
+    qcOriginal =
+        qasm3::Importer::importf(testOriginalDir + GetParam() + ".qasm");
+    qcTranspiled = qasm3::Importer::importf(testTranspiledDir + GetParam() +
+                                            "_transpiled.qasm");
   }
 };
 

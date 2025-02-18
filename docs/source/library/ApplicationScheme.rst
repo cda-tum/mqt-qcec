@@ -8,7 +8,7 @@ See :doc:`/CompilationFlowVerification` for more information on the dedicated ap
 
 In case of the other checkers, which consider both circuits individually, using a non-sequential application scheme can significantly boost the operation caching performance in the underlying decision diagram package.
 
-    .. autoclass:: mqt.qcec.types.ApplicationSchemeName
+    .. autoclass:: mqt.qcec.literals.ApplicationSchemeName
 
     .. autoclass:: mqt.qcec.ApplicationScheme
         :undoc-members:

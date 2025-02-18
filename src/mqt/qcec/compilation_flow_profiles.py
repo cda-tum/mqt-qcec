@@ -7,11 +7,22 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
-from qiskit import QuantumCircuit, transpile
-from qiskit import __version__ as qiskit_version
+
+from ._compat.optional import HAS_QISKIT
 
 if TYPE_CHECKING:
     from numpy.typing import NDArray
+    from qiskit.circuit import QuantumCircuit
+
+__all__ = [
+    "AncillaMode",
+    "generate_profile",
+    "generate_profile_name",
+]
+
+
+def __dir__() -> list[str]:
+    return __all__
 
 
 @unique
@@ -154,8 +165,10 @@ multi_controlled_gates_recursion = [mcx_recursion]
 multi_controlled_gates_v_chain = [mcx_v_chain]
 
 
-def create_general_gate(qubits: int, params: int, controls: int, identifier: str) -> QuantumCircuit:
+def __create_general_gate(qubits: int, params: int, controls: int, identifier: str) -> QuantumCircuit:
     """Create a ``QuantumCircuit`` containing a single gate ``identifier`` with the given number of ``qubits``, ``params``, and ``controls``."""
+    from qiskit.circuit import QuantumCircuit
+
     required_qubits = qubits + controls
     qc = QuantumCircuit(required_qubits)
     gate_identifier = "c" * controls + identifier
@@ -167,7 +180,7 @@ def create_general_gate(qubits: int, params: int, controls: int, identifier: str
     return qc
 
 
-def create_multi_controlled_gate(
+def __create_multi_controlled_gate(
     qubits: int,
     params: int,
     controls: int,
@@ -176,6 +189,8 @@ def create_multi_controlled_gate(
     identifier: str,
 ) -> QuantumCircuit:
     """Create a ``QuantumCircuit`` containing a single multi-controlled gate ``identifier`` with the given number of ``qubits``, ``params``, and ``controls`` using ``ancilla_qubits`` ancilla qubits and the given ancilla ``mode``."""
+    from qiskit.circuit import QuantumCircuit
+
     required_qubits = qubits + controls
 
     # special handling for v-chain mode which is indicated by the ancilla_qubits being None
@@ -208,12 +223,14 @@ def create_multi_controlled_gate(
     return qc
 
 
-def compute_cost(
+def __compute_cost(
     qc: QuantumCircuit,
     basis_gates: list[str],
     optimization_level: int = 1,
 ) -> int:
     """Compute the cost of a circuit by transpiling the circuit to a given ``basis_gates`` gate set and a certain ``optimization_level``."""
+    from qiskit import transpile
+
     transpiled_circuit = transpile(
         qc, basis_gates=basis_gates, optimization_level=optimization_level, seed_transpiler=12345
     )
@@ -228,7 +245,7 @@ class GateType(Enum):
     MULTI_CONTROLLED = 2
 
 
-def create_gate_profile_data(
+def __create_gate_profile_data(
     gate_collection: list[dict[str, Any]],
     gate_type: GateType,
     basis_gates: list[str] | None = None,
@@ -254,9 +271,9 @@ def create_gate_profile_data(
                 qc = None
                 # create the gate
                 if gate_type == GateType.GENERAL:
-                    qc = create_general_gate(qubits, params, control, gate)
+                    qc = __create_general_gate(qubits, params, control, gate)
                 elif gate_type == GateType.MULTI_CONTROLLED:
-                    qc = create_multi_controlled_gate(
+                    qc = __create_multi_controlled_gate(
                         qubits,
                         params,
                         control,
@@ -265,14 +282,14 @@ def create_gate_profile_data(
                         gate,
                     )
                 # compute the cost
-                cost = compute_cost(qc, basis_gates, optimization_level)
+                cost = __compute_cost(qc, basis_gates, optimization_level)
 
                 # add the cost to the profile data
                 profile_data[gate, control] = cost
     return profile_data
 
 
-def add_special_case_data(
+def __add_special_case_data(
     profile_data: dict[tuple[str, int], int],
     special_cases: dict[str, Any] | None = None,
 ) -> None:
@@ -292,20 +309,17 @@ def add_special_case_data(
                 profile_data.setdefault((gate, nc), cost)
 
 
-def generate_profile_name(optimization_level: int = 1, mode: AncillaMode = AncillaMode.NO_ANCILLA) -> str:
-    """Generate a profile name based on the given optimization level and ancilla mode."""
-    return "qiskit_O" + str(optimization_level) + "_" + str(mode) + ".profile"
-
-
-def write_profile_data_to_file(profile_data: dict[tuple[str, int], int], filename: Path) -> None:
+def __write_profile_data_to_file(profile_data: dict[tuple[str, int], int], filename: Path) -> None:
     """Write the profile data to a file."""
+    HAS_QISKIT.require_now("generate compilation flow profiles")
+    from qiskit import __version__ as qiskit_version
+
     with Path(filename).open("w+", encoding="utf-8") as f:
         f.write(f"# {filename}, Qiskit version: {qiskit_version}\n")
-        for (gate, controls), cost in profile_data.items():
-            f.write(f"{gate} {controls} {cost}\n")
+        f.writelines(f"{gate} {controls} {cost}\n" for (gate, controls), cost in profile_data.items())
 
 
-def check_recurrence(seq: list[int], order: int = 2) -> list[int] | None:
+def __check_recurrence(seq: list[int], order: int = 2) -> list[int] | None:
     """Determine a recurrence relation with a given ``order`` in ``sequence`` and return the corresponding coefficients or ``None`` if no relation was determined."""
     if len(seq) < (2 * order + 1):
         return None
@@ -326,7 +340,7 @@ def check_recurrence(seq: list[int], order: int = 2) -> list[int] | None:
     return list(coefficients)
 
 
-def find_continuation(
+def __find_continuation(
     profile_data: dict[tuple[str, int], int],
     gate: str,
     cutoff: int = 5,
@@ -346,7 +360,7 @@ def find_continuation(
 
     coeffs = None
     for order in range(1, max_order + 1):
-        coeffs = check_recurrence(sequence, order)
+        coeffs = __check_recurrence(sequence, order)
         if coeffs is not None:
             break
 
@@ -372,6 +386,11 @@ gate_collection_for_mode = {
 default_profile_path = Path(__file__).resolve().parent.joinpath("profiles")
 
 
+def generate_profile_name(optimization_level: int = 1, mode: AncillaMode = AncillaMode.NO_ANCILLA) -> str:
+    """Generate a profile name based on the given optimization level and ancilla mode."""
+    return "qiskit_O" + str(optimization_level) + "_" + str(mode) + ".profile"
+
+
 def generate_profile(
     optimization_level: int = 1,
     mode: AncillaMode = AncillaMode.NO_ANCILLA,
@@ -393,34 +412,34 @@ def generate_profile(
         filepath = default_profile_path
 
     # generate general profile data
-    profile = create_gate_profile_data(general_gates, GateType.GENERAL, optimization_level=optimization_level)
+    profile = __create_gate_profile_data(general_gates, GateType.GENERAL, optimization_level=optimization_level)
 
     # add multi-controlled gates
     profile.update(
-        create_gate_profile_data(
+        __create_gate_profile_data(
             multi_controlled_gates,
             GateType.MULTI_CONTROLLED,
             optimization_level=optimization_level,
         )
     )
-    find_continuation(profile, gate="p", max_control=max_controls)
+    __find_continuation(profile, gate="p", max_control=max_controls)
 
     gate_collection = gate_collection_for_mode[mode]
 
     # add multi-controlled gates with specific mode
     profile.update(
-        create_gate_profile_data(
+        __create_gate_profile_data(
             gate_collection,
             GateType.MULTI_CONTROLLED,
             optimization_level=optimization_level,
         )
     )
-    find_continuation(profile, gate="x", max_control=max_controls)
+    __find_continuation(profile, gate="x", max_control=max_controls)
 
     # add special case data
-    add_special_case_data(profile)
+    __add_special_case_data(profile)
 
     # write profile data to file
     filename = generate_profile_name(optimization_level=optimization_level, mode=mode)
     filepath = filepath.joinpath(filename)
-    write_profile_data_to_file(profile, filepath)
+    __write_profile_data_to_file(profile, filepath)

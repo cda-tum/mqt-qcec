@@ -10,7 +10,6 @@
 #include "checker/dd/simulation/StateType.hpp"
 #include "dd/RealNumber.hpp"
 #include "ir/QuantumComputation.hpp"
-#include "python/qiskit/QuantumCircuit.hpp"
 
 #include <algorithm>
 #include <exception>
@@ -26,50 +25,6 @@ namespace py = pybind11;
 using namespace pybind11::literals;
 
 namespace ec {
-namespace {
-qc::QuantumComputation importCircuit(const py::object& circ) {
-  const py::object quantumCircuit =
-      py::module::import("qiskit").attr("QuantumCircuit");
-  const py::object pyQasmQobjExperiment =
-      py::module::import("qiskit.qobj").attr("QasmQobjExperiment");
-
-  auto qc = qc::QuantumComputation();
-
-  if (py::isinstance<py::str>(circ)) {
-    const auto file = circ.cast<std::string>();
-    qc.import(file);
-  } else if (py::isinstance(circ, quantumCircuit)) {
-    qc::qiskit::QuantumCircuit::import(qc, circ);
-  } else {
-    throw std::runtime_error(
-        "PyObject is neither py::str, QuantumCircuit, nor QasmQobjExperiment");
-  }
-
-  return qc;
-}
-
-std::unique_ptr<EquivalenceCheckingManager>
-createManagerFromConfiguration(const py::object& circ1, const py::object& circ2,
-                               const Configuration& configuration = {}) {
-  qc::QuantumComputation qc1;
-  try {
-    qc1 = importCircuit(circ1);
-  } catch (const std::exception& ex) {
-    throw std::runtime_error("Could not import first circuit: " +
-                             std::string(ex.what()));
-  }
-
-  qc::QuantumComputation qc2;
-  try {
-    qc2 = importCircuit(circ2);
-  } catch (const std::exception& ex) {
-    throw std::runtime_error("Could not import second circuit: " +
-                             std::string(ex.what()));
-  }
-
-  return std::make_unique<EquivalenceCheckingManager>(qc1, qc2, configuration);
-}
-} // namespace
 
 PYBIND11_MODULE(pyqcec, m, py::mod_gil_not_used()) {
   m.doc() = "Python interface for the MQT QCEC quantum circuit equivalence "
@@ -189,8 +144,9 @@ PYBIND11_MODULE(pyqcec, m, py::mod_gil_not_used()) {
       "tool");
 
   // Constructors
-  ecm.def(py::init(&createManagerFromConfiguration), "circ1"_a, "circ2"_a,
-          "config"_a = Configuration(),
+  ecm.def(py::init<const qc::QuantumComputation&, const qc::QuantumComputation&,
+                   Configuration>(),
+          "circ1"_a, "circ2"_a, "config"_a = Configuration(),
           "Create an equivalence checking manager for two circuits and "
           "configure it with a :class:`Configuration` object.")
       .def("get_configuration", &EquivalenceCheckingManager::getConfiguration)

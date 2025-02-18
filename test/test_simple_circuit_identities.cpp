@@ -4,11 +4,11 @@
 //
 
 #include "Configuration.hpp"
-#include "Definitions.hpp"
 #include "EquivalenceCheckingManager.hpp"
 #include "checker/dd/applicationscheme/ApplicationScheme.hpp"
 #include "checker/dd/applicationscheme/GateCostApplicationScheme.hpp"
 #include "ir/QuantumComputation.hpp"
+#include "qasm3/Importer.hpp"
 
 #include <gtest/gtest.h>
 #include <iostream>
@@ -29,10 +29,8 @@ protected:
 
   void SetUp() override {
     const auto [circ1, circ2] = GetParam().second;
-    std::stringstream ss1{circ1};
-    qcOriginal.import(ss1, qc::Format::OpenQASM2);
-    std::stringstream ss2{circ2};
-    qcAlternative.import(ss2, qc::Format::OpenQASM2);
+    qcOriginal = qasm3::Importer::imports(circ1);
+    qcAlternative = qasm3::Importer::imports(circ2);
 
     config.optimizations.reconstructSWAPs = false;
     config.optimizations.fuseSingleQubitGates = false;
@@ -90,6 +88,12 @@ INSTANTIATE_TEST_SUITE_P(
                 "q[0], q[1];\n",
                 "OPENQASM 2.0;\ninclude \"qelib1.inc\";\nqreg q[2];\ns q[0]; s "
                 "q[1]; h q[0]; cx q[0],q[1]; cx q[1],q[0]; h q[1];\n"}},
+        std::pair{
+            "dcx_decomposition",
+            std::pair{"OPENQASM 2.0;\ninclude \"qelib1.inc\";\nqreg q[2];\ndcx "
+                      "q[0], q[1];\n",
+                      "OPENQASM 2.0;\ninclude \"qelib1.inc\";\nqreg q[2];\ncx "
+                      "q[0],q[1];\ncx q[1],q[0];\n"}},
         std::pair{"Global_Phase",
                   std::pair{"OPENQASM 2.0;\ninclude \"qelib1.inc\";\nqreg "
                             "q[1];\nz q[0]; x q[0]; z q[0];\n",

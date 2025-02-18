@@ -190,6 +190,10 @@ void EquivalenceCheckingManager::setupAncillariesAndGarbage() {
   const auto qubitDifference =
       largerCircuit.getNqubits() - smallerCircuit.getNqubits();
 
+  if (qubitDifference == 0) {
+    return;
+  }
+
   std::vector<std::pair<qc::Qubit, std::optional<qc::Qubit>>> removed{};
   removed.reserve(qubitDifference);
 
@@ -204,7 +208,7 @@ void EquivalenceCheckingManager::setupAncillariesAndGarbage() {
   }
 
   // add appropriate ancillary register to smaller circuit
-  smallerCircuit.addAncillaryRegister(qubitDifference);
+  smallerCircuit.addAncillaryRegister(qubitDifference, "anc_qcec");
 
   // reverse iterate over the removed qubits and add them back into the larger
   // circuit as ancillary

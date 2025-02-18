@@ -1,6 +1,0 @@
-.version 1.0
-.numvars 2
-.variables q0 q1
-.begin
-t2 q1 q0
-.end

@@ -12,27 +12,27 @@ from typing import Any, cast
 
 import pytest
 
-from mqt import qcec
 from mqt.qcec._compat.importlib import resources
-from mqt.qcec.compilation_flow_profiles import generate_profile_name
+from mqt.qcec._compat.optional import HAS_QISKIT
+from mqt.qcec.compilation_flow_profiles import AncillaMode, generate_profile, generate_profile_name
 
 
 @pytest.fixture(params=[0, 1, 2, 3])
 def optimization_level(request: Any) -> int:  # noqa: ANN401
     """Fixture for optimization levels."""
-    return cast(int, request.param)
+    return cast("int", request.param)
 
 
-@pytest.fixture(params=[qcec.AncillaMode.NO_ANCILLA, qcec.AncillaMode.RECURSION, qcec.AncillaMode.V_CHAIN])
-def ancilla_mode(request: Any) -> qcec.AncillaMode:  # noqa: ANN401
+@pytest.fixture(params=[AncillaMode.NO_ANCILLA, AncillaMode.RECURSION, AncillaMode.V_CHAIN])
+def ancilla_mode(request: Any) -> AncillaMode:  # noqa: ANN401
     """Fixture for ancilla modes."""
-    return cast(qcec.AncillaMode, request.param)
+    return cast("AncillaMode", request.param)
 
 
-def test_ancilla_mode_conversion(ancilla_mode: qcec.AncillaMode) -> None:
+def test_ancilla_mode_conversion(ancilla_mode: AncillaMode) -> None:
     """Test conversion and equality of ancilla modes."""
     ancilla_str = str(ancilla_mode)
-    assert qcec.AncillaMode(ancilla_str) == ancilla_mode
+    assert AncillaMode(ancilla_str) == ancilla_mode
     assert ancilla_str == ancilla_mode
     assert ancilla_mode == ancilla_str
 
@@ -41,13 +41,13 @@ def test_ancilla_mode_conversion(ancilla_mode: qcec.AncillaMode) -> None:
     os.environ.get("CHECK_PROFILES") is None,
     reason="This test is only executed if the CHECK_PROFILES environment variable is set.",
 )
-def test_generated_profiles_are_still_valid(optimization_level: int, ancilla_mode: qcec.AncillaMode) -> None:
+def test_generated_profiles_are_still_valid(optimization_level: int, ancilla_mode: AncillaMode) -> None:
     """Test validity of generated profiles.
 
     The main intention of this check is to catch cases where an update in Qiskit changes the respective costs.
     """
     # generate the profile
-    qcec.generate_profile(optimization_level=optimization_level, mode=ancilla_mode, filepath=Path())
+    generate_profile(optimization_level=optimization_level, mode=ancilla_mode, filepath=Path())
 
     # get path to the profile from the package resources
     profile_name = generate_profile_name(optimization_level=optimization_level, mode=ancilla_mode)
@@ -82,3 +82,9 @@ def test_generated_profiles_are_still_valid(optimization_level: int, ancilla_mod
             f"The generated profile {profile_name} differs from the reference profile {ref} by {num_diffs} lines. "
             f"This might be due to a change in Qiskit. If this is the case, the reference profile should be updated."
         )
+
+
+def test_compilation_flow_profile_generation_fails_without_qiskit() -> None:
+    """Test that profile generation fails if Qiskit is not available."""
+    with HAS_QISKIT.disable_locally(), pytest.raises(ImportError, match=r"The 'qiskit' library is required to .*"):
+        generate_profile()

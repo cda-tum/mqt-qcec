@@ -5,6 +5,7 @@
 
 #include "checker/dd/simulation/StateGenerator.hpp"
 
+#include "Definitions.hpp"
 #include "algorithms/RandomCliffordCircuit.hpp"
 #include "checker/dd/DDPackageConfigs.hpp"
 #include "checker/dd/simulation/StateType.hpp"
@@ -134,17 +135,14 @@ qc::VectorDD StateGenerator::generateRandomStabilizerState(
   // determine how many qubits truly are random
   const std::size_t randomQubits = totalQubits - ancillaryQubits;
 
-  // generate a random Clifford circuit with appropriate depth
-  auto rcs = qc::RandomCliffordCircuit(
-      randomQubits,
+  // generate a random Clifford circuit with the appropriate depth
+  const auto rcs = qc::createRandomCliffordCircuit(
+      static_cast<qc::Qubit>(randomQubits),
       static_cast<std::size_t>(std::round(std::log2(randomQubits))), mt());
 
   // generate the associated stabilizer state by simulating the Clifford
   // circuit
-  auto stabilizer = simulate(&rcs, dd.makeZeroState(randomQubits), dd);
-
-  // decrease the ref count right after so that it stays correct later on
-  dd.decRef(stabilizer);
+  const auto stabilizer = simulate(rcs, dd.makeZeroState(randomQubits), dd);
 
   // add |0> edges for all the ancillary qubits
   auto initial = stabilizer;
@@ -152,6 +150,9 @@ qc::VectorDD StateGenerator::generateRandomStabilizerState(
     initial = dd.makeDDNode(static_cast<dd::Qubit>(p),
                             std::array{initial, qc::VectorDD::zero()});
   }
+  // properly set the reference count for the state
+  dd.incRef(initial);
+  dd.decRef(stabilizer);
 
   // return the resulting decision diagram
   return initial;

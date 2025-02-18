@@ -8,6 +8,7 @@
 #include "checker/dd/applicationscheme/ApplicationScheme.hpp"
 #include "checker/dd/applicationscheme/GateCostApplicationScheme.hpp"
 #include "ir/QuantumComputation.hpp"
+#include "qasm3/Importer.hpp"
 
 #include <algorithm>
 #include <gtest/gtest.h>
@@ -25,8 +26,10 @@ protected:
   ec::Configuration configuration{};
 
   void SetUp() override {
-    qcOriginal.import(testOriginalDir + GetParam() + ".real");
-    qcTranspiled.import(testTranspiledDir + GetParam() + "_transpiled.qasm");
+    qcOriginal =
+        qasm3::Importer::importf(testOriginalDir + GetParam() + ".qasm");
+    qcTranspiled = qasm3::Importer::importf(testTranspiledDir + GetParam() +
+                                            "_transpiled.qasm");
 
     configuration.execution.runAlternatingChecker = true;
     configuration.execution.runConstructionChecker = false;
@@ -43,8 +46,8 @@ INSTANTIATE_TEST_SUITE_P(
     testing::Values("dk27_225", "pcler8_248", "5xp1_194", "alu1_198",
                     "mlp4_245", "dk17_224", "add6_196", "C7552_205", "cu_219",
                     "example2_231", "c2_181", "rd73_312", "cm150a_210",
-                    "cm163a_213", "c2_182", "sym9_317", "mod5adder_306",
-                    "rd84_313", "cm151a_211", "apla_203"),
+                    "cm163a_213", "c2_182", "sym9_317", "cm151a_211",
+                    "apla_203"),
     [](const testing::TestParamInfo<CompilationFlowTest::ParamType>& inf) {
       auto s = inf.param;
       std::replace(s.begin(), s.end(), '-', '_');

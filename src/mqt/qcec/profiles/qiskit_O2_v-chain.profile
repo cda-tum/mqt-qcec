@@ -1,4 +1,4 @@
-# qiskit_O2_v-chain.profile, Qiskit version: 1.2.0
+# qiskit_O2_v-chain.profile, Qiskit version: 1.3.0
 x 0 1
 y 0 2
 z 0 1
@@ -32,7 +32,7 @@ rx 1 9
 ry 1 10
 rz 1 4
 u 1 12
-swap 1 25
+swap 1 26
 x 2 18
 p 2 13
 p 3 50

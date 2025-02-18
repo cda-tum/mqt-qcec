@@ -5,12 +5,7 @@ from __future__ import annotations
 import warnings
 from typing import TYPE_CHECKING
 
-if TYPE_CHECKING:
-    from ._compat.typing import Unpack
-    from .configuration import ConfigurationOptions
-
-from qiskit import QuantumCircuit
-from qiskit.transpiler.passes import ContainsInstruction
+from mqt.core import load
 
 from . import ApplicationScheme, Configuration, EquivalenceCheckingManager
 from ._compat.importlib import resources
@@ -18,30 +13,47 @@ from .compilation_flow_profiles import AncillaMode, generate_profile_name
 from .configuration import augment_config_from_kwargs
 from .verify import verify
 
+if TYPE_CHECKING:
+    import os
 
-def __check_if_circuit_contains_measurements(circuit: QuantumCircuit) -> None:
+    from qiskit.circuit import QuantumCircuit
+
+    from mqt.core.ir import QuantumComputation
+
+    from ._compat.typing import Unpack
+    from .configuration import ConfigurationOptions
+
+__all__ = ["verify_compilation"]
+
+
+def __dir__() -> list[str]:
+    return __all__
+
+
+def __check_if_circuit_contains_measurements(circuit: QuantumComputation) -> None:
     """Check if the circuit contains measurements and emits a warning if it does not.
 
     Args:
         circuit: The circuit to check.
     """
-    analysis_pass = ContainsInstruction("measure")
-    analysis_pass(circuit)
-    if not analysis_pass.property_set["contains_measure"]:
-        warnings.warn(
-            UserWarning(
-                "One of the circuits does not contain any measurements. "
-                "This may lead to unexpected results since the measurements are used "
-                "to infer the output qubit permutation at the end of the circuit. "
-                "Please consider adding measurements to the circuit _before_ compilation."
-            ),
-            stacklevel=2,
-        )
+    for op in circuit:
+        if op.name == "measure":
+            return
+
+    warnings.warn(
+        UserWarning(
+            "One of the circuits does not contain any measurements. "
+            "This may lead to unexpected results since the measurements are used "
+            "to infer the output qubit permutation at the end of the circuit. "
+            "Please consider adding measurements to the circuit _before_ compilation."
+        ),
+        stacklevel=2,
+    )
 
 
 def verify_compilation(
-    original_circuit: QuantumCircuit | str,
-    compiled_circuit: QuantumCircuit | str,
+    original_circuit: QuantumComputation | str | os.PathLike[str] | QuantumCircuit,
+    compiled_circuit: QuantumComputation | str | os.PathLike[str] | QuantumCircuit,
     optimization_level: int = 1,
     ancilla_mode: AncillaMode = AncillaMode.NO_ANCILLA,
     configuration: Configuration | None = None,
@@ -78,11 +90,11 @@ def verify_compilation(
     # prepare the configuration
     augment_config_from_kwargs(configuration, kwargs)
 
-    if isinstance(original_circuit, QuantumCircuit):
-        __check_if_circuit_contains_measurements(original_circuit)
-
-    if isinstance(compiled_circuit, QuantumCircuit):
-        __check_if_circuit_contains_measurements(compiled_circuit)
+    # load the circuits
+    qc1 = load(original_circuit)
+    __check_if_circuit_contains_measurements(qc1)
+    qc2 = load(compiled_circuit)
+    __check_if_circuit_contains_measurements(qc2)
 
     # use the gate_cost scheme for the verification
     configuration.application.construction_scheme = ApplicationScheme.gate_cost
@@ -95,4 +107,4 @@ def verify_compilation(
     with resources.as_file(ref) as path:
         configuration.application.profile = str(path)
 
-    return verify(original_circuit, compiled_circuit, configuration=configuration)
+    return verify(qc1, qc2, configuration=configuration)

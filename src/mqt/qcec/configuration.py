@@ -8,6 +8,12 @@ if TYPE_CHECKING:
     from . import ApplicationScheme, Configuration, StateType
     from .literals import ApplicationSchemeName, StateTypeName
 
+__all__ = ["ConfigurationOptions", "augment_config_from_kwargs"]
+
+
+def __dir__() -> list[str]:
+    return __all__
+
 
 class ConfigurationOptions(TypedDict, total=False):
     """A dictionary of configuration options.
