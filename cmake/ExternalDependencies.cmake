@@ -78,6 +78,30 @@ if(BUILD_MQT_QCEC_TESTS)
   endif()
 endif()
 
+set(TF_BUILD_TESTS
+    OFF
+    CACHE INTERNAL "")
+set(TF_BUILD_EXAMPLES
+    OFF
+    CACHE INTERNAL "")
+set(TF_BUILD_PROFILER
+    OFF
+    CACHE INTERNAL "")
+set(TF_VERSION
+    3.6.0
+    CACHE STRING "Taskflow version")
+set(TF_URL https://github.com/taskflow/taskflow/archive/refs/tags/v${TF_VERSION}.tar.gz)
+if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.24)
+  FetchContent_Declare(taskflow URL ${TF_URL} FIND_PACKAGE_ARGS)
+  list(APPEND FETCH_PACKAGES taskflow)
+else()
+  find_package(taskflow ${TF_VERSION} QUIET)
+  if(NOT taskflow_FOUND)
+    FetchContent_Declare(taskflow URL ${TF_URL})
+    list(APPEND FETCH_PACKAGES taskflow)
+  endif()
+endif()
+
 if(BUILD_MQT_QCEC_BINDINGS)
   # add pybind11_json library
   if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.24)

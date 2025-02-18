@@ -278,6 +278,12 @@ PYBIND11_MODULE(pyqcec, m, py::mod_gil_not_used()) {
            "Set the :attr:`trace threshold "
            "<.Configuration.Functionality.trace_threshold>` used for comparing "
            "two unitaries or functionality matrices.")
+      .def("set_approximate_checking_threshold",
+           &EquivalenceCheckingManager::setApproximateCheckingThreshold,
+           "threshold"_a = 1e-8,
+           "Set the :attr:`approximate checking threshold "
+           "<.Configuration.Functionality.approximate_checking_threshold>` "
+           "used for approximate equivalence checking.")
       .def(
           "set_check_partial_equivalence",
           &EquivalenceCheckingManager::setCheckPartialEquivalence,
@@ -287,6 +293,16 @@ PYBIND11_MODULE(pyqcec, m, py::mod_gil_not_used()) {
           "they have the same probability for each measurement outcome. "
           "If set to false, the checker will output 'not equivalent' for "
           "circuits that are partially equivalent but not totally equivalent. ")
+      .def("set_check_approximate_equivalence",
+           &EquivalenceCheckingManager::setCheckApproximateEquivalence,
+           "enable"_a = false,
+           "Set whether to check for approximate equivalence. Two circuits are "
+           "approximately equivalent if the Hilbert-Schmidt inner product "
+           "(process distance) of the two circuits is less than the "
+           "approximate_checking_threshold. "
+           "If set to false, the checker will output 'not equivalent' for "
+           "circuits that are approximately equivalent but not totally "
+           "equivalent. ")
       // Simulation
       .def("set_fidelity_threshold",
            &EquivalenceCheckingManager::setFidelityThreshold,
@@ -502,6 +518,13 @@ PYBIND11_MODULE(pyqcec, m, py::mod_gil_not_used()) {
           "<EquivalenceChecking:ZX-Calculus Equivalence Checker>` should be "
           "executed. Defaults to :code:`True` but arbitrary multi-controlled "
           "operations are only partially supported.")
+      .def_readwrite(
+          "run_hsf_checker", &Configuration::Execution::runHSFChecker,
+          "Set whether the :ref:`hsf checker "
+          "<EquivalenceChecking:Hybrid Schrodinger-Feynman Equivalence "
+          "Checker>` should be "
+          "executed. Defaults to :code:`False`. Arbitrary multi-controlled "
+          "operations are only partially supported.")
       .def_readwrite("numerical_tolerance",
                      &Configuration::Execution::numericalTolerance,
                      "Set the numerical tolerance of the underlying decision "
@@ -625,6 +648,15 @@ PYBIND11_MODULE(pyqcec, m, py::mod_gil_not_used()) {
           "more than the configured threshold, the circuits are concluded to "
           "be non-equivalent. Defaults to :code:`1e-8`.")
       .def_readwrite(
+          "approximate_checking_threshold",
+          &Configuration::Functionality::approximateCheckingThreshold,
+          "To determine approximate equivalence, the Hilbert-Schmidt inner "
+          "product (or process distance) between two circuit representations "
+          "is calculated and compared against the "
+          "approximate_checking_threshold. If the process distance falls below "
+          "this threshold, the circuits are considered approximately "
+          "equivalent. Defaults to :code:`1e-8`.")
+      .def_readwrite(
           "check_partial_equivalence",
           &Configuration::Functionality::checkPartialEquivalence,
           "Two circuits are partially equivalent if, for each possible initial "
@@ -635,6 +667,21 @@ PYBIND11_MODULE(pyqcec, m, py::mod_gil_not_used()) {
           "output 'not equivalent' for circuits that are partially equivalent "
           "but not totally equivalent. In particular, garbage qubits will be "
           "treated as if they were measured qubits. Defaults to "
+          ":code:`False`.")
+      .def_readwrite(
+          "check_approximate_equivalence",
+          &Configuration::Functionality::checkApproximateEquivalence,
+          "To determine approximate equivalence, the Hilbert-Schmidt inner "
+          "product (or process distance) between two circuit representations "
+          "is calculated and compared against the "
+          "approximate_checking_threshold. If the process distance falls below "
+          "this threshold, the circuits are considered approximately "
+          "equivalent.  If set to :code:`True`, a check for approximate "
+          "equivalence "
+          "will be performed. If set to :code:`False`, the checker will "
+          "output 'not equivalent' for circuits that are approximately "
+          "equivalent "
+          "but not totally equivalent. Defaults to "
           ":code:`False`.");
 
   // simulation options
@@ -708,5 +755,5 @@ PYBIND11_MODULE(pyqcec, m, py::mod_gil_not_used()) {
           "to simpler equivalence checking instances as the random "
           "instantiation. This option "
           "changes how many of those additional checks are performed.");
-}
+};
 } // namespace ec
