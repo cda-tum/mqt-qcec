@@ -3,6 +3,7 @@ requires = [
   "scikit-build-core>=0.10.7",
   "setuptools-scm>=8.1",
   "pybind11>=2.13.6",
+  "mqt.core>=3.0.0b4",
 ]
 build-backend = "scikit_build_core.build"
 
@@ -39,11 +40,18 @@ classifiers = [
 ]
 requires-python = ">=3.9"
 dependencies = [
+    "mqt.core>=3.0.0b4",
     "importlib_resources>=5.0; python_version < '3.10'",
     "typing_extensions>=4.2; python_version < '3.11'", # used for typing.Unpack
-    "qiskit[qasm3-import]>=1.0.0",
+    "numpy>=2.1; python_version >= '3.13'",
+    "numpy>=1.26; python_version >= '3.12'",
+    "numpy>=1.24; python_version >= '3.11'",
+    "numpy>=1.22",
 ]
 dynamic = ["version"]
+
+[project.optional-dependencies]
+qiskit = ["qiskit[qasm3-import]>=1.0.0"]
 
 [project.urls]
 Homepage = "https://github.com/cda-tum/mqt-qcec"
@@ -136,6 +144,8 @@ report.exclude_also = [
     'if TYPE_CHECKING:',
     'raise AssertionError',
     'raise NotImplementedError',
+    'def __dir__()',  # Ignore __dir__ method that exists mainly for better IDE support
+    '@overload'  # Overloads are only for static typing
 ]
 
 
@@ -275,15 +285,34 @@ manylinux-aarch64-image = "manylinux_2_28"
 manylinux-ppc64le-image = "manylinux_2_28"
 manylinux-s390x-image = "manylinux_2_28"
 
+# The mqt-core shared libraries are provided by the mqt-core Python package.
+# They should not be vendorized into the mqt-qcec wheel. This requires
+# excluding the shared libraries from the repair process.
+
 [tool.cibuildwheel.linux]
 environment = { DEPLOY="ON" }
+# The SOVERSION needs to be updated when the shared libraries are updated.
+repair-wheel-command = """auditwheel repair -w {dest_dir} {wheel} \
+--exclude libmqt-core-ir.so.3.0 \
+--exclude libmqt-core-qasm.so.3.0 \
+--exclude libmqt-core-circuit-optimizer.so.3.0 \
+--exclude libmqt-core-algorithms.so.3.0 \
+--exclude libmqt-core-dd.so.3.0 \
+--exclude libmqt-core-zx.so.3.0"""
 
 [tool.cibuildwheel.macos]
 environment = { MACOSX_DEPLOYMENT_TARGET = "10.15" }
+repair-wheel-command = "delocate-wheel --require-archs {delocate_archs} -w {dest_dir} -v {wheel} --ignore-missing-dependencies"
 
 [tool.cibuildwheel.windows]
-before-build = "pip install delvewheel>=1.7.3"
-repair-wheel-command = "delvewheel repair -v -w {dest_dir} {wheel} --namespace-pkg mqt"
+before-build = "uv pip install delvewheel>=1.9.0"
+repair-wheel-command = """delvewheel repair -w {dest_dir} {wheel} --namespace-pkg mqt \
+--exclude mqt-core-ir.dll \
+--exclude mqt-core-qasm.dll \
+--exclude mqt-core-circuit-optimizer.dll \
+--exclude mqt-core-algorithms.dll \
+--exclude mqt-core-dd.dll \
+--exclude mqt-core-zx.dll"""
 environment = { CMAKE_ARGS = "-T ClangCL" }
 
 [[tool.cibuildwheel.overrides]]
@@ -295,6 +324,7 @@ environment = { MACOSX_DEPLOYMENT_TARGET = "11.0" }
 required-version = ">=0.5.20"
 reinstall-package = ["mqt.qcec"]
 
+
 [tool.uv.sources]
 mqt-qcec = { workspace = true }
 
@@ -303,10 +333,11 @@ build = [
   "pybind11>=2.13.6",
   "scikit-build-core>=0.10.7",
   "setuptools-scm>=8.1",
+  "mqt-core>=3.0.0b4",
 ]
 docs = [
   "furo>=2024.8.6",
-  "qiskit[visualization]>=1.0.0",
+  "qiskit[qasm3-import,visualization]>=1.0.0",
   "setuptools-scm>=8.1",
   "sphinx-autoapi>=3.4.0",
   "sphinx-copybutton>=0.5.2",
@@ -321,6 +352,7 @@ docs = [
 test = [
   "pytest>=8.3.4",
   "pytest-cov>=6",
+  "qiskit[qasm3-import]>=1.0.0",
 ]
 dev = [
   {include-group = "build"},

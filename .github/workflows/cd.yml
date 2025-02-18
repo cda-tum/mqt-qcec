@@ -32,7 +32,7 @@ jobs:
           pattern: cibw-*
           path: dist
           merge-multiple: true
-      - name: Generate artifact attestation for sdist and wheel(s)
+      - name: Generate artifact attestation for sdist and wheels
         uses: actions/attest-build-provenance@v2
         with:
           subject-path: "dist/*"

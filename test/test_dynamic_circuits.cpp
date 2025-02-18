@@ -235,8 +235,8 @@ protected:
     bv = qc::createBernsteinVazirani(bitwidth);
 
     const auto expected = bv.getName().substr(3);
-    dbv =
-        qc::createIterativeBernsteinVazirani(qc::BitString(expected), bitwidth);
+    dbv = qc::createIterativeBernsteinVazirani(qc::BVBitString(expected),
+                                               bitwidth);
 
     std::cout << "Hidden bitstring: " << expected << " (" << bitwidth
               << " qubits)\n";
@@ -312,7 +312,7 @@ TEST_P(DynamicCircuitTestQFT, UnitaryEquivalence) {
 }
 
 TEST(GeneralDynamicCircuitTest, DynamicCircuit) {
-  constexpr auto s = qc::BitString(15U);
+  constexpr auto s = qc::BVBitString(15U);
   const auto bv = qc::createBernsteinVazirani(s);
   const auto dbv = qc::createIterativeBernsteinVazirani(s);
 

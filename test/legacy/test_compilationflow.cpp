@@ -8,6 +8,7 @@
 #include "checker/dd/applicationscheme/ApplicationScheme.hpp"
 #include "checker/dd/applicationscheme/GateCostApplicationScheme.hpp"
 #include "ir/QuantumComputation.hpp"
+#include "qasm3/Importer.hpp"
 
 #include <algorithm>
 #include <gtest/gtest.h>
@@ -25,8 +26,10 @@ protected:
   ec::Configuration configuration{};
 
   void SetUp() override {
-    qcOriginal.import(testOriginalDir + GetParam() + ".real");
-    qcTranspiled.import(testTranspiledDir + GetParam() + "_transpiled.qasm");
+    qcOriginal =
+        qasm3::Importer::importf(testOriginalDir + GetParam() + ".qasm");
+    qcTranspiled = qasm3::Importer::importf(testTranspiledDir + GetParam() +
+                                            "_transpiled.qasm");
 
     configuration.execution.runAlternatingChecker = true;
     configuration.execution.runConstructionChecker = false;

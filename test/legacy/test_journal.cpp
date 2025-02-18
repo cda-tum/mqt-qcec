@@ -8,6 +8,7 @@
 #include "EquivalenceCriterion.hpp"
 #include "checker/dd/applicationscheme/ApplicationScheme.hpp"
 #include "ir/QuantumComputation.hpp"
+#include "qasm3/Importer.hpp"
 
 #include <algorithm>
 #include <array>
@@ -161,12 +162,13 @@ TEST_P(JournalTestNonEQ, PowerOfSimulation) {
   config.functionality.checkPartialEquivalence = true;
 
   for (std::uint16_t i = 0U; i < tries; ++i) {
-    qcOriginal.import(testOriginalDir + std::get<0>(GetParam()) + ".real");
+    qcOriginal = qasm3::Importer::importf(testOriginalDir +
+                                          std::get<0>(GetParam()) + ".qasm");
 
     // generate non-eq circuit
     std::set<std::uint64_t> removed{};
     do { // NOLINT(cppcoreguidelines-avoid-do-while)
-      qcTranspiled.import(transpiledFile);
+      qcTranspiled = qasm3::Importer::importf(transpiledFile);
       removed.clear();
       for (std::uint16_t j = 0U; j < gatesToRemove; ++j) {
         auto gateToRemove = rng() % qcTranspiled.getNops();
@@ -215,12 +217,13 @@ TEST_P(JournalTestNonEQ, PowerOfSimulationParallel) {
   config.functionality.checkPartialEquivalence = true;
 
   for (std::uint16_t i = 0; i < tries; ++i) {
-    qcOriginal.import(testOriginalDir + std::get<0>(GetParam()) + ".real");
+    qcOriginal = qasm3::Importer::importf(testOriginalDir +
+                                          std::get<0>(GetParam()) + ".qasm");
 
     // generate non-eq circuit
     std::set<std::uint64_t> removed{};
     do { // NOLINT(cppcoreguidelines-avoid-do-while)
-      qcTranspiled.import(transpiledFile);
+      qcTranspiled = qasm3::Importer::importf(transpiledFile);
       removed.clear();
       for (std::uint16_t j = 0U; j < gatesToRemove; ++j) {
         auto gateToRemove = rng() % qcTranspiled.getNops();
@@ -282,8 +285,9 @@ protected:
     ss << testTranspiledDir << GetParam() << "_transpiled.qasm";
     transpiledFile = ss.str();
 
-    qcOriginal.import(testOriginalDir + GetParam() + ".real");
-    qcTranspiled.import(transpiledFile);
+    qcOriginal =
+        qasm3::Importer::importf(testOriginalDir + GetParam() + ".qasm");
+    qcTranspiled = qasm3::Importer::importf(transpiledFile);
   }
 };
 

@@ -22,4 +22,5 @@ Compilation Flow Profile Generation
 QCEC provides dedicated compilation flow profiles for IBM Qiskit which can be used to efficiently verify the results of compilation flow results :cite:p:`burgholzer2020verifyingResultsIBM`.
 These profiles are generated from IBM Qiskit using the :func:`.generate_profile` method.
 
+    .. currentmodule:: mqt.qcec.compilation_flow_profiles
     .. autofunction:: generate_profile
