@@ -1,6 +1,6 @@
 [build-system]
 requires = [
-  "scikit-build-core>=0.10.7",
+  "scikit-build-core>=0.11.0",
   "setuptools-scm>=8.1",
   "pybind11>=2.13.6",
   "mqt.core>=3.0.0b4",
@@ -16,7 +16,8 @@ authors = [
     { name = "Tom Peham", email = "tom.peham@tum.de" }
 ]
 keywords = ["MQT", "quantum-computing", "design-automation", "equivalence-checking", "verification"]
-license = { file = "LICENSE.md" }
+license = "MIT"
+license-files = ["LICENSE.md"]
 
 classifiers = [
     "Topic :: Scientific/Engineering :: Electronic Design Automation (EDA)",
@@ -25,7 +26,6 @@ classifiers = [
     "Operating System :: POSIX :: Linux",
     "Operating System :: MacOS",
     "Operating System :: Microsoft :: Windows",
-    "License :: OSI Approved :: MIT License",
     "Programming Language :: C++",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
@@ -331,7 +331,7 @@ mqt-qcec = { workspace = true }
 [dependency-groups]
 build = [
   "pybind11>=2.13.6",
-  "scikit-build-core>=0.10.7",
+  "scikit-build-core>=0.11.0",
   "setuptools-scm>=8.1",
   "mqt-core>=3.0.0b4",
 ]

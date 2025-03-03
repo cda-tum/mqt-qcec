@@ -62,6 +62,7 @@ def _run_tests(
         # This will be fixed in a new pybind11 release that includes https://github.com/pybind/pybind11/pull/5439.
         "--no-binary-package",
         "mqt-core",
+        "--verbose",
         *install_args,
         env=env,
     )
@@ -71,6 +72,7 @@ def _run_tests(
         "--no-dev",  # do not auto-install dev dependencies
         "--no-build-isolation-package",
         "mqt-qcec",  # build the project without isolation
+        "--verbose",
         *install_args,
         "pytest",
         *run_args,
