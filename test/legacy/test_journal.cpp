@@ -155,6 +155,7 @@ TEST_P(JournalTestNonEQ, PowerOfSimulation) {
   config.execution.runConstructionChecker = false;
   config.execution.runSimulationChecker = true;
   config.execution.runZXChecker = false;
+  config.execution.runHSFChecker = false;
   config.execution.parallel = false;
   config.execution.timeout = 60.;
   config.simulation.maxSims = 16U;
@@ -209,6 +210,7 @@ TEST_P(JournalTestNonEQ, PowerOfSimulationParallel) {
   config.execution.runAlternatingChecker = false;
   config.execution.runConstructionChecker = false;
   config.execution.runZXChecker = false;
+  config.execution.runHSFChecker = false;
   config.execution.runSimulationChecker = true;
   config.execution.parallel = true;
   config.execution.timeout = 60.;
@@ -276,6 +278,7 @@ protected:
     config.execution.runConstructionChecker = false;
     config.execution.runAlternatingChecker = false;
     config.execution.runZXChecker = false;
+    config.execution.runHSFChecker = false;
     config.execution.runSimulationChecker = false;
     config.simulation.maxSims = 16;
     config.application.simulationScheme = ec::ApplicationSchemeType::OneToOne;
