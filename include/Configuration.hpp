@@ -33,6 +33,7 @@ public:
     bool runSimulationChecker = true;
     bool runAlternatingChecker = true;
     bool runZXChecker = true;
+    bool runHSFChecker = false;
   };
 
   // configuration options for pre-check optimizations
@@ -62,7 +63,9 @@ public:
 
   struct Functionality {
     double traceThreshold = 1e-8;
+    double approximateCheckingThreshold = 1e-8;
     bool checkPartialEquivalence = false;
+    bool checkApproximateEquivalence = false;
   };
 
   // configuration options for the simulation scheme

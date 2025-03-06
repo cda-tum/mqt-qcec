@@ -139,12 +139,14 @@ public:
     configuration.execution.runAlternatingChecker = run;
   }
   void setZXChecker(bool run) { configuration.execution.runZXChecker = run; }
+  void setHSFChecker(bool run) { configuration.execution.runHSFChecker = run; }
 
   void disableAllCheckers() {
     configuration.execution.runConstructionChecker = false;
     configuration.execution.runZXChecker = false;
     configuration.execution.runSimulationChecker = false;
     configuration.execution.runAlternatingChecker = false;
+    configuration.execution.runHSFChecker = false;
   }
 
   // Optimization: Optimizations are applied during initialization. Already
@@ -219,10 +221,16 @@ public:
   void setTraceThreshold(double traceThreshold) {
     configuration.functionality.traceThreshold = traceThreshold;
   }
+  void setApproximateCheckingThreshold(double approximateCheckingThreshold) {
+    configuration.functionality.approximateCheckingThreshold =
+        approximateCheckingThreshold;
+  }
   void setCheckPartialEquivalence(bool checkPE) {
     configuration.functionality.checkPartialEquivalence = checkPE;
   }
-
+  void setCheckApproximateEquivalence(bool checkAE) {
+    configuration.functionality.checkApproximateEquivalence = checkAE;
+  }
   // Simulation: These setting may be changed to adjust the kinds of simulations
   // that are performed
   void setFidelityThreshold(double fidelityThreshold) {

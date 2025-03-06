@@ -36,6 +36,7 @@ protected:
     config.execution.runConstructionChecker = false;
     config.execution.runAlternatingChecker = false;
     config.execution.runSimulationChecker = false;
+    config.execution.runHSFChecker = false;
     config.execution.runZXChecker = true;
   }
 
@@ -269,6 +270,7 @@ protected:
     config.execution.runConstructionChecker = false;
     config.execution.runAlternatingChecker = false;
     config.execution.runSimulationChecker = false;
+    config.execution.runHSFChecker = false;
     config.execution.runZXChecker = true;
 
     qcOriginal =
@@ -410,6 +412,7 @@ TEST_F(ZXTest, IdleQubit) {
   config.execution.runSimulationChecker = false;
   config.execution.runAlternatingChecker = false;
   config.execution.runConstructionChecker = false;
+  config.execution.runHSFChecker = false;
   ecm = std::make_unique<ec::EquivalenceCheckingManager>(qc1, qc2, config);
 
   ecm->run();
@@ -446,6 +449,7 @@ TEST_F(ZXTest, TwoQubitRotations) {
   config.execution.runSimulationChecker = false;
   config.execution.runAlternatingChecker = false;
   config.execution.runConstructionChecker = false;
+  config.execution.runHSFChecker = false;
   ecm = std::make_unique<ec::EquivalenceCheckingManager>(qc1, qc2, config);
 
   ecm->run();

@@ -14,8 +14,12 @@ if(NOT TARGET MQT::QCEC)
   # link to the MQT::Core libraries
   target_link_libraries(
     ${PROJECT_NAME}
-    PUBLIC MQT::CoreDD MQT::CoreZX
+    PUBLIC MQT::CoreDD MQT::CoreZX Taskflow
     PRIVATE MQT::CoreCircuitOptimizer MQT::CoreAlgorithms MQT::ProjectWarnings MQT::ProjectOptions)
+
+  set_target_properties(
+    Taskflow PROPERTIES INTERFACE_SYSTEM_INCLUDE_DIRECTORIES
+                        $<TARGET_PROPERTY:Taskflow,INTERFACE_INCLUDE_DIRECTORIES>)
 
   # add MQT alias
   add_library(MQT::QCEC ALIAS ${PROJECT_NAME})

@@ -69,6 +69,7 @@ TEST_F(GeneralTest, NothingToDo) {
   config.execution.runSimulationChecker = false;
   config.execution.runConstructionChecker = false;
   config.execution.runZXChecker = false;
+  config.execution.runHSFChecker = false;
 
   auto ecm = ec::EquivalenceCheckingManager(qc1, qc2, config);
   ecm.run();
