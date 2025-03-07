@@ -4,7 +4,8 @@ from __future__ import annotations
 
 from qiskit import QuantumCircuit
 
-from mqt import qcec
+from mqt.qcec import verify
+from mqt.qcec.pyqcec import EquivalenceCriterion
 
 
 def test_regression1() -> None:
@@ -34,8 +35,8 @@ def test_regression1() -> None:
     qc_dyn.measure(1, 3)
     qc_dyn.measure(2, 4)
 
-    result = qcec.verify(qc, qc_dyn, transform_dynamic_circuit=True, backpropagate_output_permutation=True)
-    assert result.equivalence == qcec.EquivalenceCriterion.equivalent
+    result = verify(qc, qc_dyn, transform_dynamic_circuit=True, backpropagate_output_permutation=True)
+    assert result.equivalence == EquivalenceCriterion.equivalent
 
 
 def test_regression2() -> None:
@@ -94,5 +95,5 @@ def test_regression2() -> None:
     qc_dyn.h(0)
     qc_dyn.measure(0, 7)
 
-    result = qcec.verify(qc, qc_dyn, transform_dynamic_circuit=True, backpropagate_output_permutation=True)
-    assert result.equivalence == qcec.EquivalenceCriterion.equivalent
+    result = verify(qc, qc_dyn, transform_dynamic_circuit=True, backpropagate_output_permutation=True)
+    assert result.equivalence == EquivalenceCriterion.equivalent
