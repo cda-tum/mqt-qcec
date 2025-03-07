@@ -71,8 +71,6 @@ public:
     std::size_t maxSims = computeMaxSims();
     StateType stateType = StateType::ComputationalBasis;
     std::size_t seed = 0U;
-    bool storeCEXinput = false;
-    bool storeCEXoutput = false;
 
     // this function makes sure that the maximum number of simulations is
     // configured properly.

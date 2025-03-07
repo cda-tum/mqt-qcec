@@ -60,9 +60,9 @@ public:
 
     std::size_t startedSimulations = 0U;
     std::size_t performedSimulations = 0U;
-    dd::CVec cexInput;
-    dd::CVec cexOutput1;
-    dd::CVec cexOutput2;
+    qc::VectorDD cexInput{};
+    qc::VectorDD cexOutput1{};
+    qc::VectorDD cexOutput2{};
     std::size_t performedInstantiations = 0U;
 
     nlohmann::json checkerResults = nlohmann::json::array();
@@ -80,13 +80,6 @@ public:
     }
 
     [[nodiscard]] nlohmann::json json() const;
-
-    static void toJson(nlohmann::json& j, const dd::CVec& stateVector) {
-      j = nlohmann::json::array();
-      for (const auto& amp : stateVector) {
-        j.emplace_back(std::pair{amp.real(), amp.imag()});
-      }
-    }
     [[nodiscard]] std::string toString() const { return json().dump(2); }
     friend std::ostream&
     operator<<(std::ostream& os,

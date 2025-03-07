@@ -28,14 +28,18 @@ public:
 
   void setRandomInitialState(StateGenerator& generator);
 
-  [[nodiscard]] dd::CVec getInitialVector() const {
-    return initialState.getVector();
+  /// Returns the initial state used for simulation
+  [[nodiscard]] auto getInitialState() const -> const auto& {
+    return initialState;
   }
-  [[nodiscard]] dd::CVec getInternalVector1() const {
-    return taskManager1.getInternalState().getVector();
+  /// Returns the internal state of the first task manager
+  [[nodiscard]] auto getInternalState1() const -> const auto& {
+    return taskManager1.getInternalState();
   }
-  [[nodiscard]] dd::CVec getInternalVector2() const {
-    return taskManager2.getInternalState().getVector();
+
+  /// Returns the internal state of the second task manager
+  [[nodiscard]] auto getInternalState2() const -> const auto& {
+    return taskManager2.getInternalState();
   }
 
   void json(nlohmann::basic_json<>& j) const noexcept override;

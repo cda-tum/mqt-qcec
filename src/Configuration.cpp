@@ -115,8 +115,6 @@ nlohmann::basic_json<> Configuration::json() const {
     sim["max_sims"] = simulation.maxSims;
     sim["state_type"] = ec::toString(simulation.stateType);
     sim["seed"] = simulation.seed;
-    sim["store_counterexample_input"] = simulation.storeCEXinput;
-    sim["store_counterexample_output"] = simulation.storeCEXoutput;
   }
 
   return config;

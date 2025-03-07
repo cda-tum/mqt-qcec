@@ -468,17 +468,11 @@ void EquivalenceCheckingManager::checkSequential() {
       results.equivalence = EquivalenceCriterion::ProbablyEquivalent;
     }
 
-    // Circuits have been shown to be non-equivalent
+    // Circuits are non-equivalent
     if (results.equivalence == EquivalenceCriterion::NotEquivalent) {
-      if (configuration.simulation.storeCEXinput) {
-        results.cexInput = simulationChecker->getInitialVector();
-      }
-      if (configuration.simulation.storeCEXoutput) {
-        results.cexOutput1 = simulationChecker->getInternalVector1();
-        results.cexOutput2 = simulationChecker->getInternalVector2();
-      }
-
-      // everything is done
+      results.cexInput = simulationChecker->getInitialState();
+      results.cexOutput1 = simulationChecker->getInternalState1();
+      results.cexOutput2 = simulationChecker->getInternalState2();
       done = true;
       doneCond.notify_one();
     }
@@ -735,14 +729,9 @@ void EquivalenceCheckingManager::checkParallel() {
       if (const auto* const simulationChecker =
               dynamic_cast<const DDSimulationChecker*>(checker)) {
         ++results.performedSimulations;
-
-        if (configuration.simulation.storeCEXinput) {
-          results.cexInput = simulationChecker->getInitialVector();
-        }
-        if (configuration.simulation.storeCEXoutput) {
-          results.cexOutput1 = simulationChecker->getInternalVector1();
-          results.cexOutput2 = simulationChecker->getInternalVector2();
-        }
+        results.cexInput = simulationChecker->getInitialState();
+        results.cexOutput1 = simulationChecker->getInternalState1();
+        results.cexOutput2 = simulationChecker->getInternalState2();
       }
       break;
     }
@@ -961,19 +950,6 @@ nlohmann::json EquivalenceCheckingManager::Results::json() const {
     auto& sim = res["simulations"];
     sim["started"] = startedSimulations;
     sim["performed"] = performedSimulations;
-
-    if (!cexInput.empty() || !cexOutput1.empty() || !cexOutput2.empty()) {
-      auto& cex = sim["verification_cex"];
-      if (!cexInput.empty()) {
-        toJson(cex["input"], cexInput);
-      }
-      if (!cexOutput1.empty()) {
-        toJson(cex["output1"], cexOutput1);
-      }
-      if (!cexOutput2.empty()) {
-        toJson(cex["output2"], cexOutput2);
-      }
-    }
   }
   auto& par = res["parameterized"];
   par["performed_instantiations"] = performedInstantiations;

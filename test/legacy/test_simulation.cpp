@@ -25,8 +25,6 @@ protected:
     config.execution.parallel = false;
 
     config.simulation.maxSims = 8U;
-    config.simulation.storeCEXinput = true;
-    config.simulation.storeCEXoutput = true;
     config.simulation.seed = 12345U;
   }
 };
