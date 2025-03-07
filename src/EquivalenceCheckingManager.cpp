@@ -14,6 +14,7 @@
 #include "checker/dd/simulation/StateType.hpp"
 #include "checker/zx/ZXChecker.hpp"
 #include "circuit_optimizer/CircuitOptimizer.hpp"
+#include "dd/ComplexNumbers.hpp"
 #include "ir/Permutation.hpp"
 #include "ir/QuantumComputation.hpp"
 #include "zx/FunctionalityConstruction.hpp"
@@ -364,7 +365,7 @@ EquivalenceCheckingManager::EquivalenceCheckingManager(
   const auto start = std::chrono::steady_clock::now();
 
   // set numeric tolerance used throughout the check
-  setTolerance(configuration.execution.numericalTolerance);
+  dd::ComplexNumbers::setTolerance(configuration.execution.numericalTolerance);
 
   if (qc1.isVariableFree() && qc2.isVariableFree()) {
     // run all configured optimization passes

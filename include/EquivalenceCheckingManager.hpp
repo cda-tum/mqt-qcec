@@ -81,16 +81,14 @@ public:
 
     [[nodiscard]] nlohmann::json json() const;
     [[nodiscard]] std::string toString() const { return json().dump(2); }
-    friend std::ostream&
-    operator<<(std::ostream& os,
-               const EquivalenceCheckingManager::Results& res) {
+    friend std::ostream& operator<<(std::ostream& os, const Results& res) {
       return os << res.toString();
     }
   };
 
   EquivalenceCheckingManager(const qc::QuantumComputation& circ1,
                              const qc::QuantumComputation& circ2,
-                             Configuration configuration = Configuration{});
+                             Configuration config = Configuration{});
 
   void run();
 
