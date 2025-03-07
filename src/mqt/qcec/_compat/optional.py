@@ -1,7 +1,6 @@
 """Optional dependency tester.
 
-Inspired by Qiskit's LazyDependencyManager
-https://github.com/Qiskit/qiskit/blob/f13673b05edf98263f80a174d2e13a118b4acda7/qiskit/utils/lazy_tester.py#L44
+Inspired by Qiskit's `LazyDependencyManager <https://github.com/Qiskit/qiskit/blob/f13673b05edf98263f80a174d2e13a118b4acda7/qiskit/utils/lazy_tester.py#L44>`_.
 """
 
 from __future__ import annotations

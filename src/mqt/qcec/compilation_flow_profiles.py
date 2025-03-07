@@ -30,8 +30,11 @@ class AncillaMode(Enum):
     """Enum for the ancilla mode."""
 
     NO_ANCILLA = "noancilla"
+    """No ancilla qubits are used."""
     RECURSION = "recursion"
+    """A single ancilla is used in a recursive manner."""
     V_CHAIN = "v-chain"
+    """A chain of ancilla qubits is used."""
 
     def __eq__(self, other: object) -> bool:
         """Check if two AncillaMode objects are equal. Supports string comparison."""
@@ -402,8 +405,8 @@ def generate_profile(
         optimization_level:
             The IBM Qiskit optimization level to use for the profile (0, 1, 2, or 3). Defaults to 1.
         mode:
-            The `ancilla mode <.AncillaMode>` used for realizing multi-controlled Toffoli gates, as available in Qiskit.
-            Defaults to ``AncillaMode.NO_ANCILLA``.
+            The :class:`ancilla mode <.AncillaMode>` used for realizing multi-controlled Toffoli gates, as available in Qiskit.
+            Defaults to :attr:`.AncillaMode.NO_ANCILLA`.
         filepath:
             The path to the directory where the profile should be stored.
             Defaults to the ``profiles`` directory in the ``mqt.qcec`` package.

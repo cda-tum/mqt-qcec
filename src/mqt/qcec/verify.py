@@ -6,9 +6,9 @@ from typing import TYPE_CHECKING
 
 from mqt.core import load
 
-from . import Configuration, EquivalenceCheckingManager
 from .configuration import augment_config_from_kwargs
 from .parameterized import check_parameterized
+from .pyqcec import Configuration, EquivalenceCheckingManager
 
 if TYPE_CHECKING:
     import os
@@ -36,14 +36,14 @@ def verify(
     """Verify that ``circ1`` and ``circ2`` are equivalent.
 
     Wraps creating an instance of :class:`EquivalenceCheckingManager <.EquivalenceCheckingManager>`,
-    calling :meth:`EquivalenceCheckingManager.run`,
-    and calling :meth:`EquivalenceCheckingManager.get_results`.
+    calling :meth:`.EquivalenceCheckingManager.run`,
+    and returning :attr:`.EquivalenceCheckingManager.results`.
 
     There are two (non-exclusive) ways of configuring the equivalence checking process:
 
-    1. Pass a :class:`Configuration <.Configuration>` instance as the ``configuration`` argument.
+    1. Pass a :class:`.Configuration` instance as the ``configuration`` argument.
 
-    2. Pass keyword arguments to this function. These are directly incorporated into the :class:`Configuration <.Configuration>`.
+    2. Pass keyword arguments to this function. These are directly incorporated into the :class:`.Configuration`.
     Any existing configuration is overridden by keyword arguments.
 
     Args:
@@ -75,4 +75,4 @@ def verify(
     ecm.run()
 
     # obtain the result
-    return ecm.get_results()
+    return ecm.results
