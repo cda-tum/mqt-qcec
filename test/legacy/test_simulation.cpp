@@ -22,6 +22,7 @@ protected:
     config.execution.runAlternatingChecker = false;
     config.execution.runConstructionChecker = false;
     config.execution.runSimulationChecker = true;
+    config.execution.runZXChecker = false;
     config.execution.parallel = false;
 
     config.simulation.maxSims = 8U;
