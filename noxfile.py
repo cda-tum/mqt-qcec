@@ -138,7 +138,7 @@ def docs(session: nox.Session) -> None:
         "-n",  # nitpicky mode
         "-T",  # full tracebacks
         f"-b={args.builder}",
-        "docs/source",
+        "docs",
         f"docs/_build/{args.builder}",
         *posargs,
     ]
