@@ -244,7 +244,7 @@ isort.required-imports = ["from __future__ import annotations"]
 "docs/**" = ["T20"]
 "noxfile.py" = ["T20", "TID251"]
 "src/mqt/qcec/_compat/**.py" = ["TID251"]
-"*.pyi" = ["D"]  # pydocstyle
+"*.pyi" = ["D418", "DOC202", "PYI011", "PYI021"]
 "*.ipynb" = [
     "D",    # pydocstyle
     "E402", # Allow imports to appear anywhere in Jupyter notebooks
