@@ -303,7 +303,7 @@ TEST(ZXTestsMisc, IdentityNotHadamard) {
 
   auto ecm = ec::EquivalenceCheckingManager(qc1, qc2);
   ecm.disableAllCheckers();
-  ecm.setZXChecker(true);
+  ecm.getConfiguration().execution.runZXChecker = true;
   ecm.run();
 
   EXPECT_EQ(ecm.getResults().equivalence,
@@ -324,7 +324,7 @@ TEST_F(ZXTest, NonEquivalentAncillaryCircuit) {
   EXPECT_EQ(ecm->getResults().equivalence,
             ec::EquivalenceCriterion::NoInformation);
 
-  ecm->setParallel(true);
+  ecm->getConfiguration().execution.parallel = true;
   ecm->reset();
   ecm->run();
   EXPECT_EQ(ecm->getResults().equivalence,
@@ -332,14 +332,14 @@ TEST_F(ZXTest, NonEquivalentAncillaryCircuit) {
 
   // ensure that enabling another checker allows to detect non-equivalence and
   // does not abort the computation.
-  ecm->setAlternatingChecker(true);
-  ecm->setParallel(false);
+  ecm->getConfiguration().execution.runAlternatingChecker = true;
+  ecm->getConfiguration().execution.parallel = false;
   ecm->reset();
   ecm->run();
   EXPECT_EQ(ecm->getResults().equivalence,
             ec::EquivalenceCriterion::NotEquivalent);
 
-  ecm->setParallel(true);
+  ecm->getConfiguration().execution.parallel = true;
   ecm->reset();
   ecm->run();
   EXPECT_EQ(ecm->getResults().equivalence,
@@ -362,7 +362,7 @@ TEST_F(ZXTest, NonEquivalentCircuit) {
   EXPECT_EQ(ecm->getResults().equivalence,
             ec::EquivalenceCriterion::ProbablyNotEquivalent);
 
-  ecm->setParallel(true);
+  ecm->getConfiguration().execution.parallel = true;
   ecm->reset();
   ecm->run();
   EXPECT_EQ(ecm->getResults().equivalence,
@@ -370,14 +370,14 @@ TEST_F(ZXTest, NonEquivalentCircuit) {
 
   // ensure that enabling another checker allows to detect non-equivalence and
   // does not abort the computation.
-  ecm->setAlternatingChecker(true);
-  ecm->setParallel(false);
+  ecm->getConfiguration().execution.runAlternatingChecker = true;
+  ecm->getConfiguration().execution.parallel = false;
   ecm->reset();
   ecm->run();
   EXPECT_EQ(ecm->getResults().equivalence,
             ec::EquivalenceCriterion::NotEquivalent);
 
-  ecm->setParallel(true);
+  ecm->getConfiguration().execution.parallel = true;
   ecm->reset();
   ecm->run();
   EXPECT_EQ(ecm->getResults().equivalence,

@@ -10,7 +10,6 @@
 #include "DDPackageConfigs.hpp"
 #include "EquivalenceCriterion.hpp"
 #include "checker/dd/TaskManager.hpp"
-#include "dd/DDDefinitions.hpp"
 #include "dd/Package_fwd.hpp"
 #include "ir/QuantumComputation.hpp"
 

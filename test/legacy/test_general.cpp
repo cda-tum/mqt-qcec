@@ -42,8 +42,8 @@ TEST_F(GeneralTest, RemoveDiagonalGatesBeforeMeasure) {
 
   // simulations should suggest both circuits to be equivalent
   ecm.reset();
-  ecm.setAlternatingChecker(false);
-  ecm.setZXChecker(false);
+  ecm.disableAllCheckers();
+  ecm.getConfiguration().execution.runSimulationChecker = true;
   ecm.run();
   EXPECT_TRUE(ecm.getResults().consideredEquivalent());
   std::cout << ecm.getResults() << "\n";
@@ -124,6 +124,7 @@ TEST_F(GeneralTest, NoGateCancellation) {
   ec::EquivalenceCheckingManager ecm(qc1, qc2, config);
   ecm.run();
   EXPECT_TRUE(ecm.getResults().consideredEquivalent());
+  std::cout << ecm.equivalence() << "\n";
   std::cout << ecm.getResults() << "\n";
 }
 
@@ -131,6 +132,6 @@ TEST_F(GeneralTest, Configuration) {
   auto config = ec::Configuration{};
   // fix number of simulations
   config.simulation.maxSims = 1U;
-  const ec::EquivalenceCheckingManager ecm(qc1, qc2, config);
+  ec::EquivalenceCheckingManager ecm(qc1, qc2, config);
   EXPECT_EQ(config.toString(), ecm.getConfiguration().toString());
 }

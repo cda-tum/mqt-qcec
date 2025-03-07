@@ -61,6 +61,21 @@ TEST_F(GateCostApplicationSchemeTest, SchemeFromProfile) {
   ecm.run();
   EXPECT_TRUE(ecm.getResults().consideredEquivalent());
   std::cout << ecm.getResults() << "\n";
+
+  const auto json = ecm.getConfiguration().json();
+  EXPECT_EQ(json["application"]["profile"], filename);
+  EXPECT_EQ(json["application"]["alternating"],
+            ec::toString(ec::ApplicationSchemeType::GateCost));
+
+  ecm.reset();
+  ecm.getConfiguration().application.profile = "";
+  ecm.run();
+  EXPECT_TRUE(ecm.getResults().consideredEquivalent());
+
+  const auto json2 = ecm.getConfiguration().json();
+  EXPECT_EQ(json2["application"]["profile"], "cost_function");
+  EXPECT_EQ(json["application"]["alternating"],
+            ec::toString(ec::ApplicationSchemeType::GateCost));
 }
 
 TEST_F(GateCostApplicationSchemeTest, iSWAP) {

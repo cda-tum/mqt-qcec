@@ -55,18 +55,13 @@ nlohmann::basic_json<> Configuration::json() const {
   auto& exe = config["execution"];
   exe["tolerance"] = execution.numericalTolerance;
   exe["parallel"] = execution.parallel;
-  if (execution.parallel) {
-    exe["nthreads"] = execution.nthreads;
-  } else {
-    exe["nthreads"] = 1U;
-  }
+  exe["nthreads"] = execution.nthreads;
   exe["run_construction_checker"] = execution.runConstructionChecker;
   exe["run_simulation_checker"] = execution.runSimulationChecker;
   exe["run_alternating_checker"] = execution.runAlternatingChecker;
   exe["run_zx_checker"] = execution.runZXChecker;
-  if (execution.timeout > 0.) {
-    exe["timeout"] = execution.timeout;
-  }
+  exe["timeout"] = execution.timeout;
+
   auto& opt = config["optimizations"];
   opt["fuse_consecutive_single_qubit_gates"] =
       optimizations.fuseSingleQubitGates;
@@ -80,42 +75,28 @@ nlohmann::basic_json<> Configuration::json() const {
   opt["elide_permutations"] = optimizations.elidePermutations;
 
   auto& app = config["application"];
-  if (execution.runConstructionChecker) {
-    app["construction"] = ec::toString(application.constructionScheme);
-  }
-  if (execution.runSimulationChecker) {
-    app["simulation"] = ec::toString(application.simulationScheme);
-  }
-  if (execution.runAlternatingChecker) {
-    app["alternating"] = ec::toString(application.alternatingScheme);
-  }
-  if ((application.constructionScheme == ApplicationSchemeType::GateCost) ||
-      (application.simulationScheme == ApplicationSchemeType::GateCost) ||
-      (application.alternatingScheme == ApplicationSchemeType::GateCost)) {
-    if (!application.profile.empty()) {
-      app["profile"] = application.profile;
-    } else {
-      app["profile"] = "cost_function";
-    }
+  app["construction"] = ec::toString(application.constructionScheme);
+  app["simulation"] = ec::toString(application.simulationScheme);
+  app["alternating"] = ec::toString(application.alternatingScheme);
+  if (!application.profile.empty()) {
+    app["profile"] = application.profile;
+  } else {
+    app["profile"] = "cost_function";
   }
 
   auto& par = config["parameterized"];
   par["tolerance"] = parameterized.parameterizedTol;
   par["additional_instantiations"] = parameterized.nAdditionalInstantiations;
 
-  if (execution.runConstructionChecker || execution.runAlternatingChecker) {
-    auto& fun = config["functionality"];
-    fun["trace_threshold"] = functionality.traceThreshold;
-    fun["check_partial_equivalence"] = functionality.checkPartialEquivalence;
-  }
+  auto& fun = config["functionality"];
+  fun["trace_threshold"] = functionality.traceThreshold;
+  fun["check_partial_equivalence"] = functionality.checkPartialEquivalence;
 
-  if (execution.runSimulationChecker) {
-    auto& sim = config["simulation"];
-    sim["fidelity_threshold"] = simulation.fidelityThreshold;
-    sim["max_sims"] = simulation.maxSims;
-    sim["state_type"] = ec::toString(simulation.stateType);
-    sim["seed"] = simulation.seed;
-  }
+  auto& sim = config["simulation"];
+  sim["fidelity_threshold"] = simulation.fidelityThreshold;
+  sim["max_sims"] = simulation.maxSims;
+  sim["state_type"] = ec::toString(simulation.stateType);
+  sim["seed"] = simulation.seed;
 
   return config;
 }

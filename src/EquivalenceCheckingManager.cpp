@@ -298,19 +298,6 @@ void EquivalenceCheckingManager::runOptimizationPasses() {
 void EquivalenceCheckingManager::run() {
   done = false;
 
-  results.name1 = qc1.getName();
-  results.name2 = qc2.getName();
-  results.numQubits1 = qc1.getNqubits();
-  results.numQubits2 = qc2.getNqubits();
-  results.numMeasuredQubits1 = qc1.getNmeasuredQubits();
-  results.numMeasuredQubits2 = qc2.getNmeasuredQubits();
-  results.numAncillae1 = qc1.getNancillae();
-  results.numAncillae2 = qc2.getNancillae();
-  results.numGates1 = qc1.getNops();
-  results.numGates2 = qc2.getNops();
-
-  results.configuration = configuration;
-
   results.equivalence = EquivalenceCriterion::NoInformation;
 
   const bool garbageQubitsPresent =
@@ -888,61 +875,8 @@ void EquivalenceCheckingManager::checkSymbolic() {
   }
 }
 
-void EquivalenceCheckingManager::fuseSingleQubitGates() {
-  if (!configuration.optimizations.fuseSingleQubitGates) {
-    qc::CircuitOptimizer::singleQubitGateFusion(qc1);
-    qc::CircuitOptimizer::singleQubitGateFusion(qc2);
-    configuration.optimizations.fuseSingleQubitGates = true;
-  }
-}
-
-void EquivalenceCheckingManager::reconstructSWAPs() {
-  if (!configuration.optimizations.reconstructSWAPs) {
-    qc::CircuitOptimizer::swapReconstruction(qc1);
-    qc::CircuitOptimizer::swapReconstruction(qc2);
-    configuration.optimizations.reconstructSWAPs = true;
-  }
-}
-
-void EquivalenceCheckingManager::reorderOperations() {
-  if (!configuration.optimizations.reorderOperations) {
-    qc1.reorderOperations();
-    qc2.reorderOperations();
-    configuration.optimizations.reorderOperations = true;
-  }
-}
-
-void EquivalenceCheckingManager::backpropagateOutputPermutation() {
-  if (!configuration.optimizations.backpropagateOutputPermutation) {
-    qc::CircuitOptimizer::backpropagateOutputPermutation(qc1);
-    qc::CircuitOptimizer::backpropagateOutputPermutation(qc2);
-    configuration.optimizations.backpropagateOutputPermutation = true;
-  }
-}
-
-void EquivalenceCheckingManager::elidePermutations() {
-  if (!configuration.optimizations.elidePermutations) {
-    qc::CircuitOptimizer::elidePermutations(qc1);
-    qc::CircuitOptimizer::elidePermutations(qc2);
-    configuration.optimizations.elidePermutations = true;
-  }
-}
-
 nlohmann::json EquivalenceCheckingManager::Results::json() const {
   nlohmann::json res{};
-
-  auto& circuit1 = res["circuit1"];
-  circuit1["name"] = name1;
-  circuit1["num_qubits"] = numQubits1;
-  circuit1["num_gates"] = numGates1;
-
-  auto& circuit2 = res["circuit2"];
-  circuit2["name"] = name2;
-  circuit2["num_qubits"] = numQubits2;
-  circuit2["num_gates"] = numGates2;
-
-  res["configuration"] = configuration.json();
-
   res["preprocessing_time"] = preprocessingTime;
   res["check_time"] = checkTime;
   res["equivalence"] = ec::toString(equivalence);

@@ -169,8 +169,8 @@ TEST_F(EqualityTest, AutomaticSwitchToConstructionChecker) {
 
   // setup default configuration
   config = ec::Configuration{};
+  config.functionality.checkPartialEquivalence = true;
   ec::EquivalenceCheckingManager ecm(qc1, qc2, config);
-  ecm.setCheckPartialEquivalence(true);
 
   // this should notice that the alternating checker is not capable of running
   // the circuit and should switch to the construction checker
@@ -190,8 +190,9 @@ TEST_F(EqualityTest, AutomaticSwitchToConstructionChecker) {
   // Note: this exception can only be caught in sequential mode since it is
   // raised in a different thread otherwise.
   ecm.reset();
-  ecm.setAlternatingChecker(true);
-  ecm.setParallel(false);
+  auto& conf = ecm.getConfiguration();
+  conf.execution.runAlternatingChecker = true;
+  conf.execution.parallel = false;
   EXPECT_THROW(ecm.run(), std::invalid_argument);
 }
 
@@ -300,19 +301,19 @@ TEST_F(EqualityTest, onlySingleTask) {
 
   ecm.reset();
   ecm.disableAllCheckers();
-  ecm.setConstructionChecker(true);
+  ecm.getConfiguration().execution.runConstructionChecker = true;
   ecm.run();
   EXPECT_TRUE(ecm.getConfiguration().onlySingleTask());
 
   ecm.reset();
   ecm.disableAllCheckers();
-  ecm.setZXChecker(true);
+  ecm.getConfiguration().execution.runZXChecker = true;
   ecm.run();
   EXPECT_TRUE(ecm.getConfiguration().onlySingleTask());
 
   ecm.reset();
   ecm.disableAllCheckers();
-  ecm.setAlternatingChecker(true);
+  ecm.getConfiguration().execution.runAlternatingChecker = true;
   ecm.run();
   EXPECT_TRUE(ecm.getConfiguration().onlySingleTask());
 }
@@ -335,10 +336,12 @@ TEST_F(EqualityTest, StripIdleQubitPresentInBothCircuits) {
   ec::EquivalenceCheckingManager ecm(qc1, qc2, config);
   ecm.run();
   EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::NotEquivalent);
-  EXPECT_EQ(ecm.getResults().numQubits1, ecm.getResults().numQubits2);
-  EXPECT_EQ(ecm.getResults().numQubits2, qc2.getNqubits() - 1);
-  EXPECT_EQ(ecm.getResults().numMeasuredQubits1, 1);
-  EXPECT_EQ(ecm.getResults().numMeasuredQubits2, 1);
+  const auto& circ1 = ecm.getFirstCircuit();
+  const auto& circ2 = ecm.getSecondCircuit();
+  EXPECT_EQ(circ1.getNqubits(), circ2.getNqubits());
+  EXPECT_EQ(circ2.getNqubits(), qc2.getNqubits() - 1);
+  EXPECT_EQ(circ1.getNmeasuredQubits(), 1);
+  EXPECT_EQ(circ2.getNmeasuredQubits(), 1);
 }
 
 TEST_F(EqualityTest, NotEqualDueToNoSeparateIdleQubitStripping) {
@@ -366,12 +369,14 @@ TEST_F(EqualityTest, NotEqualDueToNoSeparateIdleQubitStripping) {
   EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::NotEquivalent);
   // Check that idle qubits have not been removed and re-added as ancillary
   // qubits
-  EXPECT_EQ(ecm.getResults().numQubits1, qc1.getNqubits());
-  EXPECT_EQ(ecm.getResults().numAncillae1, 0);
-  EXPECT_EQ(ecm.getResults().numQubits2, qc2.getNqubits());
-  EXPECT_EQ(ecm.getResults().numAncillae2, 0);
-  EXPECT_EQ(ecm.getResults().numMeasuredQubits1, 2);
-  EXPECT_EQ(ecm.getResults().numMeasuredQubits2, 2);
+  const auto& circ1 = ecm.getFirstCircuit();
+  const auto& circ2 = ecm.getSecondCircuit();
+  EXPECT_EQ(circ1.getNqubits(), qc1.getNqubits());
+  EXPECT_EQ(circ2.getNqubits(), qc2.getNqubits());
+  EXPECT_EQ(circ1.getNancillae(), 0);
+  EXPECT_EQ(circ2.getNancillae(), 0);
+  EXPECT_EQ(circ1.getNmeasuredQubits(), 2);
+  EXPECT_EQ(circ2.getNmeasuredQubits(), 2);
 }
 
 TEST_F(EqualityTest, EqualDueToNoSeparateIdleQubitStripping) {
@@ -397,11 +402,12 @@ TEST_F(EqualityTest, EqualDueToNoSeparateIdleQubitStripping) {
   config.optimizations.elidePermutations = false;
   ec::EquivalenceCheckingManager ecm(qc1, qc2, config);
   ecm.run();
-  EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::Equivalent);
-  EXPECT_EQ(ecm.getResults().numQubits1, ecm.getResults().numQubits2);
-  EXPECT_EQ(ecm.getResults().numQubits2, qc2.getNqubits());
-  EXPECT_EQ(ecm.getResults().numAncillae1, 0);
-  EXPECT_EQ(ecm.getResults().numAncillae2, 0);
+  const auto& circ1 = ecm.getFirstCircuit();
+  const auto& circ2 = ecm.getSecondCircuit();
+  EXPECT_EQ(circ1.getNqubits(), qc1.getNqubits());
+  EXPECT_EQ(circ2.getNqubits(), qc2.getNqubits());
+  EXPECT_EQ(circ1.getNancillae(), 0);
+  EXPECT_EQ(circ2.getNancillae(), 0);
 }
 
 TEST_F(EqualityTest,
@@ -432,8 +438,10 @@ TEST_F(EqualityTest,
   ec::EquivalenceCheckingManager ecm(qc1, qc2, config);
   ecm.run();
   EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::Equivalent);
-  EXPECT_EQ(ecm.getResults().numQubits1, ecm.getResults().numQubits2);
-  EXPECT_EQ(ecm.getResults().numQubits2, qc2.getNqubits() - 1);
+  const auto& circ1 = ecm.getFirstCircuit();
+  const auto& circ2 = ecm.getSecondCircuit();
+  EXPECT_EQ(circ1.getNqubits(), circ2.getNqubits());
+  EXPECT_EQ(circ2.getNqubits(), qc2.getNqubits() - 1);
 }
 
 TEST_F(EqualityTest, StripIdleQubitPresentOnlyInOneCircuit) {
@@ -457,7 +465,7 @@ TEST_F(EqualityTest, StripIdleQubitPresentOnlyInOneCircuit) {
   ec::EquivalenceCheckingManager ecm(qc1, qc2, config);
   ecm.run();
   EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::Equivalent);
-  EXPECT_EQ(ecm.getResults().numQubits2, qc2.getNqubits() - 1);
+  EXPECT_EQ(ecm.getSecondCircuit().getNqubits(), qc2.getNqubits() - 1);
 }
 
 TEST_F(EqualityTest, StripIdleQubitLogicalOnlyInOnePhysicalInBothCircuits) {
@@ -487,7 +495,7 @@ TEST_F(EqualityTest, StripIdleQubitLogicalOnlyInOnePhysicalInBothCircuits) {
   ec::EquivalenceCheckingManager ecm(qc1, qc2, config);
   ecm.run();
   EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::Equivalent);
-  EXPECT_EQ(ecm.getResults().numQubits2, qc2.getNqubits() - 1);
+  EXPECT_EQ(ecm.getSecondCircuit().getNqubits(), qc2.getNqubits() - 1);
 }
 
 TEST_F(EqualityTest, StripIdleQubitOutputPermutationDifferent) {
@@ -511,10 +519,12 @@ TEST_F(EqualityTest, StripIdleQubitOutputPermutationDifferent) {
   EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::Equivalent);
   // Check that no qubits were removed as the initial and output permutation are
   // not equivalent for the idle qubits
-  EXPECT_EQ(ecm.getResults().numQubits1, ecm.getResults().numQubits2);
-  EXPECT_EQ(ecm.getResults().numQubits2, qc2.getNqubits());
-  EXPECT_EQ(ecm.getResults().numAncillae1, 0);
-  EXPECT_EQ(ecm.getResults().numAncillae2, 0);
+  const auto& circ1 = ecm.getFirstCircuit();
+  const auto& circ2 = ecm.getSecondCircuit();
+  EXPECT_EQ(circ1.getNqubits(), qc1.getNqubits());
+  EXPECT_EQ(circ2.getNqubits(), qc2.getNqubits());
+  EXPECT_EQ(circ1.getNancillae(), 0);
+  EXPECT_EQ(circ2.getNancillae(), 0);
 }
 
 TEST_F(EqualityTest, StripIdleQubitOutputPermutationEquivalent) {
@@ -536,8 +546,10 @@ TEST_F(EqualityTest, StripIdleQubitOutputPermutationEquivalent) {
   EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::Equivalent);
   // Check that qubits were removed as the initial and output permutation are
   // equivalent
-  EXPECT_EQ(ecm.getResults().numQubits1, ecm.getResults().numQubits2);
-  EXPECT_EQ(ecm.getResults().numQubits2, 0);
+  const auto& circ1 = ecm.getFirstCircuit();
+  const auto& circ2 = ecm.getSecondCircuit();
+  EXPECT_EQ(circ1.getNqubits(), 0);
+  EXPECT_EQ(circ2.getNqubits(), 0);
 }
 
 TEST_F(EqualityTest, StripQubitIdleInOneCircuitOnlyOutputPermutationDifferent) {
@@ -558,10 +570,12 @@ TEST_F(EqualityTest, StripQubitIdleInOneCircuitOnlyOutputPermutationDifferent) {
   EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::Equivalent);
   // Check that no qubits were removed as the initial and output permutation are
   // not equivalent for the idle qubits
-  EXPECT_EQ(ecm.getResults().numQubits1, 2);
-  EXPECT_EQ(ecm.getResults().numQubits2, 2);
-  EXPECT_EQ(ecm.getResults().numAncillae1, 1);
-  EXPECT_EQ(ecm.getResults().numAncillae2, 1);
+  const auto& circ1 = ecm.getFirstCircuit();
+  const auto& circ2 = ecm.getSecondCircuit();
+  EXPECT_EQ(circ1.getNqubits(), 2);
+  EXPECT_EQ(circ2.getNqubits(), 2);
+  EXPECT_EQ(circ1.getNancillae(), 1);
+  EXPECT_EQ(circ2.getNancillae(), 1);
 }
 
 TEST_F(EqualityTest,
@@ -579,8 +593,10 @@ TEST_F(EqualityTest,
   EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::Equivalent);
   // Check that qubits were removed as the initial and output permutation are
   // equivalent
-  EXPECT_EQ(ecm.getResults().numQubits1, ecm.getResults().numQubits2);
-  EXPECT_EQ(ecm.getResults().numQubits2, 0);
+  const auto& circ1 = ecm.getFirstCircuit();
+  const auto& circ2 = ecm.getSecondCircuit();
+  EXPECT_EQ(circ1.getNqubits(), 0);
+  EXPECT_EQ(circ2.getNqubits(), 0);
 }
 
 TEST_F(EqualityTest, StripIdleQubitInOutputPermutationWithAncilla) {
@@ -599,8 +615,10 @@ TEST_F(EqualityTest, StripIdleQubitInOutputPermutationWithAncilla) {
   config.execution.runConstructionChecker = true;
   ec::EquivalenceCheckingManager ecm(qc1, qc2, config);
   ecm.run();
-  EXPECT_EQ(ecm.getResults().numQubits1, ecm.getResults().numQubits2);
-  EXPECT_EQ(ecm.getResults().numQubits2, 0);
-  EXPECT_EQ(ecm.getResults().numAncillae1, 0);
-  EXPECT_EQ(ecm.getResults().numAncillae2, 0);
+  const auto& circ1 = ecm.getFirstCircuit();
+  const auto& circ2 = ecm.getSecondCircuit();
+  EXPECT_EQ(circ1.getNqubits(), 0);
+  EXPECT_EQ(circ2.getNqubits(), 0);
+  EXPECT_EQ(circ1.getNancillae(), 0);
+  EXPECT_EQ(circ2.getNancillae(), 0);
 }
