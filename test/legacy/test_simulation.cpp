@@ -161,3 +161,21 @@ TEST_F(SimulationTest, GlobalStimuliParallel) {
   std::cout << ecm2.getResults() << "\n";
   EXPECT_FALSE(ecm2.getResults().consideredEquivalent());
 }
+
+TEST_F(SimulationTest, GlobalStimuliAncillaryQubit) {
+  qcOriginal = qc::QuantumComputation(1);
+  qcOriginal.addAncillaryRegister(1);
+  qcOriginal.x(0);
+  qcOriginal.z(1);
+
+  qcAlternative = qc::QuantumComputation(1);
+  qcAlternative.addAncillaryRegister(1);
+  qcAlternative.x(0);
+
+  config.simulation.stateType = ec::StateType::Stabilizer;
+  ec::EquivalenceCheckingManager ecm(qcOriginal, qcAlternative, config);
+  ecm.run();
+  std::cout << ecm.getResults() << "\n";
+  std::cout << ecm.getFirstCircuit() << '\n' << ecm.getSecondCircuit() << '\n';
+  EXPECT_TRUE(ecm.getResults().consideredEquivalent());
+}
