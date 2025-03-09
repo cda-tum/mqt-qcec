@@ -138,6 +138,7 @@ filterwarnings = [
 
 [tool.coverage]
 run.source = ["mqt.qcec"]
+run.omit = ["src/mqt/qcec/_compat/typing.py"]
 report.exclude_also = [
     '\.\.\.',
     'if TYPE_CHECKING:',
