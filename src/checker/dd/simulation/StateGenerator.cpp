@@ -31,9 +31,9 @@ qc::VectorDD StateGenerator::generateRandomState(
     dd::Package<SimulationDDPackageConfig>& dd, const std::size_t totalQubits,
     const std::size_t ancillaryQubits, const StateType type) {
   switch (type) {
-  case ec::StateType::Random1QBasis:
+  case StateType::Random1QBasis:
     return generateRandom1QBasisState(dd, totalQubits, ancillaryQubits);
-  case ec::StateType::Stabilizer:
+  case StateType::Stabilizer:
     return generateRandomStabilizerState(dd, totalQubits, ancillaryQubits);
   default:
     return generateRandomComputationalBasisState(dd, totalQubits,
@@ -121,7 +121,7 @@ qc::VectorDD StateGenerator::generateRandom1QBasisState(
       randomBasisState[i] = dd::BasisStates::left;
       break;
     default:
-      break;
+      qc::unreachable();
     }
   }
 
