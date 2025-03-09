@@ -53,14 +53,16 @@ TEST_F(SimulationTest, ClassicalStimuli) {
   config.simulation.stateType = ec::StateType::ComputationalBasis;
   ec::EquivalenceCheckingManager ecm(qcOriginal, qcAlternative, config);
   ecm.run();
-  std::cout << ecm.getResults() << "\n";
+  std::cout << "Configuration:\n" << ecm.getConfiguration() << '\n';
+  std::cout << "Results:\n" << ecm.getResults() << '\n';
   EXPECT_TRUE(ecm.getResults().consideredEquivalent());
 
   qcAlternative =
       qasm3::Importer::importf("./circuits/test/test_erroneous.qasm");
   ec::EquivalenceCheckingManager ecm2(qcOriginal, qcAlternative, config);
   ecm2.run();
-  std::cout << ecm2.getResults() << "\n";
+  std::cout << "Results (expected non-equivalent):\n"
+            << ecm.getResults() << '\n';
   EXPECT_FALSE(ecm2.getResults().consideredEquivalent());
 }
 
@@ -72,14 +74,16 @@ TEST_F(SimulationTest, LocalStimuli) {
   config.simulation.stateType = ec::StateType::Random1QBasis;
   ec::EquivalenceCheckingManager ecm(qcOriginal, qcAlternative, config);
   ecm.run();
-  std::cout << ecm.getResults() << "\n";
+  std::cout << "Configuration:\n" << ecm.getConfiguration() << '\n';
+  std::cout << "Results:\n" << ecm.getResults() << '\n';
   EXPECT_TRUE(ecm.getResults().consideredEquivalent());
 
   qcAlternative =
       qasm3::Importer::importf("./circuits/test/test_erroneous.qasm");
   ec::EquivalenceCheckingManager ecm2(qcOriginal, qcAlternative, config);
   ecm2.run();
-  std::cout << ecm2.getResults() << "\n";
+  std::cout << "Results (expected non-equivalent):\n"
+            << ecm.getResults() << '\n';
   EXPECT_FALSE(ecm2.getResults().consideredEquivalent());
 }
 
@@ -91,14 +95,16 @@ TEST_F(SimulationTest, GlobalStimuli) {
   config.simulation.stateType = ec::StateType::Stabilizer;
   ec::EquivalenceCheckingManager ecm(qcOriginal, qcAlternative, config);
   ecm.run();
-  std::cout << ecm.getResults() << "\n";
+  std::cout << "Configuration:\n" << ecm.getConfiguration() << '\n';
+  std::cout << "Results:\n" << ecm.getResults() << '\n';
   EXPECT_TRUE(ecm.getResults().consideredEquivalent());
 
   qcAlternative =
       qasm3::Importer::importf("./circuits/test/test_erroneous.qasm");
   ec::EquivalenceCheckingManager ecm2(qcOriginal, qcAlternative, config);
   ecm2.run();
-  std::cout << ecm2.getResults() << "\n";
+  std::cout << "Results (expected non-equivalent):\n"
+            << ecm.getResults() << '\n';
   EXPECT_FALSE(ecm2.getResults().consideredEquivalent());
 }
 
@@ -111,14 +117,16 @@ TEST_F(SimulationTest, ClassicalStimuliParallel) {
   config.simulation.stateType = ec::StateType::ComputationalBasis;
   ec::EquivalenceCheckingManager ecm(qcOriginal, qcAlternative, config);
   ecm.run();
-  std::cout << ecm.getResults() << "\n";
+  std::cout << "Configuration:\n" << ecm.getConfiguration() << '\n';
+  std::cout << "Results:\n" << ecm.getResults() << '\n';
   EXPECT_TRUE(ecm.getResults().consideredEquivalent());
 
   qcAlternative =
       qasm3::Importer::importf("./circuits/test/test_erroneous.qasm");
   ec::EquivalenceCheckingManager ecm2(qcOriginal, qcAlternative, config);
   ecm2.run();
-  std::cout << ecm2.getResults() << "\n";
+  std::cout << "Results (expected non-equivalent):\n"
+            << ecm.getResults() << '\n';
   EXPECT_FALSE(ecm2.getResults().consideredEquivalent());
 }
 
@@ -131,14 +139,16 @@ TEST_F(SimulationTest, LocalStimuliParallel) {
   config.simulation.stateType = ec::StateType::Random1QBasis;
   ec::EquivalenceCheckingManager ecm(qcOriginal, qcAlternative, config);
   ecm.run();
-  std::cout << ecm.getResults() << "\n";
+  std::cout << "Configuration:\n" << ecm.getConfiguration() << '\n';
+  std::cout << "Results:\n" << ecm.getResults() << '\n';
   EXPECT_TRUE(ecm.getResults().consideredEquivalent());
 
   qcAlternative =
       qasm3::Importer::importf("./circuits/test/test_erroneous.qasm");
   ec::EquivalenceCheckingManager ecm2(qcOriginal, qcAlternative, config);
   ecm2.run();
-  std::cout << ecm2.getResults() << "\n";
+  std::cout << "Results (expected non-equivalent):\n"
+            << ecm.getResults() << '\n';
   EXPECT_FALSE(ecm2.getResults().consideredEquivalent());
 }
 
@@ -151,14 +161,16 @@ TEST_F(SimulationTest, GlobalStimuliParallel) {
   config.simulation.stateType = ec::StateType::Stabilizer;
   ec::EquivalenceCheckingManager ecm(qcOriginal, qcAlternative, config);
   ecm.run();
-  std::cout << ecm.getResults() << "\n";
+  std::cout << "Configuration:\n" << ecm.getConfiguration() << '\n';
+  std::cout << "Results:\n" << ecm.getResults() << '\n';
   EXPECT_TRUE(ecm.getResults().consideredEquivalent());
 
   qcAlternative =
       qasm3::Importer::importf("./circuits/test/test_erroneous.qasm");
   ec::EquivalenceCheckingManager ecm2(qcOriginal, qcAlternative, config);
   ecm2.run();
-  std::cout << ecm2.getResults() << "\n";
+  std::cout << "Results (expected non-equivalent):\n"
+            << ecm.getResults() << '\n';
   EXPECT_FALSE(ecm2.getResults().consideredEquivalent());
 }
 

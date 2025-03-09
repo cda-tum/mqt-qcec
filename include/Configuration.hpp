@@ -57,7 +57,9 @@ public:
 
     // options for the gate cost application scheme
     std::string profile;
-    CostFunction costFunction = &legacyCostFunction;
+    CostFunction costFunction = [](const GateCostLookupTableKeyType& /*key*/) {
+      return 1U;
+    };
   };
 
   struct Functionality {

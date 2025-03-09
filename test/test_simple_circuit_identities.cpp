@@ -5,8 +5,6 @@
 
 #include "Configuration.hpp"
 #include "EquivalenceCheckingManager.hpp"
-#include "checker/dd/applicationscheme/ApplicationScheme.hpp"
-#include "checker/dd/applicationscheme/GateCostApplicationScheme.hpp"
 #include "ir/QuantumComputation.hpp"
 #include "qasm3/Importer.hpp"
 
@@ -151,16 +149,5 @@ TEST_P(SimpleCircuitIdentitiesTest, SequentialZX) {
   ecm->getConfiguration().execution.parallel = false;
 
   EXPECT_NO_THROW(ecm->run(););
-  EXPECT_TRUE(ecm->getResults().consideredEquivalent());
-}
-
-TEST_P(SimpleCircuitIdentitiesTest, GateCostApplicationScheme) {
-  ecm->disableAllCheckers();
-  ecm->getConfiguration().execution.runAlternatingChecker = true;
-  ecm->getConfiguration().application.alternatingScheme =
-      ec::ApplicationSchemeType::GateCost;
-  ecm->setGateCostFunction(&ec::legacyCostFunction);
-  EXPECT_NO_THROW(ecm->run(););
-
   EXPECT_TRUE(ecm->getResults().consideredEquivalent());
 }

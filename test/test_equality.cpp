@@ -33,6 +33,15 @@ protected:
   ec::Configuration config{};
 };
 
+TEST_F(EqualityTest, NothingToDo) {
+  qc1.x(0);
+  qc2.x(0);
+
+  auto ecm = ec::EquivalenceCheckingManager(qc1, qc2, config);
+  ecm.run();
+  EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::NoInformation);
+}
+
 TEST_F(EqualityTest, GlobalPhase) {
   qc1.x(0);
   qc2.x(0);
@@ -621,4 +630,42 @@ TEST_F(EqualityTest, StripIdleQubitInOutputPermutationWithAncilla) {
   EXPECT_EQ(circ2.getNqubits(), 0);
   EXPECT_EQ(circ1.getNancillae(), 0);
   EXPECT_EQ(circ2.getNancillae(), 0);
+}
+
+TEST_F(EqualityTest, RemoveDiagonalGatesBeforeMeasure) {
+  qc1.addClassicalRegister(1U);
+  qc1.x(0);
+  qc1.measure(0, 0U);
+  std::cout << qc1 << "\n";
+  std::cout << "-----------------------------\n";
+
+  qc2.addClassicalRegister(1U);
+  qc2.x(0);
+  qc2.z(0);
+  qc2.measure(0, 0U);
+  std::cout << qc2 << "\n";
+  std::cout << "-----------------------------\n";
+
+  // the standard check should reveal that both circuits are not equivalent
+  auto ecm = ec::EquivalenceCheckingManager(qc1, qc2);
+  ecm.run();
+  EXPECT_FALSE(ecm.getResults().consideredEquivalent());
+  std::cout << ecm.getResults() << "\n";
+
+  // simulations should suggest both circuits to be equivalent
+  ecm.reset();
+  ecm.disableAllCheckers();
+  ecm.getConfiguration().execution.runSimulationChecker = true;
+  ecm.run();
+  EXPECT_TRUE(ecm.getResults().consideredEquivalent());
+  std::cout << ecm.getResults() << "\n";
+
+  // if configured to remove diagonal gates before measurements, the circuits
+  // are equivalent
+  config = ec::Configuration{};
+  config.optimizations.removeDiagonalGatesBeforeMeasure = true;
+  auto ecm2 = ec::EquivalenceCheckingManager(qc1, qc2, config);
+  ecm2.run();
+  EXPECT_TRUE(ecm2.getResults().consideredEquivalent());
+  std::cout << ecm2.getResults() << "\n";
 }

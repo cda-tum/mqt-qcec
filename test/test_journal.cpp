@@ -158,7 +158,6 @@ TEST_P(JournalTestNonEQ, PowerOfSimulation) {
   config.execution.parallel = false;
   config.execution.timeout = 60.;
   config.simulation.maxSims = 16U;
-  config.application.simulationScheme = ec::ApplicationSchemeType::Sequential;
   config.functionality.checkPartialEquivalence = true;
 
   for (std::uint16_t i = 0U; i < tries; ++i) {
@@ -213,7 +212,6 @@ TEST_P(JournalTestNonEQ, PowerOfSimulationParallel) {
   config.execution.parallel = true;
   config.execution.timeout = 60.;
   config.simulation.maxSims = 16U;
-  config.application.simulationScheme = ec::ApplicationSchemeType::Sequential;
   config.functionality.checkPartialEquivalence = true;
 
   for (std::uint16_t i = 0; i < tries; ++i) {
@@ -384,6 +382,7 @@ TEST_P(JournalTestEQ, EQReferenceParallel) {
 TEST_P(JournalTestEQ, EQNaiveParallel) {
   config.execution.parallel = true;
   config.execution.runAlternatingChecker = true;
+  config.execution.runSimulationChecker = true; // additionally run simulations
   config.application.alternatingScheme = ec::ApplicationSchemeType::OneToOne;
 
   ec::EquivalenceCheckingManager ecm(qcOriginal, qcTranspiled, config);
@@ -395,6 +394,7 @@ TEST_P(JournalTestEQ, EQNaiveParallel) {
 TEST_P(JournalTestEQ, EQProportionalParallel) {
   config.execution.parallel = true;
   config.execution.runAlternatingChecker = true;
+  config.execution.runSimulationChecker = true; // additionally run simulations
   config.application.alternatingScheme =
       ec::ApplicationSchemeType::Proportional;
 
@@ -407,6 +407,7 @@ TEST_P(JournalTestEQ, EQProportionalParallel) {
 TEST_P(JournalTestEQ, EQLookaheadParallel) {
   config.execution.parallel = true;
   config.execution.runAlternatingChecker = true;
+  config.execution.runSimulationChecker = true; // additionally run simulations
   config.application.alternatingScheme = ec::ApplicationSchemeType::Lookahead;
 
   ec::EquivalenceCheckingManager ecm(qcOriginal, qcTranspiled, config);

@@ -6,7 +6,6 @@
 #include "Configuration.hpp"
 #include "EquivalenceCheckingManager.hpp"
 #include "checker/dd/applicationscheme/ApplicationScheme.hpp"
-#include "checker/dd/applicationscheme/GateCostApplicationScheme.hpp"
 #include "checker/dd/simulation/StateType.hpp"
 #include "ir/QuantumComputation.hpp"
 #include "qasm3/Importer.hpp"
@@ -102,17 +101,6 @@ TEST_P(FunctionalityTest, Naive) {
   EXPECT_TRUE(ecm.getResults().consideredEquivalent());
 }
 
-TEST_P(FunctionalityTest, CompilationFlow) {
-  config.execution.runAlternatingChecker = true;
-  config.application.alternatingScheme = ec::ApplicationSchemeType::GateCost;
-  config.application.costFunction = ec::legacyCostFunction;
-
-  ec::EquivalenceCheckingManager ecm(qcOriginal, qcAlternative, config);
-  ecm.run();
-  std::cout << ecm.getResults() << "\n";
-  EXPECT_TRUE(ecm.getResults().consideredEquivalent());
-}
-
 TEST_P(FunctionalityTest, Simulation) {
   config.execution.runSimulationChecker = true;
 
@@ -190,12 +178,4 @@ TEST_F(FunctionalityTest, test2) {
   ecm4.run();
   std::cout << ecm4.getResults() << "\n";
   EXPECT_TRUE(ecm4.getResults().consideredEquivalent());
-
-  config.application.alternatingScheme = ec::ApplicationSchemeType::GateCost;
-  config.application.costFunction = ec::legacyCostFunction;
-
-  ec::EquivalenceCheckingManager ecm5(qcOriginal, qcAlternative, config);
-  ecm5.run();
-  std::cout << ecm5.getResults() << "\n";
-  EXPECT_TRUE(ecm5.getResults().consideredEquivalent());
 }
