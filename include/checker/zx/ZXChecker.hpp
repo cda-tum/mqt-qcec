@@ -68,7 +68,7 @@ private:
 
   template <class CheckFun, class RuleFun>
   bool simplifyVertices(CheckFun check, RuleFun rule) {
-    bool simplified = false;
+    auto simplified = false;
     while (!isDone()) {
       auto moreSimplified = false;
       for (const auto& [v, _] : miter.getVertices()) {
@@ -81,14 +81,14 @@ private:
       if (!moreSimplified) {
         break;
       }
-      simplified |= true;
+      simplified = true;
     }
     return simplified;
   }
 
   template <class CheckFun, class RuleFun>
   bool simplifyEdges(CheckFun check, RuleFun rule) {
-    bool simplified = false;
+    auto simplified = false;
     while (!isDone()) {
       auto moreSimplified = false;
       for (const auto& [v0, v1] : miter.getEdges()) {
@@ -102,7 +102,7 @@ private:
       if (!moreSimplified) {
         break;
       }
-      simplified |= true;
+      simplified = true;
     }
     return simplified;
   }
