@@ -13,6 +13,7 @@
 
 #include <algorithm>
 #include <cstddef>
+#include <iosfwd>
 #include <nlohmann/json_fwd.hpp>
 #include <string>
 #include <thread>
@@ -113,5 +114,8 @@ public:
   [[nodiscard]] nlohmann::json json() const;
 
   [[nodiscard]] std::string toString() const;
+
+  friend std::ostream& operator<<(std::ostream& os,
+                                  const Configuration& config);
 };
 } // namespace ec

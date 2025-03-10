@@ -10,6 +10,7 @@
 #include "checker/dd/simulation/StateType.hpp"
 
 #include <nlohmann/json.hpp>
+#include <ostream>
 
 namespace ec {
 bool Configuration::anythingToExecute() const noexcept {
@@ -104,5 +105,9 @@ nlohmann::basic_json<> Configuration::json() const {
 std::string Configuration::toString() const {
   constexpr auto indent = 2;
   return json().dump(indent);
+}
+
+std::ostream& operator<<(std::ostream& os, const Configuration& config) {
+  return os << config.toString();
 }
 } // namespace ec
