@@ -179,6 +179,8 @@ TEST_F(EqualityTest, AutomaticSwitchToConstructionChecker) {
   // setup default configuration
   config = ec::Configuration{};
   config.functionality.checkPartialEquivalence = true;
+  // clang-tidy is having an aneurysm here and suggests to use const.
+  // NOLINTNEXTLINE(misc-const-correctness)
   ec::EquivalenceCheckingManager ecm(qc1, qc2, config);
 
   // this should notice that the alternating checker is not capable of running
@@ -214,7 +216,8 @@ TEST_F(EqualityTest, ExceptionInParallelThread) {
   config.execution.runSimulationChecker = true;
   config.execution.runZXChecker = false;
   config.application.simulationScheme = ec::ApplicationSchemeType::Lookahead;
-
+  // clang-tidy is having an aneurysm here and suggests to use const.
+  // NOLINTNEXTLINE(misc-const-correctness)
   ec::EquivalenceCheckingManager ecm(qc1, qc1, config);
   EXPECT_THROW(ecm.run(), std::invalid_argument);
 }

@@ -164,6 +164,9 @@ TEST_P(CompilationFlowTest, EquivalenceCompilationFlowParallel) {
 }
 
 TEST(CompilationFlowTest, CompilationFlowProfileFromFile) {
+  // clang-tidy is having an aneurysm here and suggests to use const for some of
+  // the variables, which does not make sense in this context.
+  // NOLINTBEGIN(misc-const-correctness)
   // create a simple profile that specifies a Toffoli corresponds to 15 gates.
   const std::string filename = "simple.profile";
   std::ofstream ofs(filename);
@@ -206,6 +209,7 @@ TEST(CompilationFlowTest, CompilationFlowProfileFromFile) {
   EXPECT_EQ(json2["application"]["profile"], "cost_function");
   EXPECT_EQ(json["application"]["alternating"],
             ec::toString(ec::ApplicationSchemeType::GateCost));
+  // NOLINTEND(misc-const-correctness)
 }
 
 } // namespace ec
