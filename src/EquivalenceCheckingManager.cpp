@@ -596,22 +596,12 @@ void EquivalenceCheckingManager::checkParallel() {
     ++tasksToExecute;
   }
   if (configuration.execution.runSimulationChecker) {
-    if (configuration.simulation.maxSims > 0U) {
-      tasksToExecute += configuration.simulation.maxSims;
-    } else {
-      configuration.execution.runSimulationChecker = false;
-    }
+    tasksToExecute += configuration.simulation.maxSims;
   }
   if (configuration.execution.runZXChecker) {
     if (zx::FunctionalityConstruction::transformableToZX(&qc1) &&
         zx::FunctionalityConstruction::transformableToZX(&qc2)) {
       ++tasksToExecute;
-    } else if (configuration.onlyZXCheckerConfigured()) {
-      std::clog
-          << "Only ZX checker specified, but one of the circuits contains "
-             "operations not supported by this checker! Exiting!\n";
-      setAndSignalDone();
-      results.equivalence = EquivalenceCriterion::NoInformation;
     } else {
       configuration.execution.runZXChecker = false;
     }
