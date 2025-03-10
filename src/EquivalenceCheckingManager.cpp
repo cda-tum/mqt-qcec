@@ -14,6 +14,7 @@
 #include "checker/dd/simulation/StateType.hpp"
 #include "checker/zx/ZXChecker.hpp"
 #include "circuit_optimizer/CircuitOptimizer.hpp"
+#include "dd/ComplexNumbers.hpp"
 #include "ir/Permutation.hpp"
 #include "ir/QuantumComputation.hpp"
 #include "zx/FunctionalityConstruction.hpp"
@@ -297,19 +298,6 @@ void EquivalenceCheckingManager::runOptimizationPasses() {
 void EquivalenceCheckingManager::run() {
   done = false;
 
-  results.name1 = qc1.getName();
-  results.name2 = qc2.getName();
-  results.numQubits1 = qc1.getNqubits();
-  results.numQubits2 = qc2.getNqubits();
-  results.numMeasuredQubits1 = qc1.getNmeasuredQubits();
-  results.numMeasuredQubits2 = qc2.getNmeasuredQubits();
-  results.numAncillae1 = qc1.getNancillae();
-  results.numAncillae2 = qc2.getNancillae();
-  results.numGates1 = qc1.getNops();
-  results.numGates2 = qc2.getNops();
-
-  results.configuration = configuration;
-
   results.equivalence = EquivalenceCriterion::NoInformation;
 
   const bool garbageQubitsPresent =
@@ -364,7 +352,7 @@ EquivalenceCheckingManager::EquivalenceCheckingManager(
   const auto start = std::chrono::steady_clock::now();
 
   // set numeric tolerance used throughout the check
-  setTolerance(configuration.execution.numericalTolerance);
+  dd::ComplexNumbers::setTolerance(configuration.execution.numericalTolerance);
 
   if (qc1.isVariableFree() && qc2.isVariableFree()) {
     // run all configured optimization passes
@@ -468,17 +456,11 @@ void EquivalenceCheckingManager::checkSequential() {
       results.equivalence = EquivalenceCriterion::ProbablyEquivalent;
     }
 
-    // Circuits have been shown to be non-equivalent
+    // Circuits are non-equivalent
     if (results.equivalence == EquivalenceCriterion::NotEquivalent) {
-      if (configuration.simulation.storeCEXinput) {
-        results.cexInput = simulationChecker->getInitialVector();
-      }
-      if (configuration.simulation.storeCEXoutput) {
-        results.cexOutput1 = simulationChecker->getInternalVector1();
-        results.cexOutput2 = simulationChecker->getInternalVector2();
-      }
-
-      // everything is done
+      results.cexInput = simulationChecker->getInitialState();
+      results.cexOutput1 = simulationChecker->getInternalState1();
+      results.cexOutput2 = simulationChecker->getInternalState2();
       done = true;
       doneCond.notify_one();
     }
@@ -614,22 +596,12 @@ void EquivalenceCheckingManager::checkParallel() {
     ++tasksToExecute;
   }
   if (configuration.execution.runSimulationChecker) {
-    if (configuration.simulation.maxSims > 0U) {
-      tasksToExecute += configuration.simulation.maxSims;
-    } else {
-      configuration.execution.runSimulationChecker = false;
-    }
+    tasksToExecute += configuration.simulation.maxSims;
   }
   if (configuration.execution.runZXChecker) {
     if (zx::FunctionalityConstruction::transformableToZX(&qc1) &&
         zx::FunctionalityConstruction::transformableToZX(&qc2)) {
       ++tasksToExecute;
-    } else if (configuration.onlyZXCheckerConfigured()) {
-      std::clog
-          << "Only ZX checker specified, but one of the circuits contains "
-             "operations not supported by this checker! Exiting!\n";
-      setAndSignalDone();
-      results.equivalence = EquivalenceCriterion::NoInformation;
     } else {
       configuration.execution.runZXChecker = false;
     }
@@ -735,14 +707,9 @@ void EquivalenceCheckingManager::checkParallel() {
       if (const auto* const simulationChecker =
               dynamic_cast<const DDSimulationChecker*>(checker)) {
         ++results.performedSimulations;
-
-        if (configuration.simulation.storeCEXinput) {
-          results.cexInput = simulationChecker->getInitialVector();
-        }
-        if (configuration.simulation.storeCEXoutput) {
-          results.cexOutput1 = simulationChecker->getInternalVector1();
-          results.cexOutput2 = simulationChecker->getInternalVector2();
-        }
+        results.cexInput = simulationChecker->getInitialState();
+        results.cexOutput1 = simulationChecker->getInternalState1();
+        results.cexOutput2 = simulationChecker->getInternalState2();
       }
       break;
     }
@@ -898,61 +865,8 @@ void EquivalenceCheckingManager::checkSymbolic() {
   }
 }
 
-void EquivalenceCheckingManager::fuseSingleQubitGates() {
-  if (!configuration.optimizations.fuseSingleQubitGates) {
-    qc::CircuitOptimizer::singleQubitGateFusion(qc1);
-    qc::CircuitOptimizer::singleQubitGateFusion(qc2);
-    configuration.optimizations.fuseSingleQubitGates = true;
-  }
-}
-
-void EquivalenceCheckingManager::reconstructSWAPs() {
-  if (!configuration.optimizations.reconstructSWAPs) {
-    qc::CircuitOptimizer::swapReconstruction(qc1);
-    qc::CircuitOptimizer::swapReconstruction(qc2);
-    configuration.optimizations.reconstructSWAPs = true;
-  }
-}
-
-void EquivalenceCheckingManager::reorderOperations() {
-  if (!configuration.optimizations.reorderOperations) {
-    qc1.reorderOperations();
-    qc2.reorderOperations();
-    configuration.optimizations.reorderOperations = true;
-  }
-}
-
-void EquivalenceCheckingManager::backpropagateOutputPermutation() {
-  if (!configuration.optimizations.backpropagateOutputPermutation) {
-    qc::CircuitOptimizer::backpropagateOutputPermutation(qc1);
-    qc::CircuitOptimizer::backpropagateOutputPermutation(qc2);
-    configuration.optimizations.backpropagateOutputPermutation = true;
-  }
-}
-
-void EquivalenceCheckingManager::elidePermutations() {
-  if (!configuration.optimizations.elidePermutations) {
-    qc::CircuitOptimizer::elidePermutations(qc1);
-    qc::CircuitOptimizer::elidePermutations(qc2);
-    configuration.optimizations.elidePermutations = true;
-  }
-}
-
 nlohmann::json EquivalenceCheckingManager::Results::json() const {
   nlohmann::json res{};
-
-  auto& circuit1 = res["circuit1"];
-  circuit1["name"] = name1;
-  circuit1["num_qubits"] = numQubits1;
-  circuit1["num_gates"] = numGates1;
-
-  auto& circuit2 = res["circuit2"];
-  circuit2["name"] = name2;
-  circuit2["num_qubits"] = numQubits2;
-  circuit2["num_gates"] = numGates2;
-
-  res["configuration"] = configuration.json();
-
   res["preprocessing_time"] = preprocessingTime;
   res["check_time"] = checkTime;
   res["equivalence"] = ec::toString(equivalence);
@@ -961,19 +875,6 @@ nlohmann::json EquivalenceCheckingManager::Results::json() const {
     auto& sim = res["simulations"];
     sim["started"] = startedSimulations;
     sim["performed"] = performedSimulations;
-
-    if (!cexInput.empty() || !cexOutput1.empty() || !cexOutput2.empty()) {
-      auto& cex = sim["verification_cex"];
-      if (!cexInput.empty()) {
-        toJson(cex["input"], cexInput);
-      }
-      if (!cexOutput1.empty()) {
-        toJson(cex["output1"], cexOutput1);
-      }
-      if (!cexOutput2.empty()) {
-        toJson(cex["output2"], cexOutput2);
-      }
-    }
   }
   auto& par = res["parameterized"];
   par["performed_instantiations"] = performedInstantiations;

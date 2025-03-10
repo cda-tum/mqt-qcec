@@ -5,7 +5,8 @@ from __future__ import annotations
 import pytest
 from qiskit import QuantumCircuit, transpile
 
-from mqt import qcec
+from mqt.qcec import verify_compilation
+from mqt.qcec.pyqcec import EquivalenceCriterion
 
 
 @pytest.fixture
@@ -28,10 +29,10 @@ def test_verify_compilation_on_optimization_levels(original_circuit: QuantumCirc
         basis_gates=["cx", "x", "id", "u3", "measure", "u2", "rz", "u1", "reset", "sx"],
         optimization_level=optimization_level,
     )
-    result = qcec.verify_compilation(original_circuit, compiled_circuit, optimization_level=optimization_level)
+    result = verify_compilation(original_circuit, compiled_circuit, optimization_level=optimization_level)
     assert result.equivalence in {
-        qcec.EquivalenceCriterion.equivalent,
-        qcec.EquivalenceCriterion.equivalent_up_to_global_phase,
+        EquivalenceCriterion.equivalent,
+        EquivalenceCriterion.equivalent_up_to_global_phase,
     }
 
 
@@ -42,5 +43,5 @@ def test_warning_on_missing_measurements() -> None:
     qc.cx(0, 1)
 
     with pytest.warns(UserWarning, match=r"One of the circuits does not contain any measurements."):
-        result = qcec.verify_compilation(qc, qc)
-    assert result.equivalence == qcec.EquivalenceCriterion.equivalent
+        result = verify_compilation(qc, qc)
+    assert result.equivalence == EquivalenceCriterion.equivalent

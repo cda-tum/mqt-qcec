@@ -13,6 +13,7 @@
 
 #include <algorithm>
 #include <cstddef>
+#include <iosfwd>
 #include <nlohmann/json_fwd.hpp>
 #include <string>
 #include <thread>
@@ -57,7 +58,9 @@ public:
 
     // options for the gate cost application scheme
     std::string profile;
-    CostFunction costFunction = &legacyCostFunction;
+    CostFunction costFunction = [](const GateCostLookupTableKeyType& /*key*/) {
+      return 1U;
+    };
   };
 
   struct Functionality {
@@ -71,8 +74,6 @@ public:
     std::size_t maxSims = computeMaxSims();
     StateType stateType = StateType::ComputationalBasis;
     std::size_t seed = 0U;
-    bool storeCEXinput = false;
-    bool storeCEXoutput = false;
 
     // this function makes sure that the maximum number of simulations is
     // configured properly.
@@ -113,5 +114,8 @@ public:
   [[nodiscard]] nlohmann::json json() const;
 
   [[nodiscard]] std::string toString() const;
+
+  friend std::ostream& operator<<(std::ostream& os,
+                                  const Configuration& config);
 };
 } // namespace ec

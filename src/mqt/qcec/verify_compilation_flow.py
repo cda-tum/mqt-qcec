@@ -7,10 +7,10 @@ from typing import TYPE_CHECKING
 
 from mqt.core import load
 
-from . import ApplicationScheme, Configuration, EquivalenceCheckingManager
 from ._compat.importlib import resources
 from .compilation_flow_profiles import AncillaMode, generate_profile_name
 from .configuration import augment_config_from_kwargs
+from .pyqcec import ApplicationScheme, Configuration, EquivalenceCheckingManager
 from .verify import verify
 
 if TYPE_CHECKING:
@@ -76,7 +76,7 @@ def verify_compilation(
         compiled_circuit: The compiled circuit.
         optimization_level: The optimization level used for compiling the circuit (0, 1, 2, or 3). Defaults to 1.
         ancilla_mode:
-            The `ancilla mode <.AncillaMode>` used for realizing multi-controlled Toffoli gates, as available in Qiskit.
+            The :class:`ancilla mode <.AncillaMode>` used for realizing multi-controlled Toffoli gates, as available in Qiskit.
             Defaults to :attr:`.AncillaMode.NO_ANCILLA`.
         configuration: The configuration to use for the equivalence checking process.
         **kwargs: Keyword arguments to configure the equivalence checking process.

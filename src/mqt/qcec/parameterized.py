@@ -10,7 +10,7 @@ import numpy as np
 
 from mqt.core.ir.symbolic import Expression
 
-from . import Configuration, EquivalenceCheckingManager, EquivalenceCriterion
+from .pyqcec import Configuration, EquivalenceCheckingManager, EquivalenceCriterion
 
 if TYPE_CHECKING:
     from numpy.typing import NDArray
@@ -46,11 +46,9 @@ def check_parameterized_zx(
     """Check circuits for equivalence with the ZX-calculus."""
     ecm = EquivalenceCheckingManager(circ1, circ2, configuration)
     ecm.disable_all_checkers()
-    ecm.set_zx_checker()
-
+    ecm.configuration.execution.run_zx_checker = True
     ecm.run()
-
-    return ecm.get_results()
+    return ecm.results
 
 
 def __extract_params(
@@ -90,11 +88,9 @@ def check_instantiated(
 ) -> EquivalenceCheckingManager.Results:
     """Check circuits for equivalence with DD equivalence checker."""
     ecm = EquivalenceCheckingManager(circ1, circ2, configuration)
-    ecm.set_zx_checker(False)
-
+    ecm.configuration.execution.run_zx_checker = False
     ecm.run()
-
-    return ecm.get_results()
+    return ecm.results
 
 
 def check_instantiated_random(

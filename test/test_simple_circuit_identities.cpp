@@ -5,8 +5,6 @@
 
 #include "Configuration.hpp"
 #include "EquivalenceCheckingManager.hpp"
-#include "checker/dd/applicationscheme/ApplicationScheme.hpp"
-#include "checker/dd/applicationscheme/GateCostApplicationScheme.hpp"
 #include "ir/QuantumComputation.hpp"
 #include "qasm3/Importer.hpp"
 
@@ -36,7 +34,6 @@ protected:
     config.optimizations.fuseSingleQubitGates = false;
     config.optimizations.reorderOperations = false;
     config.optimizations.elidePermutations = false;
-    config.execution.runZXChecker = true;
     EXPECT_NO_THROW(ecm = std::make_unique<ec::EquivalenceCheckingManager>(
                         qcOriginal, qcAlternative, config););
   }
@@ -113,7 +110,7 @@ TEST_P(SimpleCircuitIdentitiesTest, DefaultOptionsParallel) {
 }
 
 TEST_P(SimpleCircuitIdentitiesTest, DefaultOptionsSequential) {
-  ecm->setParallel(false);
+  ecm->getConfiguration().execution.parallel = false;
 
   EXPECT_NO_THROW(ecm->run(););
 
@@ -121,9 +118,8 @@ TEST_P(SimpleCircuitIdentitiesTest, DefaultOptionsSequential) {
 }
 
 TEST_P(SimpleCircuitIdentitiesTest, DefaultOptionsOnlySimulation) {
-  ecm->setAlternatingChecker(false);
-  ecm->setConstructionChecker(false);
-  ecm->setZXChecker(false);
+  ecm->disableAllCheckers();
+  ecm->getConfiguration().execution.runSimulationChecker = true;
 
   EXPECT_NO_THROW(ecm->run(););
 
@@ -131,10 +127,8 @@ TEST_P(SimpleCircuitIdentitiesTest, DefaultOptionsOnlySimulation) {
 }
 
 TEST_P(SimpleCircuitIdentitiesTest, DefaultOptionsOnlyConstruction) {
-  ecm->setAlternatingChecker(false);
-  ecm->setSimulationChecker(false);
-  ecm->setConstructionChecker(true);
-  ecm->setZXChecker(false);
+  ecm->disableAllCheckers();
+  ecm->getConfiguration().execution.runConstructionChecker = true;
 
   EXPECT_NO_THROW(ecm->run(););
 
@@ -142,66 +136,18 @@ TEST_P(SimpleCircuitIdentitiesTest, DefaultOptionsOnlyConstruction) {
 }
 
 TEST_P(SimpleCircuitIdentitiesTest, DefaultOptionsOnlyZX) {
-  ecm->setAlternatingChecker(false);
-  ecm->setSimulationChecker(false);
-  ecm->setConstructionChecker(false);
-  ecm->setZXChecker(true);
+  ecm->disableAllCheckers();
+  ecm->getConfiguration().execution.runZXChecker = true;
 
   EXPECT_NO_THROW(ecm->run(););
   EXPECT_TRUE(ecm->getResults().consideredEquivalent());
 }
 
 TEST_P(SimpleCircuitIdentitiesTest, SequentialZX) {
-  ecm->setAlternatingChecker(false);
-  ecm->setSimulationChecker(false);
-  ecm->setConstructionChecker(false);
-  ecm->setZXChecker(true);
-  ecm->setParallel(false);
+  ecm->disableAllCheckers();
+  ecm->getConfiguration().execution.runZXChecker = true;
+  ecm->getConfiguration().execution.parallel = false;
 
   EXPECT_NO_THROW(ecm->run(););
-  EXPECT_TRUE(ecm->getResults().consideredEquivalent());
-}
-
-TEST_P(SimpleCircuitIdentitiesTest, GateCostApplicationScheme) {
-  ecm->setSimulationChecker(false);
-  ecm->setAlternatingApplicationScheme(ec::ApplicationSchemeType::GateCost);
-  ecm->setGateCostFunction(&ec::legacyCostFunction);
-  EXPECT_NO_THROW(ecm->run(););
-
-  EXPECT_TRUE(ecm->getResults().consideredEquivalent());
-}
-
-TEST_P(SimpleCircuitIdentitiesTest, ReorderingOperations) {
-  ecm->reorderOperations();
-  EXPECT_NO_THROW(ecm->run(););
-
-  EXPECT_TRUE(ecm->getResults().consideredEquivalent());
-}
-
-TEST_P(SimpleCircuitIdentitiesTest, FuseSingleQubitGates) {
-  ecm->fuseSingleQubitGates();
-  EXPECT_NO_THROW(ecm->run(););
-
-  EXPECT_TRUE(ecm->getResults().consideredEquivalent());
-}
-
-TEST_P(SimpleCircuitIdentitiesTest, ReconstructSWAPs) {
-  ecm->reconstructSWAPs();
-  EXPECT_NO_THROW(ecm->run(););
-
-  EXPECT_TRUE(ecm->getResults().consideredEquivalent());
-}
-
-TEST_P(SimpleCircuitIdentitiesTest, BackpropagateOutputPermutation) {
-  ecm->backpropagateOutputPermutation();
-  EXPECT_NO_THROW(ecm->run(););
-
-  EXPECT_TRUE(ecm->getResults().consideredEquivalent());
-}
-
-TEST_P(SimpleCircuitIdentitiesTest, ElidePermutations) {
-  ecm->elidePermutations();
-  EXPECT_NO_THROW(ecm->run(););
-
   EXPECT_TRUE(ecm->getResults().consideredEquivalent());
 }

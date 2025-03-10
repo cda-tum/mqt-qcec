@@ -107,7 +107,7 @@ repos:
           - nox
           - numpy
           - pytest
-          - mqt.core>=3.0.0b4
+          - mqt.core>=3.0.0b6
 
   # Check for spelling
   - repo: https://github.com/crate-ci/typos
@@ -144,3 +144,21 @@ repos:
     rev: 2025.02.24
     hooks:
       - id: validate-pyproject
+
+  # Tidy up BibTeX files
+  - repo: https://github.com/FlamingTempura/bibtex-tidy
+    rev: v1.14.0
+    hooks:
+      - id: bibtex-tidy
+        args:
+          [
+            "--align=20",
+            "--curly",
+            "--months",
+            "--blank-lines",
+            "--sort",
+            "--strip-enclosing-braces",
+            "--sort-fields",
+            "--trailing-commas",
+            "--remove-empty-fields",
+          ]

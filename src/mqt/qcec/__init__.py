@@ -24,24 +24,10 @@ if sys.platform == "win32":
     del _dll_patch
 
 from ._version import version as __version__
-from .compilation_flow_profiles import AncillaMode
-from .pyqcec import (
-    ApplicationScheme,
-    Configuration,
-    EquivalenceCheckingManager,
-    EquivalenceCriterion,
-    StateType,
-)
 from .verify import verify
 from .verify_compilation_flow import verify_compilation
 
 __all__ = [
-    "AncillaMode",
-    "ApplicationScheme",
-    "Configuration",
-    "EquivalenceCheckingManager",
-    "EquivalenceCriterion",
-    "StateType",
     "__version__",
     "verify",
     "verify_compilation",

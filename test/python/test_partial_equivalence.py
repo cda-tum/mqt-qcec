@@ -5,7 +5,8 @@ from __future__ import annotations
 import pytest
 from qiskit import QuantumCircuit
 
-from mqt import qcec
+from mqt.qcec import verify
+from mqt.qcec.pyqcec import Configuration, EquivalenceCriterion
 
 
 @pytest.fixture
@@ -32,13 +33,13 @@ def alternative_circuit() -> QuantumCircuit:
 
 def test_configuration_pec(original_circuit: QuantumCircuit, alternative_circuit: QuantumCircuit) -> None:
     """Test if the flag for partial equivalence checking works."""
-    config = qcec.Configuration()
+    config = Configuration()
     config.functionality.check_partial_equivalence = True
-    result = qcec.verify(original_circuit, alternative_circuit, configuration=config)
-    assert result.equivalence == qcec.EquivalenceCriterion.equivalent
+    result = verify(original_circuit, alternative_circuit, configuration=config)
+    assert result.equivalence == EquivalenceCriterion.equivalent
 
 
 def test_argument_pec(original_circuit: QuantumCircuit, alternative_circuit: QuantumCircuit) -> None:
     """Test if the flag for partial equivalence checking works."""
-    result = qcec.verify(original_circuit, alternative_circuit, check_partial_equivalence=True)
-    assert result.equivalence == qcec.EquivalenceCriterion.equivalent
+    result = verify(original_circuit, alternative_circuit, check_partial_equivalence=True)
+    assert result.equivalence == EquivalenceCriterion.equivalent
