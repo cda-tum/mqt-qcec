@@ -5,25 +5,26 @@
 
 #pragma once
 
-#include "Configuration.hpp"
 #include "DDEquivalenceChecker.hpp"
-#include "DDPackageConfigs.hpp"
 #include "EquivalenceCriterion.hpp"
 #include "checker/dd/TaskManager.hpp"
-#include "dd/Package_fwd.hpp"
-#include "ir/QuantumComputation.hpp"
+#include "dd/Node.hpp"
 
 #include <nlohmann/json_fwd.hpp>
 
+namespace qc {
+class QuantumComputation;
+}
+
 namespace ec {
+class Configuration;
 class StateGenerator;
 
-class DDSimulationChecker final
-    : public DDEquivalenceChecker<qc::VectorDD, SimulationDDPackageConfig> {
+class DDSimulationChecker final : public DDEquivalenceChecker<dd::VectorDD> {
 public:
   DDSimulationChecker(const qc::QuantumComputation& circ1,
                       const qc::QuantumComputation& circ2,
-                      Configuration configuration);
+                      Configuration config);
 
   void setRandomInitialState(StateGenerator& generator);
 
@@ -46,10 +47,9 @@ public:
 private:
   // the initial state used for simulation. defaults to the all-zero state
   // |0...0>
-  qc::VectorDD initialState{};
+  dd::VectorDD initialState{};
 
-  void initializeTask(TaskManager<qc::VectorDD, SimulationDDPackageConfig>&
-                          taskManager) override;
+  void initializeTask(TaskManager<dd::VectorDD>& taskManager) override;
   EquivalenceCriterion checkEquivalence() override;
 };
 } // namespace ec

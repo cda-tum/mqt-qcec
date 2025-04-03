@@ -3,10 +3,10 @@
 // See README.md or go to https://github.com/cda-tum/qcec for more information.
 //
 
-#include "Definitions.hpp"
 #include "EquivalenceCheckingManager.hpp"
 #include "EquivalenceCriterion.hpp"
 #include "dd/DDDefinitions.hpp"
+#include "ir/Definitions.hpp"
 #include "ir/QuantumComputation.hpp"
 #include "ir/operations/Control.hpp"
 #include "ir/operations/OpType.hpp"

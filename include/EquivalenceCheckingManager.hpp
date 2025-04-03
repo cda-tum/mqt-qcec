@@ -13,7 +13,7 @@
 #include "checker/dd/applicationscheme/ApplicationScheme.hpp"
 #include "checker/dd/applicationscheme/GateCostApplicationScheme.hpp"
 #include "checker/dd/simulation/StateGenerator.hpp"
-#include "dd/Package_fwd.hpp"
+#include "dd/Node.hpp"
 #include "ir/QuantumComputation.hpp"
 
 #include <condition_variable>
@@ -40,9 +40,9 @@ public:
 
     std::size_t startedSimulations = 0U;
     std::size_t performedSimulations = 0U;
-    qc::VectorDD cexInput{};
-    qc::VectorDD cexOutput1{};
-    qc::VectorDD cexOutput2{};
+    dd::VectorDD cexInput{};
+    dd::VectorDD cexOutput1{};
+    dd::VectorDD cexOutput2{};
     std::size_t performedInstantiations = 0U;
 
     nlohmann::json checkerResults = nlohmann::json::array();

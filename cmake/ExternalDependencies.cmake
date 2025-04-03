@@ -29,70 +29,43 @@ if(BUILD_MQT_QCEC_BINDINGS)
   endif()
 
   # add pybind11 library
-  find_package(pybind11 2.13.5 CONFIG REQUIRED)
+  find_package(pybind11 2.13.6 CONFIG REQUIRED)
 endif()
 
 # cmake-format: off
 set(MQT_CORE_VERSION 3.0.0
     CACHE STRING "MQT Core version")
-set(MQT_CORE_REV "f1f2de40b086293e093aa596e6391e94e7730d0b"
+set(MQT_CORE_REV "8fbea945dc64c69264f00c631f51c12b019d8916"
     CACHE STRING "MQT Core identifier (tag, branch or commit hash)")
-set(MQT_CORE_REPO_OWNER "cda-tum"
+set(MQT_CORE_REPO_OWNER "munich-quantum-toolkit"
 	CACHE STRING "MQT Core repository owner (change when using a fork)")
 # cmake-format: on
-if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.24)
-  FetchContent_Declare(
-    mqt-core
-    GIT_REPOSITORY https://github.com/${MQT_CORE_REPO_OWNER}/mqt-core.git
-    GIT_TAG ${MQT_CORE_REV}
-    FIND_PACKAGE_ARGS ${MQT_CORE_VERSION})
-  list(APPEND FETCH_PACKAGES mqt-core)
-else()
-  find_package(mqt-core ${MQT_CORE_VERSION} QUIET)
-  if(NOT mqt-core_FOUND)
-    FetchContent_Declare(
-      mqt-core
-      GIT_REPOSITORY https://github.com/${MQT_CORE_REPO_OWNER}/mqt-core.git
-      GIT_TAG ${MQT_CORE_REV})
-    list(APPEND FETCH_PACKAGES mqt-core)
-  endif()
-endif()
+FetchContent_Declare(
+  mqt-core
+  GIT_REPOSITORY https://github.com/${MQT_CORE_REPO_OWNER}/core.git
+  GIT_TAG ${MQT_CORE_REV}
+  FIND_PACKAGE_ARGS ${MQT_CORE_VERSION})
+list(APPEND FETCH_PACKAGES mqt-core)
 
 if(BUILD_MQT_QCEC_TESTS)
   set(gtest_force_shared_crt
       ON
       CACHE BOOL "" FORCE)
   set(GTEST_VERSION
-      1.14.0
+      1.16.0
       CACHE STRING "Google Test version")
   set(GTEST_URL https://github.com/google/googletest/archive/refs/tags/v${GTEST_VERSION}.tar.gz)
-  if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.24)
-    FetchContent_Declare(googletest URL ${GTEST_URL} FIND_PACKAGE_ARGS ${GTEST_VERSION} NAMES GTest)
-    list(APPEND FETCH_PACKAGES googletest)
-  else()
-    find_package(googletest ${GTEST_VERSION} QUIET NAMES GTest)
-    if(NOT googletest_FOUND)
-      FetchContent_Declare(googletest URL ${GTEST_URL})
-      list(APPEND FETCH_PACKAGES googletest)
-    endif()
-  endif()
+  FetchContent_Declare(googletest URL ${GTEST_URL} FIND_PACKAGE_ARGS ${GTEST_VERSION} NAMES GTest)
+  list(APPEND FETCH_PACKAGES googletest)
 endif()
 
 if(BUILD_MQT_QCEC_BINDINGS)
   # add pybind11_json library
-  if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.24)
-    FetchContent_Declare(
-      pybind11_json
-      GIT_REPOSITORY https://github.com/pybind/pybind11_json
-      FIND_PACKAGE_ARGS)
-    list(APPEND FETCH_PACKAGES pybind11_json)
-  else()
-    find_package(pybind11_json QUIET)
-    if(NOT pybind11_json_FOUND)
-      FetchContent_Declare(pybind11_json GIT_REPOSITORY https://github.com/pybind/pybind11_json)
-      list(APPEND FETCH_PACKAGES pybind11_json)
-    endif()
-  endif()
+  FetchContent_Declare(
+    pybind11_json
+    GIT_REPOSITORY https://github.com/pybind/pybind11_json
+    FIND_PACKAGE_ARGS)
+  list(APPEND FETCH_PACKAGES pybind11_json)
 endif()
 
 # Make all declared dependencies available.

@@ -4,9 +4,9 @@
 //
 
 #include "Configuration.hpp"
-#include "Definitions.hpp"
 #include "EquivalenceCheckingManager.hpp"
 #include "EquivalenceCriterion.hpp"
+#include "ir/Definitions.hpp"
 #include "ir/Permutation.hpp"
 #include "ir/QuantumComputation.hpp"
 #include "ir/operations/Control.hpp"

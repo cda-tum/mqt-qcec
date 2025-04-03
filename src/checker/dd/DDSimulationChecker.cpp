@@ -20,13 +20,14 @@ namespace ec {
 DDSimulationChecker::DDSimulationChecker(const qc::QuantumComputation& circ1,
                                          const qc::QuantumComputation& circ2,
                                          Configuration config)
-    : DDEquivalenceChecker(circ1, circ2, std::move(config)) {
+    : DDEquivalenceChecker(circ1, circ2, std::move(config),
+                           SimulationDDPackageConfig{}) {
   initialState = dd->makeZeroState(nqubits);
   initializeApplicationScheme(configuration.application.simulationScheme);
 }
 
 void DDSimulationChecker::initializeTask(
-    TaskManager<qc::VectorDD, SimulationDDPackageConfig>& taskManager) {
+    TaskManager<dd::VectorDD>& taskManager) {
   DDEquivalenceChecker::initializeTask(taskManager);
   taskManager.setInternalState(initialState);
   taskManager.incRef();

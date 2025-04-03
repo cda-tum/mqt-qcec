@@ -6,9 +6,9 @@
 #include "checker/zx/ZXChecker.hpp"
 
 #include "Configuration.hpp"
-#include "Definitions.hpp"
 #include "EquivalenceCriterion.hpp"
 #include "checker/EquivalenceChecker.hpp"
+#include "ir/Definitions.hpp"
 #include "ir/QuantumComputation.hpp"
 #include "zx/FunctionalityConstruction.hpp"
 #include "zx/Rules.hpp"
