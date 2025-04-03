@@ -14,6 +14,7 @@
 #include "checker/dd/applicationscheme/OneToOneApplicationScheme.hpp"
 #include "checker/dd/applicationscheme/ProportionalApplicationScheme.hpp"
 #include "checker/dd/applicationscheme/SequentialApplicationScheme.hpp"
+#include "dd/Node.hpp"
 
 #include <chrono>
 #include <nlohmann/json.hpp>
