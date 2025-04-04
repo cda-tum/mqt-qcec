@@ -5,7 +5,6 @@
 
 #include "EquivalenceCheckingManager.hpp"
 
-#include "Definitions.hpp"
 #include "EquivalenceCriterion.hpp"
 #include "ThreadSafeQueue.hpp"
 #include "checker/dd/DDAlternatingChecker.hpp"
@@ -15,6 +14,7 @@
 #include "checker/zx/ZXChecker.hpp"
 #include "circuit_optimizer/CircuitOptimizer.hpp"
 #include "dd/ComplexNumbers.hpp"
+#include "ir/Definitions.hpp"
 #include "ir/Permutation.hpp"
 #include "ir/QuantumComputation.hpp"
 #include "zx/FunctionalityConstruction.hpp"
@@ -36,6 +36,7 @@
 
 namespace ec {
 
+namespace {
 // Decrement logical qubit indices in the layout that exceed logicalQubitIndex
 void decrementLogicalQubitsInLayoutAboveIndex(
     qc::Permutation& layout, const qc::Qubit logicalQubitIndex) {
@@ -45,6 +46,7 @@ void decrementLogicalQubitsInLayoutAboveIndex(
     }
   }
 }
+} // namespace
 
 void EquivalenceCheckingManager::stripIdleQubits() {
   auto& largerCircuit = qc1.getNqubits() > qc2.getNqubits() ? qc1 : qc2;

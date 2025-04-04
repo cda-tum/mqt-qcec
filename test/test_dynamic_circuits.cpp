@@ -1,5 +1,4 @@
 #include "Configuration.hpp"
-#include "Definitions.hpp"
 #include "EquivalenceCheckingManager.hpp"
 #include "EquivalenceCriterion.hpp"
 #include "algorithms/BernsteinVazirani.hpp"
@@ -7,6 +6,7 @@
 #include "algorithms/QPE.hpp"
 #include "dd/DDDefinitions.hpp"
 #include "dd/Package.hpp"
+#include "ir/Definitions.hpp"
 #include "ir/QuantumComputation.hpp"
 
 #include <bitset>
@@ -28,7 +28,7 @@ protected:
   std::string expectedResultRepresentation;
   qc::QuantumComputation qpe;
   qc::QuantumComputation iqpe;
-  std::unique_ptr<dd::Package<>> dd;
+  std::unique_ptr<dd::Package> dd;
   std::ofstream ofs;
 
   ec::Configuration config{};
@@ -37,7 +37,7 @@ protected:
   void SetUp() override {
     precision = GetParam();
 
-    dd = std::make_unique<dd::Package<>>(precision + 1);
+    dd = std::make_unique<dd::Package>(precision + 1);
 
     qpe = qc::createQPE(precision);
 
@@ -121,7 +121,7 @@ protected:
   std::string secondExpectedResultRepresentation;
   qc::QuantumComputation qpe;
   qc::QuantumComputation iqpe;
-  std::unique_ptr<dd::Package<>> dd;
+  std::unique_ptr<dd::Package> dd;
   std::ofstream ofs;
 
   ec::Configuration config{};
@@ -130,7 +130,7 @@ protected:
   void SetUp() override {
     precision = GetParam();
 
-    dd = std::make_unique<dd::Package<>>(precision + 1);
+    dd = std::make_unique<dd::Package>(precision + 1);
 
     qpe = qc::createQPE(precision);
 
@@ -221,7 +221,7 @@ protected:
   qc::Qubit bitwidth{};
   qc::QuantumComputation bv;
   qc::QuantumComputation dbv;
-  std::unique_ptr<dd::Package<>> dd;
+  std::unique_ptr<dd::Package> dd;
   std::ofstream ofs;
 
   ec::Configuration config{};
@@ -230,7 +230,7 @@ protected:
   void SetUp() override {
     bitwidth = GetParam();
 
-    dd = std::make_unique<dd::Package<>>(bitwidth + 1);
+    dd = std::make_unique<dd::Package>(bitwidth + 1);
 
     bv = qc::createBernsteinVazirani(bitwidth);
 
@@ -271,7 +271,7 @@ protected:
   qc::Qubit precision{};
   qc::QuantumComputation qft;
   qc::QuantumComputation dqft;
-  std::unique_ptr<dd::Package<>> dd;
+  std::unique_ptr<dd::Package> dd;
   std::ofstream ofs;
 
   ec::Configuration config{};
@@ -280,7 +280,7 @@ protected:
   void SetUp() override {
     precision = GetParam();
 
-    dd = std::make_unique<dd::Package<>>(precision);
+    dd = std::make_unique<dd::Package>(precision);
 
     qft = qc::createQFT(precision);
 

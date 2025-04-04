@@ -5,41 +5,25 @@
 
 #pragma once
 
-#include "Configuration.hpp"
 #include "DDEquivalenceChecker.hpp"
-#include "DDPackageConfigs.hpp"
 #include "EquivalenceCriterion.hpp"
-#include "applicationscheme/LookaheadApplicationScheme.hpp"
-#include "dd/Package_fwd.hpp"
+#include "dd/Node.hpp"
 #include "ir/QuantumComputation.hpp"
 
 #include <nlohmann/json_fwd.hpp>
-#include <utility>
+
+namespace qc {
+class QuantumComputation;
+}
 
 namespace ec {
-class DDAlternatingChecker final
-    : public DDEquivalenceChecker<qc::MatrixDD, AlternatingDDPackageConfig> {
+class Configuration;
+
+class DDAlternatingChecker final : public DDEquivalenceChecker<dd::MatrixDD> {
 public:
   DDAlternatingChecker(const qc::QuantumComputation& circ1,
                        const qc::QuantumComputation& circ2,
-                       ec::Configuration config)
-      : DDEquivalenceChecker(circ1, circ2, std::move(config)) {
-    // gates from the second circuit shall be applied "from the right"
-    taskManager2.flipDirection();
-
-    initializeApplicationScheme(
-        this->configuration.application.alternatingScheme);
-
-    // special treatment for the lookahead application scheme
-    if (auto* lookahead = dynamic_cast<
-            LookaheadApplicationScheme<AlternatingDDPackageConfig>*>(
-            applicationScheme.get())) {
-      // initialize links for the internal state and the package of the
-      // lookahead scheme
-      lookahead->setInternalState(functionality);
-      lookahead->setPackage(dd.get());
-    }
-  }
+                       Configuration config);
 
   void json(nlohmann::json& j) const noexcept override;
 
@@ -50,7 +34,7 @@ public:
                         const qc::QuantumComputation& qc2);
 
 private:
-  qc::MatrixDD functionality{};
+  dd::MatrixDD functionality{};
 
   void initialize() override;
   void execute() override;

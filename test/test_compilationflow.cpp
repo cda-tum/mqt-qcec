@@ -177,10 +177,10 @@ TEST(CompilationFlowTest, CompilationFlowProfileFromFile) {
   auto qc = qc::QuantumComputation(3, 3);
   qc.mcx({1, 2}, 0);
 
-  auto dd = std::make_unique<dd::Package<>>(3);
-  auto tm = ec::TaskManager<qc::MatrixDD>(qc, *dd);
+  auto dd = std::make_unique<dd::Package>(3);
+  auto tm = TaskManager<dd::MatrixDD>(qc, *dd);
 
-  auto scheme = ec::GateCostApplicationScheme(tm, tm, filename, false);
+  auto scheme = GateCostApplicationScheme(tm, tm, filename, false);
 
   const auto [left, right] = scheme();
 
@@ -189,7 +189,7 @@ TEST(CompilationFlowTest, CompilationFlowProfileFromFile) {
 
   Configuration config{};
   config.application.profile = filename;
-  config.application.alternatingScheme = ec::ApplicationSchemeType::GateCost;
+  config.application.alternatingScheme = ApplicationSchemeType::GateCost;
   EquivalenceCheckingManager ecm(qc, qc, config);
   ecm.run();
   EXPECT_TRUE(ecm.getResults().consideredEquivalent());
@@ -198,7 +198,7 @@ TEST(CompilationFlowTest, CompilationFlowProfileFromFile) {
   const auto json = ecm.getConfiguration().json();
   EXPECT_EQ(json["application"]["profile"], filename);
   EXPECT_EQ(json["application"]["alternating"],
-            ec::toString(ec::ApplicationSchemeType::GateCost));
+            toString(ApplicationSchemeType::GateCost));
 
   ecm.reset();
   ecm.getConfiguration().application.profile = "";
@@ -208,7 +208,7 @@ TEST(CompilationFlowTest, CompilationFlowProfileFromFile) {
   const auto json2 = ecm.getConfiguration().json();
   EXPECT_EQ(json2["application"]["profile"], "cost_function");
   EXPECT_EQ(json["application"]["alternating"],
-            ec::toString(ec::ApplicationSchemeType::GateCost));
+            toString(ApplicationSchemeType::GateCost));
   // NOLINTEND(misc-const-correctness)
 }
 

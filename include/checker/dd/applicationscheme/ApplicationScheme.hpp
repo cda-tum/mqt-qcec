@@ -88,9 +88,9 @@ operator<<(std::ostream& out, const ApplicationSchemeType& applicationScheme) {
 // Given the current state of the check (tracked by two task managers), an
 // application scheme describes how to proceed with the check, i.e., how many
 // operations to apply from either circuit.
-template <class DDType, class Config> class ApplicationScheme {
+template <class DDType> class ApplicationScheme {
 protected:
-  using TM = TaskManager<DDType, Config>;
+  using TM = TaskManager<DDType>;
 
 public:
   ApplicationScheme(TM& tm1, TM& tm2) noexcept

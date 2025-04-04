@@ -12,13 +12,12 @@
 #include <utility>
 
 namespace ec {
-template <class DDType, class Config>
-class OneToOneApplicationScheme final
-    : public ApplicationScheme<DDType, Config> {
+template <class DDType>
+class OneToOneApplicationScheme final : public ApplicationScheme<DDType> {
 public:
-  OneToOneApplicationScheme(TaskManager<DDType, Config>& tm1,
-                            TaskManager<DDType, Config>& tm2) noexcept
-      : ApplicationScheme<DDType, Config>(tm1, tm2) {}
+  OneToOneApplicationScheme(TaskManager<DDType>& tm1,
+                            TaskManager<DDType>& tm2) noexcept
+      : ApplicationScheme<DDType>(tm1, tm2) {}
 
   std::pair<size_t, size_t> operator()() noexcept override { return {1U, 1U}; }
 };

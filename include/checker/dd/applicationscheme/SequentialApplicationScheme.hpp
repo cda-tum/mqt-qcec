@@ -12,13 +12,12 @@
 #include <utility>
 
 namespace ec {
-template <class DDType, class Config>
-class SequentialApplicationScheme final
-    : public ApplicationScheme<DDType, Config> {
+template <class DDType>
+class SequentialApplicationScheme final : public ApplicationScheme<DDType> {
 public:
-  SequentialApplicationScheme(TaskManager<DDType, Config>& tm1,
-                              TaskManager<DDType, Config>& tm2) noexcept
-      : ApplicationScheme<DDType, Config>(tm1, tm2),
+  SequentialApplicationScheme(TaskManager<DDType>& tm1,
+                              TaskManager<DDType>& tm2) noexcept
+      : ApplicationScheme<DDType>(tm1, tm2),
         gates1(tm1.getCircuit()->getNops()),
         gates2(tm2.getCircuit()->getNops()) {}
 

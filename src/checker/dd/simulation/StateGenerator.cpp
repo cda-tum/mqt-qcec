@@ -5,13 +5,12 @@
 
 #include "checker/dd/simulation/StateGenerator.hpp"
 
-#include "Definitions.hpp"
 #include "algorithms/RandomCliffordCircuit.hpp"
-#include "checker/dd/DDPackageConfigs.hpp"
 #include "checker/dd/simulation/StateType.hpp"
 #include "dd/DDDefinitions.hpp"
 #include "dd/Package.hpp"
 #include "dd/Simulation.hpp"
+#include "ir/Definitions.hpp"
 
 #include <algorithm>
 #include <array>
@@ -27,8 +26,8 @@
 
 namespace ec {
 
-qc::VectorDD StateGenerator::generateRandomState(
-    dd::Package<SimulationDDPackageConfig>& dd, const std::size_t totalQubits,
+dd::VectorDD StateGenerator::generateRandomState(
+    dd::Package& dd, const std::size_t totalQubits,
     const std::size_t ancillaryQubits, const StateType type) {
   switch (type) {
   case StateType::Random1QBasis:
@@ -41,8 +40,8 @@ qc::VectorDD StateGenerator::generateRandomState(
   }
 }
 
-qc::VectorDD StateGenerator::generateRandomComputationalBasisState(
-    dd::Package<SimulationDDPackageConfig>& dd, const std::size_t totalQubits,
+dd::VectorDD StateGenerator::generateRandomComputationalBasisState(
+    dd::Package& dd, const std::size_t totalQubits,
     const std::size_t ancillaryQubits) {
   // determine how many qubits truly are random
   const std::size_t randomQubits = totalQubits - ancillaryQubits;
@@ -91,9 +90,10 @@ qc::VectorDD StateGenerator::generateRandomComputationalBasisState(
   return dd.makeBasisState(totalQubits, stimulusBits);
 }
 
-qc::VectorDD StateGenerator::generateRandom1QBasisState(
-    dd::Package<SimulationDDPackageConfig>& dd, const std::size_t totalQubits,
-    const std::size_t ancillaryQubits) {
+dd::VectorDD
+StateGenerator::generateRandom1QBasisState(dd::Package& dd,
+                                           const std::size_t totalQubits,
+                                           const std::size_t ancillaryQubits) {
   // determine how many qubits truly are random
   const std::size_t randomQubits = totalQubits - ancillaryQubits;
 
@@ -129,8 +129,8 @@ qc::VectorDD StateGenerator::generateRandom1QBasisState(
   return dd.makeBasisState(totalQubits, randomBasisState);
 }
 
-qc::VectorDD StateGenerator::generateRandomStabilizerState(
-    dd::Package<SimulationDDPackageConfig>& dd, const std::size_t totalQubits,
+dd::VectorDD StateGenerator::generateRandomStabilizerState(
+    dd::Package& dd, const std::size_t totalQubits,
     const std::size_t ancillaryQubits) {
   // determine how many qubits truly are random
   const std::size_t randomQubits = totalQubits - ancillaryQubits;
@@ -148,7 +148,7 @@ qc::VectorDD StateGenerator::generateRandomStabilizerState(
   auto initial = stabilizer;
   for (std::size_t p = randomQubits; p < totalQubits; ++p) {
     initial = dd.makeDDNode(static_cast<dd::Qubit>(p),
-                            std::array{initial, qc::VectorDD::zero()});
+                            std::array{initial, dd::VectorDD::zero()});
     initial.p->ref = 1;
   }
 

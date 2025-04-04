@@ -14,14 +14,13 @@
 #include <utility>
 
 namespace ec {
-template <class DDType, class Config>
-class ProportionalApplicationScheme final
-    : public ApplicationScheme<DDType, Config> {
+template <class DDType>
+class ProportionalApplicationScheme final : public ApplicationScheme<DDType> {
 public:
-  ProportionalApplicationScheme(TaskManager<DDType, Config>& tm1,
-                                TaskManager<DDType, Config>& tm2,
+  ProportionalApplicationScheme(TaskManager<DDType>& tm1,
+                                TaskManager<DDType>& tm2,
                                 const bool singleQubitGateFusion) noexcept
-      : ApplicationScheme<DDType, Config>(tm1, tm2),
+      : ApplicationScheme<DDType>(tm1, tm2),
         singleQubitGateFusionEnabled(singleQubitGateFusion) {}
 
   std::pair<size_t, size_t> operator()() noexcept override {

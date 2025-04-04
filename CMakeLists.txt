@@ -1,9 +1,9 @@
 # set required cmake version
-cmake_minimum_required(VERSION 3.19...3.30)
+cmake_minimum_required(VERSION 3.24...4.0)
 
 project(
   mqt-qcec
-  LANGUAGES CXX
+  LANGUAGES C CXX
   DESCRIPTION "MQT QCEC - A tool for Quantum Circuit Equivalence Checking")
 
 option(BUILD_MQT_QCEC_BINDINGS "Build the MQT QCEC Python bindings" OFF)

@@ -6,10 +6,8 @@
 #pragma once
 
 #include "StateType.hpp"
-#include "checker/dd/DDPackageConfigs.hpp"
 #include "dd/Package_fwd.hpp"
 
-#include <cassert>
 #include <cstddef>
 #include <random>
 #include <unordered_set>
@@ -22,24 +20,23 @@ public:
   }
   StateGenerator() : StateGenerator(0U) {}
 
-  qc::VectorDD
-  generateRandomState(dd::Package<SimulationDDPackageConfig>& dd,
-                      std::size_t totalQubits, std::size_t ancillaryQubits = 0U,
+  dd::VectorDD
+  generateRandomState(dd::Package& dd, std::size_t totalQubits,
+                      std::size_t ancillaryQubits = 0U,
                       StateType type = StateType::ComputationalBasis);
 
-  qc::VectorDD generateRandomComputationalBasisState(
-      dd::Package<SimulationDDPackageConfig>& dd, std::size_t totalQubits,
-      std::size_t ancillaryQubits = 0U);
+  dd::VectorDD
+  generateRandomComputationalBasisState(dd::Package& dd,
+                                        std::size_t totalQubits,
+                                        std::size_t ancillaryQubits = 0U);
 
-  qc::VectorDD
-  generateRandom1QBasisState(dd::Package<SimulationDDPackageConfig>& dd,
-                             std::size_t totalQubits,
-                             std::size_t ancillaryQubits = 0U);
+  dd::VectorDD generateRandom1QBasisState(dd::Package& dd,
+                                          std::size_t totalQubits,
+                                          std::size_t ancillaryQubits = 0U);
 
-  qc::VectorDD
-  generateRandomStabilizerState(dd::Package<SimulationDDPackageConfig>& dd,
-                                std::size_t totalQubits,
-                                std::size_t ancillaryQubits = 0U);
+  dd::VectorDD generateRandomStabilizerState(dd::Package& dd,
+                                             std::size_t totalQubits,
+                                             std::size_t ancillaryQubits = 0U);
 
   void seedGenerator(std::size_t s);
 

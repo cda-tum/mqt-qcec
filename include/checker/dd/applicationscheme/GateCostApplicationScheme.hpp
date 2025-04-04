@@ -20,16 +20,14 @@
 #include <unordered_map>
 #include <utility>
 
-namespace std {
-template <> struct hash<std::pair<qc::OpType, std::size_t>> {
+template <> struct std::hash<std::pair<qc::OpType, std::size_t>> {
   std::size_t
   operator()(pair<qc::OpType, std::size_t> const& key) const noexcept {
     const std::size_t h1 = hash<decltype(key.first)>{}(key.first);
     const std::size_t h2 = hash<decltype(key.second)>{}(key.second);
     return h1 ^ (h2 << 1);
   }
-};
-} // namespace std
+}; // namespace std
 
 namespace ec {
 using GateCostLookupTableKeyType = std::pair<qc::OpType, std::size_t>;
@@ -38,25 +36,22 @@ using GateCostLookupTable =
 using CostFunction =
     std::function<std::size_t(const GateCostLookupTableKeyType&)>;
 
-template <class DDType, class Config>
-class GateCostApplicationScheme final
-    : public ApplicationScheme<DDType, Config> {
+template <class DDType>
+class GateCostApplicationScheme final : public ApplicationScheme<DDType> {
 public:
-  GateCostApplicationScheme(TaskManager<DDType, Config>& tm1,
-                            TaskManager<DDType, Config>& tm2,
+  GateCostApplicationScheme(TaskManager<DDType>& tm1, TaskManager<DDType>& tm2,
                             const CostFunction& costFunction,
                             const bool singleQubitGateFusion)
-      : ApplicationScheme<DDType, Config>(tm1, tm2),
+      : ApplicationScheme<DDType>(tm1, tm2),
         singleQubitGateFusionEnabled(singleQubitGateFusion) {
     populateLookupTable(costFunction, tm1.getCircuit());
     populateLookupTable(costFunction, tm2.getCircuit());
   }
 
-  GateCostApplicationScheme(TaskManager<DDType, Config>& tm1,
-                            TaskManager<DDType, Config>& tm2,
+  GateCostApplicationScheme(TaskManager<DDType>& tm1, TaskManager<DDType>& tm2,
                             const std::string& filename,
                             const bool singleQubitGateFusion)
-      : ApplicationScheme<DDType, Config>(tm1, tm2),
+      : ApplicationScheme<DDType>(tm1, tm2),
         singleQubitGateFusionEnabled(singleQubitGateFusion) {
     populateLookupTable(filename);
   }
@@ -76,7 +71,7 @@ public:
     const auto key =
         GateCostLookupTableKeyType{op->getType(), op->getNcontrols()};
     std::size_t cost = 1U;
-    if (auto it = gateCostLookupTable.find(key);
+    if (const auto it = gateCostLookupTable.find(key);
         it != gateCostLookupTable.end()) {
       cost = it->second;
     }
@@ -130,7 +125,4 @@ private:
     }
   }
 };
-
-[[nodiscard, gnu::pure]] std::size_t
-legacyCostFunction(const GateCostLookupTableKeyType& key) noexcept;
 } // namespace ec
