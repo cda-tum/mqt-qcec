@@ -46,9 +46,9 @@ except ModuleNotFoundError:
 release = version.split("+")[0]
 
 project = "MQT QCEC"
-author = "Chair for Design Automation, Technical University of Munich"
+author = "Chair for Design Automation, TUM & Munich Quantum Software Company"
 language = "en"
-project_copyright = "2025, Chair for Design Automation, Technical University of Munich"
+project_copyright = "2023 - 2025 Chair for Design Automation, TUM & 2025 Munich Quantum Software Company"
 
 master_doc = "index"
 
@@ -186,7 +186,9 @@ latex_documents = [
         master_doc,
         "mqt_qcec.tex",
         r"MQT QCEC\\{\Large A tool for Quantum Circuit Equivalence Checking}",
-        r"Chair for Design Automation\\Technical University of Munich",
+        r"""Chair for Design Automation\\ Technical University of Munich, Germany\\
+        \href{mailto:quantum.cda@xcit.tum.de}{quantum.cda@xcit.tum.de}\\
+        Munich Quantum Software Company GmbH\\Garching near Munich, Germany""",
         "howto",
         False,
     ),
