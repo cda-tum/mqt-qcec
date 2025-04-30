@@ -62,10 +62,10 @@ dynamic = ["version"]
 qiskit = ["qiskit[qasm3-import]>=1.0.0"]
 
 [project.urls]
-Homepage = "https://github.com/cda-tum/mqt-qcec"
+Homepage = "https://github.com/munich-quantum-toolkit/qcec"
 Documentation = "https://mqt.readthedocs.io/projects/qcec"
-Issues = "https://github.com/cda-tum/mqt-qcec/issues"
-Discussions = "https://github.com/cda-tum/mqt-qcec/discussions"
+Issues = "https://github.com/munich-quantum-toolkit/qcec/issues"
+Discussions = "https://github.com/munich-quantum-toolkit/qcec/discussions"
 
 
 [tool.scikit-build]

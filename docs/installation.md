@@ -98,7 +98,7 @@ $ uv pip install mqt.qcec --no-binary mqt.qcec --no-binary mqt.core
 
 This requires a [C++ compiler supporting C++17](https://en.wikipedia.org/wiki/List_of_compilers#C++_compilers) and a minimum [CMake](https://cmake.org/) version of 3.24.
 The library is continuously tested under Linux, MacOS, and Windows using the [latest available system versions for GitHub Actions](https://github.com/actions/virtual-environments).
-In order to access the latest build logs, visit the [GitHub Actions page](https://github.com/cda-tum/mqt-qcec/actions/workflows/ci.yml).
+In order to access the latest build logs, visit the [GitHub Actions page](https://github.com/munich-quantum-toolkit/qcec/actions/workflows/ci.yml).
 
 ## Integrating MQT QCEC into your project
 
@@ -195,7 +195,7 @@ However, handling git submodules can be cumbersome, especially when working with
 First, add the submodule to your project (e.g., in the `external` directory) via:
 
 ```console
-$ git submodule add https://github.com/cda-tum/mqt-qcec.git external/mqt-qcec
+$ git submodule add https://github.com/munich-quantum-toolkit/qcec.git external/mqt-qcec
 ```
 
 Then, add the following lines to your `CMakeLists.txt` to make the library's targets available in your project:

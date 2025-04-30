@@ -13,16 +13,16 @@ See <https://docs.github.com/en/get-started/quickstart> for a general introducti
 You can contribute in several ways:
 
 - 🐛 Report Bugs
-  : Report bugs at <https://github.com/cda-tum/mqt-qcec/issues> using the _🐛 Bug report_ issue template. Please make sure to fill out all relevant information in the respective issue form.
+  : Report bugs at <https://github.com/munich-quantum-toolkit/qcec/issues> using the _🐛 Bug report_ issue template. Please make sure to fill out all relevant information in the respective issue form.
 
 - 🐛 Fix Bugs
-  : Look through the [GitHub Issues](https://github.com/cda-tum/mqt-qcec/issues) for bugs. Anything tagged with "bug" is open to whoever wants to try and fix it.
+  : Look through the [GitHub Issues](https://github.com/munich-quantum-toolkit/qcec/issues) for bugs. Anything tagged with "bug" is open to whoever wants to try and fix it.
 
 - ✨ Propose New Features
-  : Propose new features at <https://github.com/cda-tum/mqt-qcec/issues> using the _✨ Feature request_ issue template. Please make sure to fill out all relevant information in the respective issue form.
+  : Propose new features at <https://github.com/munich-quantum-toolkit/qcec/issues> using the _✨ Feature request_ issue template. Please make sure to fill out all relevant information in the respective issue form.
 
 - ✨ Implement New Features
-  : Look through the [GitHub Issues](https://github.com/cda-tum/mqt-qcec/issues) for features. Anything tagged with "feature" or "enhancement" is open to whoever wants to implement it. We highly appreciate external contributions to the project.
+  : Look through the [GitHub Issues](https://github.com/munich-quantum-toolkit/qcec/issues) for features. Anything tagged with "feature" or "enhancement" is open to whoever wants to implement it. We highly appreciate external contributions to the project.
 
 - 📝 Write Documentation
   : MQT QCEC could always use some more documentation, and we appreciate any help with that.
