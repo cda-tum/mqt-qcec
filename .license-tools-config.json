@@ -14,7 +14,6 @@
     ".td": "SLASH_STYLE",
     ".yaml": "POUND_STYLE",
     ".toml": "POUND_STYLE",
-    ".profile": "POUND_STYLE",
     ".yml": "POUND_STYLE"
   },
   "exclude": [
@@ -31,6 +30,7 @@
     ".*\\.qc",
     ".*\\.real",
     ".*\\.tex",
+    ".*\\.profile",
     "uv\\.lock",
     "py\\.typed",
     ".*build.*"
