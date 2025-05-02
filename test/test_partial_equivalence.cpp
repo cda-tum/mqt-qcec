@@ -897,6 +897,7 @@ TEST_F(PartialEquivalenceTest, ConstructionCheckerSliQECPeriodFinding8Qubits) {
   EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::Equivalent);
 }
 
+namespace {
 void partialEquivalencCheckingBenchmarks(const qc::Qubit minN,
                                          const qc::Qubit maxN,
                                          const size_t reps,
@@ -935,6 +936,7 @@ void partialEquivalencCheckingBenchmarks(const qc::Qubit minN,
               << "\n";
   }
 }
+} // namespace
 
 TEST_F(PartialEquivalenceTest, Benchmark) {
   config.execution.runConstructionChecker = true;
