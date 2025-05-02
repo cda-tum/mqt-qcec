@@ -26,6 +26,7 @@
 
 namespace dd {
 
+namespace {
 const std::vector<std::vector<qc::OpType>> PRE_GENERATED_CIRCUITS_SIZE_1_1{
     {}, {}, {}, {}};
 
@@ -350,7 +351,7 @@ generatePartiallyEquivalentCircuits(const size_t n, const qc::Qubit d,
 
   return std::make_pair(circuit1, circuit2);
 }
-
+} // namespace
 } // namespace dd
 
 class PartialEquivalenceTest : public testing::Test {
