@@ -22,7 +22,7 @@
 #include <string>
 
 namespace ec {
-
+namespace {
 [[nodiscard]] std::size_t
 legacyCostFunction(const GateCostLookupTableKeyType& key) noexcept {
   const auto [gate, nc] = key;
@@ -48,7 +48,7 @@ legacyCostFunction(const GateCostLookupTableKeyType& key) noexcept {
     case qc::RX:
     case qc::RY:
     case qc::RZ:
-    // the following are merely placeholders so that the check can advance
+      // the following are merely placeholders so that the check can advance
     case qc::Compound:
     case qc::Measure:
     case qc::Reset:
@@ -67,10 +67,10 @@ legacyCostFunction(const GateCostLookupTableKeyType& key) noexcept {
 
   switch (gate) {
   case qc::X:
-    return 2UL * (nc - 2UL) *
-               ((2UL * legacyCostFunction({qc::P, 0})) +
-                (2UL * legacyCostFunction({qc::U2, 0})) +
-                (3UL * legacyCostFunction({qc::X, 1}))) +
+    return (2UL * (nc - 2UL) *
+            ((2UL * legacyCostFunction({qc::P, 0})) +
+             (2UL * legacyCostFunction({qc::U2, 0})) +
+             (3UL * legacyCostFunction({qc::X, 1})))) +
            (6UL * legacyCostFunction({qc::X, 1})) +
            (8UL * legacyCostFunction({qc::U, 0}));
   case qc::U:
@@ -105,6 +105,7 @@ legacyCostFunction(const GateCostLookupTableKeyType& key) noexcept {
     return 1U;
   }
 }
+} // namespace
 
 class CompilationFlowTest : public testing::TestWithParam<std::string> {
 protected:

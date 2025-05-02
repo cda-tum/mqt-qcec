@@ -26,6 +26,7 @@
 
 namespace dd {
 
+namespace {
 const std::vector<std::vector<qc::OpType>> PRE_GENERATED_CIRCUITS_SIZE_1_1{
     {}, {}, {}, {}};
 
@@ -350,7 +351,7 @@ generatePartiallyEquivalentCircuits(const size_t n, const qc::Qubit d,
 
   return std::make_pair(circuit1, circuit2);
 }
-
+} // namespace
 } // namespace dd
 
 class PartialEquivalenceTest : public testing::Test {
@@ -896,6 +897,7 @@ TEST_F(PartialEquivalenceTest, ConstructionCheckerSliQECPeriodFinding8Qubits) {
   EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::Equivalent);
 }
 
+namespace {
 void partialEquivalencCheckingBenchmarks(const qc::Qubit minN,
                                          const qc::Qubit maxN,
                                          const size_t reps,
@@ -934,6 +936,7 @@ void partialEquivalencCheckingBenchmarks(const qc::Qubit minN,
               << "\n";
   }
 }
+} // namespace
 
 TEST_F(PartialEquivalenceTest, Benchmark) {
   config.execution.runConstructionChecker = true;
