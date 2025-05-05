@@ -15,7 +15,6 @@
 #include "checker/EquivalenceChecker.hpp"
 #include "ir/Permutation.hpp"
 #include "ir/QuantumComputation.hpp"
-#include "zx/FunctionalityConstruction.hpp"
 #include "zx/Rules.hpp"
 #include "zx/ZXDefinitions.hpp"
 #include "zx/ZXDiagram.hpp"
