@@ -29,36 +29,66 @@ ZXEquivalenceChecker::ZXEquivalenceChecker(const qc::QuantumComputation& circ1,
     : EquivalenceChecker(circ1, circ2, std::move(config)),
       miter(zx::FunctionalityConstruction::buildFunctionality(qc1)),
       tolerance(configuration.functionality.traceThreshold) {
+
   zx::ZXDiagram dPrime = zx::FunctionalityConstruction::buildFunctionality(qc2);
 
   if ((qc1->getNancillae() != 0U) || (qc2->getNancillae() != 0U)) {
     ancilla = true;
   }
 
+  
   const auto& p1 = invertPermutations(*qc1);
   const auto& p2 = invertPermutations(*qc2);
 
+
+  bool miterEmpty = qc1->getNqubits()-qc1->getNancillae() == 0;
+  bool dPrimeEmpty = qc2->getNqubits() - qc2->getNancillae() == 0;
   // fix ancillaries to |0>
   const auto nQubitsWithoutAncillae =
       static_cast<zx::Qubit>(qc1->getNqubitsWithoutAncillae());
-  for (auto anc = static_cast<zx::Qubit>(qc1->getNqubits() - 1U);
-       anc >= nQubitsWithoutAncillae; --anc) {
-    miter.makeAncilla(
-        anc, static_cast<zx::Qubit>(p1.at(static_cast<qc::Qubit>(anc))));
-    dPrime.makeAncilla(
-        anc, static_cast<zx::Qubit>(p2.at(static_cast<qc::Qubit>(anc))));
+
+  if (miterEmpty) {
+    this->miter = zx::ZXDiagram();
+
+  } else {
+    for (zx::Qubit i = 0;
+         i < static_cast<zx::Qubit>(qc1->getNqubits()) - nQubitsWithoutAncillae;
+         ++i) {
+      zx::Qubit const anc = static_cast<zx::Qubit>(qc1->getNqubits()) - i - 1;
+      miter.makeAncilla(
+          anc, static_cast<zx::Qubit>(p1.at(static_cast<qc::Qubit>(anc))));
+    }
+    miter.invert();
   }
-  miter.invert();
+
+  if (dPrimeEmpty) {
+    return;
+  }
+    for (zx::Qubit i = 0;
+         i < static_cast<zx::Qubit>(qc2->getNqubits()) - nQubitsWithoutAncillae;
+         ++i) {
+      zx::Qubit const anc = static_cast<zx::Qubit>(qc2->getNqubits()) - i - 1;
+      dPrime.makeAncilla(
+          anc, static_cast<zx::Qubit>(p2.at(static_cast<qc::Qubit>(anc))));
+  }
   miter.concat(dPrime);
 }
 
 EquivalenceCriterion ZXEquivalenceChecker::run() {
   const auto start = std::chrono::steady_clock::now();
-
+  if (miter.getNQubits() == 0) {
+      if (miter.globalPhaseIsZero()) {
+       return EquivalenceCriterion::Equivalent;
+      } else {
+      return EquivalenceCriterion::EquivalentUpToGlobalPhase;
+      }
+  }
   fullReduceApproximate();
 
   bool equivalent = true;
 
+  std::cout << miter.getNQubits() << " qubits, " << miter.getNEdges()
+            << " edges, " << miter.getNVertices() << " vertices" << std::endl;
   if (miter.getNEdges() == miter.getNQubits()) {
     const auto& p1 = invert(invertPermutations(*qc1));
     const auto& p2 = invert(invertPermutations(*qc2));
@@ -252,4 +282,15 @@ bool ZXEquivalenceChecker::cliffordSimp() {
   return simplified;
 }
 
-} // namespace ec
+  bool ZXEquivalenceChecker::canHandle(const qc::QuantumComputation& qc1,
+                                       const qc::QuantumComputation& qc2) {
+    // no non-garbage ancillas allowed
+
+    if (qc1.getNancillae() - qc1.getNgarbageQubits() != 0U || qc2.getNancillae() - qc2.getNgarbageQubits()!= 0U ) {
+        return false;
+    }
+        return zx::FunctionalityConstruction::transformableToZX(&qc1) &&
+               zx::FunctionalityConstruction::transformableToZX(&qc2);
+
+  }
+}// namespace ec

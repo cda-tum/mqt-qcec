@@ -13,6 +13,7 @@
 #include "zx/Rules.hpp"
 #include "zx/ZXDefinitions.hpp"
 #include "zx/ZXDiagram.hpp"
+#include "zx/FunctionalityConstruction.hpp"
 
 #include <cstddef>
 #include <nlohmann/json.hpp>
@@ -26,6 +27,9 @@ public:
 
   EquivalenceCriterion run() override;
 
+  static bool canHandle(const qc::QuantumComputation& qc1,
+                        const qc::QuantumComputation& qc2); 
+  
   void json(nlohmann::basic_json<>& j) const noexcept override {
     EquivalenceChecker::json(j);
     j["checker"] = "zx";

@@ -529,8 +529,7 @@ void EquivalenceCheckingManager::checkSequential() {
   }
 
   if (configuration.execution.runZXChecker && !done) {
-    if (zx::FunctionalityConstruction::transformableToZX(&qc1) &&
-        zx::FunctionalityConstruction::transformableToZX(&qc2)) {
+    if (ZXEquivalenceChecker::canHandle(qc1, qc2)) {
       checkers.emplace_back(
           std::make_unique<ZXEquivalenceChecker>(qc1, qc2, configuration));
       const auto& zxChecker = checkers.back();

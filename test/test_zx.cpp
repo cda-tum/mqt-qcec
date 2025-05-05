@@ -16,6 +16,7 @@
 #include <gtest/gtest.h>
 #include <iostream>
 #include <memory>
+#include <ostream>
 #include <sstream>
 #include <string>
 
@@ -186,6 +187,7 @@ TEST_F(ZXTest, Ancilla) {
   qc1.i(0);
   qc2.cx(1, 0);
   qc2.setLogicalQubitAncillary(1);
+  qc2.setLogicalQubitGarbage(1);
 
   ecm = std::make_unique<ec::EquivalenceCheckingManager>(qc1, qc2, config);
   ecm->run();
@@ -467,7 +469,7 @@ TEST_F(ZXTest, EmptyCircuitWithAncillas) {
 
   ecm->run();
   EXPECT_EQ(ecm->getResults().equivalence,
-            ec::EquivalenceCriterion::NotEquivalent);
+            ec::EquivalenceCriterion::NoInformation);
 }
 
 TEST_F(ZXTest, EmptyCircuitWithAncillasAndGarbage) {
