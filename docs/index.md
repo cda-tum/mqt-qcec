@@ -43,6 +43,8 @@ compilation_flow_verification
 parametrized_circuits
 partial_equivalence
 references
+CHANGELOG
+UPGRADING
 ```
 
 ````{only} not latex
