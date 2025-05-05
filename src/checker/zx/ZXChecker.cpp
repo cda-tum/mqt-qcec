@@ -82,8 +82,8 @@ EquivalenceCriterion ZXEquivalenceChecker::run() {
   if (miter.getNQubits() == 0) {
     if (miter.globalPhaseIsZero()) {
       return EquivalenceCriterion::Equivalent;
-    } 
-      return EquivalenceCriterion::EquivalentUpToGlobalPhase;
+    }
+    return EquivalenceCriterion::EquivalentUpToGlobalPhase;
   }
   fullReduceApproximate();
 
