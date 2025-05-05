@@ -44,8 +44,8 @@ ZXEquivalenceChecker::ZXEquivalenceChecker(const qc::QuantumComputation& circ1,
   const auto& p1 = invertPermutations(*qc1);
   const auto& p2 = invertPermutations(*qc2);
 
-  bool miterEmpty = qc1->getNqubits() - qc1->getNancillae() == 0;
-  bool dPrimeEmpty = qc2->getNqubits() - qc2->getNancillae() == 0;
+  const bool miterEmpty = qc1->getNqubits() - qc1->getNancillae() == 0;
+  const bool dPrimeEmpty = qc2->getNqubits() - qc2->getNancillae() == 0;
   // fix ancillaries to |0>
   const auto nQubitsWithoutAncillae =
       static_cast<zx::Qubit>(qc1->getNqubitsWithoutAncillae());
@@ -82,16 +82,13 @@ EquivalenceCriterion ZXEquivalenceChecker::run() {
   if (miter.getNQubits() == 0) {
     if (miter.globalPhaseIsZero()) {
       return EquivalenceCriterion::Equivalent;
-    } else {
+    } 
       return EquivalenceCriterion::EquivalentUpToGlobalPhase;
-    }
   }
   fullReduceApproximate();
 
   bool equivalent = true;
 
-  std::cout << miter.getNQubits() << " qubits, " << miter.getNEdges()
-            << " edges, " << miter.getNVertices() << " vertices" << std::endl;
   if (miter.getNEdges() == miter.getNQubits()) {
     const auto& p1 = invert(invertPermutations(*qc1));
     const auto& p2 = invert(invertPermutations(*qc2));
