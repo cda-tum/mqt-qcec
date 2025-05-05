@@ -43,33 +43,26 @@ ZXEquivalenceChecker::ZXEquivalenceChecker(const qc::QuantumComputation& circ1,
   const auto& p1 = invertPermutations(*qc1);
   const auto& p2 = invertPermutations(*qc2);
 
-  const bool miterEmpty = qc1->getNqubits() - qc1->getNancillae() == 0;
-  const bool dPrimeEmpty = qc2->getNqubits() - qc2->getNancillae() == 0;
   // fix ancillaries to |0>
-  const auto nQubitsWithoutAncillae =
-      static_cast<zx::Qubit>(qc1->getNqubitsWithoutAncillae());
-
-  if (miterEmpty) {
-    this->miter = zx::ZXDiagram();
-
+  if (qc1->getNqubitsWithoutAncillae() == 0) {
+    miter = zx::ZXDiagram();
   } else {
-    for (zx::Qubit i = 0;
-         i < static_cast<zx::Qubit>(qc1->getNqubits()) - nQubitsWithoutAncillae;
+    const auto numQubits1 = static_cast<zx::Qubit>(qc1->getNqubits());
+    for (zx::Qubit i = 0; i < static_cast<zx::Qubit>(qc1->getNancillae());
          ++i) {
-      zx::Qubit const anc = static_cast<zx::Qubit>(qc1->getNqubits()) - i - 1;
+      const auto anc = numQubits1 - i - 1;
       miter.makeAncilla(
           anc, static_cast<zx::Qubit>(p1.at(static_cast<qc::Qubit>(anc))));
     }
     miter.invert();
   }
 
-  if (dPrimeEmpty) {
+  if (qc2->getNqubitsWithoutAncillae() == 0) {
     return;
   }
-  for (zx::Qubit i = 0;
-       i < static_cast<zx::Qubit>(qc2->getNqubits()) - nQubitsWithoutAncillae;
-       ++i) {
-    zx::Qubit const anc = static_cast<zx::Qubit>(qc2->getNqubits()) - i - 1;
+  const auto numQubits2 = static_cast<zx::Qubit>(qc2->getNqubits());
+  for (zx::Qubit i = 0; i < static_cast<zx::Qubit>(qc2->getNancillae()); ++i) {
+    const auto anc = numQubits2 - i - 1;
     dPrime.makeAncilla(
         anc, static_cast<zx::Qubit>(p2.at(static_cast<qc::Qubit>(anc))));
   }
