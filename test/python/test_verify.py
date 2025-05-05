@@ -99,7 +99,7 @@ def test_cpp_exception_propagation_internal() -> None:
     config.execution.run_construction_checker = False
     config.execution.run_zx_checker = False
     config.application.simulation_scheme = ApplicationScheme.lookahead
-    
+
     with pytest.raises(ValueError, match="Lookahead application scheme can only be used for matrices."):
         qcec.verify(qc, qc, configuration=config)
 

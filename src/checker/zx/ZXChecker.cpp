@@ -41,12 +41,10 @@ ZXEquivalenceChecker::ZXEquivalenceChecker(const qc::QuantumComputation& circ1,
     ancilla = true;
   }
 
-  
   const auto& p1 = invertPermutations(*qc1);
   const auto& p2 = invertPermutations(*qc2);
 
-
-  bool miterEmpty = qc1->getNqubits()-qc1->getNancillae() == 0;
+  bool miterEmpty = qc1->getNqubits() - qc1->getNancillae() == 0;
   bool dPrimeEmpty = qc2->getNqubits() - qc2->getNancillae() == 0;
   // fix ancillaries to |0>
   const auto nQubitsWithoutAncillae =
@@ -69,12 +67,12 @@ ZXEquivalenceChecker::ZXEquivalenceChecker(const qc::QuantumComputation& circ1,
   if (dPrimeEmpty) {
     return;
   }
-    for (zx::Qubit i = 0;
-         i < static_cast<zx::Qubit>(qc2->getNqubits()) - nQubitsWithoutAncillae;
-         ++i) {
-      zx::Qubit const anc = static_cast<zx::Qubit>(qc2->getNqubits()) - i - 1;
-      dPrime.makeAncilla(
-          anc, static_cast<zx::Qubit>(p2.at(static_cast<qc::Qubit>(anc))));
+  for (zx::Qubit i = 0;
+       i < static_cast<zx::Qubit>(qc2->getNqubits()) - nQubitsWithoutAncillae;
+       ++i) {
+    zx::Qubit const anc = static_cast<zx::Qubit>(qc2->getNqubits()) - i - 1;
+    dPrime.makeAncilla(
+        anc, static_cast<zx::Qubit>(p2.at(static_cast<qc::Qubit>(anc))));
   }
   miter.concat(dPrime);
 }
@@ -82,11 +80,11 @@ ZXEquivalenceChecker::ZXEquivalenceChecker(const qc::QuantumComputation& circ1,
 EquivalenceCriterion ZXEquivalenceChecker::run() {
   const auto start = std::chrono::steady_clock::now();
   if (miter.getNQubits() == 0) {
-      if (miter.globalPhaseIsZero()) {
-       return EquivalenceCriterion::Equivalent;
-      } else {
+    if (miter.globalPhaseIsZero()) {
+      return EquivalenceCriterion::Equivalent;
+    } else {
       return EquivalenceCriterion::EquivalentUpToGlobalPhase;
-      }
+    }
   }
   fullReduceApproximate();
 
@@ -287,15 +285,15 @@ bool ZXEquivalenceChecker::cliffordSimp() {
   return simplified;
 }
 
-  bool ZXEquivalenceChecker::canHandle(const qc::QuantumComputation& qc1,
-                                       const qc::QuantumComputation& qc2) {
-    // no non-garbage ancillas allowed
+bool ZXEquivalenceChecker::canHandle(const qc::QuantumComputation& qc1,
+                                     const qc::QuantumComputation& qc2) {
+  // no non-garbage ancillas allowed
 
-    if (qc1.getNancillae() - qc1.getNgarbageQubits() != 0U || qc2.getNancillae() - qc2.getNgarbageQubits()!= 0U ) {
-        return false;
-    }
-        return zx::FunctionalityConstruction::transformableToZX(&qc1) &&
-               zx::FunctionalityConstruction::transformableToZX(&qc2);
-
+  if (qc1.getNancillae() - qc1.getNgarbageQubits() != 0U ||
+      qc2.getNancillae() - qc2.getNgarbageQubits() != 0U) {
+    return false;
   }
-}// namespace ec
+  return zx::FunctionalityConstruction::transformableToZX(&qc1) &&
+         zx::FunctionalityConstruction::transformableToZX(&qc2);
+}
+} // namespace ec
