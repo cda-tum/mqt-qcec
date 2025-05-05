@@ -73,9 +73,11 @@ EquivalenceCriterion ZXEquivalenceChecker::run() {
   const auto start = std::chrono::steady_clock::now();
   if (miter.getNQubits() == 0) {
     if (miter.globalPhaseIsZero()) {
-      return EquivalenceCriterion::Equivalent;
+      equivalence = EquivalenceCriterion::Equivalent;
+    } else {
+      equivalence = EquivalenceCriterion::EquivalentUpToGlobalPhase;
     }
-    return EquivalenceCriterion::EquivalentUpToGlobalPhase;
+    return equivalence;
   }
   fullReduceApproximate();
 
