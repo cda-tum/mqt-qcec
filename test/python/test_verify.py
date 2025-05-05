@@ -100,8 +100,8 @@ def test_cpp_exception_propagation_internal() -> None:
     config.execution.run_zx_checker = False
     config.application.simulation_scheme = ApplicationScheme.lookahead
 
-    with pytest.raises(ValueError, match="Lookahead application scheme can only be used for matrices."):
-        qcec.verify(qc, qc, configuration=config)
+    with pytest.raises(ValueError, match=r"Lookahead application scheme can only be used for matrices."):
+        verify(qc, qc, configuration=config)
 
 
 def test_zx_ancilla_support() -> None:
@@ -118,7 +118,7 @@ def test_zx_ancilla_support() -> None:
     qc2 = QuantumCircuit(1, 0)
     qc2.add_register(anc)
 
-    result = qcec.verify(
+    result = verify(
         qc1,
         qc2,
         check_partial_equivalence=True,
@@ -128,4 +128,4 @@ def test_zx_ancilla_support() -> None:
         run_zx_checker=True,
         run_construction_checker=False,
     )
-    assert result.equivalence == qcec.EquivalenceCriterion.not_equivalent
+    assert result.equivalence == EquivalenceCriterion.not_equivalent
