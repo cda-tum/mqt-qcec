@@ -1,7 +1,12 @@
-//
-// This file is part of the MQT QCEC library released under the MIT license.
-// See README.md or go to https://github.com/cda-tum/qcec for more information.
-//
+/*
+ * Copyright (c) 2023 - 2025 Chair for Design Automation, TUM
+ * Copyright (c) 2025 Munich Quantum Software Company GmbH
+ * All rights reserved.
+ *
+ * SPDX-License-Identifier: MIT
+ *
+ * Licensed under the MIT License
+ */
 
 #include "checker/zx/ZXChecker.hpp"
 

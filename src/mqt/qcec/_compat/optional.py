@@ -1,3 +1,11 @@
+# Copyright (c) 2023 - 2025 Chair for Design Automation, TUM
+# Copyright (c) 2025 Munich Quantum Software Company GmbH
+# All rights reserved.
+#
+# SPDX-License-Identifier: MIT
+#
+# Licensed under the MIT License
+
 """Optional dependency tester.
 
 Inspired by Qiskit's `LazyDependencyManager <https://github.com/Qiskit/qiskit/blob/f13673b05edf98263f80a174d2e13a118b4acda7/qiskit/utils/lazy_tester.py#L44>`_.

@@ -1,3 +1,11 @@
+# Copyright (c) 2023 - 2025 Chair for Design Automation, TUM
+# Copyright (c) 2025 Munich Quantum Software Company GmbH
+# All rights reserved.
+#
+# SPDX-License-Identifier: MIT
+#
+# Licensed under the MIT License
+
 """Tests the dynamic quantum circuit support of QCEC."""
 
 from __future__ import annotations
@@ -9,7 +17,7 @@ from mqt.qcec.pyqcec import EquivalenceCriterion
 
 
 def test_regression1() -> None:
-    """Test a regression from https://github.com/cda-tum/mqt-qcec/issues/343."""
+    """Test a regression from https://github.com/munich-quantum-toolkit/qcec/issues/343."""
     qc = QuantumCircuit(5)
     qc.cx(1, 2)
     qc.cx(0, 3)
@@ -40,7 +48,7 @@ def test_regression1() -> None:
 
 
 def test_regression2() -> None:
-    """Test a regression from https://github.com/cda-tum/mqt-qcec/issues/343."""
+    """Test a regression from https://github.com/munich-quantum-toolkit/qcec/issues/343."""
     qc = QuantumCircuit(9)
     qc.h(range(9))
     qc.z(8)
