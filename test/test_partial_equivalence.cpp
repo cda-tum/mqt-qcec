@@ -1,16 +1,22 @@
-//
-// This file is part of the MQT QCEC library released under the MIT license.
-// See README.md or go to https://github.com/cda-tum/qcec for more information.
-//
+/*
+ * Copyright (c) 2023 - 2025 Chair for Design Automation, TUM
+ * Copyright (c) 2025 Munich Quantum Software Company GmbH
+ * All rights reserved.
+ *
+ * SPDX-License-Identifier: MIT
+ *
+ * Licensed under the MIT License
+ */
 
-#include "Definitions.hpp"
 #include "EquivalenceCheckingManager.hpp"
 #include "EquivalenceCriterion.hpp"
 #include "dd/DDDefinitions.hpp"
+#include "ir/Definitions.hpp"
 #include "ir/QuantumComputation.hpp"
 #include "ir/operations/Control.hpp"
 #include "ir/operations/OpType.hpp"
 #include "ir/operations/StandardOperation.hpp"
+#include "qasm3/Importer.hpp"
 
 #include <algorithm>
 #include <cstddef>
@@ -25,6 +31,7 @@
 
 namespace dd {
 
+namespace {
 const std::vector<std::vector<qc::OpType>> PRE_GENERATED_CIRCUITS_SIZE_1_1{
     {}, {}, {}, {}};
 
@@ -349,7 +356,7 @@ generatePartiallyEquivalentCircuits(const size_t n, const qc::Qubit d,
 
   return std::make_pair(circuit1, circuit2);
 }
-
+} // namespace
 } // namespace dd
 
 class PartialEquivalenceTest : public testing::Test {
@@ -713,11 +720,11 @@ TEST_F(PartialEquivalenceTest, ConstructionCheckerDifferentNumberOfQubits) {
 }
 
 TEST_F(PartialEquivalenceTest, MQTBenchGrover3Qubits) {
-  const qc::QuantumComputation c1{
+  const qc::QuantumComputation c1 = qasm3::Importer::importf(
       "./circuits/partialEquivalenceTest/"
-      "grover-noancilla_nativegates_ibm_qiskit_opt0_3.qasm"};
-  const qc::QuantumComputation c2{
-      "./circuits/partialEquivalenceTest/grover-noancilla_indep_qiskit_3.qasm"};
+      "grover-noancilla_nativegates_ibm_qiskit_opt0_3.qasm");
+  const qc::QuantumComputation c2 = qasm3::Importer::importf(
+      "./circuits/partialEquivalenceTest/grover-noancilla_indep_qiskit_3.qasm");
 
   c1.print(std::cout);
   c2.print(std::cout);
@@ -740,12 +747,12 @@ TEST_F(PartialEquivalenceTest, MQTBenchGrover3Qubits) {
 }
 
 TEST_F(PartialEquivalenceTest, MQTBenchGrover7Qubits) {
-  const qc::QuantumComputation c1{
+  const qc::QuantumComputation c1 = qasm3::Importer::importf(
       "./circuits/partialEquivalenceTest/"
-      "grover-noancilla_nativegates_ibm_qiskit_opt0_7.qasm"};
-  const qc::QuantumComputation c2{
+      "grover-noancilla_nativegates_ibm_qiskit_opt0_7.qasm");
+  const qc::QuantumComputation c2 = qasm3::Importer::importf(
       "./circuits/partialEquivalenceTest/"
-      "grover-noancilla_nativegates_ibm_qiskit_opt1_7.qasm"};
+      "grover-noancilla_nativegates_ibm_qiskit_opt1_7.qasm");
 
   // 7 measured qubits and 7 data qubits, full equivalence
   // construction checker
@@ -763,11 +770,11 @@ TEST_F(PartialEquivalenceTest, MQTBenchGrover7Qubits) {
 }
 
 TEST_F(PartialEquivalenceTest, SliQECGrover22Qubits) {
-  const qc::QuantumComputation c1{
-      "./circuits/partialEquivalenceTest/Grover_1.qasm"}; // 11 qubits, 11 data
+  const qc::QuantumComputation c1 = qasm3::Importer::importf(
+      "./circuits/partialEquivalenceTest/Grover_1.qasm"); // 11 qubits, 11 data
                                                           // qubits
-  qc::QuantumComputation c2{
-      "./circuits/partialEquivalenceTest/Grover_2.qasm"}; // 12 qubits, 11 data
+  qc::QuantumComputation c2 = qasm3::Importer::importf(
+      "./circuits/partialEquivalenceTest/Grover_2.qasm"); // 12 qubits, 11 data
                                                           // qubits
 
   // 11 measured qubits and 11 data qubits
@@ -785,10 +792,10 @@ TEST_F(PartialEquivalenceTest, SliQECAdd19Qubits) {
   // full equivalence, 19 qubits
   // but this test uses algorithm for partial equivalence, not the "zero
   // ancillae" version
-  qc::QuantumComputation c1{
-      "./circuits/partialEquivalenceTest/add6_196_1.qasm"};
-  qc::QuantumComputation c2{
-      "./circuits/partialEquivalenceTest/add6_196_2.qasm"};
+  qc::QuantumComputation c1 = qasm3::Importer::importf(
+      "./circuits/partialEquivalenceTest/add6_196_1.qasm");
+  qc::QuantumComputation c2 = qasm3::Importer::importf(
+      "./circuits/partialEquivalenceTest/add6_196_2.qasm");
 
   // just for benchmarking reasons, we only measure 8 qubits
   c1.setLogicalQubitsAncillary(8, 18);
@@ -829,30 +836,30 @@ TEST_F(PartialEquivalenceTest, AlternatingCheckerSliQEC19Qubits) {
   config.execution.runAlternatingChecker = true;
 
   // full equivalence, 10 qubits
-  const qc::QuantumComputation c1{
-      "./circuits/partialEquivalenceTest/entanglement_1.qasm"};
-  const qc::QuantumComputation c2{
-      "./circuits/partialEquivalenceTest/entanglement_2.qasm"};
+  const qc::QuantumComputation c1 = qasm3::Importer::importf(
+      "./circuits/partialEquivalenceTest/entanglement_1.qasm");
+  const qc::QuantumComputation c2 = qasm3::Importer::importf(
+      "./circuits/partialEquivalenceTest/entanglement_2.qasm");
 
   ec::EquivalenceCheckingManager ecm(c1, c2, config);
   ecm.run();
   EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::Equivalent);
 
   // full equivalence, 19 qubits
-  const qc::QuantumComputation c3{
-      "./circuits/partialEquivalenceTest/add6_196_1.qasm"};
-  const qc::QuantumComputation c4{
-      "./circuits/partialEquivalenceTest/add6_196_2.qasm"};
+  const qc::QuantumComputation c3 = qasm3::Importer::importf(
+      "./circuits/partialEquivalenceTest/add6_196_1.qasm");
+  const qc::QuantumComputation c4 = qasm3::Importer::importf(
+      "./circuits/partialEquivalenceTest/add6_196_2.qasm");
 
   ec::EquivalenceCheckingManager ecm2(c1, c2, config);
   ecm2.run();
   EXPECT_EQ(ecm2.equivalence(), ec::EquivalenceCriterion::Equivalent);
 
   // full equivalence, 10 qubits
-  const qc::QuantumComputation c5{
-      "./circuits/partialEquivalenceTest/bv_1.qasm"};
-  const qc::QuantumComputation c6{
-      "./circuits/partialEquivalenceTest/bv_2.qasm"};
+  const qc::QuantumComputation c5 =
+      qasm3::Importer::importf("./circuits/partialEquivalenceTest/bv_1.qasm");
+  const qc::QuantumComputation c6 =
+      qasm3::Importer::importf("./circuits/partialEquivalenceTest/bv_2.qasm");
 
   // calls zeroAncillaePartialEquivalenceCheck
   ec::EquivalenceCheckingManager ecm3(c1, c2, config);
@@ -863,10 +870,10 @@ TEST_F(PartialEquivalenceTest, AlternatingCheckerSliQEC19Qubits) {
 TEST_F(PartialEquivalenceTest, AlternatingCheckerSliQECRandomCircuit) {
   config.execution.runAlternatingChecker = true;
   // full equivalence, 10 qubits
-  const qc::QuantumComputation c1{
-      "./circuits/partialEquivalenceTest/random_1.qasm"};
-  const qc::QuantumComputation c2{
-      "./circuits/partialEquivalenceTest/random_2.qasm"};
+  const qc::QuantumComputation c1 = qasm3::Importer::importf(
+      "./circuits/partialEquivalenceTest/random_1.qasm");
+  const qc::QuantumComputation c2 = qasm3::Importer::importf(
+      "./circuits/partialEquivalenceTest/random_2.qasm");
 
   ec::EquivalenceCheckingManager ecm(c1, c2, config);
   ecm.run();
@@ -876,11 +883,11 @@ TEST_F(PartialEquivalenceTest, AlternatingCheckerSliQECRandomCircuit) {
 TEST_F(PartialEquivalenceTest, ConstructionCheckerSliQECPeriodFinding8Qubits) {
   config.execution.runConstructionChecker = true;
   // 8 qubits, 3 data qubits
-  qc::QuantumComputation c1{
-      "./circuits/partialEquivalenceTest/period_finding_1.qasm"};
+  qc::QuantumComputation c1 = qasm3::Importer::importf(
+      "./circuits/partialEquivalenceTest/period_finding_1.qasm");
   // 8 qubits, 3 data qubits
-  qc::QuantumComputation c2{
-      "./circuits/partialEquivalenceTest/period_finding_2.qasm"};
+  qc::QuantumComputation c2 = qasm3::Importer::importf(
+      "./circuits/partialEquivalenceTest/period_finding_2.qasm");
 
   // 3 measured qubits and 3 data qubits
 
@@ -895,6 +902,7 @@ TEST_F(PartialEquivalenceTest, ConstructionCheckerSliQECPeriodFinding8Qubits) {
   EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::Equivalent);
 }
 
+namespace {
 void partialEquivalencCheckingBenchmarks(const qc::Qubit minN,
                                          const qc::Qubit maxN,
                                          const size_t reps,
@@ -933,6 +941,7 @@ void partialEquivalencCheckingBenchmarks(const qc::Qubit minN,
               << "\n";
   }
 }
+} // namespace
 
 TEST_F(PartialEquivalenceTest, Benchmark) {
   config.execution.runConstructionChecker = true;

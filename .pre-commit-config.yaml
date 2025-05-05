@@ -42,7 +42,7 @@ repos:
 
   # Handling unwanted unicode characters
   - repo: https://github.com/sirosen/texthooks
-    rev: 0.6.7
+    rev: 0.6.8
     hooks:
       - id: fix-ligatures
       - id: fix-smartquotes
@@ -55,9 +55,15 @@ repos:
       - id: rst-directive-colons
       - id: rst-inline-touching-normal
 
+  # Check for license headers
+  - repo: https://github.com/emzeat/mz-lictools
+    rev: v2.7.0
+    hooks:
+      - id: license-tools
+
   # Python linting and formatting using ruff
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.7.4
+    rev: v0.11.8
     hooks:
       - id: ruff
         args: ["--fix", "--show-fixes"]
@@ -83,21 +89,21 @@ repos:
 
   # Clang-format the C++ part of the code base automatically
   - repo: https://github.com/pre-commit/mirrors-clang-format
-    rev: v19.1.4
+    rev: v20.1.3
     hooks:
       - id: clang-format
         types_or: [c++, c, cuda]
 
   # Format configuration files with prettier
   - repo: https://github.com/rbubley/mirrors-prettier
-    rev: v3.3.3
+    rev: v3.5.3
     hooks:
       - id: prettier
         types_or: [yaml, markdown, html, css, scss, javascript, json]
 
   # Check static types with mypy
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.13.0
+    rev: v1.15.0
     hooks:
       - id: mypy
         files: ^(src/mqt|test/python|noxfile.py)
@@ -107,10 +113,11 @@ repos:
           - nox
           - numpy
           - pytest
+          - mqt.core>=3.0.0rc2
 
   # Check for spelling
   - repo: https://github.com/crate-ci/typos
-    rev: v1.27.3
+    rev: v1.32.0
     hooks:
       - id: typos
 
@@ -125,14 +132,14 @@ repos:
 
   # Check best practices for scientific Python code
   - repo: https://github.com/scientific-python/cookie
-    rev: 2024.08.19
+    rev: 2025.01.22
     hooks:
       - id: sp-repo-review
         additional_dependencies: ["repo-review[cli]"]
 
   # Check JSON schemata
   - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 0.29.4
+    rev: 0.33.0
     hooks:
       - id: check-dependabot
       - id: check-github-workflows
@@ -140,6 +147,24 @@ repos:
 
   # Check the pyproject.toml file
   - repo: https://github.com/henryiii/validate-pyproject-schema-store
-    rev: 2024.09.23
+    rev: 2025.04.07
     hooks:
       - id: validate-pyproject
+
+  # Tidy up BibTeX files
+  - repo: https://github.com/FlamingTempura/bibtex-tidy
+    rev: v1.14.0
+    hooks:
+      - id: bibtex-tidy
+        args:
+          [
+            "--align=20",
+            "--curly",
+            "--months",
+            "--blank-lines",
+            "--sort",
+            "--strip-enclosing-braces",
+            "--sort-fields",
+            "--trailing-commas",
+            "--remove-empty-fields",
+          ]

@@ -1,23 +1,42 @@
+# Copyright (c) 2023 - 2025 Chair for Design Automation, TUM
+# Copyright (c) 2025 Munich Quantum Software Company GmbH
+# All rights reserved.
+#
+# SPDX-License-Identifier: MIT
+#
+# Licensed under the MIT License
+
 """Functionality for checking equivalence of parameterized quantum circuits."""
 
 from __future__ import annotations
 
 import time
 from itertools import chain
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
+
+import numpy as np
+
+from mqt.core.ir.symbolic import Expression
+
+from .pyqcec import Configuration, EquivalenceCheckingManager, EquivalenceCriterion
 
 if TYPE_CHECKING:
     from numpy.typing import NDArray
-    from qiskit import QuantumCircuit
 
-import numpy as np
-from qiskit.circuit import Parameter, ParameterExpression
+    from mqt.core.ir import QuantumComputation
+    from mqt.core.ir.operations import SymbolicOperation
+    from mqt.core.ir.symbolic import Variable
 
-from . import Configuration, EquivalenceCheckingManager, EquivalenceCriterion
+__all__ = [
+    "check_instantiated",
+    "check_instantiated_random",
+    "check_parameterized",
+    "check_parameterized_zx",
+]
 
 
-def __is_parameterized(qc: QuantumCircuit | str) -> bool:
-    return not isinstance(qc, str) and qc.parameters
+def __dir__() -> list[str]:
+    return __all__
 
 
 def __adjust_timeout(curr_timeout: float, res: EquivalenceCheckingManager.Results | float) -> float:
@@ -30,69 +49,60 @@ def __adjust_timeout(curr_timeout: float, res: EquivalenceCheckingManager.Result
 
 
 def check_parameterized_zx(
-    circ1: QuantumCircuit | str, circ2: QuantumCircuit | str, configuration: Configuration
+    circ1: QuantumComputation, circ2: QuantumComputation, configuration: Configuration
 ) -> EquivalenceCheckingManager.Results:
     """Check circuits for equivalence with the ZX-calculus."""
     ecm = EquivalenceCheckingManager(circ1, circ2, configuration)
     ecm.disable_all_checkers()
-    ecm.set_zx_checker(True)
-
+    ecm.configuration.execution.run_zx_checker = True
     ecm.run()
+    return ecm.results
 
-    return ecm.get_results()
 
-
-def extract_params(
-    circ1: QuantumCircuit, circ2: QuantumCircuit
-) -> tuple[list[Parameter], NDArray[np.float64], NDArray[np.float64]]:
+def __extract_params(
+    circ1: QuantumComputation, circ2: QuantumComputation
+) -> tuple[list[Variable], NDArray[np.float64], NDArray[np.float64]]:
     """Extract parameters and equations of parameterized circuits."""
-    p1 = set(circ1.parameters)
-    p2 = set(circ2.parameters)
+    symbolic_params = list(circ1.variables.union(circ2.variables))
+    num_symbolic_params = len(symbolic_params)
 
-    p = p1.union(p2)
+    symbolic_expressions = [
+        param
+        for op in chain(circ1, circ2)
+        if op.is_symbolic_operation()
+        for param in cast("SymbolicOperation", op).get_parameters()
+        if isinstance(param, Expression) and not param.is_constant()
+    ]
+    num_symbolic_expressions = len(symbolic_expressions)
 
-    n_params = len(p)
-    exprs = list(chain(*[instr.operation.params for instr in circ1.data + circ2.data if instr.operation.params != []]))
+    offsets = np.zeros(num_symbolic_expressions)
+    for row, expr in enumerate(symbolic_expressions):
+        zero_map = dict.fromkeys(expr.variables, 0.0)
+        offsets[row] = -float(expr.evaluate(zero_map))
 
-    def is_expr(x: float | Parameter | ParameterExpression) -> bool:
-        return isinstance(x, (Parameter, ParameterExpression))
+    equations = np.zeros((num_symbolic_expressions, num_symbolic_params))
+    for col, param in enumerate(symbolic_params):
+        for row, expr in enumerate(symbolic_expressions):
+            one_map = dict.fromkeys(expr.variables, 0.0)
+            if param in expr.variables:
+                one_map[param] = 1.0
+                equations[row, col] = (expr + offsets[row]).evaluate(one_map)
 
-    symb_params: list[Parameter | ParameterExpression] = [param for param in p if is_expr(param)]
-    symb_params.sort(key=lambda param: param.name)
-    symb_exprs = list(filter(is_expr, exprs))
-
-    offsets = np.zeros(len(symb_exprs))
-    for row, expr in enumerate(symb_exprs):
-        zero_map = dict.fromkeys(expr.parameters, 0)
-        offsets[row] = -float(expr.bind(zero_map))
-
-    equs = np.zeros((len(symb_exprs), n_params))
-
-    for col, param in enumerate(symb_params):
-        for row, expr in enumerate(symb_exprs):
-            one_map = dict.fromkeys(expr.parameters, 0)
-            if param in expr.parameters:
-                one_map[param] = 1
-                val = float((expr + offsets[row]).bind(one_map))
-                equs[row, col] = val
-
-    return symb_params, equs, offsets
+    return symbolic_params, equations, offsets
 
 
 def check_instantiated(
-    circ1: QuantumCircuit, circ2: QuantumCircuit, configuration: Configuration
+    circ1: QuantumComputation, circ2: QuantumComputation, configuration: Configuration
 ) -> EquivalenceCheckingManager.Results:
     """Check circuits for equivalence with DD equivalence checker."""
     ecm = EquivalenceCheckingManager(circ1, circ2, configuration)
-    ecm.set_zx_checker(False)
-
+    ecm.configuration.execution.run_zx_checker = False
     ecm.run()
-
-    return ecm.get_results()
+    return ecm.results
 
 
 def check_instantiated_random(
-    circ1: QuantumCircuit, circ2: QuantumCircuit, params: list[Parameter], configuration: Configuration
+    circ1: QuantumComputation, circ2: QuantumComputation, params: list[Variable], configuration: Configuration
 ) -> EquivalenceCheckingManager.Results:
     """Check whether circuits are equivalent for random instantiation of symbolic parameters."""
     param_map = {}
@@ -100,14 +110,14 @@ def check_instantiated_random(
     for p in params:
         param_map[p] = rng.random() * 2 * np.pi
 
-    circ1_inst = circ1.assign_parameters(param_map)
-    circ2_inst = circ2.assign_parameters(param_map)
+    circ1_inst = circ1.instantiate(param_map)
+    circ2_inst = circ2.instantiate(param_map)
 
     return check_instantiated(circ1_inst, circ2_inst, configuration)
 
 
 def check_parameterized(
-    circ1: QuantumCircuit | str, circ2: QuantumCircuit | str, configuration: Configuration
+    circ1: QuantumComputation, circ2: QuantumComputation, configuration: Configuration
 ) -> EquivalenceCheckingManager.Results:
     """Equivalence checking flow for parameterized circuit."""
     total_preprocessing_time = 0.0
@@ -115,99 +125,99 @@ def check_parameterized(
     total_simulations_started = 0
     total_simulations_finished = 0
 
-    def _update_stats(res: EquivalenceCheckingManager.Results) -> None:
+    def __update_stats(result: EquivalenceCheckingManager.Results) -> None:
         nonlocal total_preprocessing_time, total_runtime, total_simulations_started, total_simulations_finished
-        total_preprocessing_time += res.preprocessing_time
-        total_runtime += res.check_time
-        total_simulations_started += res.started_simulations
-        total_simulations_finished += res.performed_simulations
+        total_preprocessing_time += result.preprocessing_time
+        total_runtime += result.check_time
+        total_simulations_started += result.started_simulations
+        total_simulations_finished += result.performed_simulations
 
-    def _write_stats(i: int, res: EquivalenceCheckingManager.Results) -> None:
+    def __write_stats(instantiation: int, result: EquivalenceCheckingManager.Results) -> None:
         nonlocal total_preprocessing_time, total_runtime, total_simulations_started, total_simulations_finished
-        res.check_time = total_runtime
-        res.preprocessing_time = total_preprocessing_time
-        res.started_simulations = total_simulations_started
-        res.performed_simulations = total_simulations_finished
-        res.performed_instantiations = i
+        result.check_time = total_runtime
+        result.preprocessing_time = total_preprocessing_time
+        result.started_simulations = total_simulations_started
+        result.performed_simulations = total_simulations_finished
+        result.performed_instantiations = instantiation
 
     res = check_parameterized_zx(circ1, circ2, configuration)
 
     if res.considered_equivalent():
         return res
 
-    _update_stats(res)
+    __update_stats(res)
 
     timeout = __adjust_timeout(configuration.execution.timeout, res)
     n_checks = configuration.parameterized.additional_instantiations
     tol = configuration.parameterized.parameterized_tolerance
 
-    parameters, mat, offsets = extract_params(circ1, circ2)
+    parameters, mat, offsets = __extract_params(circ1, circ2)
 
-    def _instantiate_params(
-        qc1: QuantumCircuit, qc2: QuantumCircuit, b: NDArray[np.float64]
-    ) -> tuple[QuantumCircuit, QuantumCircuit, float]:
+    def __instantiate_params(
+        qc1: QuantumComputation, qc2: QuantumComputation, b: NDArray[np.float64]
+    ) -> tuple[QuantumComputation, QuantumComputation, float]:
         start_time = time.time()
         mat_pinv = np.linalg.pinv(mat)
         x = np.dot(mat_pinv, b)
         param_map = {param: x[i] for i, param in enumerate(parameters)}
-        qc1_bound = qc1.assign_parameters(param_map)
-        qc2_bound = qc2.assign_parameters(param_map)
+        qc1_bound = qc1.instantiate(param_map)
+        qc2_bound = qc2.instantiate(param_map)
 
-        def _round_zero_params(qc: QuantumCircuit) -> QuantumCircuit:
-            for instr in qc.data:
-                operation = instr.operation
-                if not hasattr(operation, "mutable") or operation.mutable:
-                    params = operation.params
-                    operation.params = [float(x) for x in params]
-                    operation.params = [0 if np.abs(x) < tol else x for x in operation.params]
-            return qc
+        def __round_zero_params(qc: QuantumComputation) -> None:
+            for op in qc:
+                if len(op.parameter) == 0:
+                    continue
 
-        qc1_bound = _round_zero_params(qc1_bound)
-        qc2_bound = _round_zero_params(qc2_bound)
+                for i, param in enumerate(op.parameter):
+                    if np.abs(param) < tol:
+                        op.parameter[i] = 0
+
+        __round_zero_params(qc1_bound)
+        __round_zero_params(qc2_bound)
         return qc1_bound, qc2_bound, time.time() - start_time
 
-    def _instantiate_params_zero(
-        qc1: QuantumCircuit, qc2: QuantumCircuit
-    ) -> tuple[QuantumCircuit, QuantumCircuit, float]:
-        return _instantiate_params(qc1, qc2, offsets)
+    def __instantiate_params_zero(
+        qc1: QuantumComputation, qc2: QuantumComputation
+    ) -> tuple[QuantumComputation, QuantumComputation, float]:
+        return __instantiate_params(qc1, qc2, offsets)
 
-    def _instantiate_params_phases(
-        qc1: QuantumCircuit, qc2: QuantumCircuit
-    ) -> tuple[QuantumCircuit, QuantumCircuit, float]:
-        phases = [0, np.pi, np.pi / 2, -np.pi / 2, np.pi / 4, -np.pi / 4]
-        rng = np.random.default_rng()
-        b = rng.choice(phases, size=len(offsets)) + offsets
-        return _instantiate_params(qc1, qc2, b)
-
-    circ1_inst, circ2_inst, runtime = _instantiate_params_zero(circ1, circ2)
+    circ1_inst, circ2_inst, runtime = __instantiate_params_zero(circ1, circ2)
     timeout = __adjust_timeout(timeout, runtime)
 
     if timeout < 0:
-        _write_stats(1, res)
+        __write_stats(1, res)
         res.equivalence = EquivalenceCriterion.no_information
         return res
 
     res = check_instantiated(circ1_inst, circ2_inst, configuration)
-    _update_stats(res)
+    __update_stats(res)
     if res.equivalence == EquivalenceCriterion.not_equivalent:
-        _write_stats(1, res)
+        __write_stats(1, res)
         return res
 
+    def __instantiate_params_phases(
+        qc1: QuantumComputation, qc2: QuantumComputation
+    ) -> tuple[QuantumComputation, QuantumComputation, float]:
+        phases = [0.0, np.pi, np.pi / 2, -np.pi / 2, np.pi / 4, -np.pi / 4]
+        rng = np.random.default_rng()
+        b = rng.choice(phases, size=len(offsets)) + offsets
+        return __instantiate_params(qc1, qc2, b)
+
     for i in range(n_checks):
-        circ1_inst, circ2_inst, runtime = _instantiate_params_phases(circ1, circ2)
+        circ1_inst, circ2_inst, runtime = __instantiate_params_phases(circ1, circ2)
         timeout = __adjust_timeout(timeout, runtime)
         res = check_instantiated(circ1_inst, circ2_inst, configuration)
         timeout = __adjust_timeout(timeout, res)
 
         if timeout < 0:
-            _write_stats(i + 2, res)
+            __write_stats(i + 2, res)
             res.equivalence = EquivalenceCriterion.no_information
             return res
 
-        _update_stats(res)
+        __update_stats(res)
 
         if res.equivalence == EquivalenceCriterion.not_equivalent:
-            _write_stats(i + 2, res)
+            __write_stats(i + 2, res)
             return res
 
     res = check_instantiated_random(circ1, circ2, parameters, configuration)
@@ -215,6 +225,6 @@ def check_parameterized(
     if timeout < 0:
         res.equivalence = EquivalenceCriterion.no_information
 
-    _update_stats(res)
-    _write_stats(n_checks + 2, res)
+    __update_stats(res)
+    __write_stats(n_checks + 2, res)
     return res

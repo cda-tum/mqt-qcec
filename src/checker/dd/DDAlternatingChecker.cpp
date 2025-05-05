@@ -1,27 +1,36 @@
-//
-// This file is part of the MQT QCEC library released under the MIT license.
-// See README.md or go to https://github.com/cda-tum/qcec for more information.
-//
+/*
+ * Copyright (c) 2023 - 2025 Chair for Design Automation, TUM
+ * Copyright (c) 2025 Munich Quantum Software Company GmbH
+ * All rights reserved.
+ *
+ * SPDX-License-Identifier: MIT
+ *
+ * Licensed under the MIT License
+ */
 
 #include "checker/dd/DDAlternatingChecker.hpp"
 
-#include "Definitions.hpp"
 #include "EquivalenceCriterion.hpp"
 #include "checker/dd/DDEquivalenceChecker.hpp"
+#include "checker/dd/DDPackageConfigs.hpp"
 #include "checker/dd/applicationscheme/ApplicationScheme.hpp"
+#include "checker/dd/applicationscheme/LookaheadApplicationScheme.hpp"
+#include "dd/Package.hpp"
+#include "ir/Definitions.hpp"
 
 #include <cassert>
 #include <cstddef>
 #include <nlohmann/json.hpp>
 #include <stdexcept>
 #include <type_traits>
+#include <utility>
 #include <vector>
 
 namespace ec {
 void DDAlternatingChecker::initialize() {
   DDEquivalenceChecker::initialize();
   // create the full identity matrix
-  functionality = dd->makeIdent();
+  functionality = dd::Package::makeIdent();
   dd->incRef(functionality);
 
   // Only count ancillaries that are present in but not acted upon in both of
@@ -52,8 +61,8 @@ void DDAlternatingChecker::initialize() {
 void DDAlternatingChecker::execute() {
   while (!taskManager1.finished() && !taskManager2.finished() && !isDone()) {
     // skip over any SWAP operations
-    taskManager1.applySwapOperations(functionality);
-    taskManager2.applySwapOperations(functionality);
+    taskManager1.applySwapOperations();
+    taskManager2.applySwapOperations();
 
     if (!taskManager1.finished() && !taskManager2.finished() && !isDone()) {
       // whenever the current functionality resembles the identity, identical
@@ -160,6 +169,26 @@ bool DDAlternatingChecker::canHandle(const qc::QuantumComputation& qc1,
     }
   }
   return true;
+}
+
+DDAlternatingChecker::DDAlternatingChecker(const qc::QuantumComputation& circ1,
+                                           const qc::QuantumComputation& circ2,
+                                           Configuration config)
+    : DDEquivalenceChecker(circ1, circ2, std::move(config),
+                           AlternatingDDPackageConfig{}) {
+  // gates from the second circuit shall be applied "from the right"
+  taskManager2.flipDirection();
+
+  initializeApplicationScheme(configuration.application.alternatingScheme);
+
+  // special treatment for the lookahead application scheme
+  if (auto* lookahead =
+          dynamic_cast<LookaheadApplicationScheme*>(applicationScheme.get())) {
+    // initialize links for the internal state and the package of the
+    // lookahead scheme
+    lookahead->setInternalState(functionality);
+    lookahead->setPackage(dd.get());
+  }
 }
 
 void DDAlternatingChecker::json(nlohmann::basic_json<>& j) const noexcept {

@@ -1,3 +1,11 @@
+# Copyright (c) 2023 - 2025 Chair for Design Automation, TUM
+# Copyright (c) 2025 Munich Quantum Software Company GmbH
+# All rights reserved.
+#
+# SPDX-License-Identifier: MIT
+#
+# Licensed under the MIT License
+
 """Test the verification of two circuits."""
 
 from __future__ import annotations
@@ -5,7 +13,8 @@ from __future__ import annotations
 import pytest
 from qiskit import QuantumCircuit, transpile
 
-from mqt import qcec
+from mqt.qcec import verify
+from mqt.qcec.pyqcec import ApplicationScheme, Configuration, EquivalenceCriterion
 
 
 @pytest.fixture
@@ -35,13 +44,13 @@ def alternative_circuit() -> QuantumCircuit:
 
 def test_verify(original_circuit: QuantumCircuit, alternative_circuit: QuantumCircuit) -> None:
     """Test the verification of two equivalent circuits."""
-    result = qcec.verify(original_circuit, alternative_circuit)
-    assert result.equivalence == qcec.EquivalenceCriterion.equivalent
+    result = verify(original_circuit, alternative_circuit)
+    assert result.equivalence == EquivalenceCriterion.equivalent
 
 
 def test_verify_kwargs(original_circuit: QuantumCircuit, alternative_circuit: QuantumCircuit) -> None:
     """Test the verification of two equivalent circuits with some keyword arguments (one of each category)."""
-    result = qcec.verify(
+    result = verify(
         original_circuit,
         alternative_circuit,
         alternating_scheme="one_to_one",
@@ -51,15 +60,15 @@ def test_verify_kwargs(original_circuit: QuantumCircuit, alternative_circuit: Qu
         additional_instantiations=2,
         seed=42,
     )
-    assert result.equivalence == qcec.EquivalenceCriterion.equivalent
+    assert result.equivalence == EquivalenceCriterion.equivalent
 
 
 def test_verify_config(original_circuit: QuantumCircuit, alternative_circuit: QuantumCircuit) -> None:
     """Test the verification of two equivalent circuits with a configuration object."""
-    config = qcec.Configuration()
+    config = Configuration()
     config.execution.timeout = 3600
-    result = qcec.verify(original_circuit, alternative_circuit, config)
-    assert result.equivalence == qcec.EquivalenceCriterion.equivalent
+    result = verify(original_circuit, alternative_circuit, config)
+    assert result.equivalence == EquivalenceCriterion.equivalent
 
 
 def test_compiled_circuit_without_measurements() -> None:
@@ -75,8 +84,8 @@ def test_compiled_circuit_without_measurements() -> None:
         basis_gates=["cx", "x", "id", "u3", "measure", "u2", "rz", "u1", "reset", "sx"],
     )
 
-    result = qcec.verify(qc, qc_compiled)
-    assert result.equivalence == qcec.EquivalenceCriterion.equivalent
+    result = verify(qc, qc_compiled)
+    assert result.equivalence == EquivalenceCriterion.equivalent
 
 
 def test_cpp_exception_propagation_internal() -> None:
@@ -84,13 +93,13 @@ def test_cpp_exception_propagation_internal() -> None:
     qc = QuantumCircuit(1)
     qc.x(0)
 
-    config = qcec.Configuration()
+    config = Configuration()
     config.execution.run_alternating_checker = False
     config.execution.run_simulation_checker = True
     config.execution.run_construction_checker = False
     config.execution.run_zx_checker = False
-    config.application.simulation_scheme = qcec.ApplicationScheme.lookahead
-
+    config.application.simulation_scheme = ApplicationScheme.lookahead
+    
     with pytest.raises(ValueError, match="Lookahead application scheme can only be used for matrices."):
         qcec.verify(qc, qc, configuration=config)
 

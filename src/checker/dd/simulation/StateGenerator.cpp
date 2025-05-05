@@ -1,16 +1,21 @@
-//
-// This file is part of the MQT QCEC library released under the MIT license.
-// See README.md or go to https://github.com/cda-tum/qcec for more information.
-//
+/*
+ * Copyright (c) 2023 - 2025 Chair for Design Automation, TUM
+ * Copyright (c) 2025 Munich Quantum Software Company GmbH
+ * All rights reserved.
+ *
+ * SPDX-License-Identifier: MIT
+ *
+ * Licensed under the MIT License
+ */
 
 #include "checker/dd/simulation/StateGenerator.hpp"
 
 #include "algorithms/RandomCliffordCircuit.hpp"
-#include "checker/dd/DDPackageConfigs.hpp"
 #include "checker/dd/simulation/StateType.hpp"
 #include "dd/DDDefinitions.hpp"
 #include "dd/Package.hpp"
 #include "dd/Simulation.hpp"
+#include "ir/Definitions.hpp"
 
 #include <algorithm>
 #include <array>
@@ -26,13 +31,13 @@
 
 namespace ec {
 
-qc::VectorDD StateGenerator::generateRandomState(
-    dd::Package<SimulationDDPackageConfig>& dd, const std::size_t totalQubits,
+dd::VectorDD StateGenerator::generateRandomState(
+    dd::Package& dd, const std::size_t totalQubits,
     const std::size_t ancillaryQubits, const StateType type) {
   switch (type) {
-  case ec::StateType::Random1QBasis:
+  case StateType::Random1QBasis:
     return generateRandom1QBasisState(dd, totalQubits, ancillaryQubits);
-  case ec::StateType::Stabilizer:
+  case StateType::Stabilizer:
     return generateRandomStabilizerState(dd, totalQubits, ancillaryQubits);
   default:
     return generateRandomComputationalBasisState(dd, totalQubits,
@@ -40,8 +45,8 @@ qc::VectorDD StateGenerator::generateRandomState(
   }
 }
 
-qc::VectorDD StateGenerator::generateRandomComputationalBasisState(
-    dd::Package<SimulationDDPackageConfig>& dd, const std::size_t totalQubits,
+dd::VectorDD StateGenerator::generateRandomComputationalBasisState(
+    dd::Package& dd, const std::size_t totalQubits,
     const std::size_t ancillaryQubits) {
   // determine how many qubits truly are random
   const std::size_t randomQubits = totalQubits - ancillaryQubits;
@@ -90,9 +95,10 @@ qc::VectorDD StateGenerator::generateRandomComputationalBasisState(
   return dd.makeBasisState(totalQubits, stimulusBits);
 }
 
-qc::VectorDD StateGenerator::generateRandom1QBasisState(
-    dd::Package<SimulationDDPackageConfig>& dd, const std::size_t totalQubits,
-    const std::size_t ancillaryQubits) {
+dd::VectorDD
+StateGenerator::generateRandom1QBasisState(dd::Package& dd,
+                                           const std::size_t totalQubits,
+                                           const std::size_t ancillaryQubits) {
   // determine how many qubits truly are random
   const std::size_t randomQubits = totalQubits - ancillaryQubits;
 
@@ -120,7 +126,7 @@ qc::VectorDD StateGenerator::generateRandom1QBasisState(
       randomBasisState[i] = dd::BasisStates::left;
       break;
     default:
-      break;
+      qc::unreachable();
     }
   }
 
@@ -128,29 +134,27 @@ qc::VectorDD StateGenerator::generateRandom1QBasisState(
   return dd.makeBasisState(totalQubits, randomBasisState);
 }
 
-qc::VectorDD StateGenerator::generateRandomStabilizerState(
-    dd::Package<SimulationDDPackageConfig>& dd, const std::size_t totalQubits,
+dd::VectorDD StateGenerator::generateRandomStabilizerState(
+    dd::Package& dd, const std::size_t totalQubits,
     const std::size_t ancillaryQubits) {
   // determine how many qubits truly are random
   const std::size_t randomQubits = totalQubits - ancillaryQubits;
 
-  // generate a random Clifford circuit with appropriate depth
-  auto rcs = qc::RandomCliffordCircuit(
-      randomQubits,
+  // generate a random Clifford circuit with the appropriate depth
+  const auto rcs = qc::createRandomCliffordCircuit(
+      static_cast<qc::Qubit>(randomQubits),
       static_cast<std::size_t>(std::round(std::log2(randomQubits))), mt());
 
   // generate the associated stabilizer state by simulating the Clifford
   // circuit
-  auto stabilizer = simulate(&rcs, dd.makeZeroState(randomQubits), dd);
-
-  // decrease the ref count right after so that it stays correct later on
-  dd.decRef(stabilizer);
+  const auto stabilizer = simulate(rcs, dd.makeZeroState(randomQubits), dd);
 
   // add |0> edges for all the ancillary qubits
   auto initial = stabilizer;
   for (std::size_t p = randomQubits; p < totalQubits; ++p) {
     initial = dd.makeDDNode(static_cast<dd::Qubit>(p),
-                            std::array{initial, qc::VectorDD::zero()});
+                            std::array{initial, dd::VectorDD::zero()});
+    initial.p->ref = 1;
   }
 
   // return the resulting decision diagram

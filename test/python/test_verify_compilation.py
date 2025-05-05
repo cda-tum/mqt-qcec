@@ -1,3 +1,11 @@
+# Copyright (c) 2023 - 2025 Chair for Design Automation, TUM
+# Copyright (c) 2025 Munich Quantum Software Company GmbH
+# All rights reserved.
+#
+# SPDX-License-Identifier: MIT
+#
+# Licensed under the MIT License
+
 """Test the compilation flow verification."""
 
 from __future__ import annotations
@@ -5,7 +13,8 @@ from __future__ import annotations
 import pytest
 from qiskit import QuantumCircuit, transpile
 
-from mqt import qcec
+from mqt.qcec import verify_compilation
+from mqt.qcec.pyqcec import EquivalenceCriterion
 
 
 @pytest.fixture
@@ -28,10 +37,10 @@ def test_verify_compilation_on_optimization_levels(original_circuit: QuantumCirc
         basis_gates=["cx", "x", "id", "u3", "measure", "u2", "rz", "u1", "reset", "sx"],
         optimization_level=optimization_level,
     )
-    result = qcec.verify_compilation(original_circuit, compiled_circuit, optimization_level=optimization_level)
+    result = verify_compilation(original_circuit, compiled_circuit, optimization_level=optimization_level)
     assert result.equivalence in {
-        qcec.EquivalenceCriterion.equivalent,
-        qcec.EquivalenceCriterion.equivalent_up_to_global_phase,
+        EquivalenceCriterion.equivalent,
+        EquivalenceCriterion.equivalent_up_to_global_phase,
     }
 
 
@@ -41,6 +50,6 @@ def test_warning_on_missing_measurements() -> None:
     qc.h(0)
     qc.cx(0, 1)
 
-    with pytest.warns(UserWarning):
-        result = qcec.verify_compilation(qc, qc)
-        assert result.equivalence == qcec.EquivalenceCriterion.equivalent
+    with pytest.warns(UserWarning, match=r"One of the circuits does not contain any measurements."):
+        result = verify_compilation(qc, qc)
+    assert result.equivalence == EquivalenceCriterion.equivalent

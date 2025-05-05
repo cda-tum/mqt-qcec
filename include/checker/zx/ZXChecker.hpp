@@ -1,7 +1,12 @@
-//
-// This file is part of the MQT QCEC library released under the MIT license.
-// See README.md or go to https://github.com/cda-tum/qcec for more information.
-//
+/*
+ * Copyright (c) 2023 - 2025 Chair for Design Automation, TUM
+ * Copyright (c) 2025 Munich Quantum Software Company GmbH
+ * All rights reserved.
+ *
+ * SPDX-License-Identifier: MIT
+ *
+ * Licensed under the MIT License
+ */
 
 #pragma once
 
@@ -72,7 +77,7 @@ private:
 
   template <class CheckFun, class RuleFun>
   bool simplifyVertices(CheckFun check, RuleFun rule) {
-    bool simplified = false;
+    auto simplified = false;
     while (!isDone()) {
       auto moreSimplified = false;
       for (const auto& [v, _] : miter.getVertices()) {
@@ -85,14 +90,14 @@ private:
       if (!moreSimplified) {
         break;
       }
-      simplified |= true;
+      simplified = true;
     }
     return simplified;
   }
 
   template <class CheckFun, class RuleFun>
   bool simplifyEdges(CheckFun check, RuleFun rule) {
-    bool simplified = false;
+    auto simplified = false;
     while (!isDone()) {
       auto moreSimplified = false;
       for (const auto& [v0, v1] : miter.getEdges()) {
@@ -106,7 +111,7 @@ private:
       if (!moreSimplified) {
         break;
       }
-      simplified |= true;
+      simplified = true;
     }
     return simplified;
   }

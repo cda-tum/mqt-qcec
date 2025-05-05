@@ -1,9 +1,17 @@
+# Copyright (c) 2023 - 2025 Chair for Design Automation, TUM
+# Copyright (c) 2025 Munich Quantum Software Company GmbH
+# All rights reserved.
+#
+# SPDX-License-Identifier: MIT
+#
+# Licensed under the MIT License
+
 # set required cmake version
-cmake_minimum_required(VERSION 3.19...3.30)
+cmake_minimum_required(VERSION 3.24...4.0)
 
 project(
   mqt-qcec
-  LANGUAGES CXX
+  LANGUAGES C CXX
   DESCRIPTION "MQT QCEC - A tool for Quantum Circuit Equivalence Checking")
 
 option(BUILD_MQT_QCEC_BINDINGS "Build the MQT QCEC Python bindings" OFF)

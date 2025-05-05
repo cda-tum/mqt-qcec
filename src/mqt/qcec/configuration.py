@@ -1,3 +1,11 @@
+# Copyright (c) 2023 - 2025 Chair for Design Automation, TUM
+# Copyright (c) 2025 Munich Quantum Software Company GmbH
+# All rights reserved.
+#
+# SPDX-License-Identifier: MIT
+#
+# Licensed under the MIT License
+
 """Configuration options for the equivalence checking manager."""
 
 from __future__ import annotations
@@ -5,8 +13,13 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, TypedDict
 
 if TYPE_CHECKING:
-    from . import ApplicationScheme, Configuration, StateType
-    from .literals import ApplicationSchemeName, StateTypeName
+    from .pyqcec import ApplicationScheme, Configuration, StateType
+
+__all__ = ["ConfigurationOptions", "augment_config_from_kwargs"]
+
+
+def __dir__() -> list[str]:
+    return __all__
 
 
 class ConfigurationOptions(TypedDict, total=False):
@@ -17,10 +30,10 @@ class ConfigurationOptions(TypedDict, total=False):
     """
 
     # Application
-    alternating_scheme: ApplicationScheme | ApplicationSchemeName
-    construction_scheme: ApplicationScheme | ApplicationSchemeName
+    alternating_scheme: ApplicationScheme | str
+    construction_scheme: ApplicationScheme | str
+    simulation_scheme: ApplicationScheme | str
     profile: str
-    simulation_scheme: ApplicationScheme | ApplicationSchemeName
     # Execution
     nthreads: int
     numerical_tolerance: float
@@ -48,13 +61,11 @@ class ConfigurationOptions(TypedDict, total=False):
     fidelity_threshold: float
     max_sims: int
     seed: int
-    state_type: StateType | StateTypeName
-    store_cex_input: bool
-    store_cex_output: bool
+    state_type: StateType | str
 
 
 def augment_config_from_kwargs(config: Configuration, kwargs: ConfigurationOptions) -> None:
-    """Augment an existing :class:`~mqt.qcec.Configuration` with options from a collection of keyword arguments.
+    """Augment an existing :class:`.Configuration` with options from a collection of keyword arguments.
 
     Args:
         config: The configuration to augment.

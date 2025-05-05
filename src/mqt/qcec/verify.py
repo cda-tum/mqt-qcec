@@ -1,37 +1,57 @@
+# Copyright (c) 2023 - 2025 Chair for Design Automation, TUM
+# Copyright (c) 2025 Munich Quantum Software Company GmbH
+# All rights reserved.
+#
+# SPDX-License-Identifier: MIT
+#
+# Licensed under the MIT License
+
 """The main entry point for the QCEC package."""
 
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from mqt.core import load
+
+from .configuration import augment_config_from_kwargs
+from .parameterized import check_parameterized
+from .pyqcec import Configuration, EquivalenceCheckingManager
+
 if TYPE_CHECKING:
-    from qiskit import QuantumCircuit
+    import os
+
+    from qiskit.circuit import QuantumCircuit
+
+    from mqt.core.ir import QuantumComputation
 
     from ._compat.typing import Unpack
     from .configuration import ConfigurationOptions
 
-from . import Configuration, EquivalenceCheckingManager
-from .configuration import augment_config_from_kwargs
-from .parameterized import __is_parameterized, check_parameterized
+__all__ = ["verify"]
+
+
+def __dir__() -> list[str]:
+    return __all__
 
 
 def verify(
-    circ1: QuantumCircuit | str,
-    circ2: QuantumCircuit | str,
+    circ1: QuantumComputation | str | os.PathLike[str] | QuantumCircuit,
+    circ2: QuantumComputation | str | os.PathLike[str] | QuantumCircuit,
     configuration: Configuration | None = None,
     **kwargs: Unpack[ConfigurationOptions],
 ) -> EquivalenceCheckingManager.Results:
     """Verify that ``circ1`` and ``circ2`` are equivalent.
 
     Wraps creating an instance of :class:`EquivalenceCheckingManager <.EquivalenceCheckingManager>`,
-    calling :meth:`EquivalenceCheckingManager.run`,
-    and calling :meth:`EquivalenceCheckingManager.get_results`.
+    calling :meth:`.EquivalenceCheckingManager.run`,
+    and returning :attr:`.EquivalenceCheckingManager.results`.
 
     There are two (non-exclusive) ways of configuring the equivalence checking process:
 
-    1. Pass a :class:`Configuration <.Configuration>` instance as the ``configuration`` argument.
+    1. Pass a :class:`.Configuration` instance as the ``configuration`` argument.
 
-    2. Pass keyword arguments to this function. These are directly incorporated into the :class:`Configuration <.Configuration>`.
+    2. Pass keyword arguments to this function. These are directly incorporated into the :class:`.Configuration`.
     Any existing configuration is overridden by keyword arguments.
 
     Args:
@@ -49,14 +69,18 @@ def verify(
     # prepare the configuration
     augment_config_from_kwargs(configuration, kwargs)
 
-    if __is_parameterized(circ1) or __is_parameterized(circ2):
-        return check_parameterized(circ1, circ2, configuration)
+    # load the circuits
+    qc1 = load(circ1)
+    qc2 = load(circ2)
+
+    if not qc1.is_variable_free() or not qc2.is_variable_free():
+        return check_parameterized(qc1, qc2, configuration)
 
     # create the equivalence checker from configuration
-    ecm = EquivalenceCheckingManager(circ1, circ2, configuration)
+    ecm = EquivalenceCheckingManager(qc1, qc2, configuration)
 
     # execute the check
     ecm.run()
 
     # obtain the result
-    return ecm.get_results()
+    return ecm.results
