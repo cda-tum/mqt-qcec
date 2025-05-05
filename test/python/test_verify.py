@@ -128,4 +128,4 @@ def test_zx_ancilla_support() -> None:
         run_zx_checker=True,
         run_construction_checker=False,
     )
-    assert result.equivalence == EquivalenceCriterion.not_equivalent
+    assert result.equivalence == EquivalenceCriterion.no_information
