@@ -23,6 +23,11 @@ _If you are upgrading: please see [`UPGRADING.md`](UPGRADING.md#300)._
 - **Breaking**: ♻️ Reduce and restructure public interface of the `EquivalenceCheckingManager` ([#566]) ([**@burgholzer**])
 - **Breaking**: ⬆️ Bump minimum required CMake version to `3.24.0` ([#582]) ([**@burgholzer**])
 - 📝 Rework existing project documentation ([#566]) ([**@burgholzer**])
+- **Breaking**: ZX-calculus checker now reports that it can't handle circuits with non-garbage ancilla qubits ([#512]) ([**@pehamTom**])
+
+### Bug Fixes
+
+- Fixed bug in ZX-calculus checker for circuits without data qubits ([#512]) ([**@pehamTom**])
 
 ### Removed
 
