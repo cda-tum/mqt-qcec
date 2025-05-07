@@ -533,8 +533,8 @@ void EquivalenceCheckingManager::checkSequential() {
       }
     }
     if (ZXEquivalenceChecker::canHandle(qc1Cpy, qc2Cpy)) {
-      checkers.emplace_back(
-          std::make_unique<ZXEquivalenceChecker>(qc1Cpy, qc2Cpy, configuration));
+      checkers.emplace_back(std::make_unique<ZXEquivalenceChecker>(
+          qc1Cpy, qc2Cpy, configuration));
       const auto& zxChecker = checkers.back();
       if (!done) {
         const auto result = zxChecker->run();
