@@ -34,7 +34,6 @@ ZXEquivalenceChecker::ZXEquivalenceChecker(const qc::QuantumComputation& circ1,
     : EquivalenceChecker(circ1, circ2, std::move(config)),
       miter(zx::FunctionalityConstruction::buildFunctionality(qc1)),
       tolerance(configuration.functionality.traceThreshold) {
-
   zx::ZXDiagram dPrime = zx::FunctionalityConstruction::buildFunctionality(qc2);
 
   if ((qc1->getNancillae() != 0U) || (qc2->getNancillae() != 0U)) {
@@ -44,38 +43,30 @@ ZXEquivalenceChecker::ZXEquivalenceChecker(const qc::QuantumComputation& circ1,
   const auto& p1 = invertPermutations(*qc1);
   const auto& p2 = invertPermutations(*qc2);
 
-  const bool miterEmpty = qc1->getNqubits() - qc1->getNancillae() == 0;
-  const bool dPrimeEmpty = qc2->getNqubits() - qc2->getNancillae() == 0;
-
-  // fix ancillaries to |0>
-  const auto nQubitsWithoutAncillae =
-      static_cast<zx::Qubit>(qc1->getNqubitsWithoutAncillae());
-
   /*
    * The ZX diagram is built with the assumption that all ancillae are garbage.
    * Garbage ancillae are initialized and post-selected to |0>.
    * Consequently, if there are no data qubits, the ZX-diagram is equivalent to the empty diagram.
    */
-  if (miterEmpty) {
+  if (qc1->getNqubitsWithoutAncillae() == 0) {
     this->miter = zx::ZXDiagram();
   } else {
-    for (zx::Qubit i = 0;
-         i < static_cast<zx::Qubit>(qc1->getNqubits()) - nQubitsWithoutAncillae;
+    const auto numQubits1 = static_cast<zx::Qubit>(qc1->getNqubits());
+    for (zx::Qubit i = 0; i < static_cast<zx::Qubit>(qc1->getNancillae());
          ++i) {
-      zx::Qubit const anc = static_cast<zx::Qubit>(qc1->getNqubits()) - i - 1;
+      const auto anc = numQubits1 - i - 1;
       miter.makeAncilla(
           anc, static_cast<zx::Qubit>(p1.at(static_cast<qc::Qubit>(anc))));
     }
     miter.invert();
   }
 
-  if (dPrimeEmpty) {
+  if (qc2->getNqubitsWithoutAncillae() == 0) {
     return;
   }
-  for (zx::Qubit i = 0;
-       i < static_cast<zx::Qubit>(qc2->getNqubits()) - nQubitsWithoutAncillae;
-       ++i) {
-    zx::Qubit const anc = static_cast<zx::Qubit>(qc2->getNqubits()) - i - 1;
+  const auto numQubits2 = static_cast<zx::Qubit>(qc2->getNqubits());
+  for (zx::Qubit i = 0; i < static_cast<zx::Qubit>(qc2->getNancillae()); ++i) {
+    const auto anc = numQubits2 - i - 1;
     dPrime.makeAncilla(
         anc, static_cast<zx::Qubit>(p2.at(static_cast<qc::Qubit>(anc))));
   }
@@ -86,9 +77,11 @@ EquivalenceCriterion ZXEquivalenceChecker::run() {
   const auto start = std::chrono::steady_clock::now();
   if (miter.getNQubits() == 0) {
     if (miter.globalPhaseIsZero()) {
-      return EquivalenceCriterion::Equivalent;
+      equivalence = EquivalenceCriterion::Equivalent;
+    } else {
+      equivalence = EquivalenceCriterion::EquivalentUpToGlobalPhase;
     }
-    return EquivalenceCriterion::EquivalentUpToGlobalPhase;
+    return equivalence;
   }
   fullReduceApproximate();
 
@@ -290,7 +283,6 @@ bool ZXEquivalenceChecker::cliffordSimp() {
 bool ZXEquivalenceChecker::canHandle(const qc::QuantumComputation& qc1,
                                      const qc::QuantumComputation& qc2) {
   // no non-garbage ancillas allowed
-
   if (qc1.getNancillae() - qc1.getNgarbageQubits() != 0U ||
       qc2.getNancillae() - qc2.getNgarbageQubits() != 0U) {
     return false;

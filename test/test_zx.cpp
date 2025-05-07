@@ -21,7 +21,6 @@
 #include <gtest/gtest.h>
 #include <iostream>
 #include <memory>
-#include <ostream>
 #include <sstream>
 #include <string>
 
