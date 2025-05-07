@@ -193,6 +193,7 @@ PYBIND11_MODULE(pyqcec, m, py::mod_gil_not_used()) {
   py::class_<Configuration::Simulation> simulation(configuration, "Simulation");
   py::class_<Configuration::Parameterized> parameterized(configuration,
                                                          "Parameterized");
+  py::class_<Configuration::ZX> zx(configuration, "ZX");
 
   // Configuration
   configuration.def(py::init<>())
@@ -271,4 +272,7 @@ PYBIND11_MODULE(pyqcec, m, py::mod_gil_not_used()) {
       .def_readwrite("additional_instantiations",
                      &Configuration::Parameterized::nAdditionalInstantiations);
 }
+  zx.def(py::init<>())
+  .def_readwrite("set_all_ancillas_garbage",
+                 &Configuration::ZX::setAllAncillasGarbage);
 } // namespace ec

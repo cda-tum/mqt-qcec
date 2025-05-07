@@ -192,7 +192,8 @@ TEST_F(ZXTest, Ancilla) {
   qc1.i(0);
   qc2.cx(1, 0);
   qc2.setLogicalQubitAncillary(1);
-  qc2.setLogicalQubitGarbage(1);
+
+  config.zx.setAllAncillasGarbage = true;
 
   ecm = std::make_unique<ec::EquivalenceCheckingManager>(qc1, qc2, config);
   ecm->run();
@@ -211,6 +212,8 @@ TEST_F(ZXTest, ZXWrongAncilla) {
   qc2.cx(1_nc, 0);
   qc2.setLogicalQubitAncillary(1);
 
+  config.zx.setAllAncillasGarbage = true;
+    
   ecm = std::make_unique<ec::EquivalenceCheckingManager>(qc1, qc2, config);
   ecm->run();
 

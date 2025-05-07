@@ -518,9 +518,23 @@ void EquivalenceCheckingManager::checkSequential() {
   }
 
   if (configuration.execution.runZXChecker && !done) {
-    if (ZXEquivalenceChecker::canHandle(qc1, qc2)) {
+    qc::QuantumComputation qc1Cpy{qc1};
+    qc::QuantumComputation qc2Cpy{qc2};
+    if (configuration.zx.setAllAncillasGarbage) {
+      for (qc::Qubit q = 0; q < qc1Cpy.getNqubits(); ++q) {
+        if (qc1Cpy.logicalQubitIsAncillary(q)) {
+          qc1Cpy.setLogicalQubitGarbage(q);
+        }
+      }
+      for (qc::Qubit q = 0; q < qc2Cpy.getNqubits(); ++q) {
+        if (qc2Cpy.logicalQubitIsAncillary(q)) {
+          qc2Cpy.setLogicalQubitGarbage(q);
+        }
+      }
+    }
+    if (ZXEquivalenceChecker::canHandle(qc1Cpy, qc2Cpy)) {
       checkers.emplace_back(
-          std::make_unique<ZXEquivalenceChecker>(qc1, qc2, configuration));
+          std::make_unique<ZXEquivalenceChecker>(qc1Cpy, qc2Cpy, configuration));
       const auto& zxChecker = checkers.back();
       if (!done) {
         const auto result = zxChecker->run();
