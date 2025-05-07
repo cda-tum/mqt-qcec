@@ -271,8 +271,9 @@ PYBIND11_MODULE(pyqcec, m, py::mod_gil_not_used()) {
                      &Configuration::Parameterized::parameterizedTol)
       .def_readwrite("additional_instantiations",
                      &Configuration::Parameterized::nAdditionalInstantiations);
-}
   zx.def(py::init<>())
-  .def_readwrite("set_all_ancillas_garbage",
-                 &Configuration::ZX::setAllAncillasGarbage);
+    .def_readwrite("set_all_ancillas_garbage",
+                   &Configuration::ZX::setAllAncillasGarbage);
+  }
+  
 } // namespace ec
