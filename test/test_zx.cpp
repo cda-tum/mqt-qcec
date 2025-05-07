@@ -212,7 +212,7 @@ TEST_F(ZXTest, ZXWrongAncilla) {
   qc2.setLogicalQubitAncillary(1);
 
   config.zx.setAllAncillasGarbage = true;
-    
+
   ecm = std::make_unique<ec::EquivalenceCheckingManager>(qc1, qc2, config);
   ecm->run();
 
