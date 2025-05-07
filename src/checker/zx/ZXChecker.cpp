@@ -46,13 +46,18 @@ ZXEquivalenceChecker::ZXEquivalenceChecker(const qc::QuantumComputation& circ1,
 
   const bool miterEmpty = qc1->getNqubits() - qc1->getNancillae() == 0;
   const bool dPrimeEmpty = qc2->getNqubits() - qc2->getNancillae() == 0;
+
   // fix ancillaries to |0>
   const auto nQubitsWithoutAncillae =
       static_cast<zx::Qubit>(qc1->getNqubitsWithoutAncillae());
 
+  /*
+   * The ZX diagram is built with the assumption that all ancillae are garbage.
+   * Garbage ancillae are initialized and post-selected to |0>.
+   * Consequently, if there are no data qubits, the ZX-diagram is equivalent to the empty diagram.
+   */
   if (miterEmpty) {
     this->miter = zx::ZXDiagram();
-
   } else {
     for (zx::Qubit i = 0;
          i < static_cast<zx::Qubit>(qc1->getNqubits()) - nQubitsWithoutAncillae;
