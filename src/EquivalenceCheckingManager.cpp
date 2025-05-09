@@ -379,7 +379,7 @@ EquivalenceCheckingManager::EquivalenceCheckingManager(
                  "inputs! Proceed with caution!\n";
   }
 
-  if (config.execution.setAllAncillaeGarbage) {
+  if (configuration.execution.setAllAncillaeGarbage) {
     for (qc::Qubit q = 0; q < qc1.getNqubits(); ++q) {
         if (qc1.logicalQubitIsAncillary(q)) {
           qc1.setLogicalQubitGarbage(q);
