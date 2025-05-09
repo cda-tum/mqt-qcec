@@ -44,8 +44,8 @@ ZXEquivalenceChecker::ZXEquivalenceChecker(const qc::QuantumComputation& circ1,
   const auto& p2 = invertPermutations(*qc2);
 
   /*
-   * The ZX diagram is built with the assumption that all ancillae are garbage.
-   * Garbage ancillae are initialized and post-selected to |0>.
+   * The ZX diagram is built with the assumption that all ancilla qubits are garbage.
+   * Garbage ancilla qubits are initialized and post-selected to |0>.
    * Consequently, if there are no data qubits, the ZX-diagram is equivalent to
    * the empty diagram.
    */
