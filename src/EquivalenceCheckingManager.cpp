@@ -379,6 +379,19 @@ EquivalenceCheckingManager::EquivalenceCheckingManager(
                  "inputs! Proceed with caution!\n";
   }
 
+  if (config.execution.setAllAncillaeGarbage) {
+    for (qc::Qubit q = 0; q < qc1.getNqubits(); ++q) {
+        if (qc1.logicalQubitIsAncillary(q)) {
+          qc1.setLogicalQubitGarbage(q);
+        }
+      }
+      for (qc::Qubit q = 0; q < qc2.getNqubits(); ++q) {
+        if (qc2.logicalQubitIsAncillary(q)) {
+          qc2.setLogicalQubitGarbage(q);
+        }
+      }
+  }
+
   // check whether the alternating checker is configured and can handle the
   // circuits
   if (configuration.execution.runAlternatingChecker &&
@@ -518,23 +531,9 @@ void EquivalenceCheckingManager::checkSequential() {
   }
 
   if (configuration.execution.runZXChecker && !done) {
-    qc::QuantumComputation qc1Cpy{qc1};
-    qc::QuantumComputation qc2Cpy{qc2};
-    if (configuration.zx.setAllAncillasGarbage) {
-      for (qc::Qubit q = 0; q < qc1Cpy.getNqubits(); ++q) {
-        if (qc1Cpy.logicalQubitIsAncillary(q)) {
-          qc1Cpy.setLogicalQubitGarbage(q);
-        }
-      }
-      for (qc::Qubit q = 0; q < qc2Cpy.getNqubits(); ++q) {
-        if (qc2Cpy.logicalQubitIsAncillary(q)) {
-          qc2Cpy.setLogicalQubitGarbage(q);
-        }
-      }
-    }
-    if (ZXEquivalenceChecker::canHandle(qc1Cpy, qc2Cpy)) {
+    if (ZXEquivalenceChecker::canHandle(qc1, qc2)) {
       checkers.emplace_back(std::make_unique<ZXEquivalenceChecker>(
-          qc1Cpy, qc2Cpy, configuration));
+          qc1, qc2, configuration));
       const auto& zxChecker = checkers.back();
       if (!done) {
         const auto result = zxChecker->run();
