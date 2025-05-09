@@ -381,15 +381,15 @@ EquivalenceCheckingManager::EquivalenceCheckingManager(
 
   if (configuration.execution.setAllAncillaeGarbage) {
     for (qc::Qubit q = 0; q < qc1.getNqubits(); ++q) {
-        if (qc1.logicalQubitIsAncillary(q)) {
-          qc1.setLogicalQubitGarbage(q);
-        }
+      if (qc1.logicalQubitIsAncillary(q)) {
+        qc1.setLogicalQubitGarbage(q);
       }
-      for (qc::Qubit q = 0; q < qc2.getNqubits(); ++q) {
-        if (qc2.logicalQubitIsAncillary(q)) {
-          qc2.setLogicalQubitGarbage(q);
-        }
+    }
+    for (qc::Qubit q = 0; q < qc2.getNqubits(); ++q) {
+      if (qc2.logicalQubitIsAncillary(q)) {
+        qc2.setLogicalQubitGarbage(q);
       }
+    }
   }
 
   // check whether the alternating checker is configured and can handle the
@@ -532,8 +532,8 @@ void EquivalenceCheckingManager::checkSequential() {
 
   if (configuration.execution.runZXChecker && !done) {
     if (ZXEquivalenceChecker::canHandle(qc1, qc2)) {
-      checkers.emplace_back(std::make_unique<ZXEquivalenceChecker>(
-          qc1, qc2, configuration));
+      checkers.emplace_back(
+          std::make_unique<ZXEquivalenceChecker>(qc1, qc2, configuration));
       const auto& zxChecker = checkers.back();
       if (!done) {
         const auto result = zxChecker->run();

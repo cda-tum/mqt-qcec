@@ -8,6 +8,7 @@ This project adheres to [Semantic Versioning], with the exception that minor rel
 ## [Unreleased]
 
 ### Changed
+
 - **Breaking**: ZX-calculus checker now reports that it can't handle circuits with non-garbage ancilla qubits ([#512]) ([**@pehamTom**])
 
 ### Fixed
