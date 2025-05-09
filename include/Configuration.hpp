@@ -39,6 +39,7 @@ public:
     bool runSimulationChecker = true;
     bool runAlternatingChecker = true;
     bool runZXChecker = true;
+    bool setAllAncillaeGarbage = false;
   };
 
   // configuration options for pre-check optimizations
@@ -101,17 +102,12 @@ public:
     std::size_t nAdditionalInstantiations = 0;
   };
 
-  struct ZX {
-    bool setAllAncillasGarbage = false;
-  };
-
   Execution execution{};
   Optimizations optimizations{};
   Application application{};
   Functionality functionality{};
   Simulation simulation{};
   Parameterized parameterized{};
-  ZX zx{};
 
   [[nodiscard]] bool anythingToExecute() const noexcept;
 
