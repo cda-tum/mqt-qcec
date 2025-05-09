@@ -275,5 +275,4 @@ PYBIND11_MODULE(pyqcec, m, py::mod_gil_not_used()) {
       .def_readwrite("set_all_ancillas_garbage",
                      &Configuration::ZX::setAllAncillasGarbage);
 }
-
 } // namespace ec
