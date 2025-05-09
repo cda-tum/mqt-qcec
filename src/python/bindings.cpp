@@ -274,5 +274,4 @@ PYBIND11_MODULE(pyqcec, m, py::mod_gil_not_used()) {
       .def_readwrite("additional_instantiations",
                      &Configuration::Parameterized::nAdditionalInstantiations);
 }
-
 } // namespace ec
