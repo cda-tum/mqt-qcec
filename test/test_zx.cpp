@@ -436,7 +436,8 @@ TEST_F(ZXTest, EmptyCircuitWithAncillas) {
   config.execution.setAllAncillaeGarbage = true;
   ecm = std::make_unique<ec::EquivalenceCheckingManager>(qc1, qc2, config);
   ecm->run();
-  EXPECT_EQ(ecm->getResults().equivalence, ec::EquivalenceCriterion::Equivalent);
+  EXPECT_EQ(ecm->getResults().equivalence,
+            ec::EquivalenceCriterion::Equivalent);
 }
 
 TEST_F(ZXTest, EmptyCircuitWithAncillasAndGarbage) {
