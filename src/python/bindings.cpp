@@ -219,7 +219,9 @@ PYBIND11_MODULE(pyqcec, m, py::mod_gil_not_used()) {
                      &Configuration::Execution::runAlternatingChecker)
       .def_readwrite("run_zx_checker", &Configuration::Execution::runZXChecker)
       .def_readwrite("numerical_tolerance",
-                     &Configuration::Execution::numericalTolerance);
+                     &Configuration::Execution::numericalTolerance)
+      .def_readwrite("set_all_ancillae_garbage",
+                     &Configuration::Execution::setAllAncillaeGarbage);
 
   // optimization options
   optimizations.def(py::init<>())
@@ -271,9 +273,6 @@ PYBIND11_MODULE(pyqcec, m, py::mod_gil_not_used()) {
                      &Configuration::Parameterized::parameterizedTol)
       .def_readwrite("additional_instantiations",
                      &Configuration::Parameterized::nAdditionalInstantiations);
-  zx.def(py::init<>())
-      .def_readwrite("set_all_ancillas_garbage",
-                     &Configuration::ZX::setAllAncillasGarbage);
 }
 
 } // namespace ec
