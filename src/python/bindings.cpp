@@ -193,7 +193,6 @@ PYBIND11_MODULE(pyqcec, m, py::mod_gil_not_used()) {
   py::class_<Configuration::Simulation> simulation(configuration, "Simulation");
   py::class_<Configuration::Parameterized> parameterized(configuration,
                                                          "Parameterized");
-  py::class_<Configuration::ZX> zx(configuration, "ZX");
 
   // Configuration
   configuration.def(py::init<>())
