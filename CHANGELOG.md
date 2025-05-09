@@ -7,6 +7,13 @@ This project adheres to [Semantic Versioning], with the exception that minor rel
 
 ## [Unreleased]
 
+### Changed
+- **Breaking**: ZX-calculus checker now reports that it can't handle circuits with non-garbage ancilla qubits ([#512]) ([**@pehamTom**])
+
+### Fixed
+
+- Fixed bug in ZX-calculus checker for circuits without data qubits ([#512]) ([**@pehamTom**])
+
 ## [3.0.0] - 2025-05-05
 
 _If you are upgrading: please see [`UPGRADING.md`](UPGRADING.md#300)._
@@ -23,11 +30,6 @@ _If you are upgrading: please see [`UPGRADING.md`](UPGRADING.md#300)._
 - **Breaking**: ♻️ Reduce and restructure public interface of the `EquivalenceCheckingManager` ([#566]) ([**@burgholzer**])
 - **Breaking**: ⬆️ Bump minimum required CMake version to `3.24.0` ([#582]) ([**@burgholzer**])
 - 📝 Rework existing project documentation ([#566]) ([**@burgholzer**])
-- **Breaking**: ZX-calculus checker now reports that it can't handle circuits with non-garbage ancilla qubits ([#512]) ([**@pehamTom**])
-
-### Bug Fixes
-
-- Fixed bug in ZX-calculus checker for circuits without data qubits ([#512]) ([**@pehamTom**])
 
 ### Removed
 
