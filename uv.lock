@@ -1553,8 +1553,8 @@ wheels = [
 
 [[package]]
 name = "mqt-core"
-version = "3.11.1.dev11+g0bee0d165"
-source = { git = "https://github.com/munich-quantum-toolkit/core.git?rev=0bee0d1659e07e4d0d8c43edfdcb35f6e08dc798#0bee0d1659e07e4d0d8c43edfdcb35f6e08dc798" }
+version = "3.11.1.dev12+g4e28fd8b8"
+source = { git = "https://github.com/munich-quantum-toolkit/core.git?rev=4e28fd8b855fc743170c8acdd8f4d06c72021ea5#4e28fd8b855fc743170c8acdd8f4d06c72021ea5" }
 dependencies = [
     { name = "nanobind-backend" },
 ]
@@ -1619,7 +1619,7 @@ test = [
 
 [package.metadata]
 requires-dist = [
-    { name = "mqt-core", git = "https://github.com/munich-quantum-toolkit/core.git?rev=0bee0d1659e07e4d0d8c43edfdcb35f6e08dc798" },
+    { name = "mqt-core", git = "https://github.com/munich-quantum-toolkit/core.git?rev=4e28fd8b855fc743170c8acdd8f4d06c72021ea5" },
     { name = "nanobind-backend", specifier = ">=1" },
     { name = "numpy", specifier = ">=1.24" },
     { name = "numpy", marker = "python_full_version >= '3.12'", specifier = ">=1.26" },
@@ -1633,14 +1633,14 @@ provides-extras = ["qiskit"]
 [package.metadata.requires-dev]
 build = [
     { name = "cmake", specifier = ">=4.4.1" },
-    { name = "mqt-core", git = "https://github.com/munich-quantum-toolkit/core.git?rev=0bee0d1659e07e4d0d8c43edfdcb35f6e08dc798" },
+    { name = "mqt-core", git = "https://github.com/munich-quantum-toolkit/core.git?rev=4e28fd8b855fc743170c8acdd8f4d06c72021ea5" },
     { name = "nanobind", specifier = "~=3.1.0" },
     { name = "scikit-build-core", specifier = ">=1.1" },
     { name = "vcs-versioning", specifier = ">=2.3" },
 ]
 dev = [
     { name = "cmake", specifier = ">=4.4.1" },
-    { name = "mqt-core", git = "https://github.com/munich-quantum-toolkit/core.git?rev=0bee0d1659e07e4d0d8c43edfdcb35f6e08dc798" },
+    { name = "mqt-core", git = "https://github.com/munich-quantum-toolkit/core.git?rev=4e28fd8b855fc743170c8acdd8f4d06c72021ea5" },
     { name = "nanobind", specifier = "~=3.1.0" },
     { name = "nox", specifier = ">=2025.11.12" },
     { name = "pytest", specifier = ">=9.0.3" },

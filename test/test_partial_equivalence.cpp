@@ -413,6 +413,45 @@ TEST(PartialEquivalenceGenerator, ReproducibleAndIndependentSeeds) {
             expected);
 }
 
+TEST_F(PartialEquivalenceTest, PreservesInputCoherence) {
+  config.optimizations.fuseSingleQubitGates = false;
+  for (const auto alternating : {false, true}) {
+    config.execution.runAlternatingChecker = alternating;
+    config.execution.runConstructionChecker = !alternating;
+    qc1 = qc::QuantumComputation(1);
+    qc2 = qc::QuantumComputation(1);
+    qc1.h(0);
+    qc2.z(0);
+    qc2.h(0);
+    // The input |+> produces opposite deterministic measurement outcomes.
+    ec::EquivalenceCheckingManager ecm(qc1, qc2, config);
+    ecm.run();
+    EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::NotEquivalent);
+  }
+}
+
+TEST_F(PartialEquivalenceTest, IgnoresOnlyCommonGarbage) {
+  config.optimizations.fuseSingleQubitGates = false;
+  for (const auto alternating : {false, true}) {
+    config.execution.runAlternatingChecker = alternating;
+    config.execution.runConstructionChecker = !alternating;
+    for (const auto common : {false, true}) {
+      qc1 = qc::QuantumComputation(2);
+      qc1.h(0);
+      qc1.h(1);
+      qc2 = qc1;
+      qc2.x(1);
+      qc1.setLogicalQubitGarbage(1);
+      if (common) {
+        qc2.setLogicalQubitGarbage(1);
+      }
+      ec::EquivalenceCheckingManager ecm(qc1, qc2, config);
+      ecm.run();
+      EXPECT_EQ(ecm.getResults().consideredEquivalent(), common);
+    }
+  }
+}
+
 TEST_F(PartialEquivalenceTest, SmallMeasuredRotation) {
   config.optimizations.fuseSingleQubitGates = false;
   for (const auto alternating : {false, true}) {
@@ -799,8 +838,7 @@ TEST_F(PartialEquivalenceTest, MQTBenchGrover3Qubits) {
   config.execution.runAlternatingChecker = true;
   ec::EquivalenceCheckingManager ecm2(c1, c2, config);
   ecm2.run();
-  EXPECT_EQ(ecm2.equivalence(),
-            ec::EquivalenceCriterion::EquivalentUpToGlobalPhase);
+  EXPECT_EQ(ecm2.equivalence(), ec::EquivalenceCriterion::Equivalent);
 }
 
 TEST_F(PartialEquivalenceTest, MQTBenchGrover7Qubits) {

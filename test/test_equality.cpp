@@ -14,6 +14,7 @@
 #include "checker/dd/applicationscheme/ApplicationScheme.hpp"
 #include "dd/DDDefinitions.hpp"
 #include "dd/Node.hpp"
+#include "ir/Definitions.hpp"
 #include "ir/QuantumComputation.hpp"
 #include "ir/operations/Control.hpp"
 
@@ -110,6 +111,47 @@ TEST_F(EqualityTest, RotationTolerance) {
           EXPECT_EQ(ecm.getResults().consideredEquivalent(), angle < threshold);
         }
       }
+    }
+  }
+}
+
+TEST_F(EqualityTest, PairwiseRotationTolerance) {
+  config.optimizations.fuseSingleQubitGates = false;
+  constexpr auto threshold = 1e-8;
+  config.functionality.traceThreshold = threshold;
+  for (const auto alternating : {false, true}) {
+    config.execution.runAlternatingChecker = alternating;
+    config.execution.runConstructionChecker = !alternating;
+    qc1 = qc::QuantumComputation(1);
+    qc2 = qc::QuantumComputation(1);
+    qc1.rx(1.5 * threshold, 0);
+    qc2.rx(-1.5 * threshold, 0);
+    ec::EquivalenceCheckingManager ecm(qc1, qc2, config);
+    ecm.run();
+    EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::NotEquivalent);
+  }
+}
+
+TEST_F(EqualityTest, AccumulatedSmallRotations) {
+  config.optimizations.fuseSingleQubitGates = false;
+  config.functionality.traceThreshold = 1e-8;
+  for (const auto partial : {false, true}) {
+    config.functionality.checkPartialEquivalence = partial;
+    for (const auto alternating : {false, true}) {
+      config.execution.runAlternatingChecker = alternating;
+      config.execution.runConstructionChecker = !alternating;
+      qc1 = qc::QuantumComputation(64);
+      for (qc::Qubit q = 0; q < 64; ++q) {
+        qc1.h(q);
+        qc1.h(q);
+      }
+      qc2 = qc1;
+      for (qc::Qubit q = 0; q < 64; ++q) {
+        qc2.rx(1e-8, q);
+      }
+      ec::EquivalenceCheckingManager ecm(qc1, qc2, config);
+      ecm.run();
+      EXPECT_EQ(ecm.equivalence(), ec::EquivalenceCriterion::NotEquivalent);
     }
   }
 }

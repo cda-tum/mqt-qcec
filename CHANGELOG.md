@@ -12,8 +12,9 @@ releases may include breaking changes.
 
 ### Fixed
 
-- 🐛 Use complex distance from zero or one for DD identity checks, including
-  ancillary diagonals ([#1135]) ([**@burgholzer**])
+- 🐛 Use normalized Frobenius comparisons for full and partial DD equivalence
+  without ancillas, preserving input coherences and bounding accumulated error
+  ([#1135]) ([**@burgholzer**])
 
 ## [3.11.0] - 2026-10-09
 
