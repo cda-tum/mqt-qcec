@@ -37,7 +37,7 @@ set(MQT_CORE_MINIMUM_VERSION 3.11.1
     CACHE STRING "MQT Core minimum version")
 set(MQT_CORE_VERSION 3.11.1
     CACHE STRING "MQT Core version")
-set(MQT_CORE_REV "4e28fd8b855fc743170c8acdd8f4d06c72021ea5"
+set(MQT_CORE_REV "1da3d05e3aa25cd4301a8b4a243949cff49edb0f"
     CACHE STRING "MQT Core identifier (tag, branch or commit hash)")
 set(MQT_CORE_REPO_OWNER "munich-quantum-toolkit"
 	  CACHE STRING "MQT Core repository owner (change when using a fork)")
