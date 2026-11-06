@@ -413,6 +413,30 @@ TEST(PartialEquivalenceGenerator, ReproducibleAndIndependentSeeds) {
             expected);
 }
 
+TEST_F(PartialEquivalenceTest, SmallMeasuredRotation) {
+  config.optimizations.fuseSingleQubitGates = false;
+  for (const auto alternating : {false, true}) {
+    SCOPED_TRACE(alternating);
+    config.execution.runAlternatingChecker = alternating;
+    config.execution.runConstructionChecker = !alternating;
+    qc1 = qc::QuantumComputation(2);
+    qc1.h(0);
+    qc1.h(0);
+    qc1.h(1);
+    qc2 = qc1;
+    qc2.rx(1e-4, 0);
+    ec::EquivalenceCheckingManager different(qc1, qc2, config);
+    different.run();
+    EXPECT_EQ(different.equivalence(), ec::EquivalenceCriterion::NotEquivalent);
+
+    qc1.setLogicalQubitGarbage(0);
+    qc2.setLogicalQubitGarbage(0);
+    ec::EquivalenceCheckingManager garbage(qc1, qc2, config);
+    garbage.run();
+    EXPECT_TRUE(garbage.getResults().consideredEquivalent());
+  }
+}
+
 TEST_F(PartialEquivalenceTest, AlternatingCheckerGarbage) {
   // these circuits have the same gates acting on the measured qubit
   // and random gates acting on the two garbage qubits

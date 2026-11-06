@@ -10,6 +10,12 @@ releases may include breaking changes.
 
 ## [Unreleased]
 
+### Fixed
+
+- 🐛 Apply DD identity tolerances to amplitudes so small off-diagonal rotations
+  are rejected consistently with diagonal rotations ([#1135])
+  ([**@burgholzer**])
+
 ## [3.11.0] - 2026-10-09
 
 _If you are upgrading: please see [`UPGRADING.md`](UPGRADING.md#3110)._
@@ -426,3 +432,5 @@ _📚 Refer to the [GitHub Release Notes] for previous changelogs._
 [munich-quantum-toolkit]: https://github.com/munich-quantum-toolkit
 [CMake presets]: https://cmake.org/cmake/help/latest/manual/cmake-presets.7.html
 [munich-quantum-toolkit/workflows]: https://github.com/munich-quantum-toolkit/workflows
+
+[#1135]: https://github.com/munich-quantum-toolkit/qcec/pull/1135

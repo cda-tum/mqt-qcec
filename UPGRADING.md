@@ -6,6 +6,15 @@ of changes including minor and patch releases, please refer to the
 
 ## [Unreleased]
 
+This release requires MQT Core 3.11.1 or newer with the DD identity tolerance
+fix.
+
+The DD checkers apply `trace_threshold` to off-diagonal amplitudes instead of
+squared amplitudes. Circuits with small differences previously accepted up to
+roughly `sqrt(trace_threshold)` can now return `not_equivalent`. Numerical
+roundoff below the threshold remains accepted. For deliberate approximation, use
+`check_approximate_equivalence` and `approximate_checking_threshold`.
+
 ## [3.11.0]
 
 This release updates the minimum required `mqt-core` version to 3.11.0. Rebuild

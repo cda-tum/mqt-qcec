@@ -30,6 +30,14 @@ If numerical error collapses a decision diagram to zero, its checker returns
 unitary circuits. Other enabled checkers can still provide a result; if none
 does, the overall result remains inconclusive.
 
+The DD checkers use `trace_threshold` (default `1e-8`) to allow numerical
+roundoff. It bounds the magnitude of normalized DD edge weights close to zero.
+For diagonal weights close to one, it bounds the squared-magnitude deviation
+from one and the phase angle in radians. This local tolerance does not define a
+basis-independent distance between circuits. Use
+[approximate equivalence checking](approximate_equivalence_checking.md) to allow
+a specified circuit-level approximation error.
+
 ## Construction Equivalence Checker (using Decision Diagrams)
 
 While the underlying matrices are exponentially large with respect to the number
