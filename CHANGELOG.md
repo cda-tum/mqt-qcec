@@ -12,9 +12,8 @@ releases may include breaking changes.
 
 ### Fixed
 
-- 🐛 Apply DD identity tolerances to amplitudes so small off-diagonal rotations
-  are rejected consistently with diagonal rotations ([#1135])
-  ([**@burgholzer**])
+- 🐛 Use complex distance from zero or one for DD identity checks, including
+  ancillary diagonals ([#1135]) ([**@burgholzer**])
 
 ## [3.11.0] - 2026-10-09
 

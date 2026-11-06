@@ -9,10 +9,12 @@ of changes including minor and patch releases, please refer to the
 This release requires MQT Core 3.11.1 or newer with the DD identity tolerance
 fix.
 
-The DD checkers apply `trace_threshold` to off-diagonal amplitudes instead of
-squared amplitudes. Circuits with small differences previously accepted up to
-roughly `sqrt(trace_threshold)` can now return `not_equivalent`. Numerical
-roundoff below the threshold remains accepted. For deliberate approximation, use
+The DD checkers apply `trace_threshold` to the complex distance of normalized DD
+edge weights from zero or one. Circuits with small off-diagonal differences
+previously accepted up to roughly `sqrt(trace_threshold)` can now return
+`not_equivalent`. Near one, radial errors may now pass while combined radial and
+phase errors may now fail. Numerical roundoff within the local distance bound
+remains accepted. For deliberate approximation, use
 `check_approximate_equivalence` and `approximate_checking_threshold`.
 
 ## [3.11.0]
