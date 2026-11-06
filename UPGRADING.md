@@ -6,25 +6,6 @@ of changes including minor and patch releases, please refer to the
 
 ## [Unreleased]
 
-This release requires MQT Core 3.11.1 or newer with DD matrix comparisons.
-
-For circuits without ancillary inputs, the DD checkers apply `trace_threshold`
-to a Frobenius distance divided by the square root of the matrix dimension. Full
-equivalence compares the relative unitary with identity, allowing one global
-phase. Partial equivalence measures the weight outside measured-output diagonal
-blocks and preserves interference between arbitrary input states.
-
-Reassess custom thresholds: local errors can accumulate, while normalization can
-dilute errors confined to small input subspaces. Partial checks without ancillas
-report `equivalent` when measurement probabilities match, including cases that
-previously reported `equivalent_up_to_global_phase`.
-
-Ancillary checks retain structural edge comparisons with complex-distance
-bounds. These do not provide a matrix-norm guarantee. For deliberate
-approximation, use `check_approximate_equivalence` and
-`approximate_checking_threshold`, whose projective Hilbert--Schmidt contract is
-separate from the numerical tolerance.
-
 ## [3.11.0]
 
 This release updates the minimum required `mqt-core` version to 3.11.0. Rebuild
