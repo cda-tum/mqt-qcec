@@ -9,7 +9,7 @@
 [build-system]
 build-backend = "scikit_build_core.build"
 requires = [
-  "mqt-core~=3.11.0",
+  "mqt-core @ git+https://github.com/munich-quantum-toolkit/core.git@1da3d05e3aa25cd4301a8b4a243949cff49edb0f",
   "nanobind~=3.1.0",
   "scikit-build-core>=1.1",
   "vcs-versioning>=2.3",
@@ -47,7 +47,7 @@ classifiers = [
 ]
 dynamic = [ "import-names", "import-namespaces", "version" ]
 dependencies = [
-  "mqt-core~=3.11.0",
+  "mqt-core @ git+https://github.com/munich-quantum-toolkit/core.git@1da3d05e3aa25cd4301a8b4a243949cff49edb0f",
   "nanobind-backend>=1",
   "numpy>=1.24",
   "numpy>=1.26; python_version>='3.12'",
@@ -101,7 +101,7 @@ docs = [
 ]
 build = [
   "cmake>=4.4.1",
-  "mqt-core~=3.11.0",
+  "mqt-core @ git+https://github.com/munich-quantum-toolkit/core.git@1da3d05e3aa25cd4301a8b4a243949cff49edb0f",
   "nanobind~=3.1.0",
   "scikit-build-core>=1.1",
   "vcs-versioning>=2.3",

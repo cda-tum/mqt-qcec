@@ -10,6 +10,12 @@ releases may include breaking changes.
 
 ## [Unreleased]
 
+### Fixed
+
+- 🐛 Use normalized Frobenius comparisons for full and partial DD equivalence
+  without ancillas, preserving input coherences and bounding accumulated error
+  ([#1135]) ([**@burgholzer**])
+
 ## [3.11.0] - 2026-10-09
 
 _If you are upgrading: please see [`UPGRADING.md`](UPGRADING.md#3110)._
@@ -355,6 +361,7 @@ _📚 Refer to the [GitHub Release Notes] for previous changelogs._
 
 <!-- PR links -->
 
+[#1135]: https://github.com/munich-quantum-toolkit/qcec/pull/1135
 [#1109]: https://github.com/munich-quantum-toolkit/qcec/pull/1109
 [#1108]: https://github.com/munich-quantum-toolkit/qcec/pull/1108
 [#1107]: https://github.com/munich-quantum-toolkit/qcec/pull/1107
